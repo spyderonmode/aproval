@@ -32,6 +32,8 @@ export function GameBoard({ game, onGameOver, gameMode, user }: GameBoardProps) 
     if (game) {
       console.log('🎮 Game prop changed:', game);
       console.log('📋 Setting board to:', game.board || {});
+      console.log('👤 Player X Info:', game.playerXInfo);
+      console.log('👤 Player O Info:', game.playerOInfo);
       setBoard(game.board || {});
       setCurrentPlayer(game.currentPlayer || 'X');
     }
@@ -204,8 +206,8 @@ export function GameBoard({ game, onGameOver, gameMode, user }: GameBoardProps) 
     
     if (checkWin(newBoard, currentPlayer)) {
       const winnerInfo = currentPlayer === 'X' 
-        ? (game?.playerXInfo?.displayName || game?.playerXInfo?.username || 'Player X')
-        : (game?.playerOInfo?.displayName || game?.playerOInfo?.username || (gameMode === 'ai' ? 'AI' : 'Player O'));
+        ? (game?.playerXInfo?.firstName || game?.playerXInfo?.displayName || game?.playerXInfo?.username || 'Player X')
+        : (game?.playerOInfo?.firstName || game?.playerOInfo?.displayName || game?.playerOInfo?.username || (gameMode === 'ai' ? 'AI' : 'Player O'));
       
       onGameOver({
         winner: currentPlayer,
@@ -478,9 +480,9 @@ export function GameBoard({ game, onGameOver, gameMode, user }: GameBoardProps) 
             <div className="flex items-center space-x-2">
               <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
               <div className="flex items-center space-x-2">
-                {game?.playerXInfo?.profilePicture ? (
+                {game?.playerXInfo?.profileImageUrl || game?.playerXInfo?.profilePicture ? (
                   <img 
-                    src={game.playerXInfo.profilePicture} 
+                    src={game.playerXInfo.profileImageUrl || game.playerXInfo.profilePicture} 
                     alt="Player X" 
                     className="w-6 h-6 rounded-full object-cover"
                   />
@@ -490,16 +492,16 @@ export function GameBoard({ game, onGameOver, gameMode, user }: GameBoardProps) 
                   </div>
                 )}
                 <span className="text-sm text-gray-300">
-                  {game?.playerXInfo?.displayName || game?.playerXInfo?.username || 'Player X'}
+                  {game?.playerXInfo?.firstName || game?.playerXInfo?.displayName || game?.playerXInfo?.username || 'Player X'}
                 </span>
               </div>
             </div>
             <div className="flex items-center space-x-2">
               <div className="w-3 h-3 bg-red-500 rounded-full"></div>
               <div className="flex items-center space-x-2">
-                {game?.playerOInfo?.profilePicture ? (
+                {game?.playerOInfo?.profileImageUrl || game?.playerOInfo?.profilePicture ? (
                   <img 
-                    src={game.playerOInfo.profilePicture} 
+                    src={game.playerOInfo.profileImageUrl || game.playerOInfo.profilePicture} 
                     alt="Player O" 
                     className="w-6 h-6 rounded-full object-cover"
                   />
@@ -509,7 +511,7 @@ export function GameBoard({ game, onGameOver, gameMode, user }: GameBoardProps) 
                   </div>
                 )}
                 <span className="text-sm text-gray-300">
-                  {game?.playerOInfo?.displayName || game?.playerOInfo?.username || (gameMode === 'ai' ? 'AI' : 'Player O')}
+                  {game?.playerOInfo?.firstName || game?.playerOInfo?.displayName || game?.playerOInfo?.username || (gameMode === 'ai' ? 'AI' : 'Player O')}
                 </span>
               </div>
             </div>
@@ -531,8 +533,8 @@ export function GameBoard({ game, onGameOver, gameMode, user }: GameBoardProps) 
             </div>
             <span className="text-lg font-medium">
               {currentPlayer === 'X' 
-                ? (game?.playerXInfo?.displayName || game?.playerXInfo?.username || 'Player X')
-                : (game?.playerOInfo?.displayName || game?.playerOInfo?.username || (gameMode === 'ai' ? 'AI' : 'Player O'))
+                ? (game?.playerXInfo?.firstName || game?.playerXInfo?.displayName || game?.playerXInfo?.username || 'Player X')
+                : (game?.playerOInfo?.firstName || game?.playerOInfo?.displayName || game?.playerOInfo?.username || (gameMode === 'ai' ? 'AI' : 'Player O'))
               }'s Turn
             </span>
           </div>

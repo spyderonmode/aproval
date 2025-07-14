@@ -44,14 +44,16 @@ export default function Home() {
           console.log('🎮 Processing game_started message:', lastMessage);
           console.log('🎮 Current room ID:', currentRoom?.id);
           console.log('🎮 Message room ID:', lastMessage.roomId);
+          console.log('🎮 Game data:', lastMessage.game);
           // Handle game start from WebSocket - ensure both players transition
           if (lastMessage.roomId === currentRoom?.id) {
             console.log('🎮 Setting current game from WebSocket:', lastMessage.game);
             setCurrentGame(lastMessage.game);
-            // Force a state update to ensure both players see the game
-            setTimeout(() => {
-              setCurrentGame(lastMessage.game);
-            }, 100);
+            // Also trigger a re-render to ensure the game board appears
+            setCurrentGame(prevGame => ({
+              ...lastMessage.game,
+              timestamp: Date.now() // Force re-render
+            }));
           }
           break;
         case 'game_over':
