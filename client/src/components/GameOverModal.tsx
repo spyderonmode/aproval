@@ -1,8 +1,7 @@
 import React from "react";
-// Removed Dialog import to fix white screen issue
-import { Button } from "@/components/ui/button";
 import { Home, User, RefreshCw } from "lucide-react";
 import { useAudio } from "@/hooks/useAudio";
+import { SimpleModal } from "./SimpleModal";
 
 interface GameOverModalProps {
   open: boolean;
@@ -29,58 +28,69 @@ export function GameOverModal({ open, onClose, result, onPlayAgain }: GameOverMo
     }
   }, [open, isDraw, playSound]);
 
-  if (!open) return null;
-  
   return (
-    <div 
-      className="fixed inset-0 z-50 flex items-center justify-center p-4" 
-      style={{ backgroundColor: 'rgba(0, 0, 0, 0.9)' }}
-      onClick={onClose}
-    >
-      <div 
-        className="relative w-full max-w-md p-6 rounded-lg shadow-lg" 
-        style={{ 
-          backgroundColor: '#1e293b', 
-          border: '2px solid #475569',
-          color: 'white'
-        }}
-        onClick={(e) => e.stopPropagation()}
-      >
-        <h2 className="text-2xl font-bold mb-6 text-center" style={{ color: 'white' }}>Game Over!</h2>
+    <SimpleModal open={open} onClose={onClose}>
+      <div style={{ color: 'white', textAlign: 'center' }}>
+        <h2 style={{ fontSize: '24px', fontWeight: 'bold', marginBottom: '24px', color: 'white' }}>
+          Game Over!
+        </h2>
         
-        <div className="mb-6">
+        <div style={{ marginBottom: '24px' }}>
           {isDraw ? (
-            <div className="text-center">
-              <div className="w-20 h-20 mx-auto mb-4 bg-yellow-500 rounded-full flex items-center justify-center">
-                <span className="text-3xl">🤝</span>
+            <div>
+              <div 
+                style={{
+                  width: '80px',
+                  height: '80px',
+                  margin: '0 auto 16px',
+                  backgroundColor: '#eab308',
+                  borderRadius: '50%',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center'
+                }}
+              >
+                <span style={{ fontSize: '32px' }}>🤝</span>
               </div>
-              <p className="text-xl text-gray-300">It's a Draw!</p>
+              <p style={{ fontSize: '20px', color: '#d1d5db' }}>It's a Draw!</p>
             </div>
           ) : (
-            <div className="text-center">
-              {/* Winner Profile Picture */}
-              <div className="w-16 h-16 mx-auto mb-4">
+            <div>
+              <div style={{ width: '64px', height: '64px', margin: '0 auto 16px' }}>
                 {winnerInfo?.profilePicture ? (
                   <img 
                     src={winnerInfo.profilePicture} 
                     alt="Winner" 
-                    className="w-16 h-16 rounded-full object-cover"
+                    style={{
+                      width: '64px',
+                      height: '64px',
+                      borderRadius: '50%',
+                      objectFit: 'cover'
+                    }}
                   />
                 ) : (
-                  <div className="w-16 h-16 bg-primary rounded-full flex items-center justify-center">
-                    <User className="w-8 h-8 text-white" />
+                  <div 
+                    style={{
+                      width: '64px',
+                      height: '64px',
+                      backgroundColor: '#3b82f6',
+                      borderRadius: '50%',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center'
+                    }}
+                  >
+                    <User style={{ width: '32px', height: '32px', color: 'white' }} />
                   </div>
                 )}
               </div>
               
-              {/* Winner Name */}
-              <p className="text-xl text-white mb-4">
+              <p style={{ fontSize: '20px', color: 'white', marginBottom: '16px' }}>
                 {winnerInfo?.displayName || winnerInfo?.firstName || winnerInfo?.username || `Player ${winnerSymbol}`} Wins!
               </p>
               
-              {/* Win condition */}
               {result.condition && result.condition !== 'draw' && (
-                <p className="text-sm text-gray-400">
+                <p style={{ fontSize: '14px', color: '#9ca3af' }}>
                   {result.condition === 'horizontal' ? 'Horizontal line' : 'Diagonal line'}
                 </p>
               )}
@@ -88,33 +98,43 @@ export function GameOverModal({ open, onClose, result, onPlayAgain }: GameOverMo
           )}
         </div>
         
-        <div className="flex justify-center space-x-3">
+        <div style={{ display: 'flex', justifyContent: 'center', gap: '12px' }}>
           <button
             onClick={onClose}
-            className="px-4 py-2 rounded-lg border border-slate-600 text-gray-300 hover:bg-slate-700"
-            style={{ 
-              backgroundColor: '#374151', 
+            style={{
+              padding: '8px 16px',
+              borderRadius: '8px',
+              backgroundColor: '#374151',
               color: 'white',
-              border: '1px solid #6b7280'
+              border: '1px solid #6b7280',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px'
             }}
           >
-            <Home className="w-4 h-4 mr-2 inline" />
+            <Home style={{ width: '16px', height: '16px' }} />
             Main Menu
           </button>
           <button
             onClick={onPlayAgain}
-            className="px-4 py-2 rounded-lg"
-            style={{ 
-              backgroundColor: '#3b82f6', 
+            style={{
+              padding: '8px 16px',
+              borderRadius: '8px',
+              backgroundColor: '#3b82f6',
               color: 'white',
-              border: '1px solid #2563eb'
+              border: '1px solid #2563eb',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px'
             }}
           >
-            <RefreshCw className="w-4 h-4 mr-2 inline" />
+            <RefreshCw style={{ width: '16px', height: '16px' }} />
             Play Again
           </button>
         </div>
       </div>
-    </div>
+    </SimpleModal>
   );
 }
