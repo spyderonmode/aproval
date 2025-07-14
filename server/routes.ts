@@ -241,7 +241,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
           playerOId: 'AI',
         };
       } else if (gameData.gameMode === 'online' && gameData.roomId) {
-        // Online mode: get room participants and assign as players
+        // Online mode: check if a game already exists for this room
+        const existingGame = await storage.getActiveGameByRoomId(gameData.roomId);
+        if (existingGame) {
+          console.log('🎮 Game already exists for room:', existingGame.id);
+          // Get player information for the existing game
+          const playerXInfo = await storage.getUser(existingGame.playerXId);
+          const playerOInfo = existingGame.playerOId && existingGame.playerOId !== 'AI' ? await storage.getUser(existingGame.playerOId) : null;
+          
+          const gameWithPlayers = {
+            ...existingGame,
+            playerXInfo,
+            playerOInfo: playerOInfo || { 
+              id: 'AI', 
+              firstName: 'AI', 
+              lastName: 'Player',
+              profileImageUrl: null 
+            }
+          };
+          
+          return res.json(gameWithPlayers);
+        }
+        
+        // Get room participants and assign as players
         const participants = await storage.getRoomParticipants(gameData.roomId);
         const players = participants.filter(p => p.role === 'player');
         
