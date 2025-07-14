@@ -44,54 +44,8 @@ export function GameBoard({ game, onGameOver, gameMode, user }: GameBoardProps) 
     }
   }, [game]);
 
-  // Handle WebSocket messages for online games
-  useEffect(() => {
-    if (gameMode === 'online' && lastMessage && game) {
-      console.log('🎮 Processing WebSocket message:', lastMessage.type);
-      switch (lastMessage.type) {
-        case 'move':
-          if (lastMessage.gameId === game.id) {
-            console.log('🎮 Received move WebSocket message:', lastMessage);
-            console.log('📋 Current board state:', board);
-            console.log('📋 New board state:', lastMessage.board);
-            console.log('📋 Position:', lastMessage.position);
-            console.log('📋 Current player:', lastMessage.currentPlayer);
-            
-            // Force state update immediately with proper synchronization
-            setBoard(lastMessage.board);
-            setCurrentPlayer(lastMessage.currentPlayer);
-            setLastMove(lastMessage.position);
-            playSound('move');
-            // Force query invalidation to ensure UI updates
-            queryClient.invalidateQueries({ queryKey: ['/api/games', game?.id] });
-          }
-          break;
-        case 'game_started':
-          console.log('🎮 GameBoard received game_started message:', lastMessage);
-          console.log('🎮 Game roomId:', game?.roomId);
-          console.log('🎮 Message roomId:', lastMessage.roomId);
-          if (lastMessage.roomId === game?.roomId || lastMessage.game?.id === game?.id) {
-            console.log('🎮 Game started WebSocket message:', lastMessage);
-            console.log('📋 Game started board:', lastMessage.game.board || {});
-            // Update the game with the new player information
-            setBoard(lastMessage.game.board || {});
-            setCurrentPlayer(lastMessage.game.currentPlayer || 'X');
-            // Force a re-render to ensure the board updates
-            queryClient.invalidateQueries({ queryKey: ['/api/games', game?.id] });
-          }
-          break;
-        case 'game_over':
-          if (lastMessage.gameId === game.id) {
-            onGameOver({
-              winner: lastMessage.winner,
-              condition: lastMessage.condition,
-              board: lastMessage.board
-            });
-          }
-          break;
-      }
-    }
-  }, [lastMessage, gameMode, game, onGameOver, playSound]);
+  // Remove WebSocket handling from GameBoard - it's now handled in Home component
+  // This prevents double handling and state conflicts
 
   // Debug effect to track board state changes
   useEffect(() => {
@@ -116,10 +70,9 @@ export function GameBoard({ game, onGameOver, gameMode, user }: GameBoardProps) 
     onSuccess: (data) => {
       console.log('🎯 Move mutation success:', data);
       if (game && game.id !== 'local-game') {
-        // For online games, don't update local state immediately
-        // Let the WebSocket message handle the update to ensure synchronization
-        console.log('✅ Move successful, waiting for WebSocket update');
-        queryClient.invalidateQueries({ queryKey: ['/api/games', game?.id] });
+        // For online games, the Home component will handle WebSocket updates
+        // No need to update local state here
+        console.log('✅ Move successful, WebSocket will handle board update');
       }
     },
     onError: (error) => {

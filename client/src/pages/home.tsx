@@ -54,6 +54,22 @@ export default function Home() {
             });
           }
           break;
+        case 'move':
+          // Handle move updates from WebSocket - THIS IS THE KEY FIX
+          if (currentGame && lastMessage.gameId === currentGame.id) {
+            console.log('🎮 Home received move WebSocket message:', lastMessage);
+            console.log('🎮 Updating game board from:', currentGame.board, 'to:', lastMessage.board);
+            // Update the current game state immediately
+            setCurrentGame(prevGame => ({
+              ...prevGame,
+              board: lastMessage.board,
+              currentPlayer: lastMessage.currentPlayer,
+              lastMove: lastMessage.position,
+              timestamp: Date.now() // Force re-render
+            }));
+            playSound('move');
+          }
+          break;
         case 'game_over':
           // Handle game over from WebSocket
           if (currentGame && lastMessage.gameId === currentGame.id) {
