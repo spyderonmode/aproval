@@ -1,7 +1,7 @@
 import React from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+// Removed Dialog import to fix white screen issue
 import { Button } from "@/components/ui/button";
-import { Trophy, RotateCcw, Home, Crown, User } from "lucide-react";
+import { Home, User } from "lucide-react";
 import { useAudio } from "@/hooks/useAudio";
 
 interface GameOverModalProps {
@@ -29,14 +29,14 @@ export function GameOverModal({ open, onClose, result, onPlayAgain }: GameOverMo
     }
   }, [open, isDraw, playSound]);
 
+  if (!open) return null;
+  
   return (
-    <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="bg-slate-800 border-slate-700 text-white text-center max-w-md mx-auto focus:outline-none !bg-slate-800">
-        <DialogHeader>
-          <DialogTitle className="text-2xl text-white">Game Over!</DialogTitle>
-        </DialogHeader>
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+      <div className="bg-slate-800 border border-slate-700 text-white text-center max-w-md mx-auto p-6 rounded-lg shadow-xl">
+        <h2 className="text-2xl text-white mb-6">Game Over!</h2>
         
-        <div className="py-6">
+        <div className="mb-6">
           {isDraw ? (
             <div className="text-center">
               <div className="w-20 h-20 mx-auto mb-4 bg-yellow-500 rounded-full flex items-center justify-center">
@@ -46,34 +46,25 @@ export function GameOverModal({ open, onClose, result, onPlayAgain }: GameOverMo
             </div>
           ) : (
             <div className="text-center">
-              {/* Winner Profile Picture with Crown */}
-              <div className="relative w-20 h-20 mx-auto mb-4">
+              {/* Winner Profile Picture */}
+              <div className="w-16 h-16 mx-auto mb-4">
                 {winnerInfo?.profilePicture ? (
                   <img 
                     src={winnerInfo.profilePicture} 
                     alt="Winner" 
-                    className="w-20 h-20 rounded-full object-cover border-4 border-yellow-400"
+                    className="w-16 h-16 rounded-full object-cover"
                   />
                 ) : (
-                  <div className="w-20 h-20 bg-primary rounded-full flex items-center justify-center border-4 border-yellow-400">
-                    <User className="w-10 h-10 text-white" />
+                  <div className="w-16 h-16 bg-primary rounded-full flex items-center justify-center">
+                    <User className="w-8 h-8 text-white" />
                   </div>
                 )}
-                {/* Crown on top */}
-                <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
-                  <Crown className="w-8 h-8 text-yellow-400 fill-yellow-400" />
-                </div>
               </div>
               
               {/* Winner Name */}
-              <p className="text-xl text-white mb-2">
+              <p className="text-xl text-white mb-4">
                 {winnerInfo?.displayName || winnerInfo?.firstName || winnerInfo?.username || `Player ${winnerSymbol}`} Wins!
               </p>
-              
-              {/* Celebration sparkles */}
-              <div className="text-2xl mb-4">
-                ✨ 🎉 ✨
-              </div>
               
               {/* Win condition */}
               {result.condition && result.condition !== 'draw' && (
@@ -95,7 +86,7 @@ export function GameOverModal({ open, onClose, result, onPlayAgain }: GameOverMo
             Main Menu
           </Button>
         </div>
-      </DialogContent>
-    </Dialog>
+      </div>
+    </div>
   );
 }
