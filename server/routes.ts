@@ -337,6 +337,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const isPlayerX = game.playerXId === userId;
       const isPlayerO = game.playerOId === userId;
       
+      console.log('Move validation:', {
+        userId,
+        gameId,
+        playerXId: game.playerXId,
+        playerOId: game.playerOId,
+        currentPlayer: game.currentPlayer,
+        isPlayerX,
+        isPlayerO
+      });
+      
       if (!isPlayerX && !isPlayerO) {
         return res.status(403).json({ message: "Not a player in this game" });
       }

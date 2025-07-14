@@ -87,14 +87,14 @@ async function createUser(username: string, password: string, email?: string): P
     await storage.upsertUser({
       id: newUser.id,
       email: email || null,
-      firstName: null,
+      firstName: newUser.displayName || newUser.username,
       lastName: null,
-      profileImageUrl: null,
+      profileImageUrl: newUser.profilePicture || null,
     });
     console.log('User created in database:', newUser.id);
   } catch (error) {
     console.error('Error creating user in database:', error);
-    return res.status(500).json({ error: 'Failed to create user in database' });
+    // Don't return error here as the user is already created in JSON
   }
   
   return newUser;
@@ -110,6 +110,19 @@ function updateUser(userId: string, updates: Partial<User>): User | null {
   
   users[userIndex] = { ...users[userIndex], ...updates };
   saveUsers(users);
+  
+  // Also update user in database
+  try {
+    storage.upsertUser({
+      id: userId,
+      email: users[userIndex].email || null,
+      firstName: users[userIndex].displayName || users[userIndex].username,
+      lastName: null,
+      profileImageUrl: users[userIndex].profilePicture || null,
+    });
+  } catch (error) {
+    console.error('Error updating user in database:', error);
+  }
   
   return users[userIndex];
 }
