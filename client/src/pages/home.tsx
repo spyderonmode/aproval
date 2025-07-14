@@ -8,10 +8,12 @@ import { RoomManager } from "@/components/RoomManager";
 import { PlayerList } from "@/components/PlayerList";
 import { CreateRoomModal } from "@/components/CreateRoomModal";
 import { GameOverModal } from "@/components/GameOverModal";
+import { ProfilePictureUpload } from "@/components/ProfilePictureUpload";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { GamepadIcon, LogOut } from "lucide-react";
+import { GamepadIcon, LogOut, User } from "lucide-react";
+import { logout } from "@/lib/firebase";
 
 export default function Home() {
   const { user } = useAuth();
@@ -86,14 +88,14 @@ export default function Home() {
           {/* User Profile */}
           <div className="flex items-center space-x-4">
             <div className="flex items-center space-x-3">
-              {user?.profileImageUrl && (
+              {user?.photoURL && (
                 <img 
-                  src={user.profileImageUrl} 
+                  src={user.photoURL} 
                   alt="User Avatar" 
                   className="w-8 h-8 rounded-full object-cover"
                 />
               )}
-              <span className="text-gray-300">{user?.firstName || 'Player'}</span>
+              <span className="text-gray-300">{user?.displayName || 'Player'}</span>
             </div>
             <div className="flex items-center space-x-2">
               <div className={`w-2 h-2 rounded-full ${isConnected ? 'bg-green-500' : 'bg-red-500'}`}></div>
@@ -104,7 +106,7 @@ export default function Home() {
             <Button 
               variant="outline" 
               size="sm"
-              onClick={() => window.location.href = '/api/logout'}
+              onClick={() => logout()}
             >
               <LogOut className="w-4 h-4 mr-2" />
               Logout
@@ -148,6 +150,24 @@ export default function Home() {
 
           {/* Sidebar */}
           <div className="space-y-6">
+            {/* User Profile */}
+            <Card className="bg-slate-800 border-slate-700">
+              <CardHeader>
+                <CardTitle className="text-lg flex items-center space-x-2">
+                  <User className="w-5 h-5" />
+                  <span>Profile</span>
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <ProfilePictureUpload user={user} />
+                <div className="mt-4 text-center">
+                  <p className="text-sm text-gray-300">
+                    {user?.displayName || user?.email || 'Player'}
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+
             {/* Game Mode Selection */}
             <GameModeSelector 
               selectedMode={selectedMode}

@@ -8,6 +8,13 @@ This is a full-stack web application for a strategic Tic-Tac-Toe game played on 
 
 Preferred communication style: Simple, everyday language.
 
+## Recent Changes
+
+- **Google Authentication Migration** (July 14, 2025): Migrated from Replit Auth to Google/Firebase authentication
+- **Profile Picture Upload**: Added Firebase Storage integration for user profile picture uploads
+- **Removed Undo Move**: Removed undo move functionality from game board as requested
+- **UI Updates**: Updated user interface to display Google profile information (photoURL, displayName)
+
 ## System Architecture
 
 ### Frontend Architecture

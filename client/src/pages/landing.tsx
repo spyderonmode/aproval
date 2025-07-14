@@ -1,8 +1,13 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Users, Zap, Trophy, GamepadIcon } from "lucide-react";
+import { signInWithGoogle } from "@/lib/firebase";
 
 export default function Landing() {
+  const handleGoogleLogin = () => {
+    signInWithGoogle();
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
       {/* Header */}
@@ -15,10 +20,10 @@ export default function Landing() {
             <h1 className="text-xl font-bold text-white">TicTac 3x5</h1>
           </div>
           <Button 
-            onClick={() => window.location.href = '/api/login'}
+            onClick={handleGoogleLogin}
             className="bg-primary hover:bg-primary/90"
           >
-            Get Started
+            Sign in with Google
           </Button>
         </div>
       </nav>
@@ -36,10 +41,10 @@ export default function Landing() {
           </p>
           <Button 
             size="lg" 
-            onClick={() => window.location.href = '/api/login'}
+            onClick={handleGoogleLogin}
             className="bg-primary hover:bg-primary/90 text-lg px-8 py-3"
           >
-            Start Playing Now
+            Sign in with Google to Play
           </Button>
         </div>
 
@@ -113,7 +118,7 @@ export default function Landing() {
             
             <div className="text-center pt-6">
               <Button 
-                onClick={() => window.location.href = '/api/login'}
+                onClick={handleGoogleLogin}
                 className="bg-primary hover:bg-primary/90"
               >
                 Ready to Play?

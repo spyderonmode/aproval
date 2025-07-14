@@ -177,19 +177,13 @@ export function GameBoard({ game, onGameOver, gameMode, user }: GameBoardProps) 
         </div>
 
         {/* Game Controls */}
-        <div className="mt-8 flex justify-center space-x-4">
+        <div className="mt-8 flex justify-center">
           <Button 
             variant="destructive"
             onClick={resetGame}
             disabled={makeMoveMutation.isPending}
           >
             Reset Game
-          </Button>
-          <Button 
-            variant="secondary"
-            disabled={makeMoveMutation.isPending}
-          >
-            Undo Move
           </Button>
         </div>
       </CardContent>
