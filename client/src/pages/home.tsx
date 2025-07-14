@@ -72,6 +72,15 @@ export default function Home() {
           setCurrentRoom(lastMessage.room);
           joinRoom(lastMessage.room.id);
           break;
+        case 'matchmaking_response':
+          // Handle matchmaking response for waiting players
+          if (lastMessage.status === 'matched') {
+            setIsMatchmaking(false);
+            setMatchmakingStatus('');
+            setCurrentRoom(lastMessage.room);
+            joinRoom(lastMessage.room.id);
+          }
+          break;
       }
     }
   }, [lastMessage, currentGame, currentRoom, user, playSound]);

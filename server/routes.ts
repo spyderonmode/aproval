@@ -99,7 +99,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
         await notifyPlayer(player1Id);
         await notifyPlayer(player2Id);
         
+        // Return matched status to the player who just joined
         res.json({ status: 'matched', room: room });
+        
+        // Send matched response to the first player who was waiting
+        for (const [connId, connection] of connections.entries()) {
+          if (connection.userId === player1Id && connection.ws.readyState === WebSocket.OPEN) {
+            connection.ws.send(JSON.stringify({
+              type: 'matchmaking_response',
+              status: 'matched',
+              room: room
+            }));
+            break;
+          }
+        }
       } else {
         res.json({ status: 'waiting', message: 'Waiting for another player...' });
       }
@@ -345,15 +358,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const isPlayerX = game.playerXId === userId;
       const isPlayerO = game.playerOId === userId;
       
-
-      
       if (!isPlayerX && !isPlayerO) {
         return res.status(403).json({ message: "Not a player in this game" });
       }
 
       const playerSymbol = isPlayerX ? 'X' : 'O';
+      
       if (game.currentPlayer !== playerSymbol) {
-        return res.status(400).json({ message: "Not your turn" });
+        return res.status(400).json({ message: `Not your turn. Current player: ${game.currentPlayer}, Your symbol: ${playerSymbol}` });
       }
 
       // Validate move
@@ -440,6 +452,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
         const nextPlayer = getOpponentSymbol(playerSymbol);
         await storage.updateCurrentPlayer(gameId, nextPlayer);
         
+        // Broadcast move to room AFTER updating current player
+        if (game.roomId && roomConnections.has(game.roomId)) {
+          const roomUsers = roomConnections.get(game.roomId)!;
+          roomUsers.forEach(connectionId => {
+            const connection = connections.get(connectionId);
+            if (connection && connection.ws.readyState === WebSocket.OPEN) {
+              connection.ws.send(JSON.stringify({
+                type: 'move',
+                gameId,
+                position,
+                player: playerSymbol,
+                board: newBoard,
+                currentPlayer: nextPlayer, // Next player's turn
+              }));
+            }
+          });
+        }
+        
         // Handle AI move if it's AI mode
         if (game.gameMode === 'ai' && nextPlayer === 'O') {
           setTimeout(async () => {
@@ -521,10 +551,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
                   const connection = connections.get(connectionId);
                   if (connection && connection.ws.readyState === WebSocket.OPEN) {
                     connection.ws.send(JSON.stringify({
-                      type: 'ai_move',
+                      type: 'move',
                       gameId,
                       position: aiMove,
+                      player: 'O',
                       board: aiBoard,
+                      currentPlayer: 'X', // Back to player X's turn after AI move
                     }));
                   }
                 });
@@ -536,25 +568,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       }
 
-      // Broadcast move to room
-      if (game.roomId && roomConnections.has(game.roomId)) {
-        const roomUsers = roomConnections.get(game.roomId)!;
-        roomUsers.forEach(connectionId => {
-          const connection = connections.get(connectionId);
-          if (connection && connection.ws.readyState === WebSocket.OPEN) {
-            connection.ws.send(JSON.stringify({
-              type: 'move',
-              gameId,
-              position,
-              player: playerSymbol,
-              board: newBoard,
-              currentPlayer: getOpponentSymbol(playerSymbol), // Next player's turn
-            }));
-          }
-        });
-      }
-
-      res.json({ message: "Move made successfully" });
+      res.json({ 
+        message: "Move made successfully",
+        board: newBoard,
+        currentPlayer: getOpponentSymbol(playerSymbol),
+        gameId: gameId
+      });
     } catch (error) {
       console.error("Error making move:", error);
       res.status(500).json({ message: "Failed to make move" });

@@ -40,10 +40,9 @@ export function GameBoard({ game, onGameOver, gameMode, user }: GameBoardProps) 
     if (gameMode === 'online' && lastMessage && game) {
       switch (lastMessage.type) {
         case 'move':
-        case 'ai_move':
           if (lastMessage.gameId === game.id) {
             setBoard(lastMessage.board);
-            setCurrentPlayer(lastMessage.currentPlayer || (lastMessage.player === 'X' ? 'O' : 'X'));
+            setCurrentPlayer(lastMessage.currentPlayer);
             setLastMove(lastMessage.position);
             playSound('move');
           }
@@ -81,8 +80,13 @@ export function GameBoard({ game, onGameOver, gameMode, user }: GameBoardProps) 
       
       return await apiRequest('POST', `/api/games/${game.id}/moves`, { position });
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
       if (game && game.id !== 'local-game') {
+        // Update local state immediately for better UX
+        if (data && data.board) {
+          setBoard(data.board);
+          setCurrentPlayer(data.currentPlayer);
+        }
         queryClient.invalidateQueries({ queryKey: ['/api/games', game?.id] });
       }
     },
