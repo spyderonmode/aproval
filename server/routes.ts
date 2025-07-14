@@ -260,6 +260,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
             }
           };
           
+          // Always broadcast game_started to ensure both players receive it
+          console.log('🎮 Broadcasting game_started for existing game to room:', gameData.roomId);
+          if (roomConnections.has(gameData.roomId)) {
+            const roomUsers = roomConnections.get(gameData.roomId)!;
+            console.log(`🎮 Broadcasting to ${roomUsers.size} users in room`);
+            roomUsers.forEach(connectionId => {
+              const connection = connections.get(connectionId);
+              if (connection && connection.ws.readyState === WebSocket.OPEN) {
+                console.log(`🎮 Sending game_started to user: ${connection.userId}`);
+                connection.ws.send(JSON.stringify({
+                  type: 'game_started',
+                  game: gameWithPlayers,
+                  roomId: gameData.roomId,
+                }));
+              }
+            });
+          }
+          
           return res.json(gameWithPlayers);
         }
         
@@ -313,11 +331,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
         await storage.updateRoomStatus(gameData.roomId, 'playing');
         
         // Broadcast game start to all room participants
+        console.log('🎮 Broadcasting game_started for new game to room:', gameData.roomId);
         if (roomConnections.has(gameData.roomId)) {
           const roomUsers = roomConnections.get(gameData.roomId)!;
+          console.log(`🎮 Broadcasting to ${roomUsers.size} users in room`);
           roomUsers.forEach(connectionId => {
             const connection = connections.get(connectionId);
             if (connection && connection.ws.readyState === WebSocket.OPEN) {
+              console.log(`🎮 Sending game_started to user: ${connection.userId}`);
               connection.ws.send(JSON.stringify({
                 type: 'game_started',
                 game: gameWithPlayers,

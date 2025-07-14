@@ -63,7 +63,10 @@ export function GameBoard({ game, onGameOver, gameMode, user }: GameBoardProps) 
           }
           break;
         case 'game_started':
-          if (lastMessage.roomId === game.roomId) {
+          console.log('🎮 GameBoard received game_started message:', lastMessage);
+          console.log('🎮 Game roomId:', game?.roomId);
+          console.log('🎮 Message roomId:', lastMessage.roomId);
+          if (lastMessage.roomId === game?.roomId || lastMessage.game?.id === game?.id) {
             console.log('🎮 Game started WebSocket message:', lastMessage);
             console.log('📋 Game started board:', lastMessage.game.board || {});
             // Update the game with the new player information

@@ -38,10 +38,15 @@ export default function Home() {
 
   useEffect(() => {
     if (lastMessage) {
+      console.log('🎮 Home received WebSocket message:', lastMessage);
       switch (lastMessage.type) {
         case 'game_started':
+          console.log('🎮 Processing game_started message:', lastMessage);
+          console.log('🎮 Current room ID:', currentRoom?.id);
+          console.log('🎮 Message room ID:', lastMessage.roomId);
           // Handle game start from WebSocket
           if (lastMessage.roomId === currentRoom?.id) {
+            console.log('🎮 Setting current game from WebSocket:', lastMessage.game);
             setCurrentGame(lastMessage.game);
           }
           break;
