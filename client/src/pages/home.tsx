@@ -186,35 +186,39 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-slate-900 text-white">
       {/* Navigation Header */}
-      <nav className="bg-slate-800 border-b border-slate-700 px-6 py-4">
+      <nav className="bg-slate-800 border-b border-slate-700 px-4 py-4">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
-          <div className="flex items-center space-x-4">
-            <div className="w-10 h-10 bg-primary rounded-lg flex items-center justify-center">
-              <GamepadIcon className="w-6 h-6 text-white" />
+          <div className="flex items-center space-x-2 md:space-x-4">
+            <div className="w-8 h-8 md:w-10 md:h-10 bg-primary rounded-lg flex items-center justify-center">
+              <GamepadIcon className="w-4 h-4 md:w-6 md:h-6 text-white" />
             </div>
-            <h1 className="text-xl font-bold">TicTac 3x5</h1>
+            <h1 className="text-lg md:text-xl font-bold">TicTac 3x5</h1>
           </div>
           
           {/* User Profile */}
-          <div className="flex items-center space-x-4">
-            <div className="flex items-center space-x-3">
+          <div className="flex items-center space-x-2 md:space-x-4">
+            <div className="flex items-center space-x-2 md:space-x-3">
               {user?.profilePicture ? (
                 <img 
                   src={user.profilePicture} 
                   alt="Profile" 
-                  className="w-8 h-8 rounded-full object-cover"
+                  className="w-6 h-6 md:w-8 md:h-8 rounded-full object-cover"
                 />
               ) : (
-                <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center">
-                  <User className="w-5 h-5 text-white" />
+                <div className="w-6 h-6 md:w-8 md:h-8 bg-primary rounded-full flex items-center justify-center">
+                  <User className="w-3 h-3 md:w-5 md:h-5 text-white" />
                 </div>
               )}
-              <span className="text-gray-300">{user?.displayName || user?.username || 'Player'}</span>
-              <span className="text-xs text-gray-500">({user?.userId || user?.id})</span>
+              <span className="text-sm md:text-base text-gray-300 hidden sm:block">
+                {user?.displayName || user?.username || 'Player'}
+              </span>
+              <span className="text-xs text-gray-500 hidden lg:block">
+                ({user?.userId || user?.id})
+              </span>
             </div>
-            <div className="flex items-center space-x-2">
+            <div className="flex items-center space-x-1 md:space-x-2">
               <div className={`w-2 h-2 rounded-full ${isConnected ? 'bg-green-500' : 'bg-red-500'}`}></div>
-              <span className="text-sm text-gray-400">
+              <span className="text-xs md:text-sm text-gray-400">
                 {isConnected ? 'Online' : 'Offline'}
               </span>
             </div>
@@ -222,17 +226,18 @@ export default function Home() {
               variant="outline" 
               size="sm"
               onClick={() => logout()}
-              className="bg-slate-800 border-slate-600 text-white hover:bg-slate-700"
+              className="bg-slate-700 border-slate-600 text-white hover:bg-slate-600 px-2 md:px-4 py-1 md:py-2"
             >
-              <LogOut className="w-4 h-4 mr-2" />
-              Logout
+              <LogOut className="w-3 h-3 md:w-4 md:h-4 mr-1 md:mr-2" />
+              <span className="hidden sm:inline">Logout</span>
+              <span className="sm:hidden">Out</span>
             </Button>
           </div>
         </div>
       </nav>
 
-      <div className="max-w-7xl mx-auto px-6 py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <div className="max-w-7xl mx-auto px-4 py-6 md:px-6 md:py-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 md:gap-8">
           {/* Game Board Section */}
           <div className="lg:col-span-2">
             {currentGame ? (

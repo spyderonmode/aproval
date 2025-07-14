@@ -364,7 +364,7 @@ export function GameBoard({ game, onGameOver, gameMode, user }: GameBoardProps) 
       <motion.div
         key={position}
         className={`
-          w-12 h-12 sm:w-16 sm:h-16 bg-slate-700 rounded-lg flex items-center justify-center cursor-pointer 
+          w-10 h-10 sm:w-12 sm:h-12 md:w-16 md:h-16 bg-slate-700 rounded-lg flex items-center justify-center cursor-pointer 
           border-2 border-transparent hover:border-primary transition-all duration-200
           ${isEmpty ? 'hover:bg-slate-600' : 'cursor-not-allowed'}
           ${makeMoveMutation.isPending ? 'opacity-50' : ''}
@@ -381,7 +381,7 @@ export function GameBoard({ game, onGameOver, gameMode, user }: GameBoardProps) 
         <AnimatePresence>
           {symbol && (
             <motion.span
-              className={`text-xl sm:text-2xl font-bold ${
+              className={`text-lg sm:text-xl md:text-2xl font-bold ${
                 symbol === 'X' ? 'text-blue-500' : 'text-red-500'
               }`}
               initial={{ scale: 0 }}
@@ -393,7 +393,7 @@ export function GameBoard({ game, onGameOver, gameMode, user }: GameBoardProps) 
             </motion.span>
           )}
         </AnimatePresence>
-        <span className="text-xs text-gray-500 absolute mt-10 sm:mt-12">{position}</span>
+        <span className="text-xs text-gray-500 absolute mt-8 sm:mt-10 md:mt-12">{position}</span>
       </motion.div>
     );
   };
@@ -493,7 +493,7 @@ export function GameBoard({ game, onGameOver, gameMode, user }: GameBoardProps) 
         {/* 3x5 Game Grid */}
         <div 
           key={`board-${JSON.stringify(board)}`}
-          className="relative grid grid-cols-5 gap-2 sm:gap-3 max-w-xs sm:max-w-lg mx-auto"
+          className="relative grid grid-cols-5 gap-2 sm:gap-3 md:gap-4 max-w-xs sm:max-w-md md:max-w-lg mx-auto"
         >
           {/* Row 1: 1,2,3,4,5 */}
           {[1, 2, 3, 4, 5].map(renderCell)}
