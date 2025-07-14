@@ -10,6 +10,7 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+- **Player Display Enhancement** (July 14, 2025): Added player names and profile pictures to the game board, showing actual player information instead of generic "Player X/O" labels
 - **Game Start Broadcasting** (July 14, 2025): Enhanced game start broadcast to notify both players when game begins, ensuring both players see the same game state and move to the game board simultaneously
 - **Table Rendering Fixes** (July 14, 2025): Fixed board rendering issues with comprehensive debugging, forced re-renders, and improved WebSocket message handling to ensure moves appear properly on both devices
 - **Room Creator Permission Control** (July 14, 2025): Fixed room permissions so only the room creator can start games - other players see "Wait for Start" button and must wait for room owner to begin the game

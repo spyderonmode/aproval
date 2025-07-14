@@ -44,10 +44,14 @@ export default function Home() {
           console.log('🎮 Processing game_started message:', lastMessage);
           console.log('🎮 Current room ID:', currentRoom?.id);
           console.log('🎮 Message room ID:', lastMessage.roomId);
-          // Handle game start from WebSocket
+          // Handle game start from WebSocket - ensure both players transition
           if (lastMessage.roomId === currentRoom?.id) {
             console.log('🎮 Setting current game from WebSocket:', lastMessage.game);
             setCurrentGame(lastMessage.game);
+            // Force a state update to ensure both players see the game
+            setTimeout(() => {
+              setCurrentGame(lastMessage.game);
+            }, 100);
           }
           break;
         case 'game_over':
@@ -103,6 +107,7 @@ export default function Home() {
   };
 
   const handleGameStart = (game: any) => {
+    console.log('🎮 handleGameStart called with game:', game);
     setCurrentGame(game);
   };
 
@@ -241,12 +246,25 @@ export default function Home() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Game Board Section */}
           <div className="lg:col-span-2">
-            <GameBoard 
-              game={currentGame}
-              onGameOver={handleGameOver}
-              gameMode={selectedMode}
-              user={user}
-            />
+            {currentGame ? (
+              <div>
+                <div className="mb-4 text-center">
+                  <span className="text-sm text-gray-400">
+                    Game ID: {currentGame.id} | Room: {currentRoom?.code || 'Local'}
+                  </span>
+                </div>
+                <GameBoard 
+                  game={currentGame}
+                  onGameOver={handleGameOver}
+                  gameMode={selectedMode}
+                  user={user}
+                />
+              </div>
+            ) : (
+              <div className="text-center p-8 text-gray-400">
+                <p>No active game. Select a game mode to start playing.</p>
+              </div>
+            )}
 
             {/* Game Rules */}
             <Card className="mt-6 bg-slate-800 border-slate-700">

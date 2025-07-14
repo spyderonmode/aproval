@@ -40,6 +40,10 @@ export function useWebSocket() {
         if (message.type === 'move') {
           console.log(`📥 Move message - GameId: ${message.gameId}, Position: ${message.position}, Board:`, message.board);
         }
+        if (message.type === 'game_started') {
+          console.log(`📥 Game started message - RoomId: ${message.roomId}, GameId: ${message.game?.id}`);
+          console.log(`📥 Game players - X: ${message.game?.playerXInfo?.displayName}, O: ${message.game?.playerOInfo?.displayName}`);
+        }
         setLastMessage(message);
       } catch (error) {
         console.error('Failed to parse WebSocket message:', error);

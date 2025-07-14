@@ -14,7 +14,8 @@ export function GameOverModal({ open, onClose, result, onPlayAgain }: GameOverMo
 
   const isWin = result.winner;
   const isDraw = result.condition === 'draw';
-  const winnerSymbol = result.player;
+  const winnerSymbol = result.winner;
+  const winnerName = result.winnerName;
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
@@ -47,7 +48,7 @@ export function GameOverModal({ open, onClose, result, onPlayAgain }: GameOverMo
               <p className="text-lg text-gray-300">It's a Draw!</p>
             ) : (
               <p className="text-lg text-gray-300">
-                Player {winnerSymbol} Wins!
+                {winnerName || `Player ${winnerSymbol}`} Wins!
               </p>
             )}
             {result.condition && result.condition !== 'draw' && (

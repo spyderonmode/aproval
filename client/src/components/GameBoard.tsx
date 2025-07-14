@@ -203,8 +203,13 @@ export function GameBoard({ game, onGameOver, gameMode, user }: GameBoardProps) 
     setBoard(newBoard);
     
     if (checkWin(newBoard, currentPlayer)) {
+      const winnerInfo = currentPlayer === 'X' 
+        ? (game?.playerXInfo?.displayName || game?.playerXInfo?.username || 'Player X')
+        : (game?.playerOInfo?.displayName || game?.playerOInfo?.username || (gameMode === 'ai' ? 'AI' : 'Player O'));
+      
       onGameOver({
         winner: currentPlayer,
+        winnerName: winnerInfo,
         condition: 'diagonal',
         board: newBoard
       });
@@ -214,6 +219,7 @@ export function GameBoard({ game, onGameOver, gameMode, user }: GameBoardProps) 
     if (checkDraw(newBoard)) {
       onGameOver({
         winner: null,
+        winnerName: null,
         condition: 'draw',
         board: newBoard
       });
