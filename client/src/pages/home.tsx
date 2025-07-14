@@ -55,11 +55,11 @@ export default function Home() {
           }
           break;
         case 'move':
-          // Handle move updates from WebSocket - THIS IS THE KEY FIX
+          // Handle move updates from WebSocket - FOR BOTH PLAYERS AND SPECTATORS
           if (currentGame && lastMessage.gameId === currentGame.id) {
             console.log('🎮 Home received move WebSocket message:', lastMessage);
             console.log('🎮 Updating game board from:', currentGame.board, 'to:', lastMessage.board);
-            // Update the current game state immediately
+            // Update the current game state immediately for everyone (players and spectators)
             setCurrentGame(prevGame => ({
               ...prevGame,
               board: lastMessage.board,
@@ -67,6 +67,30 @@ export default function Home() {
               lastMove: lastMessage.position,
               timestamp: Date.now() // Force re-render
             }));
+            playSound('move');
+          } else if (currentRoom && (lastMessage.roomId === currentRoom.id || lastMessage.gameId)) {
+            // If we're in the room but don't have currentGame set, set it from the move message
+            console.log('🎮 Spectator receiving move for room game');
+            if (!currentGame) {
+              // Create a basic game object for spectators
+              setCurrentGame({
+                id: lastMessage.gameId,
+                roomId: currentRoom.id,
+                board: lastMessage.board,
+                currentPlayer: lastMessage.currentPlayer,
+                lastMove: lastMessage.position,
+                timestamp: Date.now()
+              });
+            } else {
+              // Update existing game state
+              setCurrentGame(prevGame => ({
+                ...prevGame,
+                board: lastMessage.board,
+                currentPlayer: lastMessage.currentPlayer,
+                lastMove: lastMessage.position,
+                timestamp: Date.now()
+              }));
+            }
             playSound('move');
           }
           break;
@@ -85,7 +109,8 @@ export default function Home() {
             setGameResult({
               winner: lastMessage.winner,
               condition: lastMessage.condition,
-              board: lastMessage.board
+              board: lastMessage.board,
+              winnerInfo: lastMessage.winnerInfo
             });
             setShowGameOver(true);
           }

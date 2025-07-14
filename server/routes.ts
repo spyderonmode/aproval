@@ -487,9 +487,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
           await storage.updateRoomStatus(game.roomId, 'finished');
         }
         
-        // Broadcast game over to room
+        // Broadcast game over to room with winner info
         if (game.roomId && roomConnections.has(game.roomId)) {
           const roomUsers = roomConnections.get(game.roomId)!;
+          // Get winner profile information
+          const winnerInfo = await storage.getUser(userId);
           roomUsers.forEach(connectionId => {
             const connection = connections.get(connectionId);
             if (connection && connection.ws.readyState === WebSocket.OPEN) {
@@ -499,6 +501,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
                 winner: userId,
                 condition: winResult.condition,
                 board: newBoard,
+                winnerInfo: winnerInfo ? {
+                  displayName: winnerInfo.displayName,
+                  firstName: winnerInfo.firstName,
+                  username: winnerInfo.username,
+                  profilePicture: winnerInfo.profilePicture
+                } : null
               }));
             }
           });
@@ -538,7 +546,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         console.log(`- Next player: ${nextPlayer}`);
         console.log(`- Broadcasting to room: ${game.roomId}`);
         
-        // Broadcast move to room AFTER updating current player
+        // Broadcast move to room AFTER updating current player (INCLUDING SPECTATORS)
         if (game.roomId && roomConnections.has(game.roomId)) {
           const roomUsers = roomConnections.get(game.roomId)!;
           console.log(`- Room has ${roomUsers.size} connected users`);
@@ -550,6 +558,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
               connection.ws.send(JSON.stringify({
                 type: 'move',
                 gameId,
+                roomId: game.roomId, // Add roomId for spectators
                 position,
                 player: playerSymbol,
                 board: newBoard,

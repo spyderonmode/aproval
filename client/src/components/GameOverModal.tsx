@@ -1,6 +1,8 @@
+import React from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Trophy, RotateCcw, Home } from "lucide-react";
+import { Trophy, RotateCcw, Home, Crown, User } from "lucide-react";
+import { useAudio } from "@/hooks/useAudio";
 
 interface GameOverModalProps {
   open: boolean;
@@ -10,12 +12,22 @@ interface GameOverModalProps {
 }
 
 export function GameOverModal({ open, onClose, result, onPlayAgain }: GameOverModalProps) {
+  const { playSound } = useAudio();
+  
   if (!result) return null;
 
   const isWin = result.winner;
   const isDraw = result.condition === 'draw';
   const winnerSymbol = result.winner;
   const winnerName = result.winnerName;
+  const winnerInfo = result.winnerInfo; // This should contain profile info
+  
+  // Play celebration sound when modal opens
+  React.useEffect(() => {
+    if (open && !isDraw) {
+      playSound('win');
+    }
+  }, [open, isDraw, playSound]);
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
@@ -25,48 +37,55 @@ export function GameOverModal({ open, onClose, result, onPlayAgain }: GameOverMo
         </DialogHeader>
         
         <div className="py-6">
-          <div className="w-16 h-16 mx-auto mb-4 flex items-center justify-center rounded-full">
-            {isDraw ? (
-              <div className="w-16 h-16 bg-yellow-500 rounded-full flex items-center justify-center">
-                <span className="text-2xl">🤝</span>
+          {isDraw ? (
+            <div className="text-center">
+              <div className="w-20 h-20 mx-auto mb-4 bg-yellow-500 rounded-full flex items-center justify-center">
+                <span className="text-3xl">🤝</span>
               </div>
-            ) : (
-              <div className={`w-16 h-16 rounded-full flex items-center justify-center ${
-                winnerSymbol === 'X' ? 'bg-blue-500' : 'bg-red-500'
-              }`}>
-                {isWin ? (
-                  <Trophy className="w-8 h-8 text-white" />
+              <p className="text-xl text-gray-300">It's a Draw!</p>
+            </div>
+          ) : (
+            <div className="text-center">
+              {/* Winner Profile Picture with Crown */}
+              <div className="relative w-20 h-20 mx-auto mb-4">
+                {winnerInfo?.profilePicture ? (
+                  <img 
+                    src={winnerInfo.profilePicture} 
+                    alt="Winner" 
+                    className="w-20 h-20 rounded-full object-cover border-4 border-yellow-400"
+                  />
                 ) : (
-                  <span className="text-2xl font-bold text-white">{winnerSymbol}</span>
+                  <div className="w-20 h-20 bg-primary rounded-full flex items-center justify-center border-4 border-yellow-400">
+                    <User className="w-10 h-10 text-white" />
+                  </div>
                 )}
+                {/* Crown on top */}
+                <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
+                  <Crown className="w-8 h-8 text-yellow-400 fill-yellow-400" />
+                </div>
               </div>
-            )}
-          </div>
-          
-          <div className="mb-4">
-            {isDraw ? (
-              <p className="text-lg text-gray-300">It's a Draw!</p>
-            ) : (
-              <p className="text-lg text-gray-300">
-                {winnerName || `Player ${winnerSymbol}`} Wins!
+              
+              {/* Winner Name */}
+              <p className="text-xl text-white mb-2">
+                {winnerInfo?.displayName || winnerInfo?.firstName || winnerInfo?.username || `Player ${winnerSymbol}`} Wins!
               </p>
-            )}
-            {result.condition && result.condition !== 'draw' && (
-              <p className="text-sm text-gray-400 mt-2">
-                {result.condition === 'horizontal' ? 'Horizontal line' : 'Diagonal line'}
-              </p>
-            )}
-          </div>
+              
+              {/* Celebration sparkles */}
+              <div className="text-2xl mb-4">
+                ✨ 🎉 ✨
+              </div>
+              
+              {/* Win condition */}
+              {result.condition && result.condition !== 'draw' && (
+                <p className="text-sm text-gray-400">
+                  {result.condition === 'horizontal' ? 'Horizontal line' : 'Diagonal line'}
+                </p>
+              )}
+            </div>
+          )}
         </div>
         
         <div className="flex justify-center space-x-3">
-          <Button
-            onClick={onPlayAgain}
-            className="bg-purple-600 hover:bg-purple-700"
-          >
-            <RotateCcw className="w-4 h-4 mr-2" />
-            Play Again
-          </Button>
           <Button
             variant="outline"
             onClick={onClose}

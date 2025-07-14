@@ -24,30 +24,18 @@ export function useAudio() {
   }, [settings]);
 
   useEffect(() => {
-    // Initialize background music
+    // Initialize background music (disabled to prevent vibrating sound)
     if (!backgroundMusicRef.current) {
       backgroundMusicRef.current = new Audio();
       backgroundMusicRef.current.loop = true;
       backgroundMusicRef.current.volume = settings.volume * 0.3; // Lower volume for background music
       
-      // Generate a simple background music tone using Web Audio API
-      const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
-      const oscillator = audioContext.createOscillator();
-      const gainNode = audioContext.createGain();
-      
-      oscillator.connect(gainNode);
-      gainNode.connect(audioContext.destination);
-      
-      oscillator.frequency.setValueAtTime(220, audioContext.currentTime); // A3 note
-      gainNode.gain.setValueAtTime(0.1, audioContext.currentTime);
-      
-      if (settings.backgroundMusic) {
-        oscillator.start();
-      }
+      // Remove the Web Audio API oscillator that was causing the vibrating sound
+      // Background music is now disabled to prevent creepy vibrating sounds
     }
 
     // Initialize sound effects
-    const sounds = ['move', 'win', 'lose', 'draw', 'click'];
+    const sounds = ['move', 'win', 'lose', 'draw', 'click', 'celebrate'];
     sounds.forEach(sound => {
       if (!soundEffectsRef.current[sound]) {
         soundEffectsRef.current[sound] = new Audio();
