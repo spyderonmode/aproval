@@ -264,8 +264,9 @@ export function GameBoard({ game, onGameOver, gameMode, user }: GameBoardProps) 
 
     // Check if it's the player's turn
     if (gameMode === 'online') {
-      const isPlayerX = game.playerXId === user?.id;
-      const isPlayerO = game.playerOId === user?.id;
+      const userId = user?.userId || user?.id;
+      const isPlayerX = game.playerXId === userId;
+      const isPlayerO = game.playerOId === userId;
       const playerSymbol = isPlayerX ? 'X' : 'O';
       
       if (currentPlayer !== playerSymbol) {

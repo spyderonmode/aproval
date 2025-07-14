@@ -25,7 +25,7 @@ export function useWebSocket() {
       // Authenticate with WebSocket
       ws.current?.send(JSON.stringify({
         type: 'auth',
-        userId: user.id,
+        userId: user.userId || user.id,
       }));
     };
 

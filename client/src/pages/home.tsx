@@ -306,13 +306,13 @@ export default function Home() {
             />
 
             {/* Online Matchmaking */}
-            {selectedMode === 'online' && !currentRoom && (
+            {selectedMode === 'online' && (
               <Card className="bg-slate-800 border-slate-700">
                 <CardHeader>
                   <CardTitle className="text-lg">Online Matchmaking</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  {!isMatchmaking ? (
+                  {!currentRoom && !isMatchmaking && (
                     <div className="space-y-4">
                       <p className="text-sm text-gray-300">
                         Find an opponent to play against online in real-time.
@@ -327,7 +327,8 @@ export default function Home() {
                         Find Match
                       </Button>
                     </div>
-                  ) : (
+                  )}
+                  {!currentRoom && isMatchmaking && (
                     <div className="space-y-4">
                       <div className="flex items-center space-x-2">
                         <div className="w-2 h-2 bg-blue-500 rounded-full animate-ping"></div>
@@ -343,6 +344,14 @@ export default function Home() {
                       >
                         Cancel
                       </Button>
+                    </div>
+                  )}
+                  {currentRoom && (
+                    <div className="space-y-4">
+                      <div className="flex items-center space-x-2">
+                        <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                        <span className="text-sm">Connected to room {currentRoom.code}</span>
+                      </div>
                     </div>
                   )}
                 </CardContent>
