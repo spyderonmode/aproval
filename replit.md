@@ -12,7 +12,7 @@ Preferred communication style: Simple, everyday language.
 
 - **Audio System Integration** (July 14, 2025): Added comprehensive audio system with sound effects for moves, wins/losses, and UI interactions, plus background music toggle and volume control
 - **Diagonal Win Restriction Fix** (July 14, 2025): Fixed diagonal win logic to properly exclude positions 5, 10, 15 from diagonal win patterns with additional validation
-- **Enhanced Game Rules Display** (July 14, 2025): Updated home page with detailed game rules including valid diagonal patterns and restrictions
+- **Enhanced Game Rules Display** (July 14, 2025): Updated both home page and landing page with detailed game rules including valid diagonal patterns and restrictions
 - **Updated Game Rules** (July 14, 2025): Changed winning conditions to horizontal (4 in a row), vertical (3 in a column), and diagonal (3 in diagonal, excluding columns 5, 10, 15)
 - **Profile Management System**: Added ability for users to upload profile pictures and set display names
 - **Enhanced Authentication**: Extended user data to include displayName and profilePicture fields

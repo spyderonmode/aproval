@@ -38,7 +38,7 @@ export default function Landing() {
             <span className="block text-primary">Reimagined</span>
           </h2>
           <p className="text-xl text-slate-300 max-w-3xl mx-auto mb-8">
-            Experience the classic game with a twist! Play on a complete 3x5 grid (positions 1-15) with diagonal-only winning conditions. 
+            Experience the classic game with a twist! Play on a complete 3x5 grid (positions 1-15) with multiple winning conditions. 
             Challenge AI opponents, compete with friends, or spectate exciting matches.
           </p>
           <Button 
@@ -83,7 +83,7 @@ export default function Landing() {
               </div>
               <CardTitle className="text-white">Custom Rules</CardTitle>
               <CardDescription className="text-slate-400">
-                Complete 3x5 grid (positions 1-15) with diagonal-only winning conditions
+                Complete 3x5 grid (positions 1-15) with horizontal, vertical, and restricted diagonal wins
               </CardDescription>
             </CardHeader>
           </Card>
@@ -107,14 +107,41 @@ export default function Landing() {
                 <h3 className="text-lg font-semibold text-white mb-3">Winning Conditions</h3>
                 <ul className="space-y-2 text-slate-300">
                   <li className="flex items-start">
-                    <span className="w-2 h-2 bg-primary rounded-full mt-2 mr-3 flex-shrink-0"></span>
-                    <span><strong>Diagonal Only:</strong> Get 3 symbols on straight diagonal lines to win</span>
+                    <span className="w-2 h-2 bg-green-500 rounded-full mt-2 mr-3 flex-shrink-0"></span>
+                    <span><strong>Horizontal:</strong> Get 4 symbols in a row horizontally</span>
                   </li>
                   <li className="flex items-start">
-                    <span className="w-2 h-2 bg-primary rounded-full mt-2 mr-3 flex-shrink-0"></span>
-                    <span><strong>Strategic Play:</strong> No horizontal or vertical wins - only diagonal patterns count</span>
+                    <span className="w-2 h-2 bg-blue-500 rounded-full mt-2 mr-3 flex-shrink-0"></span>
+                    <span><strong>Vertical:</strong> Get 3 symbols in a column vertically</span>
+                  </li>
+                  <li className="flex items-start">
+                    <span className="w-2 h-2 bg-purple-500 rounded-full mt-2 mr-3 flex-shrink-0"></span>
+                    <span><strong>Diagonal:</strong> Get 3 symbols diagonally (positions 5, 10, 15 restricted)</span>
+                  </li>
+                  <li className="flex items-start">
+                    <span className="w-2 h-2 bg-red-500 rounded-full mt-2 mr-3 flex-shrink-0"></span>
+                    <span><strong>Restriction:</strong> No diagonal wins using rightmost column</span>
                   </li>
                 </ul>
+              </div>
+            </div>
+            
+            <div className="mt-6 p-4 bg-slate-900 rounded-lg">
+              <h3 className="text-lg font-semibold text-white mb-3">Valid Diagonal Patterns</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-slate-300">
+                <div>
+                  <p><strong>Allowed patterns:</strong></p>
+                  <ul className="list-disc list-inside space-y-1 mt-2">
+                    <li>[1, 7, 13] - Main diagonal</li>
+                    <li>[2, 8, 14] - Main diagonal</li>
+                    <li>[3, 7, 11] - Anti-diagonal</li>
+                    <li>[4, 8, 12] - Anti-diagonal</li>
+                  </ul>
+                </div>
+                <div>
+                  <p><strong>Restricted positions:</strong></p>
+                  <p className="mt-2">Positions 5, 10, 15 (rightmost column) cannot be used in diagonal wins</p>
+                </div>
               </div>
             </div>
             
