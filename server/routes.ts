@@ -374,6 +374,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.log(`- Is Player O: ${isPlayerO}`);
       
       if (!isPlayerX && !isPlayerO) {
+        console.log(`❌ MOVE REJECTED: User ${userId} is not a player in this game`);
         return res.status(403).json({ message: "Not a player in this game" });
       }
 
@@ -382,8 +383,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.log(`- Turn validation: ${game.currentPlayer} === ${playerSymbol} ? ${game.currentPlayer === playerSymbol}`);
       
       if (game.currentPlayer !== playerSymbol) {
-        console.log(`❌ MOVE REJECTED: Not your turn`);
-        return res.status(400).json({ message: `Not your turn. Current player: ${game.currentPlayer}, Your symbol: ${playerSymbol}` });
+        console.log(`❌ MOVE REJECTED: Not your turn. Current: ${game.currentPlayer}, User: ${playerSymbol}`);
+        return res.status(400).json({ 
+          message: `Not your turn. Current player: ${game.currentPlayer}, Your symbol: ${playerSymbol}`,
+          debug: {
+            userId,
+            playerXId: game.playerXId,
+            playerOId: game.playerOId,
+            currentPlayer: game.currentPlayer,
+            isPlayerX,
+            isPlayerO,
+            playerSymbol
+          }
+        });
       }
 
       // Validate move
