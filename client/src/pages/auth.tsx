@@ -36,7 +36,7 @@ export default function Auth() {
           description: "Welcome back!",
         });
         // Redirect to dashboard after successful login
-        setLocation("/home");
+        setLocation("/");
       } else {
         if (!email) {
           toast({
@@ -59,7 +59,7 @@ export default function Auth() {
         
         // Also redirect to dashboard after a short delay if email verification is not required
         setTimeout(() => {
-          setLocation("/home");
+          setLocation("/");
         }, 2000);
       }
     } catch (error) {

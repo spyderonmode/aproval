@@ -83,6 +83,7 @@ export function RoomManager({
       return response.json();
     },
     onSuccess: (game) => {
+      console.log('🎮 Game started successfully:', game);
       onGameStart(game);
       toast({
         title: "Game Started",
@@ -182,12 +183,15 @@ export function RoomManager({
               {/* Check if user is room owner */}
               {currentRoom.ownerId === (user?.userId || user?.id) ? (
                 <Button
-                  onClick={() => startGameMutation.mutate()}
+                  onClick={() => {
+                    console.log('🎮 Start game button clicked');
+                    startGameMutation.mutate();
+                  }}
                   disabled={startGameMutation.isPending}
                   className="flex-1 bg-primary hover:bg-primary/90"
                 >
                   <Play className="w-4 h-4 mr-2" />
-                  Start Game
+                  {startGameMutation.isPending ? 'Starting...' : 'Start Game'}
                 </Button>
               ) : (
                 <Button

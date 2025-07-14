@@ -28,8 +28,7 @@ export default function Home() {
   const [showCreateRoom, setShowCreateRoom] = useState(false);
   const [showGameOver, setShowGameOver] = useState(false);
   const [gameResult, setGameResult] = useState<any>(null);
-  const [isMatchmaking, setIsMatchmaking] = useState(false);
-  const [matchmakingStatus, setMatchmakingStatus] = useState('');
+  // Remove matchmaking state variables
 
   const { data: userStats } = useQuery({
     queryKey: ["/api/users", user?.id, "stats"],
@@ -48,12 +47,9 @@ export default function Home() {
           // Handle game start from WebSocket - ensure both players transition
           if (lastMessage.roomId === currentRoom?.id) {
             console.log('🎮 Setting current game from WebSocket:', lastMessage.game);
+            // Force complete state update to ensure game appears
             setCurrentGame(lastMessage.game);
-            // Also trigger a re-render to ensure the game board appears
-            setCurrentGame(prevGame => ({
-              ...lastMessage.game,
-              timestamp: Date.now() // Force re-render
-            }));
+            // No need for setTimeout - just ensure the state is properly set
           }
           break;
         case 'game_over':
@@ -76,22 +72,7 @@ export default function Home() {
             setShowGameOver(true);
           }
           break;
-        case 'match_found':
-          // Handle successful matchmaking
-          setIsMatchmaking(false);
-          setMatchmakingStatus('');
-          setCurrentRoom(lastMessage.room);
-          joinRoom(lastMessage.room.id);
-          break;
-        case 'matchmaking_response':
-          // Handle matchmaking response for waiting players
-          if (lastMessage.status === 'matched') {
-            setIsMatchmaking(false);
-            setMatchmakingStatus('');
-            setCurrentRoom(lastMessage.room);
-            joinRoom(lastMessage.room.id);
-          }
-          break;
+        // Remove matchmaking WebSocket handlers
       }
     }
   }, [lastMessage, currentGame, currentRoom, user, playSound]);
@@ -113,53 +94,7 @@ export default function Home() {
     setCurrentGame(game);
   };
 
-  const handleStartOnlineMatch = async () => {
-    try {
-      setIsMatchmaking(true);
-      setMatchmakingStatus('Searching for opponent...');
-      
-      const response = await fetch('/api/matchmaking/join', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
-      
-      if (!response.ok) {
-        throw new Error('Failed to join matchmaking');
-      }
-      
-      const data = await response.json();
-      
-      if (data.status === 'waiting') {
-        setMatchmakingStatus('Waiting for another player...');
-      } else if (data.status === 'matched') {
-        setIsMatchmaking(false);
-        setMatchmakingStatus('');
-        setCurrentRoom(data.room);
-        joinRoom(data.room.id);
-      }
-    } catch (error) {
-      console.error('Matchmaking error:', error);
-      setIsMatchmaking(false);
-      setMatchmakingStatus('');
-    }
-  };
-
-  const handleCancelMatchmaking = async () => {
-    try {
-      await fetch('/api/matchmaking/leave', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
-      setIsMatchmaking(false);
-      setMatchmakingStatus('');
-    } catch (error) {
-      console.error('Error canceling matchmaking:', error);
-    }
-  };
+  // Remove matchmaking functions - only keeping create room and join room
 
   // Initialize local game for AI and pass-play modes when no game exists
   const initializeLocalGame = () => {
@@ -342,55 +277,24 @@ export default function Home() {
               }}
             />
 
-            {/* Online Matchmaking */}
+            {/* Online Room Management */}
             {selectedMode === 'online' && (
               <Card className="bg-slate-800 border-slate-700">
                 <CardHeader>
-                  <CardTitle className="text-lg">Online Matchmaking</CardTitle>
+                  <CardTitle className="text-lg">Online Room Management</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  {!currentRoom && !isMatchmaking && (
-                    <div className="space-y-4">
-                      <p className="text-sm text-gray-300">
-                        Find an opponent to play against online in real-time.
-                      </p>
-                      <Button 
-                        onClick={() => {
-                          playSound('click');
-                          handleStartOnlineMatch();
-                        }}
-                        className="w-full bg-blue-600 hover:bg-blue-700"
-                      >
-                        Find Match
-                      </Button>
-                    </div>
-                  )}
-                  {!currentRoom && isMatchmaking && (
-                    <div className="space-y-4">
-                      <div className="flex items-center space-x-2">
-                        <div className="w-2 h-2 bg-blue-500 rounded-full animate-ping"></div>
-                        <span className="text-sm">{matchmakingStatus}</span>
-                      </div>
-                      <Button 
-                        onClick={() => {
-                          playSound('click');
-                          handleCancelMatchmaking();
-                        }}
-                        variant="outline"
-                        className="w-full"
-                      >
-                        Cancel
-                      </Button>
-                    </div>
-                  )}
-                  {currentRoom && (
-                    <div className="space-y-4">
+                  <div className="space-y-4">
+                    <p className="text-sm text-gray-300">
+                      Create a room or join an existing room to play online with friends.
+                    </p>
+                    {currentRoom && (
                       <div className="flex items-center space-x-2">
                         <div className="w-2 h-2 bg-green-500 rounded-full"></div>
                         <span className="text-sm">Connected to room {currentRoom.code}</span>
                       </div>
-                    </div>
-                  )}
+                    )}
+                  </div>
                 </CardContent>
               </Card>
             )}
