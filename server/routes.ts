@@ -187,7 +187,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post('/api/games', requireAuth, async (req: any, res) => {
     try {
       const userId = req.user.userId;
-      const gameData = insertGameSchema.parse(req.body);
+      console.log('Game creation request:', req.body);
+      console.log('User ID:', userId);
+      
+      // Validate the request body with detailed error reporting
+      const parseResult = insertGameSchema.safeParse(req.body);
+      if (!parseResult.success) {
+        console.log('Schema validation failed:', parseResult.error);
+        return res.status(400).json({ 
+          message: "Invalid game data", 
+          errors: parseResult.error.errors 
+        });
+      }
+      
+      const gameData = parseResult.data;
+      console.log('Parsed game data:', gameData);
       
       let gameCreateData;
       
@@ -267,7 +281,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(gameWithPlayers);
     } catch (error) {
       console.error("Error creating game:", error);
-      res.status(500).json({ message: "Failed to create game" });
+      console.error("Error stack:", error.stack);
+      res.status(500).json({ message: "Failed to create game", error: error.message });
     }
   });
 

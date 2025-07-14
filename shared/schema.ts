@@ -126,9 +126,10 @@ export const insertRoomSchema = createInsertSchema(rooms).pick({
 
 export const insertGameSchema = createInsertSchema(games).pick({
   roomId: true,
-  playerXId: true,
-  playerOId: true,
   gameMode: true,
+}).extend({
+  playerXId: z.string().optional(),
+  playerOId: z.string().optional(),
 });
 
 export const insertMoveSchema = createInsertSchema(moves).pick({
