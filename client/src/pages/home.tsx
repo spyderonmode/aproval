@@ -185,16 +185,24 @@ export default function Home() {
                   <span><strong>Horizontal Win:</strong> Get 4 symbols in a row horizontally</span>
                 </div>
                 <div className="flex items-start space-x-2">
-                  <div className="w-1.5 h-1.5 bg-green-500 rounded-full mt-2"></div>
+                  <div className="w-1.5 h-1.5 bg-blue-500 rounded-full mt-2"></div>
                   <span><strong>Vertical Win:</strong> Get 3 symbols in a column vertically</span>
                 </div>
                 <div className="flex items-start space-x-2">
-                  <div className="w-1.5 h-1.5 bg-green-500 rounded-full mt-2"></div>
-                  <span><strong>Diagonal Win:</strong> Get 3 symbols diagonally (columns 5, 10, 15 restricted)</span>
+                  <div className="w-1.5 h-1.5 bg-purple-500 rounded-full mt-2"></div>
+                  <span><strong>Diagonal Win:</strong> Get 3 symbols diagonally (positions 5, 10, 15 restricted)</span>
                 </div>
                 <div className="flex items-start space-x-2">
-                  <div className="w-1.5 h-1.5 bg-green-500 rounded-full mt-2"></div>
-                  <span><strong>Grid:</strong> Complete 3x5 board with positions 1-15</span>
+                  <div className="w-1.5 h-1.5 bg-yellow-500 rounded-full mt-2"></div>
+                  <span><strong>Grid Layout:</strong> 3 rows × 5 columns (positions 1-15)</span>
+                </div>
+                <div className="flex items-start space-x-2">
+                  <div className="w-1.5 h-1.5 bg-orange-500 rounded-full mt-2"></div>
+                  <span><strong>Valid Diagonal Patterns:</strong> [1,7,13], [2,8,14], [3,7,11], [4,8,12]</span>
+                </div>
+                <div className="flex items-start space-x-2">
+                  <div className="w-1.5 h-1.5 bg-red-500 rounded-full mt-2"></div>
+                  <span><strong>Restricted:</strong> No diagonal wins using the rightmost column (5, 10, 15)</span>
                 </div>
               </CardContent>
             </Card>

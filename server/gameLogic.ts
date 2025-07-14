@@ -86,28 +86,31 @@ export function checkVerticalWin(board: GameBoard, player: string): boolean {
 
 export function checkDiagonalWin(board: GameBoard, player: string): boolean {
   // Define diagonal patterns for 3 consecutive positions on the 3x5 grid
-  // Exclude patterns that include columns 5, 10, 15 (positions 5, 10, 15)
+  // STRICTLY exclude any patterns that include positions 5, 10, or 15 (last column)
   const diagonalPatterns = [
-    // Main diagonals (top-left to bottom-right) - excluding those with positions 5, 10, 15
-    [1, 7, 13],   // 1 -> 7 -> 13
-    [2, 8, 14],   // 2 -> 8 -> 14  
+    // Main diagonals (top-left to bottom-right) - ONLY those without positions 5, 10, 15
+    [1, 7, 13],   // 1 -> 7 -> 13 (valid: no positions 5, 10, 15)
+    [2, 8, 14],   // 2 -> 8 -> 14 (valid: no positions 5, 10, 15)
     // [3, 9, 15] - EXCLUDED (contains position 15)
     
-    // Anti-diagonals (top-right to bottom-left) - excluding those with positions 5, 10, 15
-    [3, 7, 11],   // 3 -> 7 -> 11
-    [4, 8, 12],   // 4 -> 8 -> 12
+    // Anti-diagonals (top-right to bottom-left) - ONLY those without positions 5, 10, 15
+    [3, 7, 11],   // 3 -> 7 -> 11 (valid: no positions 5, 10, 15)
+    [4, 8, 12],   // 4 -> 8 -> 12 (valid: no positions 5, 10, 15)
     // [5, 9, 13] - EXCLUDED (contains position 5)
     
-    // Additional diagonal patterns - excluding those with positions 5, 10, 15
-    // [6, 8, 10] - EXCLUDED (contains position 10)
-    [11, 7, 3],   // 11 -> 7 -> 3
-    [12, 8, 4],   // 12 -> 8 -> 4
-    // [13, 9, 5] - EXCLUDED (contains position 5)
-    // [1, 8, 15] - EXCLUDED (contains position 15)
-    // [5, 8, 11] - EXCLUDED (contains position 5)
+    // All other diagonal patterns are excluded because they contain positions 5, 10, or 15
   ];
 
+  // Additional validation: ensure no pattern contains restricted positions
+  const restrictedPositions = [5, 10, 15];
+  
   for (const pattern of diagonalPatterns) {
+    // Double-check that pattern doesn't contain restricted positions
+    const hasRestrictedPosition = pattern.some(pos => restrictedPositions.includes(pos));
+    if (hasRestrictedPosition) {
+      continue; // Skip this pattern
+    }
+    
     if (pattern.every(pos => board[pos.toString()] === player)) {
       return true;
     }
