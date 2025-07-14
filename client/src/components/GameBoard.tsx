@@ -4,6 +4,7 @@ import { apiRequest } from "@/lib/queryClient";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
+import { useAudio } from "@/hooks/useAudio";
 import { isUnauthorizedError } from "@/lib/authUtils";
 
 const VALID_POSITIONS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15];
@@ -19,6 +20,7 @@ export function GameBoard({ game, onGameOver, gameMode, user }: GameBoardProps) 
   const [board, setBoard] = useState<Record<string, string>>({});
   const [currentPlayer, setCurrentPlayer] = useState<'X' | 'O'>('X');
   const { toast } = useToast();
+  const { playSound } = useAudio();
   const queryClient = useQueryClient();
 
   useEffect(() => {
@@ -69,6 +71,7 @@ export function GameBoard({ game, onGameOver, gameMode, user }: GameBoardProps) 
   const handleLocalMove = (position: number) => {
     if (!game) return;
     
+    playSound('move');
     const newBoard = { ...board };
     newBoard[position.toString()] = currentPlayer;
     
@@ -156,6 +159,7 @@ export function GameBoard({ game, onGameOver, gameMode, user }: GameBoardProps) 
     // Simple AI: random move
     const randomMove = availableMoves[Math.floor(Math.random() * availableMoves.length)];
     
+    playSound('move');
     const newBoard = { ...currentBoard };
     newBoard[randomMove.toString()] = 'O';
     
@@ -262,6 +266,7 @@ export function GameBoard({ game, onGameOver, gameMode, user }: GameBoardProps) 
       }
     }
 
+    playSound('move');
     makeMoveMutation.mutate(position);
   };
 

@@ -1,10 +1,12 @@
 import { useAuth } from "@/hooks/useAuth";
 import { useWebSocket } from "@/hooks/useWebSocket";
+import { useAudio } from "@/hooks/useAudio";
 import { useQuery } from "@tanstack/react-query";
 import { useState, useEffect } from "react";
 import { GameBoard } from "@/components/GameBoard";
 import { GameModeSelector } from "@/components/GameModeSelector";
 import { ProfileManager } from "@/components/ProfileManager";
+import { AudioControls } from "@/components/AudioControls";
 import { RoomManager } from "@/components/RoomManager";
 import { PlayerList } from "@/components/PlayerList";
 import { CreateRoomModal } from "@/components/CreateRoomModal";
@@ -19,6 +21,7 @@ import { logout } from "@/lib/firebase";
 export default function Home() {
   const { user } = useAuth();
   const { isConnected, lastMessage, joinRoom, leaveRoom } = useWebSocket();
+  const { playSound } = useAudio();
   const [selectedMode, setSelectedMode] = useState<'ai' | 'pass-play' | 'online'>('ai');
   const [currentRoom, setCurrentRoom] = useState<any>(null);
   const [currentGame, setCurrentGame] = useState<any>(null);
@@ -37,6 +40,7 @@ export default function Home() {
         case 'move':
         case 'ai_move':
           // Handle move updates
+          playSound('move');
           if (currentGame && lastMessage.gameId === currentGame.id) {
             setCurrentGame(prev => ({
               ...prev,
@@ -46,6 +50,14 @@ export default function Home() {
           }
           break;
         case 'game_over':
+          // Play appropriate sound based on result
+          if (lastMessage.winner === user?.userId) {
+            playSound('win');
+          } else if (lastMessage.winner === null) {
+            playSound('draw');
+          } else {
+            playSound('lose');
+          }
           setGameResult(lastMessage);
           setShowGameOver(true);
           break;
@@ -93,6 +105,14 @@ export default function Home() {
   }, [selectedMode, currentGame, user]);
 
   const handleGameOver = (result: any) => {
+    // Play appropriate sound based on result
+    if (result.winner === 'X') {
+      playSound('win');
+    } else if (result.winner === 'O') {
+      playSound('lose');
+    } else {
+      playSound('draw');
+    }
     setGameResult(result);
     setShowGameOver(true);
   };
@@ -214,7 +234,10 @@ export default function Home() {
             {/* Game Mode Selection */}
             <GameModeSelector 
               selectedMode={selectedMode}
-              onModeChange={setSelectedMode}
+              onModeChange={(mode) => {
+                playSound('click');
+                setSelectedMode(mode);
+              }}
             />
 
             {/* Room Management */}
@@ -231,6 +254,9 @@ export default function Home() {
             {currentRoom && (
               <PlayerList roomId={currentRoom.id} />
             )}
+
+            {/* Audio Controls */}
+            <AudioControls />
 
             {/* Game Statistics */}
             <Card className="bg-slate-800 border-slate-700">
