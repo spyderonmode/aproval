@@ -72,9 +72,9 @@ export function GameOverModal({ open, onClose, result, onPlayAgain }: GameOverMo
           ) : (
             <div>
               <div style={{ width: '64px', height: '64px', margin: '0 auto 16px' }}>
-                {winnerInfo?.profilePicture ? (
+                {winnerInfo?.profileImageUrl || winnerInfo?.profilePicture ? (
                   <img 
-                    src={winnerInfo.profilePicture} 
+                    src={winnerInfo.profileImageUrl || winnerInfo.profilePicture} 
                     alt="Winner" 
                     style={{
                       width: '64px',

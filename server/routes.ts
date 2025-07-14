@@ -505,7 +505,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
                   displayName: winnerInfo.displayName,
                   firstName: winnerInfo.firstName,
                   username: winnerInfo.username,
-                  profilePicture: winnerInfo.profilePicture
+                  profilePicture: winnerInfo.profilePicture,
+                  profileImageUrl: winnerInfo.profileImageUrl
                 } : null
               }));
             }

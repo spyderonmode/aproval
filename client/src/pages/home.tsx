@@ -114,6 +114,8 @@ export default function Home() {
             } else {
               playSound('lose');
             }
+            console.log('🎮 Game over message received:', lastMessage);
+            console.log('🎮 Winner info from server:', lastMessage.winnerInfo);
             setGameResult({
               winner: lastMessage.winner,
               condition: lastMessage.condition,
@@ -199,6 +201,7 @@ export default function Home() {
         
         if (response.ok) {
           const newGame = await response.json();
+          console.log('🎮 New game created for play again:', newGame);
           setCurrentGame(newGame);
           
           // Broadcast new game to all room participants
@@ -210,6 +213,8 @@ export default function Home() {
           });
           
           playSound('gameStart');
+        } else {
+          console.error('Failed to create new game:', response.status);
         }
       } catch (error) {
         console.error('Error starting new game:', error);
