@@ -345,10 +345,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const { id: gameId } = req.params;
       const { position } = req.body;
 
+      console.log(`\n=== MOVE REQUEST ===`);
+      console.log(`Game ID: ${gameId}`);
+      console.log(`User ID: ${userId}`);
+      console.log(`Position: ${position}`);
+
       const game = await storage.getGameById(gameId);
       if (!game) {
         return res.status(404).json({ message: "Game not found" });
       }
+
+      console.log(`Current game state:`);
+      console.log(`- Player X: ${game.playerXId}`);
+      console.log(`- Player O: ${game.playerOId}`);
+      console.log(`- Current player: ${game.currentPlayer}`);
+      console.log(`- Board: ${JSON.stringify(game.board)}`);
 
       if (game.status !== 'active') {
         return res.status(400).json({ message: "Game is not active" });
@@ -358,13 +369,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const isPlayerX = game.playerXId === userId;
       const isPlayerO = game.playerOId === userId;
       
+      console.log(`- Is Player X: ${isPlayerX}`);
+      console.log(`- Is Player O: ${isPlayerO}`);
+      
       if (!isPlayerX && !isPlayerO) {
         return res.status(403).json({ message: "Not a player in this game" });
       }
 
       const playerSymbol = isPlayerX ? 'X' : 'O';
+      console.log(`- Player symbol: ${playerSymbol}`);
+      console.log(`- Turn validation: ${game.currentPlayer} === ${playerSymbol} ? ${game.currentPlayer === playerSymbol}`);
       
       if (game.currentPlayer !== playerSymbol) {
+        console.log(`❌ MOVE REJECTED: Not your turn`);
         return res.status(400).json({ message: `Not your turn. Current player: ${game.currentPlayer}, Your symbol: ${playerSymbol}` });
       }
 
@@ -452,12 +469,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
         const nextPlayer = getOpponentSymbol(playerSymbol);
         await storage.updateCurrentPlayer(gameId, nextPlayer);
         
+        console.log(`✅ MOVE SUCCESSFUL: ${playerSymbol} at position ${position}`);
+        console.log(`- Next player: ${nextPlayer}`);
+        console.log(`- Broadcasting to room: ${game.roomId}`);
+        
         // Broadcast move to room AFTER updating current player
         if (game.roomId && roomConnections.has(game.roomId)) {
           const roomUsers = roomConnections.get(game.roomId)!;
+          console.log(`- Room has ${roomUsers.size} connected users`);
           roomUsers.forEach(connectionId => {
             const connection = connections.get(connectionId);
             if (connection && connection.ws.readyState === WebSocket.OPEN) {
+              console.log(`- Sending move to user: ${connection.userId}`);
               connection.ws.send(JSON.stringify({
                 type: 'move',
                 gameId,
