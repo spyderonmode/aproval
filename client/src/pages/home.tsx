@@ -4,6 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useState, useEffect } from "react";
 import { GameBoard } from "@/components/GameBoard";
 import { GameModeSelector } from "@/components/GameModeSelector";
+import { ProfileManager } from "@/components/ProfileManager";
 import { RoomManager } from "@/components/RoomManager";
 import { PlayerList } from "@/components/PlayerList";
 import { CreateRoomModal } from "@/components/CreateRoomModal";
@@ -111,10 +112,18 @@ export default function Home() {
           {/* User Profile */}
           <div className="flex items-center space-x-4">
             <div className="flex items-center space-x-3">
-              <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center">
-                <User className="w-5 h-5 text-white" />
-              </div>
-              <span className="text-gray-300">{user?.username || 'Player'}</span>
+              {user?.profilePicture ? (
+                <img 
+                  src={user.profilePicture} 
+                  alt="Profile" 
+                  className="w-8 h-8 rounded-full object-cover"
+                />
+              ) : (
+                <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center">
+                  <User className="w-5 h-5 text-white" />
+                </div>
+              )}
+              <span className="text-gray-300">{user?.displayName || user?.username || 'Player'}</span>
             </div>
             <div className="flex items-center space-x-2">
               <div className={`w-2 h-2 rounded-full ${isConnected ? 'bg-green-500' : 'bg-red-500'}`}></div>
@@ -153,15 +162,19 @@ export default function Home() {
               <CardContent className="space-y-3 text-sm text-gray-300">
                 <div className="flex items-start space-x-2">
                   <div className="w-1.5 h-1.5 bg-green-500 rounded-full mt-2"></div>
-                  <span><strong>Diagonal Win:</strong> Get 3 symbols on straight diagonal lines</span>
+                  <span><strong>Horizontal Win:</strong> Get 4 symbols in a row horizontally</span>
+                </div>
+                <div className="flex items-start space-x-2">
+                  <div className="w-1.5 h-1.5 bg-green-500 rounded-full mt-2"></div>
+                  <span><strong>Vertical Win:</strong> Get 3 symbols in a column vertically</span>
+                </div>
+                <div className="flex items-start space-x-2">
+                  <div className="w-1.5 h-1.5 bg-green-500 rounded-full mt-2"></div>
+                  <span><strong>Diagonal Win:</strong> Get 3 symbols diagonally (columns 5, 10, 15 restricted)</span>
                 </div>
                 <div className="flex items-start space-x-2">
                   <div className="w-1.5 h-1.5 bg-green-500 rounded-full mt-2"></div>
                   <span><strong>Grid:</strong> Complete 3x5 board with positions 1-15</span>
-                </div>
-                <div className="flex items-start space-x-2">
-                  <div className="w-1.5 h-1.5 bg-green-500 rounded-full mt-2"></div>
-                  <span><strong>Strategy:</strong> Only diagonal patterns count - no horizontal or vertical wins</span>
                 </div>
               </CardContent>
             </Card>
@@ -179,12 +192,21 @@ export default function Home() {
               </CardHeader>
               <CardContent>
                 <div className="text-center">
-                  <div className="w-16 h-16 bg-primary rounded-full flex items-center justify-center mx-auto mb-3">
-                    <User className="w-8 h-8 text-white" />
-                  </div>
-                  <p className="text-sm text-gray-300">
-                    {user?.username || 'Player'}
+                  {user?.profilePicture ? (
+                    <img 
+                      src={user.profilePicture} 
+                      alt="Profile" 
+                      className="w-16 h-16 rounded-full object-cover mx-auto mb-3"
+                    />
+                  ) : (
+                    <div className="w-16 h-16 bg-primary rounded-full flex items-center justify-center mx-auto mb-3">
+                      <User className="w-8 h-8 text-white" />
+                    </div>
+                  )}
+                  <p className="text-sm text-gray-300 mb-3">
+                    {user?.displayName || user?.username || 'Player'}
                   </p>
+                  <ProfileManager user={user} />
                 </div>
               </CardContent>
             </Card>

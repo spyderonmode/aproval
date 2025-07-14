@@ -10,10 +10,11 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
-- **JSON Authentication System** (July 14, 2025): Replaced Google/Firebase authentication with simple JSON-based login/register system
+- **Updated Game Rules** (July 14, 2025): Changed winning conditions to horizontal (4 in a row), vertical (3 in a column), and diagonal (3 in diagonal, excluding columns 5, 10, 15)
+- **Profile Management System**: Added ability for users to upload profile pictures and set display names
+- **Enhanced Authentication**: Extended user data to include displayName and profilePicture fields
+- **JSON Authentication System**: Replaced Google/Firebase authentication with simple JSON-based login/register system
 - **Local Game Initialization**: Fixed "game not active" error by implementing automatic game initialization for AI and pass-play modes
-- **Simplified User Interface**: Updated UI to display username instead of Google profile information
-- **Password Security**: Added password hashing using Node.js crypto module for secure authentication
 - **Session Management**: Implemented Express sessions for secure user authentication
 
 ## System Architecture

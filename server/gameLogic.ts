@@ -1,5 +1,5 @@
 export type GameBoard = Record<string, string>;
-export type WinCondition = 'diagonal' | null;
+export type WinCondition = 'diagonal' | 'horizontal' | 'vertical' | null;
 
 // Valid positions in the 3x5 grid (1-15)
 export const VALID_POSITIONS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15];
@@ -45,31 +45,66 @@ export function makeMove(board: GameBoard, position: number, player: string): Ga
   };
 }
 
-// Horizontal win is no longer used - only diagonal wins are allowed
 export function checkHorizontalWin(board: GameBoard, player: string): boolean {
+  // Check for 4 consecutive tokens horizontally in any row
+  const rows = [
+    [1, 2, 3, 4, 5],
+    [6, 7, 8, 9, 10],
+    [11, 12, 13, 14, 15]
+  ];
+  
+  for (const row of rows) {
+    for (let i = 0; i <= row.length - 4; i++) {
+      const positions = row.slice(i, i + 4);
+      if (positions.every(pos => board[pos.toString()] === player)) {
+        return true;
+      }
+    }
+  }
+  
+  return false;
+}
+
+export function checkVerticalWin(board: GameBoard, player: string): boolean {
+  // Check for 3 consecutive tokens vertically in any column
+  const columns = [
+    [1, 6, 11],   // Column 1
+    [2, 7, 12],   // Column 2
+    [3, 8, 13],   // Column 3
+    [4, 9, 14],   // Column 4
+    [5, 10, 15]   // Column 5
+  ];
+  
+  for (const column of columns) {
+    if (column.every(pos => board[pos.toString()] === player)) {
+      return true;
+    }
+  }
+  
   return false;
 }
 
 export function checkDiagonalWin(board: GameBoard, player: string): boolean {
   // Define diagonal patterns for 3 consecutive positions on the 3x5 grid
+  // Exclude patterns that include columns 5, 10, 15 (positions 5, 10, 15)
   const diagonalPatterns = [
-    // Main diagonals (top-left to bottom-right)
+    // Main diagonals (top-left to bottom-right) - excluding those with positions 5, 10, 15
     [1, 7, 13],   // 1 -> 7 -> 13
     [2, 8, 14],   // 2 -> 8 -> 14  
-    [3, 9, 15],   // 3 -> 9 -> 15
+    // [3, 9, 15] - EXCLUDED (contains position 15)
     
-    // Anti-diagonals (top-right to bottom-left)
+    // Anti-diagonals (top-right to bottom-left) - excluding those with positions 5, 10, 15
     [3, 7, 11],   // 3 -> 7 -> 11
     [4, 8, 12],   // 4 -> 8 -> 12
-    [5, 9, 13],   // 5 -> 9 -> 13
+    // [5, 9, 13] - EXCLUDED (contains position 5)
     
-    // Additional diagonal patterns
-    [6, 8, 10],   // 6 -> 8 -> 10
+    // Additional diagonal patterns - excluding those with positions 5, 10, 15
+    // [6, 8, 10] - EXCLUDED (contains position 10)
     [11, 7, 3],   // 11 -> 7 -> 3
     [12, 8, 4],   // 12 -> 8 -> 4
-    [13, 9, 5],   // 13 -> 9 -> 5
-    [1, 8, 15],   // 1 -> 8 -> 15
-    [5, 8, 11],   // 5 -> 8 -> 11
+    // [13, 9, 5] - EXCLUDED (contains position 5)
+    // [1, 8, 15] - EXCLUDED (contains position 15)
+    // [5, 8, 11] - EXCLUDED (contains position 5)
   ];
 
   for (const pattern of diagonalPatterns) {
@@ -82,6 +117,14 @@ export function checkDiagonalWin(board: GameBoard, player: string): boolean {
 }
 
 export function checkWin(board: GameBoard, player: string): { winner: boolean; condition: WinCondition } {
+  if (checkHorizontalWin(board, player)) {
+    return { winner: true, condition: 'horizontal' };
+  }
+  
+  if (checkVerticalWin(board, player)) {
+    return { winner: true, condition: 'vertical' };
+  }
+  
   if (checkDiagonalWin(board, player)) {
     return { winner: true, condition: 'diagonal' };
   }

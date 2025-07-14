@@ -8,6 +8,8 @@ interface User {
   id: string;
   username: string;
   password: string;
+  displayName?: string;
+  profilePicture?: string;
   createdAt: string;
 }
 
@@ -60,11 +62,32 @@ function createUser(username: string, password: string): User {
     id: crypto.randomUUID(),
     username,
     password: hashPassword(password),
+    displayName: username,
+    profilePicture: null,
     createdAt: new Date().toISOString()
   };
   users.push(newUser);
   saveUsers(users);
   return newUser;
+}
+
+function updateUser(userId: string, updates: Partial<User>): User | null {
+  const users = getUsers();
+  const userIndex = users.findIndex(u => u.id === userId);
+  
+  if (userIndex === -1) {
+    return null;
+  }
+  
+  users[userIndex] = { ...users[userIndex], ...updates };
+  saveUsers(users);
+  
+  return users[userIndex];
+}
+
+function getUserById(userId: string): User | undefined {
+  const users = getUsers();
+  return users.find(u => u.id === userId);
 }
 
 export function setupAuth(app: Express) {
@@ -137,7 +160,45 @@ export function setupAuth(app: Express) {
     if (!req.session.user) {
       return res.status(401).json({ error: 'Not authenticated' });
     }
-    res.json(req.session.user);
+    
+    // Get full user info including profile data
+    const user = getUserById(req.session.user.userId);
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+    
+    res.json({
+      userId: user.id,
+      username: user.username,
+      displayName: user.displayName,
+      profilePicture: user.profilePicture
+    });
+  });
+
+  // Update user profile endpoint
+  app.put('/api/auth/profile', (req, res) => {
+    if (!req.session.user) {
+      return res.status(401).json({ error: 'Not authenticated' });
+    }
+    
+    const { displayName, profilePicture } = req.body;
+    const userId = req.session.user.userId;
+    
+    const updates: Partial<User> = {};
+    if (displayName !== undefined) updates.displayName = displayName;
+    if (profilePicture !== undefined) updates.profilePicture = profilePicture;
+    
+    const updatedUser = updateUser(userId, updates);
+    if (!updatedUser) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+    
+    res.json({
+      userId: updatedUser.id,
+      username: updatedUser.username,
+      displayName: updatedUser.displayName,
+      profilePicture: updatedUser.profilePicture
+    });
   });
 
   // Middleware to check authentication

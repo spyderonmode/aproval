@@ -72,12 +72,40 @@ export function GameBoard({ game, onGameOver, gameMode, user }: GameBoardProps) 
     const newBoard = { ...board };
     newBoard[position.toString()] = currentPlayer;
     
-    // Check for win condition (diagonal only)
+    // Check for win condition (horizontal: 4 in a row, vertical: 3 in a column, diagonal: 3 in diagonal excluding columns 5,10,15)
     const checkWin = (board: Record<string, string>, player: string) => {
+      // Check horizontal (4 consecutive)
+      const rows = [
+        [1, 2, 3, 4, 5],
+        [6, 7, 8, 9, 10],
+        [11, 12, 13, 14, 15]
+      ];
+      
+      for (const row of rows) {
+        for (let i = 0; i <= row.length - 4; i++) {
+          const positions = row.slice(i, i + 4);
+          if (positions.every(pos => board[pos.toString()] === player)) {
+            return true;
+          }
+        }
+      }
+      
+      // Check vertical (3 consecutive)
+      const columns = [
+        [1, 6, 11], [2, 7, 12], [3, 8, 13], [4, 9, 14], [5, 10, 15]
+      ];
+      
+      for (const column of columns) {
+        if (column.every(pos => board[pos.toString()] === player)) {
+          return true;
+        }
+      }
+      
+      // Check diagonal (3 consecutive, excluding columns 5,10,15)
       const diagonals = [
-        [1, 7, 13], [2, 8, 14], [3, 9, 15],
-        [3, 7, 11], [4, 8, 12], [5, 9, 13],
-        [6, 8, 10], [1, 8, 15], [5, 8, 11]
+        [1, 7, 13], [2, 8, 14], // Main diagonals (excluding [3,9,15])
+        [3, 7, 11], [4, 8, 12], // Anti-diagonals (excluding [5,9,13])
+        [11, 7, 3], [12, 8, 4]  // Additional patterns (excluding those with 5,10,15)
       ];
       
       return diagonals.some(diagonal => 
@@ -133,12 +161,40 @@ export function GameBoard({ game, onGameOver, gameMode, user }: GameBoardProps) 
     
     setBoard(newBoard);
     
-    // Check for AI win
+    // Check for AI win using same logic
     const checkWin = (board: Record<string, string>, player: string) => {
+      // Check horizontal (4 consecutive)
+      const rows = [
+        [1, 2, 3, 4, 5],
+        [6, 7, 8, 9, 10],
+        [11, 12, 13, 14, 15]
+      ];
+      
+      for (const row of rows) {
+        for (let i = 0; i <= row.length - 4; i++) {
+          const positions = row.slice(i, i + 4);
+          if (positions.every(pos => board[pos.toString()] === player)) {
+            return true;
+          }
+        }
+      }
+      
+      // Check vertical (3 consecutive)
+      const columns = [
+        [1, 6, 11], [2, 7, 12], [3, 8, 13], [4, 9, 14], [5, 10, 15]
+      ];
+      
+      for (const column of columns) {
+        if (column.every(pos => board[pos.toString()] === player)) {
+          return true;
+        }
+      }
+      
+      // Check diagonal (3 consecutive, excluding columns 5,10,15)
       const diagonals = [
-        [1, 7, 13], [2, 8, 14], [3, 9, 15],
-        [3, 7, 11], [4, 8, 12], [5, 9, 13],
-        [6, 8, 10], [1, 8, 15], [5, 8, 11]
+        [1, 7, 13], [2, 8, 14], // Main diagonals (excluding [3,9,15])
+        [3, 7, 11], [4, 8, 12], // Anti-diagonals (excluding [5,9,13])
+        [11, 7, 3], [12, 8, 4]  // Additional patterns (excluding those with 5,10,15)
       ];
       
       return diagonals.some(diagonal => 
