@@ -36,6 +36,15 @@ export default function Auth() {
         // Redirect to home after successful login
         setLocation("/");
       } else {
+        if (!email) {
+          toast({
+            title: "Email required",
+            description: "Please provide an email address to register.",
+            variant: "destructive",
+          });
+          return;
+        }
+        
         const user = await register({ username, password, email });
         setUser(user);
         toast({
@@ -43,18 +52,13 @@ export default function Auth() {
           description: "Welcome to TicTac 3x5!",
         });
         
-        // Show email verification modal if email was provided
-        if (email) {
-          setShowEmailVerification(true);
-        } else {
-          // Redirect to home after successful registration
-          setLocation("/");
-        }
+        // Show email verification modal since email is now always required
+        setShowEmailVerification(true);
       }
     } catch (error) {
       toast({
         title: isLogin ? "Login failed" : "Registration failed",
-        description: "Please check your credentials and try again.",
+        description: error instanceof Error ? error.message : "Please check your credentials and try again.",
         variant: "destructive",
       });
     } finally {
@@ -103,17 +107,18 @@ export default function Auth() {
               </div>
               {!isLogin && (
                 <div className="space-y-2">
-                  <Label htmlFor="email" className="text-slate-300">Email (optional)</Label>
+                  <Label htmlFor="email" className="text-slate-300">Email</Label>
                   <Input
                     id="email"
                     type="email"
-                    placeholder="Enter your email (optional)"
+                    placeholder="Enter your email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
+                    required
                     className="bg-slate-700 border-slate-600 text-white"
                   />
                   <p className="text-xs text-slate-400">
-                    Email is optional but recommended for account recovery
+                    Email is required for account verification and recovery
                   </p>
                 </div>
               )}

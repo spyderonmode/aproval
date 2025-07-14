@@ -10,6 +10,11 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+- **Online Matchmaking System** (July 14, 2025): Implemented real-time matchmaking queue for online multiplayer - users click "Find Match" and get automatically paired with other players waiting for matches
+- **Enhanced Winning Line Animation** (July 14, 2025): Upgraded winning line effects with gradients, glow effects, and sparkle animations for better visual feedback
+- **SMTP Email Verification** (July 14, 2025): Replaced SendGrid with configurable SMTP email system for account verification, made email verification optional during registration
+- **Database Schema Fixes** (July 14, 2025): Fixed database foreign key constraints and removed problematic email verification columns causing user creation errors
+- **Room Creation Fixes** (July 14, 2025): Fixed room creation failures by ensuring proper user synchronization between JSON auth and database
 - **Audio System Integration** (July 14, 2025): Added comprehensive audio system with sound effects for moves, wins/losses, and UI interactions, plus background music toggle and volume control
 - **Diagonal Win Restriction Fix** (July 14, 2025): Fixed diagonal win logic to properly exclude positions 5, 10, 15 from diagonal win patterns with additional validation
 - **Enhanced Game Rules Display** (July 14, 2025): Updated both home page and landing page with detailed game rules including valid diagonal patterns and restrictions

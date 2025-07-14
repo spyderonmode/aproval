@@ -42,5 +42,29 @@
     "emailVerificationToken": "f3a06911-5106-472e-8985-c19fea0cf2c5",
     "emailVerificationExpiry": "2025-07-15T13:49:56.601Z",
     "createdAt": "2025-07-14T13:49:56.601Z"
+  },
+  {
+    "id": "51844699-06cd-436e-80c1-c612a3a56b28",
+    "username": "sam01",
+    "password": "e0bc60c82713f64ef8a57c0c40d02ce24fd0141d5cc3086259c19b1e62a62bea",
+    "email": "yogeshsh999@gmail.com",
+    "displayName": "sam01",
+    "profilePicture": null,
+    "isEmailVerified": false,
+    "emailVerificationToken": "290eb698-f4ec-4c51-b21d-3bcbc99bc699",
+    "emailVerificationExpiry": "2025-07-15T14:34:43.518Z",
+    "createdAt": "2025-07-14T14:34:43.518Z"
+  },
+  {
+    "id": "c9122c48-3c24-4891-a6b5-f02aa8362af2",
+    "username": "sam0100",
+    "password": "5dd4fcd7beff3ae9d30eff2e5c977b24ab9f5a7c520d5fcbf04720a0fe2c1c40",
+    "email": "samil000828@gmail.com",
+    "displayName": "sam0100",
+    "profilePicture": null,
+    "isEmailVerified": false,
+    "emailVerificationToken": "f3a12bfa-029d-4ff7-bd3e-2d8334278872",
+    "emailVerificationExpiry": "2025-07-15T14:35:40.787Z",
+    "createdAt": "2025-07-14T14:35:40.787Z"
   }
 ]

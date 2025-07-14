@@ -28,6 +28,8 @@ export default function Home() {
   const [showCreateRoom, setShowCreateRoom] = useState(false);
   const [showGameOver, setShowGameOver] = useState(false);
   const [gameResult, setGameResult] = useState<any>(null);
+  const [isMatchmaking, setIsMatchmaking] = useState(false);
+  const [matchmakingStatus, setMatchmakingStatus] = useState('');
 
   const { data: userStats } = useQuery({
     queryKey: ["/api/users", user?.id, "stats"],
@@ -61,6 +63,13 @@ export default function Home() {
           setGameResult(lastMessage);
           setShowGameOver(true);
           break;
+        case 'match_found':
+          // Handle successful matchmaking
+          setIsMatchmaking(false);
+          setMatchmakingStatus('');
+          setCurrentRoom(lastMessage.room);
+          joinRoom(lastMessage.room.id);
+          break;
       }
     }
   }, [lastMessage, currentGame]);
@@ -79,6 +88,54 @@ export default function Home() {
 
   const handleGameStart = (game: any) => {
     setCurrentGame(game);
+  };
+
+  const handleStartOnlineMatch = async () => {
+    try {
+      setIsMatchmaking(true);
+      setMatchmakingStatus('Searching for opponent...');
+      
+      const response = await fetch('/api/matchmaking/join', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to join matchmaking');
+      }
+      
+      const data = await response.json();
+      
+      if (data.status === 'waiting') {
+        setMatchmakingStatus('Waiting for another player...');
+      } else if (data.status === 'matched') {
+        setIsMatchmaking(false);
+        setMatchmakingStatus('');
+        setCurrentRoom(data.room);
+        joinRoom(data.room.id);
+      }
+    } catch (error) {
+      console.error('Matchmaking error:', error);
+      setIsMatchmaking(false);
+      setMatchmakingStatus('');
+    }
+  };
+
+  const handleCancelMatchmaking = async () => {
+    try {
+      await fetch('/api/matchmaking/leave', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+      setIsMatchmaking(false);
+      setMatchmakingStatus('');
+    } catch (error) {
+      console.error('Error canceling matchmaking:', error);
+    }
   };
 
   // Initialize local game for AI and pass-play modes when no game exists
@@ -248,15 +305,61 @@ export default function Home() {
               }}
             />
 
+            {/* Online Matchmaking */}
+            {selectedMode === 'online' && !currentRoom && (
+              <Card className="bg-slate-800 border-slate-700">
+                <CardHeader>
+                  <CardTitle className="text-lg">Online Matchmaking</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  {!isMatchmaking ? (
+                    <div className="space-y-4">
+                      <p className="text-sm text-gray-300">
+                        Find an opponent to play against online in real-time.
+                      </p>
+                      <Button 
+                        onClick={() => {
+                          playSound('click');
+                          handleStartOnlineMatch();
+                        }}
+                        className="w-full bg-blue-600 hover:bg-blue-700"
+                      >
+                        Find Match
+                      </Button>
+                    </div>
+                  ) : (
+                    <div className="space-y-4">
+                      <div className="flex items-center space-x-2">
+                        <div className="w-2 h-2 bg-blue-500 rounded-full animate-ping"></div>
+                        <span className="text-sm">{matchmakingStatus}</span>
+                      </div>
+                      <Button 
+                        onClick={() => {
+                          playSound('click');
+                          handleCancelMatchmaking();
+                        }}
+                        variant="outline"
+                        className="w-full"
+                      >
+                        Cancel
+                      </Button>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            )}
+
             {/* Room Management */}
-            <RoomManager 
-              currentRoom={currentRoom}
-              onRoomJoin={handleRoomJoin}
-              onRoomLeave={handleRoomLeave}
-              onCreateRoom={() => setShowCreateRoom(true)}
-              onGameStart={handleGameStart}
-              gameMode={selectedMode}
-            />
+            {selectedMode === 'online' && currentRoom && (
+              <RoomManager 
+                currentRoom={currentRoom}
+                onRoomJoin={handleRoomJoin}
+                onRoomLeave={handleRoomLeave}
+                onCreateRoom={() => setShowCreateRoom(true)}
+                onGameStart={handleGameStart}
+                gameMode={selectedMode}
+              />
+            )}
 
             {/* Players & Spectators */}
             {currentRoom && (

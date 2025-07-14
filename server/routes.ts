@@ -19,6 +19,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   const connections = new Map<string, WSConnection>();
   const roomConnections = new Map<string, Set<string>>();
+  const matchmakingQueue: string[] = []; // Queue of user IDs waiting for matches
 
   // User stats route
   app.get('/api/users/:id/stats', requireAuth, async (req: any, res) => {
@@ -29,6 +30,89 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error fetching user stats:", error);
       res.status(500).json({ message: "Failed to fetch user stats" });
+    }
+  });
+
+  // Online matchmaking endpoint
+  app.post('/api/matchmaking/join', requireAuth, async (req: any, res) => {
+    try {
+      const userId = req.user.userId;
+      
+      // Check if user is already in queue
+      if (matchmakingQueue.includes(userId)) {
+        return res.json({ status: 'waiting', message: 'Already in matchmaking queue' });
+      }
+      
+      // Add to queue
+      matchmakingQueue.push(userId);
+      
+      // Check if we can make a match (need 2 players)
+      if (matchmakingQueue.length >= 2) {
+        // Remove two players from queue
+        const player1Id = matchmakingQueue.shift()!;
+        const player2Id = matchmakingQueue.shift()!;
+        
+        // Create room for matched players
+        const room = await storage.createRoom({
+          name: `Match ${Date.now()}`,
+          isPrivate: false,
+          maxPlayers: 2,
+          ownerId: player1Id,
+        });
+        
+        // Add both players as participants
+        await storage.addRoomParticipant({
+          roomId: room.id,
+          userId: player1Id,
+          role: 'player',
+        });
+        
+        await storage.addRoomParticipant({
+          roomId: room.id,
+          userId: player2Id,
+          role: 'player',
+        });
+        
+        // Notify both players via WebSocket
+        const notifyPlayer = (playerId: string) => {
+          // Find connection by userId
+          for (const [connId, connection] of connections.entries()) {
+            if (connection.userId === playerId && connection.ws.readyState === WebSocket.OPEN) {
+              connection.ws.send(JSON.stringify({
+                type: 'match_found',
+                room: room,
+                opponent: playerId === player1Id ? player2Id : player1Id,
+              }));
+              break;
+            }
+          }
+        };
+        
+        notifyPlayer(player1Id);
+        notifyPlayer(player2Id);
+        
+        res.json({ status: 'matched', room: room });
+      } else {
+        res.json({ status: 'waiting', message: 'Waiting for another player...' });
+      }
+    } catch (error) {
+      console.error("Error in matchmaking:", error);
+      res.status(500).json({ message: "Failed to join matchmaking" });
+    }
+  });
+  
+  // Leave matchmaking queue
+  app.post('/api/matchmaking/leave', requireAuth, async (req: any, res) => {
+    try {
+      const userId = req.user.userId;
+      const index = matchmakingQueue.indexOf(userId);
+      if (index > -1) {
+        matchmakingQueue.splice(index, 1);
+      }
+      res.json({ message: 'Left matchmaking queue' });
+    } catch (error) {
+      console.error("Error leaving matchmaking:", error);
+      res.status(500).json({ message: "Failed to leave matchmaking" });
     }
   });
 

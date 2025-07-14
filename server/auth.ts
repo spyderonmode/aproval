@@ -156,12 +156,16 @@ export function setupAuth(app: Express) {
   app.post('/api/auth/register', async (req, res) => {
     const { username, password, email } = req.body;
 
-    if (!username || !password) {
-      return res.status(400).json({ error: 'Username and password are required' });
+    if (!username || !password || !email) {
+      return res.status(400).json({ error: 'Username, password, and email are required' });
     }
 
     if (findUserByUsername(username)) {
       return res.status(400).json({ error: 'Username already exists' });
+    }
+
+    if (findUserByEmail(email)) {
+      return res.status(400).json({ error: 'Email already exists' });
     }
 
     try {

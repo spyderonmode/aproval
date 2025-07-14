@@ -7,13 +7,14 @@ export const login = async (credentials: { username: string; password: string })
   });
   
   if (!response.ok) {
-    throw new Error('Login failed');
+    const errorData = await response.json();
+    throw new Error(errorData.error || 'Login failed');
   }
   
   return response.json();
 };
 
-export const register = async (credentials: { username: string; password: string; email?: string }) => {
+export const register = async (credentials: { username: string; password: string; email: string }) => {
   const response = await fetch('/api/auth/register', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -21,7 +22,8 @@ export const register = async (credentials: { username: string; password: string
   });
   
   if (!response.ok) {
-    throw new Error('Registration failed');
+    const errorData = await response.json();
+    throw new Error(errorData.error || 'Registration failed');
   }
   
   return response.json();
