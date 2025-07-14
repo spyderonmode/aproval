@@ -20,10 +20,20 @@ export function useAuth() {
     checkAuth();
   }, []);
 
+  const refreshUser = async () => {
+    try {
+      const currentUser = await getCurrentUser();
+      setUser(currentUser);
+    } catch (error) {
+      setUser(null);
+    }
+  };
+
   return {
     user,
     isLoading,
     isAuthenticated: !!user,
     setUser,
+    refreshUser,
   };
 }

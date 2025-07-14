@@ -18,7 +18,7 @@ export default function Auth() {
   const [isLoading, setIsLoading] = useState(false);
   const [showEmailVerification, setShowEmailVerification] = useState(false);
   const { toast } = useToast();
-  const { setUser } = useAuth();
+  const { setUser, refreshUser } = useAuth();
   const [, setLocation] = useLocation();
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -29,6 +29,8 @@ export default function Auth() {
       if (isLogin) {
         const user = await login({ username, password });
         setUser(user);
+        // Refresh user state to ensure authentication is properly updated
+        await refreshUser();
         toast({
           title: "Login successful",
           description: "Welcome back!",
@@ -54,6 +56,11 @@ export default function Auth() {
         
         // Show email verification modal since email is now always required
         setShowEmailVerification(true);
+        
+        // Also redirect to home after a short delay if email verification is not required
+        setTimeout(() => {
+          setLocation("/");
+        }, 2000);
       }
     } catch (error) {
       toast({

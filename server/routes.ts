@@ -153,8 +153,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       const participants = await storage.getRoomParticipants(room.id);
-      const playerCount = participants.filter(p => p.role === 'player').length;
+      
+      // Check if user is already in the room
+      const existingParticipant = participants.find(p => p.userId === userId);
+      if (existingParticipant) {
+        return res.json({ message: "Already in room", room });
+      }
 
+      // Check if room is full (only for players)
+      const playerCount = participants.filter(p => p.role === 'player').length;
       if (role === 'player' && playerCount >= 2) {
         return res.status(400).json({ message: "Room is full" });
       }
