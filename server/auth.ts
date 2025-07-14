@@ -4,7 +4,7 @@ import crypto from 'crypto';
 import { Express } from 'express';
 import session from 'express-session';
 import { storage } from './storage';
-import { sendEmail } from './sendgrid';
+import { createEmailService } from './emailService';
 
 interface User {
   id: string;
@@ -90,12 +90,11 @@ async function createUser(username: string, password: string, email?: string): P
       firstName: null,
       lastName: null,
       profileImageUrl: null,
-      isEmailVerified: false,
-      emailVerificationToken: verificationToken || null,
-      emailVerificationExpiry: verificationExpiry || null,
     });
+    console.log('User created in database:', newUser.id);
   } catch (error) {
     console.error('Error creating user in database:', error);
+    return res.status(500).json({ error: 'Failed to create user in database' });
   }
   
   return newUser;
@@ -126,29 +125,14 @@ function findUserByEmail(email: string): User | undefined {
 }
 
 async function sendVerificationEmail(email: string, token: string): Promise<void> {
-  if (!process.env.SENDGRID_API_KEY) {
-    console.warn('SENDGRID_API_KEY not configured. Email verification will be skipped.');
+  const emailService = createEmailService();
+  if (!emailService) {
+    console.log('Email service not configured - verification email not sent');
     return;
   }
-
-  const verificationUrl = `${process.env.FRONTEND_URL || 'http://localhost:5000'}/verify-email?token=${token}`;
   
-  const emailContent = `
-    <h1>Welcome to TicTac 3x5!</h1>
-    <p>Thank you for registering. Please click the link below to verify your email address:</p>
-    <a href="${verificationUrl}" style="background-color: #4CAF50; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">Verify Email</a>
-    <p>If you can't click the button, copy and paste this link into your browser:</p>
-    <p>${verificationUrl}</p>
-    <p>This link will expire in 24 hours.</p>
-  `;
-
   try {
-    await sendEmail(process.env.SENDGRID_API_KEY, {
-      to: email,
-      from: process.env.FROM_EMAIL || 'noreply@tictac3x5.com',
-      subject: 'Verify your email address - TicTac 3x5',
-      html: emailContent
-    });
+    await emailService.sendVerificationEmail(email, token);
   } catch (error) {
     console.error('Failed to send verification email:', error);
     throw error;
@@ -222,13 +206,15 @@ export function setupAuth(app: Express) {
     try {
       await storage.upsertUser({
         id: user.id,
-        email: null,
+        email: user.email || null,
         firstName: null,
         lastName: null,
         profileImageUrl: null,
       });
+      console.log('User synced to database:', user.id);
     } catch (error) {
       console.error('Error syncing user to database:', error);
+      return res.status(500).json({ error: 'Failed to sync user data' });
     }
 
     const sessionData = { userId: user.id, username: user.username };
@@ -361,9 +347,6 @@ export function setupAuth(app: Express) {
         firstName: null,
         lastName: null,
         profileImageUrl: null,
-        isEmailVerified: true,
-        emailVerificationToken: null,
-        emailVerificationExpiry: null,
       });
       
       res.json({ message: 'Email verified successfully' });

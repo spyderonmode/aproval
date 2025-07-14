@@ -352,6 +352,15 @@ export function GameBoard({ game, onGameOver, gameMode, user }: GameBoardProps) 
     };
   };
 
+  const getSparklePosition = (position: number) => {
+    const row = Math.floor((position - 1) / 5);
+    const col = (position - 1) % 5;
+    return { 
+      x: col * 20 + 10,
+      y: row * 33.33 + 16.67 
+    };
+  };
+
   return (
     <Card className="bg-slate-800 border-slate-700">
       <CardHeader>
@@ -402,25 +411,75 @@ export function GameBoard({ game, onGameOver, gameMode, user }: GameBoardProps) 
           {/* Winning Line Animation */}
           {winningLine && (
             <motion.div
-              className="absolute inset-0 pointer-events-none"
+              className="absolute inset-0 pointer-events-none z-10"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              transition={{ duration: 0.5 }}
+              transition={{ duration: 0.3 }}
             >
               <svg className="w-full h-full" viewBox="0 0 100 100">
+                <defs>
+                  <linearGradient id="winningGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stopColor="#10b981" />
+                    <stop offset="50%" stopColor="#34d399" />
+                    <stop offset="100%" stopColor="#6ee7b7" />
+                  </linearGradient>
+                  <filter id="glow">
+                    <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
+                    <feMerge> 
+                      <feMergeNode in="coloredBlur"/>
+                      <feMergeNode in="SourceGraphic"/>
+                    </feMerge>
+                  </filter>
+                </defs>
                 <motion.line
                   x1={getLineCoordinates(winningLine).x1}
                   y1={getLineCoordinates(winningLine).y1}
                   x2={getLineCoordinates(winningLine).x2}
                   y2={getLineCoordinates(winningLine).y2}
-                  stroke="#10b981"
-                  strokeWidth="3"
+                  stroke="url(#winningGradient)"
+                  strokeWidth="4"
+                  strokeLinecap="round"
+                  filter="url(#glow)"
+                  initial={{ pathLength: 0, opacity: 0 }}
+                  animate={{ pathLength: 1, opacity: 1 }}
+                  transition={{ duration: 1.2, ease: "easeInOut" }}
+                />
+                <motion.line
+                  x1={getLineCoordinates(winningLine).x1}
+                  y1={getLineCoordinates(winningLine).y1}
+                  x2={getLineCoordinates(winningLine).x2}
+                  y2={getLineCoordinates(winningLine).y2}
+                  stroke="#ffffff"
+                  strokeWidth="2"
                   strokeLinecap="round"
                   initial={{ pathLength: 0 }}
                   animate={{ pathLength: 1 }}
-                  transition={{ duration: 0.8, ease: "easeInOut" }}
+                  transition={{ duration: 1.2, ease: "easeInOut", delay: 0.2 }}
                 />
               </svg>
+              {/* Sparkle effects */}
+              {winningLine.map((position, index) => (
+                <motion.div
+                  key={position}
+                  className="absolute w-2 h-2 bg-yellow-400 rounded-full"
+                  style={{
+                    left: `${getSparklePosition(position).x}%`,
+                    top: `${getSparklePosition(position).y}%`,
+                  }}
+                  initial={{ scale: 0, opacity: 0 }}
+                  animate={{ 
+                    scale: [0, 1.5, 0],
+                    opacity: [0, 1, 0],
+                    rotate: [0, 360]
+                  }}
+                  transition={{ 
+                    duration: 1.5,
+                    delay: index * 0.1 + 0.5,
+                    repeat: Infinity,
+                    repeatDelay: 1
+                  }}
+                />
+              ))}
             </motion.div>
           )}
         </div>

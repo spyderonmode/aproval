@@ -30,5 +30,17 @@
     "displayName": "testuser2",
     "profilePicture": null,
     "createdAt": "2025-07-14T12:15:51.549Z"
+  },
+  {
+    "id": "e08f9202-f1d0-4adf-abc7-f5fbca314dc3",
+    "username": "sam00",
+    "password": "44d8a37077a0371d348502162aa4547889de06ed8b045beedefa143c00c6945a",
+    "email": "yogeshsh999@gmail.com",
+    "displayName": "sam00",
+    "profilePicture": null,
+    "isEmailVerified": false,
+    "emailVerificationToken": "f3a06911-5106-472e-8985-c19fea0cf2c5",
+    "emailVerificationExpiry": "2025-07-15T13:49:56.601Z",
+    "createdAt": "2025-07-14T13:49:56.601Z"
   }
 ]

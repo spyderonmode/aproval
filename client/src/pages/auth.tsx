@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { login, register } from "@/lib/firebase";
 import { useAuth } from "@/hooks/useAuth";
+import { EmailVerificationModal } from "@/components/EmailVerificationModal";
 import { GamepadIcon, Mail } from "lucide-react";
 
 export default function Auth() {
@@ -15,6 +16,7 @@ export default function Auth() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [showEmailVerification, setShowEmailVerification] = useState(false);
   const { toast } = useToast();
   const { setUser } = useAuth();
   const [, setLocation] = useLocation();
@@ -40,8 +42,14 @@ export default function Auth() {
           title: "Registration successful",
           description: "Welcome to TicTac 3x5!",
         });
-        // Redirect to home after successful registration
-        setLocation("/");
+        
+        // Show email verification modal if email was provided
+        if (email) {
+          setShowEmailVerification(true);
+        } else {
+          // Redirect to home after successful registration
+          setLocation("/");
+        }
       }
     } catch (error) {
       toast({
@@ -95,16 +103,18 @@ export default function Auth() {
               </div>
               {!isLogin && (
                 <div className="space-y-2">
-                  <Label htmlFor="email" className="text-slate-300">Email</Label>
+                  <Label htmlFor="email" className="text-slate-300">Email (optional)</Label>
                   <Input
                     id="email"
                     type="email"
-                    placeholder="Enter your email"
+                    placeholder="Enter your email (optional)"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    required
                     className="bg-slate-700 border-slate-600 text-white"
                   />
+                  <p className="text-xs text-slate-400">
+                    Email is optional but recommended for account recovery
+                  </p>
                 </div>
               )}
               <div className="space-y-2">
@@ -143,6 +153,17 @@ export default function Auth() {
             </div>
           </CardContent>
         </Card>
+        
+        {/* Email Verification Modal */}
+        {showEmailVerification && (
+          <EmailVerificationModal 
+            email={email}
+            onClose={() => {
+              setShowEmailVerification(false);
+              setLocation("/");
+            }}
+          />
+        )}
       </div>
     </div>
   );
