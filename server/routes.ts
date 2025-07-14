@@ -2,7 +2,7 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { WebSocketServer, WebSocket } from "ws";
 import { storage } from "./storage";
-import { setupAuth, isAuthenticated } from "./replitAuth";
+import { setupAuth, requireAuth } from "./auth";
 import { insertRoomSchema, insertGameSchema, insertMoveSchema } from "@shared/schema";
 import { AIPlayer } from "./aiPlayer";
 import { makeMove, checkWin, checkDraw, getOpponentSymbol, validateMove } from "./gameLogic";
@@ -15,27 +15,27 @@ interface WSConnection {
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Auth middleware
-  await setupAuth(app);
+  setupAuth(app);
 
   const connections = new Map<string, WSConnection>();
   const roomConnections = new Map<string, Set<string>>();
 
-  // Auth routes
-  app.get('/api/auth/user', isAuthenticated, async (req: any, res) => {
+  // User stats route
+  app.get('/api/users/:id/stats', requireAuth, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
-      const user = await storage.getUser(userId);
-      res.json(user);
+      const userId = req.params.id;
+      const stats = await storage.getUserStats(userId);
+      res.json(stats);
     } catch (error) {
-      console.error("Error fetching user:", error);
-      res.status(500).json({ message: "Failed to fetch user" });
+      console.error("Error fetching user stats:", error);
+      res.status(500).json({ message: "Failed to fetch user stats" });
     }
   });
 
   // Room routes
-  app.post('/api/rooms', isAuthenticated, async (req: any, res) => {
+  app.post('/api/rooms', requireAuth, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user.userId;
       const roomData = insertRoomSchema.parse(req.body);
       
       const room = await storage.createRoom({
@@ -57,9 +57,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post('/api/rooms/:code/join', isAuthenticated, async (req: any, res) => {
+  app.post('/api/rooms/:code/join', requireAuth, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user.userId;
       const { code } = req.params;
       const { role = 'player' } = req.body;
 
@@ -88,7 +88,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get('/api/rooms/:id/participants', isAuthenticated, async (req, res) => {
+  app.get('/api/rooms/:id/participants', requireAuth, async (req, res) => {
     try {
       const { id } = req.params;
       const participants = await storage.getRoomParticipants(id);
@@ -100,9 +100,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Game routes
-  app.post('/api/games', isAuthenticated, async (req: any, res) => {
+  app.post('/api/games', requireAuth, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user.userId;
       const gameData = insertGameSchema.parse(req.body);
       
       const game = await storage.createGame(gameData);
@@ -119,7 +119,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get('/api/games/:id', isAuthenticated, async (req, res) => {
+  app.get('/api/games/:id', requireAuth, async (req, res) => {
     try {
       const { id } = req.params;
       const game = await storage.getGameById(id);
@@ -133,9 +133,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post('/api/games/:id/moves', isAuthenticated, async (req: any, res) => {
+  app.post('/api/games/:id/moves', requireAuth, async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
+      const userId = req.user.userId;
       const { id: gameId } = req.params;
       const { position } = req.body;
 
@@ -297,7 +297,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get('/api/users/:id/stats', isAuthenticated, async (req, res) => {
+  app.get('/api/users/:id/stats', requireAuth, async (req, res) => {
     try {
       const { id } = req.params;
       const stats = await storage.getUserStats(id);

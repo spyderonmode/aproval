@@ -8,7 +8,7 @@ import { RoomManager } from "@/components/RoomManager";
 import { PlayerList } from "@/components/PlayerList";
 import { CreateRoomModal } from "@/components/CreateRoomModal";
 import { GameOverModal } from "@/components/GameOverModal";
-import { ProfilePictureUpload } from "@/components/ProfilePictureUpload";
+
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -88,14 +88,10 @@ export default function Home() {
           {/* User Profile */}
           <div className="flex items-center space-x-4">
             <div className="flex items-center space-x-3">
-              {user?.photoURL && (
-                <img 
-                  src={user.photoURL} 
-                  alt="User Avatar" 
-                  className="w-8 h-8 rounded-full object-cover"
-                />
-              )}
-              <span className="text-gray-300">{user?.displayName || 'Player'}</span>
+              <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center">
+                <User className="w-5 h-5 text-white" />
+              </div>
+              <span className="text-gray-300">{user?.username || 'Player'}</span>
             </div>
             <div className="flex items-center space-x-2">
               <div className={`w-2 h-2 rounded-full ${isConnected ? 'bg-green-500' : 'bg-red-500'}`}></div>
@@ -159,10 +155,12 @@ export default function Home() {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <ProfilePictureUpload user={user} />
-                <div className="mt-4 text-center">
+                <div className="text-center">
+                  <div className="w-16 h-16 bg-primary rounded-full flex items-center justify-center mx-auto mb-3">
+                    <User className="w-8 h-8 text-white" />
+                  </div>
                   <p className="text-sm text-gray-300">
-                    {user?.displayName || user?.email || 'Player'}
+                    {user?.username || 'Player'}
                   </p>
                 </div>
               </CardContent>

@@ -1,27 +1,40 @@
-import { initializeApp } from "firebase/app";
-import { getAuth, GoogleAuthProvider, signInWithRedirect, signOut, onAuthStateChanged } from "firebase/auth";
-import { getStorage } from "firebase/storage";
-
-const firebaseConfig = {
-  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
-  authDomain: `${import.meta.env.VITE_FIREBASE_PROJECT_ID}.firebaseapp.com`,
-  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
-  storageBucket: `${import.meta.env.VITE_FIREBASE_PROJECT_ID}.appspot.com`,
-  appId: import.meta.env.VITE_FIREBASE_APP_ID,
+// Simple auth API calls
+export const login = async (credentials: { username: string; password: string }) => {
+  const response = await fetch('/api/auth/login', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(credentials)
+  });
+  
+  if (!response.ok) {
+    throw new Error('Login failed');
+  }
+  
+  return response.json();
 };
 
-const app = initializeApp(firebaseConfig);
-export const auth = getAuth(app);
-export const storage = getStorage(app);
-
-const provider = new GoogleAuthProvider();
-
-export const signInWithGoogle = () => {
-  return signInWithRedirect(auth, provider);
+export const register = async (credentials: { username: string; password: string }) => {
+  const response = await fetch('/api/auth/register', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(credentials)
+  });
+  
+  if (!response.ok) {
+    throw new Error('Registration failed');
+  }
+  
+  return response.json();
 };
 
-export const logout = () => {
-  return signOut(auth);
+export const logout = async () => {
+  await fetch('/api/auth/logout', { method: 'POST' });
 };
 
-export { onAuthStateChanged };
+export const getCurrentUser = async () => {
+  const response = await fetch('/api/auth/user');
+  if (!response.ok) {
+    return null;
+  }
+  return response.json();
+};

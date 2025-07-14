@@ -1,0 +1,128 @@
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { useToast } from "@/hooks/use-toast";
+import { login, register } from "@/lib/firebase";
+import { useAuth } from "@/hooks/useAuth";
+import { GamepadIcon } from "lucide-react";
+
+export default function Auth() {
+  const [isLogin, setIsLogin] = useState(true);
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const { toast } = useToast();
+  const { setUser } = useAuth();
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsLoading(true);
+
+    try {
+      if (isLogin) {
+        const user = await login({ username, password });
+        setUser(user);
+        toast({
+          title: "Login successful",
+          description: "Welcome back!",
+        });
+      } else {
+        const user = await register({ username, password });
+        setUser(user);
+        toast({
+          title: "Registration successful",
+          description: "Welcome to TicTac 3x5!",
+        });
+      }
+    } catch (error) {
+      toast({
+        title: isLogin ? "Login failed" : "Registration failed",
+        description: "Please check your credentials and try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center p-4">
+      <div className="w-full max-w-md">
+        <div className="text-center mb-8">
+          <div className="flex justify-center mb-4">
+            <div className="w-16 h-16 bg-primary rounded-2xl flex items-center justify-center">
+              <GamepadIcon className="w-8 h-8 text-white" />
+            </div>
+          </div>
+          <h1 className="text-3xl font-bold text-white mb-2">TicTac 3x5</h1>
+          <p className="text-slate-400">Strategic Tic-Tac-Toe Reimagined</p>
+        </div>
+
+        <Card className="bg-slate-800 border-slate-700">
+          <CardHeader className="space-y-1">
+            <CardTitle className="text-2xl text-white">
+              {isLogin ? "Welcome back" : "Create account"}
+            </CardTitle>
+            <CardDescription className="text-slate-400">
+              {isLogin 
+                ? "Enter your credentials to access your account"
+                : "Enter your details to create a new account"
+              }
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="username" className="text-slate-300">Username</Label>
+                <Input
+                  id="username"
+                  type="text"
+                  placeholder="Enter your username"
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
+                  required
+                  className="bg-slate-700 border-slate-600 text-white"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="password" className="text-slate-300">Password</Label>
+                <Input
+                  id="password"
+                  type="password"
+                  placeholder="Enter your password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                  className="bg-slate-700 border-slate-600 text-white"
+                />
+              </div>
+              <Button 
+                type="submit" 
+                className="w-full bg-primary hover:bg-primary/90"
+                disabled={isLoading}
+              >
+                {isLoading ? "Please wait..." : (isLogin ? "Sign In" : "Sign Up")}
+              </Button>
+            </form>
+            
+            <div className="text-center">
+              <Button
+                type="button"
+                variant="link"
+                className="text-slate-400 hover:text-white"
+                onClick={() => setIsLogin(!isLogin)}
+              >
+                {isLogin 
+                  ? "Don't have an account? Sign up"
+                  : "Already have an account? Sign in"
+                }
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    </div>
+  );
+}
