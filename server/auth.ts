@@ -186,6 +186,19 @@ export function setupAuth(app: Express) {
       const sessionData = { userId: user.id, username: user.username };
       req.session.user = sessionData;
       
+      // Sync user to database
+      try {
+        await storage.upsertUser({
+          id: user.id,
+          email: user.email || null,
+          firstName: user.displayName || user.username || 'Anonymous',
+          lastName: null,
+          profileImageUrl: user.profilePicture || null,
+        });
+      } catch (error) {
+        console.error('Error syncing new user to database:', error);
+      }
+      
       // If email is provided, send verification email
       if (email && user.emailVerificationToken) {
         try {
@@ -224,9 +237,9 @@ export function setupAuth(app: Express) {
       await storage.upsertUser({
         id: user.id,
         email: user.email || null,
-        firstName: null,
+        firstName: user.displayName || user.username || 'Anonymous',
         lastName: null,
-        profileImageUrl: null,
+        profileImageUrl: user.profilePicture || null,
       });
       console.log('User synced to database:', user.id);
     } catch (error) {

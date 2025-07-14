@@ -66,7 +66,7 @@ export function PlayerList({ roomId }: PlayerListProps) {
                       </div>
                     )}
                     <span className="text-sm">
-                      {participant.user.firstName || 'Anonymous'}
+                      {participant.user.firstName || participant.user.username || 'Anonymous'}
                     </span>
                   </div>
                   <div className="flex items-center space-x-2">
@@ -109,7 +109,7 @@ export function PlayerList({ roomId }: PlayerListProps) {
                       </div>
                     )}
                     <span className="text-sm">
-                      {participant.user.firstName || 'Anonymous'}
+                      {participant.user.firstName || participant.user.username || 'Anonymous'}
                     </span>
                   </div>
                   <Badge variant="secondary" className="bg-gray-600 text-xs">

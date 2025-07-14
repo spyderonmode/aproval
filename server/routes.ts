@@ -74,22 +74,30 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
         
         // Notify both players via WebSocket
-        const notifyPlayer = (playerId: string) => {
+        const notifyPlayer = async (playerId: string) => {
           // Find connection by userId
           for (const [connId, connection] of connections.entries()) {
             if (connection.userId === playerId && connection.ws.readyState === WebSocket.OPEN) {
+              // Get user information for both players
+              const player1 = await storage.getUser(player1Id);
+              const player2 = await storage.getUser(player2Id);
+              
               connection.ws.send(JSON.stringify({
                 type: 'match_found',
                 room: room,
                 opponent: playerId === player1Id ? player2Id : player1Id,
+                players: {
+                  player1: player1,
+                  player2: player2
+                }
               }));
               break;
             }
           }
         };
         
-        notifyPlayer(player1Id);
-        notifyPlayer(player2Id);
+        await notifyPlayer(player1Id);
+        await notifyPlayer(player2Id);
         
         res.json({ status: 'matched', room: room });
       } else {
@@ -572,7 +580,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   wss.on('connection', (ws, req) => {
     const connectionId = Math.random().toString(36).substring(7);
     
-    ws.on('message', (message) => {
+    ws.on('message', async (message) => {
       try {
         const data = JSON.parse(message.toString());
         
@@ -596,6 +604,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
               // Notify all participants in the room about the new connection
               const roomConnIds = roomConnections.get(data.roomId);
               if (roomConnIds) {
+                // Get user information for the joining user
+                const userInfo = await storage.getUser(connection.userId);
+                
                 for (const connId of roomConnIds) {
                   const conn = connections.get(connId);
                   if (conn && conn.ws.readyState === WebSocket.OPEN) {
@@ -603,6 +614,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
                       type: 'user_joined',
                       userId: connection.userId,
                       roomId: data.roomId,
+                      userInfo: userInfo,
                     }));
                   }
                 }
