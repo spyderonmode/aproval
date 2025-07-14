@@ -369,11 +369,41 @@ export function GameBoard({ game, onGameOver, gameMode, user }: GameBoardProps) 
           <div className="flex items-center space-x-4">
             <div className="flex items-center space-x-2">
               <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
-              <span className="text-sm text-gray-300">Player X</span>
+              <div className="flex items-center space-x-2">
+                {game?.playerXInfo?.profilePicture ? (
+                  <img 
+                    src={game.playerXInfo.profilePicture} 
+                    alt="Player X" 
+                    className="w-6 h-6 rounded-full object-cover"
+                  />
+                ) : (
+                  <div className="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center">
+                    <span className="text-xs text-white font-bold">X</span>
+                  </div>
+                )}
+                <span className="text-sm text-gray-300">
+                  {game?.playerXInfo?.displayName || game?.playerXInfo?.username || 'Player X'}
+                </span>
+              </div>
             </div>
             <div className="flex items-center space-x-2">
               <div className="w-3 h-3 bg-red-500 rounded-full"></div>
-              <span className="text-sm text-gray-300">Player O</span>
+              <div className="flex items-center space-x-2">
+                {game?.playerOInfo?.profilePicture ? (
+                  <img 
+                    src={game.playerOInfo.profilePicture} 
+                    alt="Player O" 
+                    className="w-6 h-6 rounded-full object-cover"
+                  />
+                ) : (
+                  <div className="w-6 h-6 bg-red-500 rounded-full flex items-center justify-center">
+                    <span className="text-xs text-white font-bold">O</span>
+                  </div>
+                )}
+                <span className="text-sm text-gray-300">
+                  {game?.playerOInfo?.displayName || game?.playerOInfo?.username || (gameMode === 'ai' ? 'AI' : 'Player O')}
+                </span>
+              </div>
             </div>
           </div>
         </div>
@@ -392,7 +422,10 @@ export function GameBoard({ game, onGameOver, gameMode, user }: GameBoardProps) 
               }`}></div>
             </div>
             <span className="text-lg font-medium">
-              Player {currentPlayer}'s Turn
+              {currentPlayer === 'X' 
+                ? (game?.playerXInfo?.displayName || game?.playerXInfo?.username || 'Player X')
+                : (game?.playerOInfo?.displayName || game?.playerOInfo?.username || (gameMode === 'ai' ? 'AI' : 'Player O'))
+              }'s Turn
             </span>
           </div>
         </div>

@@ -10,7 +10,8 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
-- **Online Matchmaking System** (July 14, 2025): Implemented real-time matchmaking queue for online multiplayer - users click "Find Match" and get automatically paired with other players waiting for matches
+- **Online Matchmaking System** (July 14, 2025): Implemented real-time matchmaking queue for online multiplayer - users click "Find Match" and get automatically paired with other players waiting for matches. Fixed WebSocket connections and restored create room/spectator features alongside matchmaking.
+- **Player Display Enhancement** (July 14, 2025): Added player names and profile pictures to the game board, showing actual player information instead of generic "Player X/O" labels
 - **Enhanced Winning Line Animation** (July 14, 2025): Upgraded winning line effects with gradients, glow effects, and sparkle animations for better visual feedback
 - **SMTP Email Verification** (July 14, 2025): Replaced SendGrid with configurable SMTP email system for account verification, made email verification optional during registration
 - **Database Schema Fixes** (July 14, 2025): Fixed database foreign key constraints and removed problematic email verification columns causing user creation errors

@@ -66,5 +66,17 @@
     "emailVerificationToken": "f3a12bfa-029d-4ff7-bd3e-2d8334278872",
     "emailVerificationExpiry": "2025-07-15T14:35:40.787Z",
     "createdAt": "2025-07-14T14:35:40.787Z"
+  },
+  {
+    "id": "089d1187-b441-4723-a593-688d26fe3661",
+    "username": "sam000",
+    "password": "a79be49e082ea4aad16994c0a53ace4e378f4118ab92c5c01270da8eb0b30196",
+    "email": "deadly1947@gmail.com",
+    "displayName": "sam000",
+    "profilePicture": null,
+    "isEmailVerified": false,
+    "emailVerificationToken": "91335539-30a2-4fc0-8304-e066db7a5bc9",
+    "emailVerificationExpiry": "2025-07-15T14:41:38.147Z",
+    "createdAt": "2025-07-14T14:41:27.170Z"
   }
 ]

@@ -198,12 +198,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       const game = await storage.createGame(gameCreateData);
       
+      // Get player information for the game
+      const playerXInfo = await storage.getUser(game.playerXId);
+      const playerOInfo = game.playerOId !== 'AI' ? await storage.getUser(game.playerOId) : null;
+      
+      const gameWithPlayers = {
+        ...game,
+        playerXInfo,
+        playerOInfo: playerOInfo || { username: 'AI', displayName: 'AI' }
+      };
+      
       // Update room status
       if (gameData.roomId) {
         await storage.updateRoomStatus(gameData.roomId, 'playing');
       }
 
-      res.json(game);
+      res.json(gameWithPlayers);
     } catch (error) {
       console.error("Error creating game:", error);
       res.status(500).json({ message: "Failed to create game" });
@@ -217,7 +227,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!game) {
         return res.status(404).json({ message: "Game not found" });
       }
-      res.json(game);
+      
+      // Get player information for the game
+      const playerXInfo = await storage.getUser(game.playerXId);
+      const playerOInfo = game.playerOId !== 'AI' ? await storage.getUser(game.playerOId) : null;
+      
+      const gameWithPlayers = {
+        ...game,
+        playerXInfo,
+        playerOInfo: playerOInfo || { username: 'AI', displayName: 'AI' }
+      };
+      
+      res.json(gameWithPlayers);
     } catch (error) {
       console.error("Error fetching game:", error);
       res.status(500).json({ message: "Failed to fetch game" });
@@ -427,6 +448,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
                 roomConnections.set(data.roomId, new Set());
               }
               roomConnections.get(data.roomId)!.add(connectionId);
+              
+              // Notify all participants in the room about the new connection
+              const roomConnIds = roomConnections.get(data.roomId);
+              if (roomConnIds) {
+                for (const connId of roomConnIds) {
+                  const conn = connections.get(connId);
+                  if (conn && conn.ws.readyState === WebSocket.OPEN) {
+                    conn.ws.send(JSON.stringify({
+                      type: 'user_joined',
+                      userId: connection.userId,
+                      roomId: data.roomId,
+                    }));
+                  }
+                }
+              }
             }
             break;
             

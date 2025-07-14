@@ -350,7 +350,7 @@ export default function Home() {
             )}
 
             {/* Room Management */}
-            {selectedMode === 'online' && currentRoom && (
+            {selectedMode === 'online' && (
               <RoomManager 
                 currentRoom={currentRoom}
                 onRoomJoin={handleRoomJoin}
