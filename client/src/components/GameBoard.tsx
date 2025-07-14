@@ -41,7 +41,9 @@ export function GameBoard({ game, onGameOver, gameMode, user }: GameBoardProps) 
       switch (lastMessage.type) {
         case 'move':
           if (lastMessage.gameId === game.id) {
-            console.log('Received move WebSocket message:', lastMessage);
+            console.log('🎮 Received move WebSocket message:', lastMessage);
+            console.log('📋 Current board state:', board);
+            console.log('📋 New board state:', lastMessage.board);
             setBoard(lastMessage.board);
             setCurrentPlayer(lastMessage.currentPlayer);
             setLastMove(lastMessage.position);
@@ -84,14 +86,16 @@ export function GameBoard({ game, onGameOver, gameMode, user }: GameBoardProps) 
       return await apiRequest('POST', `/api/games/${game.id}/moves`, { position });
     },
     onSuccess: (data) => {
+      console.log('🎯 Move mutation success:', data);
       if (game && game.id !== 'local-game') {
         // For online games, don't update local state immediately
         // Let the WebSocket message handle the update to ensure synchronization
-        console.log('Move successful, waiting for WebSocket update');
+        console.log('✅ Move successful, waiting for WebSocket update');
         queryClient.invalidateQueries({ queryKey: ['/api/games', game?.id] });
       }
     },
     onError: (error) => {
+      console.log('❌ Move mutation error:', error);
       if (isUnauthorizedError(error)) {
         toast({
           title: "Unauthorized",
@@ -284,7 +288,14 @@ export function GameBoard({ game, onGameOver, gameMode, user }: GameBoardProps) 
   };
 
   const handleCellClick = (position: number) => {
+    console.log('🎯 Cell click - Position:', position);
+    console.log('📋 Current board state:', board);
+    console.log('👤 Current player:', currentPlayer);
+    console.log('🎮 Game mode:', gameMode);
+    console.log('🎲 Game object:', game);
+    
     if (!game || (game.status && game.status !== 'active')) {
+      console.log('❌ Game not active');
       toast({
         title: "Game not active",
         description: "Start a new game to play",
@@ -294,6 +305,7 @@ export function GameBoard({ game, onGameOver, gameMode, user }: GameBoardProps) 
     }
 
     if (board[position.toString()]) {
+      console.log('❌ Position already occupied');
       toast({
         title: "Invalid move",
         description: "Position already occupied",
@@ -308,7 +320,15 @@ export function GameBoard({ game, onGameOver, gameMode, user }: GameBoardProps) 
       const isPlayerX = game.playerXId === userId;
       const isPlayerO = game.playerOId === userId;
       
+      console.log('🎭 Turn check:');
+      console.log('  - User ID:', userId);
+      console.log('  - Player X ID:', game.playerXId);
+      console.log('  - Player O ID:', game.playerOId);
+      console.log('  - Is Player X:', isPlayerX);
+      console.log('  - Is Player O:', isPlayerO);
+      
       if (!isPlayerX && !isPlayerO) {
+        console.log('❌ User is not a player in this game');
         toast({
           title: "Not a player",
           description: "You are not a player in this game",
@@ -318,8 +338,11 @@ export function GameBoard({ game, onGameOver, gameMode, user }: GameBoardProps) 
       }
       
       const playerSymbol = isPlayerX ? 'X' : 'O';
+      console.log('  - Player symbol:', playerSymbol);
+      console.log('  - Current player turn:', currentPlayer);
       
       if (currentPlayer !== playerSymbol) {
+        console.log('❌ Not your turn');
         const currentPlayerName = currentPlayer === 'X' ? 
           (game.playerXInfo?.firstName || 'Player X') : 
           (game.playerOInfo?.firstName || 'Player O');
@@ -332,6 +355,7 @@ export function GameBoard({ game, onGameOver, gameMode, user }: GameBoardProps) 
       }
     }
 
+    console.log('✅ Making move on position:', position);
     playSound('move');
     makeMoveMutation.mutate(position);
   };
