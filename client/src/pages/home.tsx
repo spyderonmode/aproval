@@ -28,6 +28,7 @@ export default function Home() {
   const [showCreateRoom, setShowCreateRoom] = useState(false);
   const [showGameOver, setShowGameOver] = useState(false);
   const [gameResult, setGameResult] = useState<any>(null);
+  const [isCreatingGame, setIsCreatingGame] = useState(false);
   // Remove matchmaking state variables
 
   const { data: userStats } = useQuery({
@@ -142,6 +143,15 @@ export default function Home() {
     }
   };
 
+  const resetToMainMenu = () => {
+    setCurrentRoom(null);
+    setCurrentGame(null);
+    setShowGameOver(false);
+    setGameResult(null);
+    setIsCreatingGame(false);
+    setSelectedMode('ai');
+  };
+
   const handleGameStart = (game: any) => {
     console.log('🎮 handleGameStart called with game:', game);
     setCurrentGame(game);
@@ -186,12 +196,19 @@ export default function Home() {
   };
 
   const handlePlayAgain = async () => {
+    if (isCreatingGame) {
+      console.log('🎮 Already creating game, ignoring request');
+      return;
+    }
+    
+    setIsCreatingGame(true);
     setShowGameOver(false);
     setGameResult(null);
     
     if (selectedMode === 'online' && currentRoom) {
       // For online mode, create a new game in the same room
       try {
+        console.log('🎮 Creating new game for room:', currentRoom.id);
         const response = await fetch(`/api/rooms/${currentRoom.id}/start-game`, {
           method: 'POST',
           headers: {
@@ -237,6 +254,11 @@ export default function Home() {
       setCurrentGame(newGame);
       playSound('gameStart');
     }
+    
+    // Reset creating state after a short delay
+    setTimeout(() => {
+      setIsCreatingGame(false);
+    }, 1000);
   };
 
   return (
@@ -487,6 +509,8 @@ export default function Home() {
         onClose={() => setShowGameOver(false)}
         result={gameResult}
         onPlayAgain={handlePlayAgain}
+        isCreatingGame={isCreatingGame}
+        onMainMenu={resetToMainMenu}
       />
     </div>
   );

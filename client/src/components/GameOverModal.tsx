@@ -6,9 +6,11 @@ interface GameOverModalProps {
   onClose: () => void;
   result: any;
   onPlayAgain: () => void;
+  isCreatingGame?: boolean;
+  onMainMenu?: () => void;
 }
 
-export function GameOverModal({ open, onClose, result, onPlayAgain }: GameOverModalProps) {
+export function GameOverModal({ open, onClose, result, onPlayAgain, isCreatingGame = false, onMainMenu }: GameOverModalProps) {
   if (!open || !result) return null;
 
   const isDraw = result.condition === 'draw';
@@ -115,7 +117,12 @@ export function GameOverModal({ open, onClose, result, onPlayAgain }: GameOverMo
         
         <div style={{ display: 'flex', justifyContent: 'center', gap: '12px' }}>
           <button
-            onClick={onClose}
+            onClick={() => {
+              onClose();
+              if (onMainMenu) {
+                onMainMenu();
+              }
+            }}
             style={{
               padding: '8px 16px',
               borderRadius: '8px',
@@ -132,17 +139,23 @@ export function GameOverModal({ open, onClose, result, onPlayAgain }: GameOverMo
             Main Menu
           </button>
           <button
-            onClick={onPlayAgain}
+            onClick={() => {
+              if (!isCreatingGame) {
+                onPlayAgain();
+              }
+            }}
+            disabled={isCreatingGame}
             style={{
               padding: '8px 16px',
               borderRadius: '8px',
-              backgroundColor: '#3b82f6',
+              backgroundColor: isCreatingGame ? '#6b7280' : '#3b82f6',
               color: 'white',
-              border: '1px solid #2563eb',
-              cursor: 'pointer',
+              border: isCreatingGame ? '1px solid #6b7280' : '1px solid #2563eb',
+              cursor: isCreatingGame ? 'not-allowed' : 'pointer',
               display: 'flex',
               alignItems: 'center',
-              gap: '8px'
+              gap: '8px',
+              opacity: isCreatingGame ? 0.6 : 1
             }}
           >
             <RefreshCw style={{ width: '16px', height: '16px' }} />
