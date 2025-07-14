@@ -10,10 +10,11 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
-- **Google Authentication Migration** (July 14, 2025): Migrated from Replit Auth to Google/Firebase authentication
-- **Profile Picture Upload**: Added Firebase Storage integration for user profile picture uploads
-- **Removed Undo Move**: Removed undo move functionality from game board as requested
-- **UI Updates**: Updated user interface to display Google profile information (photoURL, displayName)
+- **JSON Authentication System** (July 14, 2025): Replaced Google/Firebase authentication with simple JSON-based login/register system
+- **Local Game Initialization**: Fixed "game not active" error by implementing automatic game initialization for AI and pass-play modes
+- **Simplified User Interface**: Updated UI to display username instead of Google profile information
+- **Password Security**: Added password hashing using Node.js crypto module for secure authentication
+- **Session Management**: Implemented Express sessions for secure user authentication
 
 ## System Architecture
 

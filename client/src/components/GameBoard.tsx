@@ -33,10 +33,18 @@ export function GameBoard({ game, onGameOver, gameMode, user }: GameBoardProps) 
       if (!game) {
         throw new Error('No active game');
       }
+      
+      // For local games (AI and pass-play), handle moves locally
+      if (game.id === 'local-game') {
+        return handleLocalMove(position);
+      }
+      
       return await apiRequest('POST', `/api/games/${game.id}/moves`, { position });
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/games', game?.id] });
+      if (game && game.id !== 'local-game') {
+        queryClient.invalidateQueries({ queryKey: ['/api/games', game?.id] });
+      }
     },
     onError: (error) => {
       if (isUnauthorizedError(error)) {
@@ -58,8 +66,113 @@ export function GameBoard({ game, onGameOver, gameMode, user }: GameBoardProps) 
     },
   });
 
+  const handleLocalMove = (position: number) => {
+    if (!game) return;
+    
+    const newBoard = { ...board };
+    newBoard[position.toString()] = currentPlayer;
+    
+    // Check for win condition (diagonal only)
+    const checkWin = (board: Record<string, string>, player: string) => {
+      const diagonals = [
+        [1, 7, 13], [2, 8, 14], [3, 9, 15],
+        [3, 7, 11], [4, 8, 12], [5, 9, 13],
+        [6, 8, 10], [1, 8, 15], [5, 8, 11]
+      ];
+      
+      return diagonals.some(diagonal => 
+        diagonal.every(pos => board[pos.toString()] === player)
+      );
+    };
+    
+    const checkDraw = (board: Record<string, string>) => {
+      return VALID_POSITIONS.every(pos => board[pos.toString()]);
+    };
+    
+    setBoard(newBoard);
+    
+    if (checkWin(newBoard, currentPlayer)) {
+      onGameOver({
+        winner: currentPlayer,
+        condition: 'diagonal',
+        board: newBoard
+      });
+      return;
+    }
+    
+    if (checkDraw(newBoard)) {
+      onGameOver({
+        winner: null,
+        condition: 'draw',
+        board: newBoard
+      });
+      return;
+    }
+    
+    // Switch player
+    const nextPlayer = currentPlayer === 'X' ? 'O' : 'X';
+    setCurrentPlayer(nextPlayer);
+    
+    // Handle AI move
+    if (gameMode === 'ai' && nextPlayer === 'O') {
+      setTimeout(() => {
+        makeAIMove(newBoard);
+      }, 500);
+    }
+  };
+
+  const makeAIMove = (currentBoard: Record<string, string>) => {
+    const availableMoves = VALID_POSITIONS.filter(pos => !currentBoard[pos.toString()]);
+    if (availableMoves.length === 0) return;
+    
+    // Simple AI: random move
+    const randomMove = availableMoves[Math.floor(Math.random() * availableMoves.length)];
+    
+    const newBoard = { ...currentBoard };
+    newBoard[randomMove.toString()] = 'O';
+    
+    setBoard(newBoard);
+    
+    // Check for AI win
+    const checkWin = (board: Record<string, string>, player: string) => {
+      const diagonals = [
+        [1, 7, 13], [2, 8, 14], [3, 9, 15],
+        [3, 7, 11], [4, 8, 12], [5, 9, 13],
+        [6, 8, 10], [1, 8, 15], [5, 8, 11]
+      ];
+      
+      return diagonals.some(diagonal => 
+        diagonal.every(pos => board[pos.toString()] === player)
+      );
+    };
+    
+    const checkDraw = (board: Record<string, string>) => {
+      return VALID_POSITIONS.every(pos => board[pos.toString()]);
+    };
+    
+    if (checkWin(newBoard, 'O')) {
+      onGameOver({
+        winner: 'O',
+        condition: 'diagonal',
+        board: newBoard
+      });
+      return;
+    }
+    
+    if (checkDraw(newBoard)) {
+      onGameOver({
+        winner: null,
+        condition: 'draw',
+        board: newBoard
+      });
+      return;
+    }
+    
+    setCurrentPlayer('X');
+  };
+
   const handleCellClick = (position: number) => {
-    if (!game || game.status !== 'active') {
+    if (!game || (game.status && game.status !== 'active')) {
       toast({
         title: "Game not active",
         description: "Start a new game to play",

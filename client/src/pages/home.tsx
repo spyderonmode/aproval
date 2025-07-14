@@ -68,6 +68,29 @@ export default function Home() {
     setCurrentGame(game);
   };
 
+  // Initialize local game for AI and pass-play modes when no game exists
+  const initializeLocalGame = () => {
+    if (selectedMode === 'ai' || selectedMode === 'pass-play') {
+      const newGame = {
+        id: 'local-game',
+        board: {},
+        currentPlayer: 'X',
+        status: 'active',
+        gameMode: selectedMode,
+        playerXId: user?.userId || user?.id,
+        playerOId: selectedMode === 'ai' ? 'ai' : 'player2'
+      };
+      setCurrentGame(newGame);
+    }
+  };
+
+  // Auto-initialize game when switching to AI or pass-play mode
+  useEffect(() => {
+    if (!currentGame && (selectedMode === 'ai' || selectedMode === 'pass-play')) {
+      initializeLocalGame();
+    }
+  }, [selectedMode, currentGame, user]);
+
   const handleGameOver = (result: any) => {
     setGameResult(result);
     setShowGameOver(true);
