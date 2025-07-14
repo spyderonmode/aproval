@@ -189,28 +189,79 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const userId = req.user.userId;
       const gameData = insertGameSchema.parse(req.body);
       
-      // Fix the game creation by setting proper player IDs
-      const gameCreateData = {
-        ...gameData,
-        playerXId: userId, // Set current user as player X
-        playerOId: gameData.gameMode === 'ai' ? 'AI' : gameData.playerOId,
-      };
+      let gameCreateData;
+      
+      if (gameData.gameMode === 'ai') {
+        // AI mode: current user vs AI
+        gameCreateData = {
+          ...gameData,
+          playerXId: userId,
+          playerOId: 'AI',
+        };
+      } else if (gameData.gameMode === 'online' && gameData.roomId) {
+        // Online mode: get room participants and assign as players
+        const participants = await storage.getRoomParticipants(gameData.roomId);
+        const players = participants.filter(p => p.role === 'player');
+        
+        if (players.length < 2) {
+          return res.status(400).json({ message: "Need 2 players to start online game" });
+        }
+        
+        // Assign players: current user as X, other player as O
+        const otherPlayer = players.find(p => p.userId !== userId);
+        if (!otherPlayer) {
+          return res.status(400).json({ message: "Could not find opponent" });
+        }
+        
+        gameCreateData = {
+          ...gameData,
+          playerXId: userId,
+          playerOId: otherPlayer.userId,
+        };
+      } else {
+        // Pass-play mode: current user starts as X, O will be filled in during play
+        gameCreateData = {
+          ...gameData,
+          playerXId: userId,
+          playerOId: gameData.playerOId || null,
+        };
+      }
       
       const game = await storage.createGame(gameCreateData);
       
       // Get player information for the game
       const playerXInfo = await storage.getUser(game.playerXId);
-      const playerOInfo = game.playerOId !== 'AI' ? await storage.getUser(game.playerOId) : null;
+      const playerOInfo = game.playerOId && game.playerOId !== 'AI' ? await storage.getUser(game.playerOId) : null;
       
       const gameWithPlayers = {
         ...game,
         playerXInfo,
-        playerOInfo: playerOInfo || { username: 'AI', displayName: 'AI' }
+        playerOInfo: playerOInfo || { 
+          id: 'AI', 
+          firstName: 'AI', 
+          lastName: 'Player',
+          profileImageUrl: null 
+        }
       };
       
       // Update room status
       if (gameData.roomId) {
         await storage.updateRoomStatus(gameData.roomId, 'playing');
+        
+        // Broadcast game start to all room participants
+        if (roomConnections.has(gameData.roomId)) {
+          const roomUsers = roomConnections.get(gameData.roomId)!;
+          roomUsers.forEach(connectionId => {
+            const connection = connections.get(connectionId);
+            if (connection && connection.ws.readyState === WebSocket.OPEN) {
+              connection.ws.send(JSON.stringify({
+                type: 'game_started',
+                game: gameWithPlayers,
+                roomId: gameData.roomId,
+              }));
+            }
+          });
+        }
       }
 
       res.json(gameWithPlayers);
@@ -301,7 +352,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         await storage.updateGameStatus(gameId, 'finished', userId, winResult.condition || undefined);
         await storage.updateUserStats(userId, 'win');
         const opponentId = isPlayerX ? game.playerOId : game.playerXId;
-        if (opponentId) {
+        if (opponentId && opponentId !== 'AI') {
           await storage.updateUserStats(opponentId, 'loss');
         }
         
@@ -309,14 +360,48 @@ export async function registerRoutes(app: Express): Promise<Server> {
         if (game.roomId) {
           await storage.updateRoomStatus(game.roomId, 'finished');
         }
+        
+        // Broadcast game over to room
+        if (game.roomId && roomConnections.has(game.roomId)) {
+          const roomUsers = roomConnections.get(game.roomId)!;
+          roomUsers.forEach(connectionId => {
+            const connection = connections.get(connectionId);
+            if (connection && connection.ws.readyState === WebSocket.OPEN) {
+              connection.ws.send(JSON.stringify({
+                type: 'game_over',
+                gameId,
+                winner: userId,
+                condition: winResult.condition,
+                board: newBoard,
+              }));
+            }
+          });
+        }
       } else if (checkDraw(newBoard)) {
         await storage.updateGameStatus(gameId, 'finished', undefined, 'draw');
-        if (game.playerXId) await storage.updateUserStats(game.playerXId, 'draw');
-        if (game.playerOId) await storage.updateUserStats(game.playerOId, 'draw');
+        if (game.playerXId && game.playerXId !== 'AI') await storage.updateUserStats(game.playerXId, 'draw');
+        if (game.playerOId && game.playerOId !== 'AI') await storage.updateUserStats(game.playerOId, 'draw');
         
         // Update room status
         if (game.roomId) {
           await storage.updateRoomStatus(game.roomId, 'finished');
+        }
+        
+        // Broadcast game over to room
+        if (game.roomId && roomConnections.has(game.roomId)) {
+          const roomUsers = roomConnections.get(game.roomId)!;
+          roomUsers.forEach(connectionId => {
+            const connection = connections.get(connectionId);
+            if (connection && connection.ws.readyState === WebSocket.OPEN) {
+              connection.ws.send(JSON.stringify({
+                type: 'game_over',
+                gameId,
+                winner: null,
+                condition: 'draw',
+                board: newBoard,
+              }));
+            }
+          });
         }
       } else {
         // Switch turns
@@ -352,12 +437,46 @@ export async function registerRoutes(app: Express): Promise<Server> {
                 if (game.roomId) {
                   await storage.updateRoomStatus(game.roomId, 'finished');
                 }
+                
+                // Broadcast AI win to room
+                if (game.roomId && roomConnections.has(game.roomId)) {
+                  const roomUsers = roomConnections.get(game.roomId)!;
+                  roomUsers.forEach(connectionId => {
+                    const connection = connections.get(connectionId);
+                    if (connection && connection.ws.readyState === WebSocket.OPEN) {
+                      connection.ws.send(JSON.stringify({
+                        type: 'game_over',
+                        gameId,
+                        winner: game.playerOId || 'AI',
+                        condition: aiWinResult.condition,
+                        board: aiBoard,
+                      }));
+                    }
+                  });
+                }
               } else if (checkDraw(aiBoard)) {
                 await storage.updateGameStatus(gameId, 'finished', undefined, 'draw');
                 await storage.updateUserStats(userId, 'draw');
                 
                 if (game.roomId) {
                   await storage.updateRoomStatus(game.roomId, 'finished');
+                }
+                
+                // Broadcast AI draw to room
+                if (game.roomId && roomConnections.has(game.roomId)) {
+                  const roomUsers = roomConnections.get(game.roomId)!;
+                  roomUsers.forEach(connectionId => {
+                    const connection = connections.get(connectionId);
+                    if (connection && connection.ws.readyState === WebSocket.OPEN) {
+                      connection.ws.send(JSON.stringify({
+                        type: 'game_over',
+                        gameId,
+                        winner: null,
+                        condition: 'draw',
+                        board: aiBoard,
+                      }));
+                    }
+                  });
                 }
               } else {
                 await storage.updateCurrentPlayer(gameId, 'X');

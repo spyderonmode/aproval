@@ -39,29 +39,31 @@ export default function Home() {
   useEffect(() => {
     if (lastMessage) {
       switch (lastMessage.type) {
-        case 'move':
-        case 'ai_move':
-          // Handle move updates
-          playSound('move');
-          if (currentGame && lastMessage.gameId === currentGame.id) {
-            setCurrentGame(prev => ({
-              ...prev,
-              board: lastMessage.board,
-              currentPlayer: lastMessage.player === 'X' ? 'O' : 'X',
-            }));
+        case 'game_started':
+          // Handle game start from WebSocket
+          if (lastMessage.roomId === currentRoom?.id) {
+            setCurrentGame(lastMessage.game);
           }
           break;
         case 'game_over':
-          // Play appropriate sound based on result
-          if (lastMessage.winner === user?.userId) {
-            playSound('win');
-          } else if (lastMessage.winner === null) {
-            playSound('draw');
-          } else {
-            playSound('lose');
+          // Handle game over from WebSocket
+          if (currentGame && lastMessage.gameId === currentGame.id) {
+            // Play appropriate sound based on result
+            const userId = user?.userId || user?.id;
+            if (lastMessage.winner === userId) {
+              playSound('win');
+            } else if (lastMessage.winner === null) {
+              playSound('draw');
+            } else {
+              playSound('lose');
+            }
+            setGameResult({
+              winner: lastMessage.winner,
+              condition: lastMessage.condition,
+              board: lastMessage.board
+            });
+            setShowGameOver(true);
           }
-          setGameResult(lastMessage);
-          setShowGameOver(true);
           break;
         case 'match_found':
           // Handle successful matchmaking
@@ -72,7 +74,7 @@ export default function Home() {
           break;
       }
     }
-  }, [lastMessage, currentGame]);
+  }, [lastMessage, currentGame, currentRoom, user, playSound]);
 
   const handleRoomJoin = (room: any) => {
     setCurrentRoom(room);

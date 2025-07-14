@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { useAudio } from "@/hooks/useAudio";
+import { useWebSocket } from "@/hooks/useWebSocket";
 import { isUnauthorizedError } from "@/lib/authUtils";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -24,6 +25,7 @@ export function GameBoard({ game, onGameOver, gameMode, user }: GameBoardProps) 
   const [lastMove, setLastMove] = useState<number | null>(null);
   const { toast } = useToast();
   const { playSound } = useAudio();
+  const { lastMessage } = useWebSocket();
   const queryClient = useQueryClient();
 
   useEffect(() => {
@@ -32,6 +34,39 @@ export function GameBoard({ game, onGameOver, gameMode, user }: GameBoardProps) 
       setCurrentPlayer(game.currentPlayer || 'X');
     }
   }, [game]);
+
+  // Handle WebSocket messages for online games
+  useEffect(() => {
+    if (gameMode === 'online' && lastMessage && game) {
+      switch (lastMessage.type) {
+        case 'move':
+        case 'ai_move':
+          if (lastMessage.gameId === game.id) {
+            setBoard(lastMessage.board);
+            setCurrentPlayer(lastMessage.player === 'X' ? 'O' : 'X');
+            setLastMove(lastMessage.position);
+            playSound('move');
+          }
+          break;
+        case 'game_started':
+          if (lastMessage.roomId === game.roomId) {
+            // Update the game with the new player information
+            setBoard(lastMessage.game.board || {});
+            setCurrentPlayer(lastMessage.game.currentPlayer || 'X');
+          }
+          break;
+        case 'game_over':
+          if (lastMessage.gameId === game.id) {
+            onGameOver({
+              winner: lastMessage.winner,
+              condition: lastMessage.condition,
+              board: lastMessage.board
+            });
+          }
+          break;
+      }
+    }
+  }, [lastMessage, gameMode, game, onGameOver, playSound]);
 
   const makeMoveMutation = useMutation({
     mutationFn: async (position: number) => {
