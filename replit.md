@@ -10,6 +10,9 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+- **Game Creation Schema Fix** (July 14, 2025): Fixed game creation failure caused by null playerOId values - updated schema validation to properly handle optional fields and prevent null values from breaking validation
+- **Room Join Logic Fix** (July 14, 2025): Fixed "room is full" error by checking if user is already in room before validating player count, preventing room owners from being blocked from their own rooms
+- **Login Redirect Enhancement** (July 14, 2025): Fixed authentication flow to properly redirect users to home page after successful login without requiring manual page refresh
 - **Online Matchmaking System** (July 14, 2025): Implemented real-time matchmaking queue for online multiplayer - users click "Find Match" and get automatically paired with other players waiting for matches. Fixed WebSocket connections and restored create room/spectator features alongside matchmaking.
 - **Player Display Enhancement** (July 14, 2025): Added player names and profile pictures to the game board, showing actual player information instead of generic "Player X/O" labels
 - **Enhanced Winning Line Animation** (July 14, 2025): Upgraded winning line effects with gradients, glow effects, and sparkle animations for better visual feedback

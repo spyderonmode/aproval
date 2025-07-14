@@ -67,11 +67,17 @@ export function RoomManager({
     mutationFn: async () => {
       if (!currentRoom) throw new Error('No room selected');
       
-      const response = await apiRequest('POST', '/api/games', {
+      const gamePayload: any = {
         roomId: currentRoom.id,
         gameMode: gameMode,
-        playerOId: gameMode === 'ai' ? 'AI' : null,
-      });
+      };
+      
+      // Only include playerOId if it's not null/undefined
+      if (gameMode === 'ai') {
+        gamePayload.playerOId = 'AI';
+      }
+      
+      const response = await apiRequest('POST', '/api/games', gamePayload);
       return response.json();
     },
     onSuccess: (game) => {

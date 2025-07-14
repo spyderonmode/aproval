@@ -244,7 +244,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         gameCreateData = {
           ...gameData,
           playerXId: userId,
-          playerOId: gameData.playerOId || null,
+          playerOId: gameData.playerOId || undefined,
         };
       }
       
