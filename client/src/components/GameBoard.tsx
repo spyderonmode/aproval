@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { useAudio } from "@/hooks/useAudio";
 import { isUnauthorizedError } from "@/lib/authUtils";
+import { motion, AnimatePresence } from "framer-motion";
 
 const VALID_POSITIONS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15];
 
@@ -19,6 +20,8 @@ interface GameBoardProps {
 export function GameBoard({ game, onGameOver, gameMode, user }: GameBoardProps) {
   const [board, setBoard] = useState<Record<string, string>>({});
   const [currentPlayer, setCurrentPlayer] = useState<'X' | 'O'>('X');
+  const [winningLine, setWinningLine] = useState<number[] | null>(null);
+  const [lastMove, setLastMove] = useState<number | null>(null);
   const { toast } = useToast();
   const { playSound } = useAudio();
   const queryClient = useQueryClient();
@@ -74,8 +77,10 @@ export function GameBoard({ game, onGameOver, gameMode, user }: GameBoardProps) 
     playSound('move');
     const newBoard = { ...board };
     newBoard[position.toString()] = currentPlayer;
+    setBoard(newBoard);
+    setLastMove(position);
     
-    // Check for win condition (horizontal: 4 in a row, vertical: 3 in a column, diagonal: 3 in diagonal excluding columns 5,10,15)
+    // Check for win condition with winning line detection
     const checkWin = (board: Record<string, string>, player: string) => {
       // Check horizontal (4 consecutive)
       const rows = [
@@ -88,6 +93,7 @@ export function GameBoard({ game, onGameOver, gameMode, user }: GameBoardProps) 
         for (let i = 0; i <= row.length - 4; i++) {
           const positions = row.slice(i, i + 4);
           if (positions.every(pos => board[pos.toString()] === player)) {
+            setWinningLine(positions);
             return true;
           }
         }
@@ -100,6 +106,7 @@ export function GameBoard({ game, onGameOver, gameMode, user }: GameBoardProps) 
       
       for (const column of columns) {
         if (column.every(pos => board[pos.toString()] === player)) {
+          setWinningLine(column);
           return true;
         }
       }
@@ -111,9 +118,14 @@ export function GameBoard({ game, onGameOver, gameMode, user }: GameBoardProps) 
         [11, 7, 3], [12, 8, 4]  // Additional patterns (excluding those with 5,10,15)
       ];
       
-      return diagonals.some(diagonal => 
-        diagonal.every(pos => board[pos.toString()] === player)
-      );
+      for (const diagonal of diagonals) {
+        if (diagonal.every(pos => board[pos.toString()] === player)) {
+          setWinningLine(diagonal);
+          return true;
+        }
+      }
+      
+      return false;
     };
     
     const checkDraw = (board: Record<string, string>) => {
@@ -273,33 +285,71 @@ export function GameBoard({ game, onGameOver, gameMode, user }: GameBoardProps) 
   const resetGame = () => {
     setBoard({});
     setCurrentPlayer('X');
+    setWinningLine(null);
+    setLastMove(null);
   };
 
   const renderCell = (position: number) => {
     const symbol = board[position.toString()];
     const isEmpty = !symbol;
+    const isWinningCell = winningLine?.includes(position);
+    const isLastMove = lastMove === position;
     
     return (
-      <div
+      <motion.div
         key={position}
         className={`
           w-12 h-12 sm:w-16 sm:h-16 bg-slate-700 rounded-lg flex items-center justify-center cursor-pointer 
           border-2 border-transparent hover:border-primary transition-all duration-200
           ${isEmpty ? 'hover:bg-slate-600' : 'cursor-not-allowed'}
           ${makeMoveMutation.isPending ? 'opacity-50' : ''}
+          ${isWinningCell ? 'bg-green-600 border-green-400' : ''}
+          ${isLastMove ? 'ring-2 ring-yellow-400' : ''}
         `}
         onClick={() => handleCellClick(position)}
+        initial={{ scale: 0 }}
+        animate={{ scale: 1 }}
+        transition={{ duration: 0.3 }}
+        whileHover={{ scale: isEmpty ? 1.05 : 1 }}
+        whileTap={{ scale: 0.95 }}
       >
-        {symbol && (
-          <span className={`text-xl sm:text-2xl font-bold ${
-            symbol === 'X' ? 'text-blue-500' : 'text-red-500'
-          }`}>
-            {symbol}
-          </span>
-        )}
+        <AnimatePresence>
+          {symbol && (
+            <motion.span
+              className={`text-xl sm:text-2xl font-bold ${
+                symbol === 'X' ? 'text-blue-500' : 'text-red-500'
+              }`}
+              initial={{ scale: 0, rotate: -180 }}
+              animate={{ scale: 1, rotate: 0 }}
+              exit={{ scale: 0, rotate: 180 }}
+              transition={{ duration: 0.3 }}
+            >
+              {symbol}
+            </motion.span>
+          )}
+        </AnimatePresence>
         <span className="text-xs text-gray-500 absolute mt-10 sm:mt-12">{position}</span>
-      </div>
+      </motion.div>
     );
+  };
+
+  const getLineCoordinates = (positions: number[]) => {
+    // Get grid coordinates for line drawing
+    const getGridPosition = (pos: number) => {
+      const row = Math.floor((pos - 1) / 5);
+      const col = (pos - 1) % 5;
+      return { x: col * 20 + 10, y: row * 33.33 + 16.67 };
+    };
+    
+    const start = getGridPosition(positions[0]);
+    const end = getGridPosition(positions[positions.length - 1]);
+    
+    return {
+      x1: start.x,
+      y1: start.y,
+      x2: end.x,
+      y2: end.y
+    };
   };
 
   return (
@@ -339,7 +389,7 @@ export function GameBoard({ game, onGameOver, gameMode, user }: GameBoardProps) 
         </div>
 
         {/* 3x5 Game Grid */}
-        <div className="grid grid-cols-5 gap-2 sm:gap-3 max-w-xs sm:max-w-lg mx-auto">
+        <div className="relative grid grid-cols-5 gap-2 sm:gap-3 max-w-xs sm:max-w-lg mx-auto">
           {/* Row 1: 1,2,3,4,5 */}
           {[1, 2, 3, 4, 5].map(renderCell)}
           
@@ -348,6 +398,31 @@ export function GameBoard({ game, onGameOver, gameMode, user }: GameBoardProps) 
           
           {/* Row 3: 11,12,13,14,15 */}
           {[11, 12, 13, 14, 15].map(renderCell)}
+          
+          {/* Winning Line Animation */}
+          {winningLine && (
+            <motion.div
+              className="absolute inset-0 pointer-events-none"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.5 }}
+            >
+              <svg className="w-full h-full" viewBox="0 0 100 100">
+                <motion.line
+                  x1={getLineCoordinates(winningLine).x1}
+                  y1={getLineCoordinates(winningLine).y1}
+                  x2={getLineCoordinates(winningLine).x2}
+                  y2={getLineCoordinates(winningLine).y2}
+                  stroke="#10b981"
+                  strokeWidth="3"
+                  strokeLinecap="round"
+                  initial={{ pathLength: 0 }}
+                  animate={{ pathLength: 1 }}
+                  transition={{ duration: 0.8, ease: "easeInOut" }}
+                />
+              </svg>
+            </motion.div>
+          )}
         </div>
 
         {/* Game Controls */}

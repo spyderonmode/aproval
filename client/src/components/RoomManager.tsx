@@ -70,7 +70,6 @@ export function RoomManager({
       const response = await apiRequest('POST', '/api/games', {
         roomId: currentRoom.id,
         gameMode: gameMode,
-        playerXId: 'current-user', // Will be set by server
         playerOId: gameMode === 'ai' ? 'AI' : null,
       });
       return response.json();

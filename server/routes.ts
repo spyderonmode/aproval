@@ -105,7 +105,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const userId = req.user.userId;
       const gameData = insertGameSchema.parse(req.body);
       
-      const game = await storage.createGame(gameData);
+      // Fix the game creation by setting proper player IDs
+      const gameCreateData = {
+        ...gameData,
+        playerXId: userId, // Set current user as player X
+        playerOId: gameData.gameMode === 'ai' ? 'AI' : gameData.playerOId,
+      };
+      
+      const game = await storage.createGame(gameCreateData);
       
       // Update room status
       if (gameData.roomId) {
