@@ -1,7 +1,5 @@
 import React from "react";
 import { Home, User, RefreshCw } from "lucide-react";
-import { useAudio } from "@/hooks/useAudio";
-import { SimpleModal } from "./SimpleModal";
 
 interface GameOverModalProps {
   open: boolean;
@@ -11,26 +9,43 @@ interface GameOverModalProps {
 }
 
 export function GameOverModal({ open, onClose, result, onPlayAgain }: GameOverModalProps) {
-  const { playSound } = useAudio();
-  
-  if (!result) return null;
+  if (!open || !result) return null;
 
-  const isWin = result.winner;
   const isDraw = result.condition === 'draw';
   const winnerSymbol = result.winner;
-  const winnerName = result.winnerName;
-  const winnerInfo = result.winnerInfo; // This should contain profile info
-  
-  // Play celebration sound when modal opens
-  React.useEffect(() => {
-    if (open && !isDraw) {
-      playSound('win');
-    }
-  }, [open, isDraw, playSound]);
+  const winnerInfo = result.winnerInfo;
 
   return (
-    <SimpleModal open={open} onClose={onClose}>
-      <div style={{ color: 'white', textAlign: 'center' }}>
+    <div 
+      style={{
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        backgroundColor: 'rgba(0, 0, 0, 0.9)',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        zIndex: 9999,
+        padding: '16px'
+      }}
+      onClick={onClose}
+    >
+      <div 
+        style={{
+          backgroundColor: '#1e293b',
+          borderRadius: '8px',
+          padding: '24px',
+          maxWidth: '400px',
+          width: '100%',
+          boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
+          border: '1px solid #475569',
+          color: 'white',
+          textAlign: 'center'
+        }}
+        onClick={(e) => e.stopPropagation()}
+      >
         <h2 style={{ fontSize: '24px', fontWeight: 'bold', marginBottom: '24px', color: 'white' }}>
           Game Over!
         </h2>
@@ -135,6 +150,6 @@ export function GameOverModal({ open, onClose, result, onPlayAgain }: GameOverMo
           </button>
         </div>
       </div>
-    </SimpleModal>
+    </div>
   );
 }

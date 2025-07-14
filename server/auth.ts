@@ -3,6 +3,7 @@ import path from 'path';
 import crypto from 'crypto';
 import { Express } from 'express';
 import session from 'express-session';
+import MemoryStore from 'memorystore';
 import { storage } from './storage';
 import { createEmailService } from './emailService';
 
@@ -153,15 +154,22 @@ async function sendVerificationEmail(email: string, token: string): Promise<void
 }
 
 export function setupAuth(app: Express) {
+  // Memory store for sessions
+  const MemoryStoreSession = MemoryStore(session);
+  
   // Session middleware
   app.use(session({
-    secret: process.env.SESSION_SECRET || 'your-secret-key',
+    secret: process.env.SESSION_SECRET || 'your-secret-key-change-in-production',
     resave: false,
     saveUninitialized: false,
+    store: new MemoryStoreSession({
+      checkPeriod: 86400000 // prune expired entries every 24h
+    }),
     cookie: {
-      secure: false,
+      secure: process.env.NODE_ENV === 'production', // Only use secure in production
       httpOnly: true,
-      maxAge: 24 * 60 * 60 * 1000 // 24 hours
+      maxAge: 24 * 60 * 60 * 1000, // 24 hours
+      sameSite: 'lax'
     }
   }));
 
@@ -396,8 +404,9 @@ export function setupAuth(app: Express) {
 }
 
 export function requireAuth(req: any, res: any, next: any) {
-  if (!req.user) {
-    return res.status(401).json({ error: 'Authentication required' });
+  if (!req.session?.user) {
+    return res.status(401).json({ error: 'Not authenticated' });
   }
+  req.user = req.session.user;
   next();
 }
