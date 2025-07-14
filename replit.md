@@ -10,6 +10,7 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+- **Board Refresh and Spectator Fixes** (July 14, 2025): Fixed board refresh issue with force re-rendering and better WebSocket synchronization, fixed spectator room joining by correcting capacity logic to allow spectators when room supports them, added separate join buttons for players vs spectators
 - **Authentication and Matchmaking Fixes** (July 14, 2025): Fixed login redirect to use "/" instead of "/home" to prevent 403 errors, removed find matching logic keeping only create room and join room functionality, enhanced game state synchronization to fix repeated start game clicking issue
 - **Player Display Enhancement** (July 14, 2025): Added player names and profile pictures to the game board, showing actual player information instead of generic "Player X/O" labels
 - **Game Start Broadcasting** (July 14, 2025): Enhanced game start broadcast to notify both players when game begins, ensuring both players see the same game state and move to the game board simultaneously

@@ -181,10 +181,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.json({ message: "Already in room", room });
       }
 
-      // Check if room is full (only for players)
+      // Check if room is full (only for players, spectators can always join)
       const playerCount = participants.filter(p => p.role === 'player').length;
       if (role === 'player' && playerCount >= 2) {
         return res.status(400).json({ message: "Room is full" });
+      }
+      
+      // Check total room capacity based on maxPlayers setting
+      const totalCapacity = parseInt(room.maxPlayers || '2');
+      const maxSpectators = totalCapacity > 2 ? totalCapacity - 2 : 0;
+      const spectatorCount = participants.filter(p => p.role === 'spectator').length;
+      
+      if (role === 'spectator' && spectatorCount >= maxSpectators) {
+        return res.status(400).json({ message: "Spectator limit reached" });
       }
 
       await storage.addRoomParticipant({

@@ -48,8 +48,10 @@ export default function Home() {
           if (lastMessage.roomId === currentRoom?.id) {
             console.log('🎮 Setting current game from WebSocket:', lastMessage.game);
             // Force complete state update to ensure game appears
-            setCurrentGame(lastMessage.game);
-            // No need for setTimeout - just ensure the state is properly set
+            setCurrentGame(prevGame => {
+              console.log('🎮 Game state update - prev:', prevGame, 'new:', lastMessage.game);
+              return lastMessage.game;
+            });
           }
           break;
         case 'game_over':
@@ -191,6 +193,7 @@ export default function Home() {
                   </span>
                 </div>
                 <GameBoard 
+                  key={`${currentGame?.id}-${JSON.stringify(currentGame?.board)}`}
                   game={currentGame}
                   onGameOver={handleGameOver}
                   gameMode={selectedMode}

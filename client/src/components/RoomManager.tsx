@@ -33,8 +33,8 @@ export function RoomManager({
   const queryClient = useQueryClient();
 
   const joinRoomMutation = useMutation({
-    mutationFn: async (code: string) => {
-      const response = await apiRequest('POST', `/api/rooms/${code}/join`, { role: 'player' });
+    mutationFn: async (data: { code: string, role: 'player' | 'spectator' }) => {
+      const response = await apiRequest('POST', `/api/rooms/${data.code}/join`, { role: data.role });
       return response.json();
     },
     onSuccess: (data) => {
@@ -110,9 +110,12 @@ export function RoomManager({
     },
   });
 
-  const handleJoinRoom = () => {
+  const handleJoinRoom = (role: 'player' | 'spectator' = 'player') => {
     if (joinCode.trim()) {
-      joinRoomMutation.mutate(joinCode.trim().toUpperCase());
+      joinRoomMutation.mutate({ 
+        code: joinCode.trim().toUpperCase(), 
+        role 
+      });
     }
   };
 
@@ -133,7 +136,7 @@ export function RoomManager({
         {!currentRoom ? (
           <>
             {/* Join Room */}
-            <div className="flex space-x-2">
+            <div className="space-y-2">
               <Input
                 placeholder="Room code"
                 value={joinCode}
@@ -141,13 +144,22 @@ export function RoomManager({
                 className="bg-slate-700 border-slate-600 text-white"
                 maxLength={8}
               />
-              <Button 
-                onClick={handleJoinRoom}
-                disabled={!joinCode.trim() || joinRoomMutation.isPending}
-                className="bg-green-600 hover:bg-green-700"
-              >
-                Join
-              </Button>
+              <div className="flex space-x-2">
+                <Button 
+                  onClick={() => handleJoinRoom('player')}
+                  disabled={!joinCode.trim() || joinRoomMutation.isPending}
+                  className="flex-1 bg-green-600 hover:bg-green-700"
+                >
+                  Join as Player
+                </Button>
+                <Button 
+                  onClick={() => handleJoinRoom('spectator')}
+                  disabled={!joinCode.trim() || joinRoomMutation.isPending}
+                  className="flex-1 bg-blue-600 hover:bg-blue-700"
+                >
+                  Join as Spectator
+                </Button>
+              </div>
             </div>
             
             {/* Create Room */}

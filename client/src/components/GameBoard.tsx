@@ -34,7 +34,12 @@ export function GameBoard({ game, onGameOver, gameMode, user }: GameBoardProps) 
       console.log('📋 Setting board to:', game.board || {});
       console.log('👤 Player X Info:', game.playerXInfo);
       console.log('👤 Player O Info:', game.playerOInfo);
-      setBoard(game.board || {});
+      // Force board state update
+      setBoard(prevBoard => {
+        const newBoard = game.board || {};
+        console.log('📋 Board update - prev:', prevBoard, 'new:', newBoard);
+        return newBoard;
+      });
       setCurrentPlayer(game.currentPlayer || 'X');
     }
   }, [game]);
@@ -52,11 +57,8 @@ export function GameBoard({ game, onGameOver, gameMode, user }: GameBoardProps) 
             console.log('📋 Position:', lastMessage.position);
             console.log('📋 Current player:', lastMessage.currentPlayer);
             
-            // Force state update immediately
-            setBoard(prevBoard => {
-              console.log('📋 Updating board from:', prevBoard, 'to:', lastMessage.board);
-              return lastMessage.board;
-            });
+            // Force state update immediately with proper synchronization
+            setBoard(lastMessage.board);
             setCurrentPlayer(lastMessage.currentPlayer);
             setLastMove(lastMessage.position);
             playSound('move');
