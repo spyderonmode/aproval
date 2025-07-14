@@ -621,6 +621,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   wss.on('connection', (ws, req) => {
     const connectionId = Math.random().toString(36).substring(7);
+    console.log(`🔗 New WebSocket connection: ${connectionId}`);
     
     ws.on('message', async (message) => {
       try {
@@ -628,6 +629,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         
         switch (data.type) {
           case 'auth':
+            console.log(`🔐 WebSocket auth: ${data.userId} -> ${connectionId}`);
             connections.set(connectionId, {
               ws,
               userId: data.userId,
@@ -637,11 +639,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
           case 'join_room':
             const connection = connections.get(connectionId);
             if (connection) {
+              console.log(`🏠 User ${connection.userId} joining room ${data.roomId} via connection ${connectionId}`);
               connection.roomId = data.roomId;
               if (!roomConnections.has(data.roomId)) {
                 roomConnections.set(data.roomId, new Set());
               }
               roomConnections.get(data.roomId)!.add(connectionId);
+              console.log(`🏠 Room ${data.roomId} now has ${roomConnections.get(data.roomId)?.size} connections`);
               
               // Notify all participants in the room about the new connection
               const roomConnIds = roomConnections.get(data.roomId);
