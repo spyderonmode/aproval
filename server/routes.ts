@@ -350,12 +350,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.log(`User ID: ${userId}`);
       console.log(`Position: ${position}`);
 
+      // Always fetch fresh game state to avoid stale data
       const game = await storage.getGameById(gameId);
       if (!game) {
         return res.status(404).json({ message: "Game not found" });
       }
 
-      console.log(`Current game state:`);
+      console.log(`Current game state (fresh from DB):`);
       console.log(`- Player X: ${game.playerXId}`);
       console.log(`- Player O: ${game.playerOId}`);
       console.log(`- Current player: ${game.currentPlayer}`);
@@ -477,6 +478,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         if (game.roomId && roomConnections.has(game.roomId)) {
           const roomUsers = roomConnections.get(game.roomId)!;
           console.log(`- Room has ${roomUsers.size} connected users`);
+          let broadcastCount = 0;
           roomUsers.forEach(connectionId => {
             const connection = connections.get(connectionId);
             if (connection && connection.ws.readyState === WebSocket.OPEN) {
@@ -489,8 +491,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
                 board: newBoard,
                 currentPlayer: nextPlayer, // Next player's turn
               }));
+              broadcastCount++;
             }
           });
+          console.log(`- Successfully broadcast to ${broadcastCount} users`);
+        } else {
+          console.log(`❌ Room not found or no connections: ${game.roomId}`);
         }
         
         // Handle AI move if it's AI mode

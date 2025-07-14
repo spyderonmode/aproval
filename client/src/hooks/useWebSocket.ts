@@ -32,6 +32,7 @@ export function useWebSocket() {
     ws.current.onmessage = (event) => {
       try {
         const message = JSON.parse(event.data);
+        console.log(`📥 Received WebSocket message:`, message);
         setLastMessage(message);
       } catch (error) {
         console.error('Failed to parse WebSocket message:', error);
@@ -53,11 +54,15 @@ export function useWebSocket() {
 
   const sendMessage = (message: WebSocketMessage) => {
     if (ws.current && ws.current.readyState === WebSocket.OPEN) {
+      console.log(`📤 Sending WebSocket message:`, message);
       ws.current.send(JSON.stringify(message));
+    } else {
+      console.warn(`❌ WebSocket not ready, message not sent:`, message);
     }
   };
 
   const joinRoom = (roomId: string) => {
+    console.log(`🏠 Joining room: ${roomId}`);
     sendMessage({ type: 'join_room', roomId });
   };
 

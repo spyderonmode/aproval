@@ -41,10 +41,13 @@ export function GameBoard({ game, onGameOver, gameMode, user }: GameBoardProps) 
       switch (lastMessage.type) {
         case 'move':
           if (lastMessage.gameId === game.id) {
+            console.log('Received move WebSocket message:', lastMessage);
             setBoard(lastMessage.board);
             setCurrentPlayer(lastMessage.currentPlayer);
             setLastMove(lastMessage.position);
             playSound('move');
+            // Force query invalidation to ensure UI updates
+            queryClient.invalidateQueries({ queryKey: ['/api/games', game?.id] });
           }
           break;
         case 'game_started':
@@ -82,11 +85,9 @@ export function GameBoard({ game, onGameOver, gameMode, user }: GameBoardProps) 
     },
     onSuccess: (data) => {
       if (game && game.id !== 'local-game') {
-        // Update local state immediately for better UX
-        if (data && data.board) {
-          setBoard(data.board);
-          setCurrentPlayer(data.currentPlayer);
-        }
+        // For online games, don't update local state immediately
+        // Let the WebSocket message handle the update to ensure synchronization
+        console.log('Move successful, waiting for WebSocket update');
         queryClient.invalidateQueries({ queryKey: ['/api/games', game?.id] });
       }
     },
