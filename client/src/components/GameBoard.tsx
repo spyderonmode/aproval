@@ -43,7 +43,7 @@ export function GameBoard({ game, onGameOver, gameMode, user }: GameBoardProps) 
         case 'ai_move':
           if (lastMessage.gameId === game.id) {
             setBoard(lastMessage.board);
-            setCurrentPlayer(lastMessage.player === 'X' ? 'O' : 'X');
+            setCurrentPlayer(lastMessage.currentPlayer || (lastMessage.player === 'X' ? 'O' : 'X'));
             setLastMove(lastMessage.position);
             playSound('move');
           }
@@ -302,12 +302,25 @@ export function GameBoard({ game, onGameOver, gameMode, user }: GameBoardProps) 
       const userId = user?.userId || user?.id;
       const isPlayerX = game.playerXId === userId;
       const isPlayerO = game.playerOId === userId;
+      
+      if (!isPlayerX && !isPlayerO) {
+        toast({
+          title: "Not a player",
+          description: "You are not a player in this game",
+          variant: "destructive",
+        });
+        return;
+      }
+      
       const playerSymbol = isPlayerX ? 'X' : 'O';
       
       if (currentPlayer !== playerSymbol) {
+        const currentPlayerName = currentPlayer === 'X' ? 
+          (game.playerXInfo?.firstName || 'Player X') : 
+          (game.playerOInfo?.firstName || 'Player O');
         toast({
           title: "Not your turn",
-          description: "Wait for your opponent's move",
+          description: `Waiting for ${currentPlayerName} to make a move`,
           variant: "destructive",
         });
         return;
