@@ -65,33 +65,41 @@ export default function Home() {
               board: lastMessage.board,
               currentPlayer: lastMessage.currentPlayer,
               lastMove: lastMessage.position,
+              playerXInfo: lastMessage.playerXInfo || prevGame.playerXInfo,
+              playerOInfo: lastMessage.playerOInfo || prevGame.playerOInfo,
               timestamp: Date.now() // Force re-render
             }));
-            playSound('move');
+            // Play move sound with slight delay to ensure it's heard
+            setTimeout(() => playSound('move'), 100);
           } else if (currentRoom && (lastMessage.roomId === currentRoom.id || lastMessage.gameId)) {
             // If we're in the room but don't have currentGame set, set it from the move message
             console.log('🎮 Spectator receiving move for room game');
             if (!currentGame) {
-              // Create a basic game object for spectators
+              // Create a basic game object for spectators with player info
               setCurrentGame({
                 id: lastMessage.gameId,
                 roomId: currentRoom.id,
                 board: lastMessage.board,
                 currentPlayer: lastMessage.currentPlayer,
                 lastMove: lastMessage.position,
+                playerXInfo: lastMessage.playerXInfo,
+                playerOInfo: lastMessage.playerOInfo,
                 timestamp: Date.now()
               });
             } else {
-              // Update existing game state
+              // Update existing game state with player info
               setCurrentGame(prevGame => ({
                 ...prevGame,
                 board: lastMessage.board,
                 currentPlayer: lastMessage.currentPlayer,
                 lastMove: lastMessage.position,
+                playerXInfo: lastMessage.playerXInfo || prevGame.playerXInfo,
+                playerOInfo: lastMessage.playerOInfo || prevGame.playerOInfo,
                 timestamp: Date.now()
               }));
             }
-            playSound('move');
+            // Play move sound with slight delay to ensure it's heard
+            setTimeout(() => playSound('move'), 100);
           }
           break;
         case 'game_over':

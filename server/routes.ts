@@ -563,6 +563,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
                 player: playerSymbol,
                 board: newBoard,
                 currentPlayer: nextPlayer, // Next player's turn
+                // Add player info so spectators can see names
+                playerXInfo: game.playerXInfo,
+                playerOInfo: game.playerOInfo
               }));
               broadcastCount++;
             }

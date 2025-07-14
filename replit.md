@@ -10,6 +10,7 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+- **Critical UI & Audio Fixes** (July 14, 2025): Fixed spectator player name display by sending player info with WebSocket messages, resolved white screen popup issue with proper modal styling, improved move sound timing with delay for better real-time feedback, enhanced spectator game state handling to show complete player information on game board
 - **Spectator WebSocket Fix & Enhanced Game Over** (July 14, 2025): Fixed spectator move visibility by adding roomId to WebSocket messages and improved spectator game state handling, removed creepy vibrating sound from Web Audio API oscillator, enhanced winning popup with profile pictures, crown icons, celebration effects, proper name display, and celebration sounds, removed reset game logic entirely
 - **Critical Game Sync Fix** (July 14, 2025): Fixed the root cause of game board not updating after moves - moved WebSocket message handling from GameBoard to Home component to prevent double handling and state conflicts, added direct game state updates for move messages to ensure immediate board synchronization
 - **Board Refresh and Spectator Fixes** (July 14, 2025): Fixed board refresh issue with force re-rendering and better WebSocket synchronization, fixed spectator room joining by correcting capacity logic to allow spectators when room supports them, added separate join buttons for players vs spectators

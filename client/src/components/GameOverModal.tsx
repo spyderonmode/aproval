@@ -31,9 +31,9 @@ export function GameOverModal({ open, onClose, result, onPlayAgain }: GameOverMo
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="bg-slate-800 border-slate-700 text-white text-center">
+      <DialogContent className="bg-slate-800 border-slate-700 text-white text-center max-w-md mx-auto focus:outline-none !bg-slate-800">
         <DialogHeader>
-          <DialogTitle className="text-2xl">Game Over!</DialogTitle>
+          <DialogTitle className="text-2xl text-white">Game Over!</DialogTitle>
         </DialogHeader>
         
         <div className="py-6">
