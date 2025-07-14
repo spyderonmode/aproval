@@ -10,7 +10,7 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
-- **Critical Session Issue Identified** (July 14, 2025): Discovered that both devices authenticate as same user when using same preview link, causing "not your turn" errors. Both devices show as Player X instead of separate X and O players. WebSocket broadcasting works correctly but turn validation fails due to shared authentication.
+- **Critical Session Issue Confirmed** (July 14, 2025): Both devices authenticate as same user (34fc8c77-2526-4273-afe2-ea02283a12e3) even when using different browsers/accounts. Database shows correct room participants but both devices send moves as Player X instead of separate X and O players. WebSocket broadcasting works correctly but turn validation fails due to shared authentication. Need proper session separation for two-device multiplayer.
 - **Game Creation Schema Fix** (July 14, 2025): Fixed game creation failure caused by null playerOId values - updated schema validation to properly handle optional fields and prevent null values from breaking validation
 - **Room Join Logic Fix** (July 14, 2025): Fixed "room is full" error by checking if user is already in room before validating player count, preventing room owners from being blocked from their own rooms
 - **Login Redirect Enhancement** (July 14, 2025): Fixed authentication flow to properly redirect users to home page after successful login without requiring manual page refresh

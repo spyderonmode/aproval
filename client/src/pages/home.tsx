@@ -212,6 +212,7 @@ export default function Home() {
                 </div>
               )}
               <span className="text-gray-300">{user?.displayName || user?.username || 'Player'}</span>
+              <span className="text-xs text-gray-500">({user?.userId || user?.id})</span>
             </div>
             <div className="flex items-center space-x-2">
               <div className={`w-2 h-2 rounded-full ${isConnected ? 'bg-green-500' : 'bg-red-500'}`}></div>
