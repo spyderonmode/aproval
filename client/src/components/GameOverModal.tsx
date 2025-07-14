@@ -1,7 +1,7 @@
 import React from "react";
 // Removed Dialog import to fix white screen issue
 import { Button } from "@/components/ui/button";
-import { Home, User } from "lucide-react";
+import { Home, User, RefreshCw } from "lucide-react";
 import { useAudio } from "@/hooks/useAudio";
 
 interface GameOverModalProps {
@@ -32,13 +32,21 @@ export function GameOverModal({ open, onClose, result, onPlayAgain }: GameOverMo
   if (!open) return null;
   
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ backgroundColor: 'rgba(0, 0, 0, 0.8)' }}>
+    <div 
+      className="fixed inset-0 z-50 flex items-center justify-center p-4" 
+      style={{ backgroundColor: 'rgba(0, 0, 0, 0.9)' }}
+      onClick={onClose}
+    >
       <div 
         className="relative w-full max-w-md p-6 rounded-lg shadow-lg" 
-        style={{ backgroundColor: '#1e293b', border: '1px solid #475569' }}
+        style={{ 
+          backgroundColor: '#1e293b', 
+          border: '2px solid #475569',
+          color: 'white'
+        }}
         onClick={(e) => e.stopPropagation()}
       >
-        <h2 className="text-2xl font-bold text-white mb-6 text-center">Game Over!</h2>
+        <h2 className="text-2xl font-bold mb-6 text-center" style={{ color: 'white' }}>Game Over!</h2>
         
         <div className="mb-6">
           {isDraw ? (
@@ -81,14 +89,30 @@ export function GameOverModal({ open, onClose, result, onPlayAgain }: GameOverMo
         </div>
         
         <div className="flex justify-center space-x-3">
-          <Button
-            variant="outline"
+          <button
             onClick={onClose}
-            className="border-slate-600 text-gray-300 hover:bg-slate-700"
+            className="px-4 py-2 rounded-lg border border-slate-600 text-gray-300 hover:bg-slate-700"
+            style={{ 
+              backgroundColor: '#374151', 
+              color: 'white',
+              border: '1px solid #6b7280'
+            }}
           >
-            <Home className="w-4 h-4 mr-2" />
+            <Home className="w-4 h-4 mr-2 inline" />
             Main Menu
-          </Button>
+          </button>
+          <button
+            onClick={onPlayAgain}
+            className="px-4 py-2 rounded-lg"
+            style={{ 
+              backgroundColor: '#3b82f6', 
+              color: 'white',
+              border: '1px solid #2563eb'
+            }}
+          >
+            <RefreshCw className="w-4 h-4 mr-2 inline" />
+            Play Again
+          </button>
         </div>
       </div>
     </div>

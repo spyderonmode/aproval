@@ -183,6 +183,57 @@ export default function Home() {
     setShowGameOver(true);
   };
 
+  const handlePlayAgain = async () => {
+    setShowGameOver(false);
+    setGameResult(null);
+    
+    if (selectedMode === 'online' && currentRoom) {
+      // For online mode, create a new game in the same room
+      try {
+        const response = await fetch(`/api/rooms/${currentRoom.id}/start-game`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        });
+        
+        if (response.ok) {
+          const newGame = await response.json();
+          setCurrentGame(newGame);
+          
+          // Broadcast new game to all room participants
+          sendMessage({
+            type: 'game_started',
+            gameId: newGame.id,
+            roomId: currentRoom.id,
+            game: newGame
+          });
+          
+          playSound('gameStart');
+        }
+      } catch (error) {
+        console.error('Error starting new game:', error);
+      }
+    } else {
+      // For AI and pass-play modes, restart locally
+      const newGame = {
+        id: Date.now().toString(),
+        board: {},
+        currentPlayer: 'X',
+        status: 'active',
+        playerX: user?.id || 'local-x',
+        playerO: selectedMode === 'ai' ? 'ai' : 'local-o',
+        playerXInfo: user,
+        playerOInfo: selectedMode === 'ai' ? { username: 'AI', displayName: 'AI Player' } : null,
+        gameMode: selectedMode,
+        createdAt: new Date().toISOString()
+      };
+      
+      setCurrentGame(newGame);
+      playSound('gameStart');
+    }
+  };
+
   return (
     <div className="min-h-screen bg-slate-900 text-white">
       {/* Navigation Header */}
@@ -427,10 +478,7 @@ export default function Home() {
         open={showGameOver}
         onClose={() => setShowGameOver(false)}
         result={gameResult}
-        onPlayAgain={() => {
-          setShowGameOver(false);
-          setCurrentGame(null);
-        }}
+        onPlayAgain={handlePlayAgain}
       />
     </div>
   );
