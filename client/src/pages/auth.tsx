@@ -35,8 +35,8 @@ export default function Auth() {
           title: "Login successful",
           description: "Welcome back!",
         });
-        // Redirect to home after successful login
-        setLocation("/");
+        // Redirect to dashboard after successful login
+        setLocation("/home");
       } else {
         if (!email) {
           toast({
@@ -57,9 +57,9 @@ export default function Auth() {
         // Show email verification modal since email is now always required
         setShowEmailVerification(true);
         
-        // Also redirect to home after a short delay if email verification is not required
+        // Also redirect to dashboard after a short delay if email verification is not required
         setTimeout(() => {
-          setLocation("/");
+          setLocation("/home");
         }, 2000);
       }
     } catch (error) {

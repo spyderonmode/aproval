@@ -379,6 +379,7 @@ export default function Home() {
                 onCreateRoom={() => setShowCreateRoom(true)}
                 onGameStart={handleGameStart}
                 gameMode={selectedMode}
+                user={user}
               />
             )}
 

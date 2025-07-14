@@ -16,6 +16,7 @@ interface RoomManagerProps {
   onCreateRoom: () => void;
   onGameStart: (game: any) => void;
   gameMode: 'ai' | 'pass-play' | 'online';
+  user: any;
 }
 
 export function RoomManager({ 
@@ -24,7 +25,8 @@ export function RoomManager({
   onRoomLeave, 
   onCreateRoom, 
   onGameStart,
-  gameMode 
+  gameMode,
+  user 
 }: RoomManagerProps) {
   const [joinCode, setJoinCode] = useState("");
   const { toast } = useToast();
@@ -177,14 +179,25 @@ export function RoomManager({
 
             {/* Room Actions */}
             <div className="flex space-x-2">
-              <Button
-                onClick={() => startGameMutation.mutate()}
-                disabled={startGameMutation.isPending}
-                className="flex-1 bg-primary hover:bg-primary/90"
-              >
-                <Play className="w-4 h-4 mr-2" />
-                Start Game
-              </Button>
+              {/* Check if user is room owner */}
+              {currentRoom.ownerId === (user?.userId || user?.id) ? (
+                <Button
+                  onClick={() => startGameMutation.mutate()}
+                  disabled={startGameMutation.isPending}
+                  className="flex-1 bg-primary hover:bg-primary/90"
+                >
+                  <Play className="w-4 h-4 mr-2" />
+                  Start Game
+                </Button>
+              ) : (
+                <Button
+                  disabled
+                  className="flex-1 bg-gray-600 cursor-not-allowed"
+                >
+                  <Play className="w-4 h-4 mr-2" />
+                  Wait for Start
+                </Button>
+              )}
               <Button
                 variant="outline"
                 onClick={handleLeaveRoom}

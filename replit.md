@@ -10,6 +10,8 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+- **Room Creator Permission Control** (July 14, 2025): Fixed room permissions so only the room creator can start games - other players see "Wait for Start" button and must wait for room owner to begin the game
+- **Login Redirect Fix** (July 14, 2025): Fixed authentication redirect to send users to their dashboard (/home) instead of homepage (/) after successful login
 - **Critical Game Creation Issue Fixed** (July 14, 2025): Fixed root cause of multiplayer board not updating - both users were creating separate games instead of sharing the same game. Added check to prevent duplicate game creation for same room, ensuring both players interact with the same game instance.
 - **Game Creation Schema Fix** (July 14, 2025): Fixed game creation failure caused by null playerOId values - updated schema validation to properly handle optional fields and prevent null values from breaking validation
 - **Room Join Logic Fix** (July 14, 2025): Fixed "room is full" error by checking if user is already in room before validating player count, preventing room owners from being blocked from their own rooms
