@@ -3,6 +3,7 @@ import path from 'path';
 import crypto from 'crypto';
 import { Express } from 'express';
 import session from 'express-session';
+import { storage } from './storage';
 
 interface User {
   id: string;
@@ -56,7 +57,7 @@ function findUserByUsername(username: string): User | undefined {
   return users.find(u => u.username === username);
 }
 
-function createUser(username: string, password: string): User {
+async function createUser(username: string, password: string): Promise<User> {
   const users = getUsers();
   const newUser: User = {
     id: crypto.randomUUID(),
@@ -68,6 +69,20 @@ function createUser(username: string, password: string): User {
   };
   users.push(newUser);
   saveUsers(users);
+  
+  // Also create user in database
+  try {
+    await storage.upsertUser({
+      id: newUser.id,
+      email: null,
+      firstName: null,
+      lastName: null,
+      profileImageUrl: null,
+    });
+  } catch (error) {
+    console.error('Error creating user in database:', error);
+  }
+  
   return newUser;
 }
 
@@ -104,7 +119,7 @@ export function setupAuth(app: Express) {
   }));
 
   // Register endpoint
-  app.post('/api/auth/register', (req, res) => {
+  app.post('/api/auth/register', async (req, res) => {
     const { username, password } = req.body;
 
     if (!username || !password) {
@@ -116,7 +131,7 @@ export function setupAuth(app: Express) {
     }
 
     try {
-      const user = createUser(username, password);
+      const user = await createUser(username, password);
       const sessionData = { userId: user.id, username: user.username };
       req.session.user = sessionData;
       
@@ -127,7 +142,7 @@ export function setupAuth(app: Express) {
   });
 
   // Login endpoint
-  app.post('/api/auth/login', (req, res) => {
+  app.post('/api/auth/login', async (req, res) => {
     const { username, password } = req.body;
 
     if (!username || !password) {
@@ -137,6 +152,19 @@ export function setupAuth(app: Express) {
     const user = findUserByUsername(username);
     if (!user || user.password !== hashPassword(password)) {
       return res.status(401).json({ error: 'Invalid credentials' });
+    }
+
+    // Ensure user exists in database
+    try {
+      await storage.upsertUser({
+        id: user.id,
+        email: null,
+        firstName: null,
+        lastName: null,
+        profileImageUrl: null,
+      });
+    } catch (error) {
+      console.error('Error syncing user to database:', error);
     }
 
     const sessionData = { userId: user.id, username: user.username };

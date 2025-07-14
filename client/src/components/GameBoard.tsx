@@ -283,7 +283,7 @@ export function GameBoard({ game, onGameOver, gameMode, user }: GameBoardProps) 
       <div
         key={position}
         className={`
-          w-16 h-16 bg-slate-700 rounded-lg flex items-center justify-center cursor-pointer 
+          w-12 h-12 sm:w-16 sm:h-16 bg-slate-700 rounded-lg flex items-center justify-center cursor-pointer 
           border-2 border-transparent hover:border-primary transition-all duration-200
           ${isEmpty ? 'hover:bg-slate-600' : 'cursor-not-allowed'}
           ${makeMoveMutation.isPending ? 'opacity-50' : ''}
@@ -291,13 +291,13 @@ export function GameBoard({ game, onGameOver, gameMode, user }: GameBoardProps) 
         onClick={() => handleCellClick(position)}
       >
         {symbol && (
-          <span className={`text-2xl font-bold ${
+          <span className={`text-xl sm:text-2xl font-bold ${
             symbol === 'X' ? 'text-blue-500' : 'text-red-500'
           }`}>
             {symbol}
           </span>
         )}
-        <span className="text-xs text-gray-500 absolute mt-12">{position}</span>
+        <span className="text-xs text-gray-500 absolute mt-10 sm:mt-12">{position}</span>
       </div>
     );
   };
@@ -339,7 +339,7 @@ export function GameBoard({ game, onGameOver, gameMode, user }: GameBoardProps) 
         </div>
 
         {/* 3x5 Game Grid */}
-        <div className="grid grid-cols-5 gap-3 max-w-lg mx-auto">
+        <div className="grid grid-cols-5 gap-2 sm:gap-3 max-w-xs sm:max-w-lg mx-auto">
           {/* Row 1: 1,2,3,4,5 */}
           {[1, 2, 3, 4, 5].map(renderCell)}
           
