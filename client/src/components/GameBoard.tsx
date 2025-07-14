@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { isUnauthorizedError } from "@/lib/authUtils";
 
-const VALID_POSITIONS = [1, 2, 3, 4, 6, 7, 8, 9, 11, 12, 13, 14];
+const VALID_POSITIONS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15];
 
 interface GameBoardProps {
   game: any;
@@ -165,15 +165,15 @@ export function GameBoard({ game, onGameOver, gameMode, user }: GameBoardProps) 
         </div>
 
         {/* 3x5 Game Grid */}
-        <div className="grid grid-cols-4 gap-3 max-w-md mx-auto">
-          {/* Row 1: 1,2,3,4 */}
-          {[1, 2, 3, 4].map(renderCell)}
+        <div className="grid grid-cols-5 gap-3 max-w-lg mx-auto">
+          {/* Row 1: 1,2,3,4,5 */}
+          {[1, 2, 3, 4, 5].map(renderCell)}
           
-          {/* Row 2: 6,7,8,9 */}
-          {[6, 7, 8, 9].map(renderCell)}
+          {/* Row 2: 6,7,8,9,10 */}
+          {[6, 7, 8, 9, 10].map(renderCell)}
           
-          {/* Row 3: 11,12,13,14 */}
-          {[11, 12, 13, 14].map(renderCell)}
+          {/* Row 3: 11,12,13,14,15 */}
+          {[11, 12, 13, 14, 15].map(renderCell)}
         </div>
 
         {/* Game Controls */}

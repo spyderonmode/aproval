@@ -234,7 +234,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
               // Check AI win
               const aiWinResult = checkWin(aiBoard, 'O');
               if (aiWinResult.winner) {
-                await storage.updateGameStatus(gameId, 'finished', game.playerOId, aiWinResult.condition || undefined);
+                await storage.updateGameStatus(gameId, 'finished', game.playerOId || undefined, aiWinResult.condition || undefined);
                 await storage.updateUserStats(userId, 'loss');
                 
                 if (game.roomId) {

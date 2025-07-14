@@ -132,15 +132,15 @@ export default function Home() {
               <CardContent className="space-y-3 text-sm text-gray-300">
                 <div className="flex items-start space-x-2">
                   <div className="w-1.5 h-1.5 bg-green-500 rounded-full mt-2"></div>
-                  <span><strong>Horizontal Win:</strong> Get 4 symbols in a row horizontally</span>
-                </div>
-                <div className="flex items-start space-x-2">
-                  <div className="w-1.5 h-1.5 bg-green-500 rounded-full mt-2"></div>
                   <span><strong>Diagonal Win:</strong> Get 3 symbols on straight diagonal lines</span>
                 </div>
                 <div className="flex items-start space-x-2">
                   <div className="w-1.5 h-1.5 bg-green-500 rounded-full mt-2"></div>
-                  <span><strong>Grid:</strong> 3x5 board with positions 1,2,3,4,6,7,8,9,11,12,13,14</span>
+                  <span><strong>Grid:</strong> Complete 3x5 board with positions 1-15</span>
+                </div>
+                <div className="flex items-start space-x-2">
+                  <div className="w-1.5 h-1.5 bg-green-500 rounded-full mt-2"></div>
+                  <span><strong>Strategy:</strong> Only diagonal patterns count - no horizontal or vertical wins</span>
                 </div>
               </CardContent>
             </Card>

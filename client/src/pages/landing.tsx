@@ -31,7 +31,7 @@ export default function Landing() {
             <span className="block text-primary">Reimagined</span>
           </h2>
           <p className="text-xl text-slate-300 max-w-3xl mx-auto mb-8">
-            Experience the classic game with a twist! Play on a unique 3x5 grid with custom winning conditions. 
+            Experience the classic game with a twist! Play on a complete 3x5 grid (positions 1-15) with diagonal-only winning conditions. 
             Challenge AI opponents, compete with friends, or spectate exciting matches.
           </p>
           <Button 
@@ -76,7 +76,7 @@ export default function Landing() {
               </div>
               <CardTitle className="text-white">Custom Rules</CardTitle>
               <CardDescription className="text-slate-400">
-                Unique 3x5 grid with horizontal (4 in a row) and diagonal (3 in a line) wins
+                Complete 3x5 grid (positions 1-15) with diagonal-only winning conditions
               </CardDescription>
             </CardHeader>
           </Card>
@@ -92,8 +92,8 @@ export default function Landing() {
               <div>
                 <h3 className="text-lg font-semibold text-white mb-3">Game Board</h3>
                 <p className="text-slate-300 mb-4">
-                  Play on a unique 3x5 grid with positions numbered 1,2,3,4,6,7,8,9,11,12,13,14.
-                  Notice that positions 5, 10, and 15 are not used, creating an interesting strategic challenge.
+                  Play on a complete 3x5 grid with all positions numbered 1-15.
+                  The board offers a full strategic experience with every cell available for play.
                 </p>
               </div>
               <div>
@@ -101,11 +101,11 @@ export default function Landing() {
                 <ul className="space-y-2 text-slate-300">
                   <li className="flex items-start">
                     <span className="w-2 h-2 bg-primary rounded-full mt-2 mr-3 flex-shrink-0"></span>
-                    <span><strong>Horizontal:</strong> Get 4 symbols in a row</span>
+                    <span><strong>Diagonal Only:</strong> Get 3 symbols on straight diagonal lines to win</span>
                   </li>
                   <li className="flex items-start">
                     <span className="w-2 h-2 bg-primary rounded-full mt-2 mr-3 flex-shrink-0"></span>
-                    <span><strong>Diagonal:</strong> Get 3 symbols on straight diagonal lines</span>
+                    <span><strong>Strategic Play:</strong> No horizontal or vertical wins - only diagonal patterns count</span>
                   </li>
                 </ul>
               </div>

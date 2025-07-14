@@ -34,8 +34,8 @@ Preferred communication style: Simple, everyday language.
 ## Key Components
 
 ### Game Engine
-- **Custom Game Logic**: Implements 3x5 grid Tic-Tac-Toe with horizontal and diagonal winning conditions
-- **AI Player**: Multi-difficulty AI with random, medium (strategic), and hard (minimax-like) modes
+- **Custom Game Logic**: Implements complete 3x5 grid Tic-Tac-Toe (positions 1-15) with diagonal-only winning conditions
+- **AI Player**: Multi-difficulty AI with random, medium (strategic), and hard (minimax-like) modes optimized for diagonal patterns
 - **Move Validation**: Server-side validation for all game moves
 - **Game State Management**: Real-time synchronization between clients
 

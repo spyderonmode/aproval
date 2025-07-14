@@ -163,34 +163,25 @@ export class AIPlayer {
   }
 
   private evaluateHorizontalPatterns(board: GameBoard): number {
-    let score = 0;
-    const rows = [
-      [1, 2, 3, 4],
-      [6, 7, 8, 9],
-      [11, 12, 13, 14]
-    ];
-
-    for (const row of rows) {
-      const aiCount = row.filter(pos => board[pos.toString()] === this.symbol).length;
-      const humanCount = row.filter(pos => board[pos.toString()] === getOpponentSymbol(this.symbol)).length;
-      
-      if (aiCount > 0 && humanCount === 0) {
-        score += Math.pow(10, aiCount);
-      } else if (humanCount > 0 && aiCount === 0) {
-        score -= Math.pow(10, humanCount);
-      }
-    }
-
-    return score;
+    // No horizontal patterns since only diagonal wins count
+    return 0;
   }
 
   private evaluateDiagonalPatterns(board: GameBoard): number {
     let score = 0;
     const diagonals = [
-      [1, 7, 13],
-      [2, 8, 14],
-      [3, 7, 11],
-      [4, 8, 12]
+      [1, 7, 13],   // Main diagonal
+      [2, 8, 14],   // Main diagonal
+      [3, 9, 15],   // Main diagonal
+      [3, 7, 11],   // Anti-diagonal
+      [4, 8, 12],   // Anti-diagonal
+      [5, 9, 13],   // Anti-diagonal
+      [6, 8, 10],   // Center horizontal diagonal
+      [11, 7, 3],   // Anti-diagonal
+      [12, 8, 4],   // Anti-diagonal
+      [13, 9, 5],   // Anti-diagonal
+      [1, 8, 15],   // Long diagonal
+      [5, 8, 11],   // Long diagonal
     ];
 
     for (const diagonal of diagonals) {
