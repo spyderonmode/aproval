@@ -10,6 +10,8 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+- **Game Start Broadcasting** (July 14, 2025): Enhanced game start broadcast to notify both players when game begins, ensuring both players see the same game state and move to the game board simultaneously
+- **Table Rendering Fixes** (July 14, 2025): Fixed board rendering issues with comprehensive debugging, forced re-renders, and improved WebSocket message handling to ensure moves appear properly on both devices
 - **Room Creator Permission Control** (July 14, 2025): Fixed room permissions so only the room creator can start games - other players see "Wait for Start" button and must wait for room owner to begin the game
 - **Login Redirect Fix** (July 14, 2025): Fixed authentication redirect to send users to their dashboard (/home) instead of homepage (/) after successful login
 - **Critical Game Creation Issue Fixed** (July 14, 2025): Fixed root cause of multiplayer board not updating - both users were creating separate games instead of sharing the same game. Added check to prevent duplicate game creation for same room, ensuring both players interact with the same game instance.

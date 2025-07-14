@@ -40,13 +40,21 @@ export function GameBoard({ game, onGameOver, gameMode, user }: GameBoardProps) 
   // Handle WebSocket messages for online games
   useEffect(() => {
     if (gameMode === 'online' && lastMessage && game) {
+      console.log('🎮 Processing WebSocket message:', lastMessage.type);
       switch (lastMessage.type) {
         case 'move':
           if (lastMessage.gameId === game.id) {
             console.log('🎮 Received move WebSocket message:', lastMessage);
             console.log('📋 Current board state:', board);
             console.log('📋 New board state:', lastMessage.board);
-            setBoard(lastMessage.board);
+            console.log('📋 Position:', lastMessage.position);
+            console.log('📋 Current player:', lastMessage.currentPlayer);
+            
+            // Force state update immediately
+            setBoard(prevBoard => {
+              console.log('📋 Updating board from:', prevBoard, 'to:', lastMessage.board);
+              return lastMessage.board;
+            });
             setCurrentPlayer(lastMessage.currentPlayer);
             setLastMove(lastMessage.position);
             playSound('move');
@@ -56,9 +64,13 @@ export function GameBoard({ game, onGameOver, gameMode, user }: GameBoardProps) 
           break;
         case 'game_started':
           if (lastMessage.roomId === game.roomId) {
+            console.log('🎮 Game started WebSocket message:', lastMessage);
+            console.log('📋 Game started board:', lastMessage.game.board || {});
             // Update the game with the new player information
             setBoard(lastMessage.game.board || {});
             setCurrentPlayer(lastMessage.game.currentPlayer || 'X');
+            // Force a re-render to ensure the board updates
+            queryClient.invalidateQueries({ queryKey: ['/api/games', game?.id] });
           }
           break;
         case 'game_over':
@@ -73,6 +85,13 @@ export function GameBoard({ game, onGameOver, gameMode, user }: GameBoardProps) 
       }
     }
   }, [lastMessage, gameMode, game, onGameOver, playSound]);
+
+  // Debug effect to track board state changes
+  useEffect(() => {
+    console.log('🔄 Board state changed:', board);
+    console.log('🔄 Board keys:', Object.keys(board));
+    console.log('🔄 Board values:', Object.values(board));
+  }, [board]);
 
   const makeMoveMutation = useMutation({
     mutationFn: async (position: number) => {
@@ -511,7 +530,10 @@ export function GameBoard({ game, onGameOver, gameMode, user }: GameBoardProps) 
         </div>
 
         {/* 3x5 Game Grid */}
-        <div className="relative grid grid-cols-5 gap-2 sm:gap-3 max-w-xs sm:max-w-lg mx-auto">
+        <div 
+          key={`board-${JSON.stringify(board)}`}
+          className="relative grid grid-cols-5 gap-2 sm:gap-3 max-w-xs sm:max-w-lg mx-auto"
+        >
           {/* Row 1: 1,2,3,4,5 */}
           {[1, 2, 3, 4, 5].map(renderCell)}
           
