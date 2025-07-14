@@ -222,6 +222,7 @@ export default function Home() {
               variant="outline" 
               size="sm"
               onClick={() => logout()}
+              className="bg-slate-800 border-slate-600 text-white hover:bg-slate-700"
             >
               <LogOut className="w-4 h-4 mr-2" />
               Logout

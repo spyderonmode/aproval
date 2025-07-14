@@ -191,7 +191,7 @@ export function GameBoard({ game, onGameOver, gameMode, user }: GameBoardProps) 
     if (gameMode === 'ai' && nextPlayer === 'O') {
       setTimeout(() => {
         makeAIMove(newBoard);
-      }, 500);
+      }, 1000); // Increased delay to reduce blinking
     }
   };
 
@@ -374,9 +374,9 @@ export function GameBoard({ game, onGameOver, gameMode, user }: GameBoardProps) 
         onClick={() => handleCellClick(position)}
         initial={{ scale: 0 }}
         animate={{ scale: 1 }}
-        transition={{ duration: 0.3 }}
-        whileHover={{ scale: isEmpty ? 1.05 : 1 }}
-        whileTap={{ scale: 0.95 }}
+        transition={{ duration: 0.2 }}
+        whileHover={{ scale: isEmpty ? 1.02 : 1 }}
+        whileTap={{ scale: 0.98 }}
       >
         <AnimatePresence>
           {symbol && (
@@ -384,10 +384,10 @@ export function GameBoard({ game, onGameOver, gameMode, user }: GameBoardProps) 
               className={`text-xl sm:text-2xl font-bold ${
                 symbol === 'X' ? 'text-blue-500' : 'text-red-500'
               }`}
-              initial={{ scale: 0, rotate: -180 }}
-              animate={{ scale: 1, rotate: 0 }}
-              exit={{ scale: 0, rotate: 180 }}
-              transition={{ duration: 0.3 }}
+              initial={{ scale: 0 }}
+              animate={{ scale: 1 }}
+              exit={{ scale: 0 }}
+              transition={{ duration: 0.2 }}
             >
               {symbol}
             </motion.span>
@@ -478,14 +478,9 @@ export function GameBoard({ game, onGameOver, gameMode, user }: GameBoardProps) 
         {/* Current Player Indicator */}
         <div className="mb-6 p-4 bg-slate-700 rounded-lg">
           <div className="flex items-center justify-center space-x-3">
-            <div className="relative">
-              <div className={`w-4 h-4 rounded-full ${
-                currentPlayer === 'X' ? 'bg-blue-500' : 'bg-red-500'
-              }`}></div>
-              <div className={`absolute inset-0 w-4 h-4 rounded-full animate-ping ${
-                currentPlayer === 'X' ? 'bg-blue-500' : 'bg-red-500'
-              }`}></div>
-            </div>
+            <div className={`w-4 h-4 rounded-full ${
+              currentPlayer === 'X' ? 'bg-blue-500' : 'bg-red-500'
+            }`}></div>
             <span className="text-lg font-medium">
               {currentPlayer === 'X' 
                 ? (game?.playerXInfo?.firstName || game?.playerXInfo?.displayName || game?.playerXInfo?.username || 'Player X')

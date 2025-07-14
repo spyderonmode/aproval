@@ -32,9 +32,9 @@ export function GameOverModal({ open, onClose, result, onPlayAgain }: GameOverMo
   if (!open) return null;
   
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-slate-800 border border-slate-700 text-white text-center max-w-md mx-auto p-6 rounded-lg shadow-xl">
-        <h2 className="text-2xl text-white mb-6">Game Over!</h2>
+    <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50" onClick={onClose}>
+      <div className="bg-slate-900 border-2 border-slate-600 text-white text-center max-w-md mx-4 p-8 rounded-xl shadow-2xl" onClick={(e) => e.stopPropagation()}>
+        <h2 className="text-2xl font-bold text-white mb-6">Game Over!</h2>
         
         <div className="mb-6">
           {isDraw ? (
