@@ -21,18 +21,25 @@ export function useWebSocket() {
     ws.current = new WebSocket(wsUrl);
 
     ws.current.onopen = () => {
+      console.log('🔌 WebSocket connected');
       setIsConnected(true);
       // Authenticate with WebSocket
-      ws.current?.send(JSON.stringify({
+      const authMessage = {
         type: 'auth',
         userId: user.userId || user.id,
-      }));
+      };
+      console.log('🔐 Sending auth message:', authMessage);
+      ws.current?.send(JSON.stringify(authMessage));
     };
 
     ws.current.onmessage = (event) => {
       try {
         const message = JSON.parse(event.data);
         console.log(`📥 Received WebSocket message:`, message);
+        console.log(`📥 Message type: ${message.type}`);
+        if (message.type === 'move') {
+          console.log(`📥 Move message - GameId: ${message.gameId}, Position: ${message.position}, Board:`, message.board);
+        }
         setLastMessage(message);
       } catch (error) {
         console.error('Failed to parse WebSocket message:', error);

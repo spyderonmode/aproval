@@ -30,6 +30,8 @@ export function GameBoard({ game, onGameOver, gameMode, user }: GameBoardProps) 
 
   useEffect(() => {
     if (game) {
+      console.log('🎮 Game prop changed:', game);
+      console.log('📋 Setting board to:', game.board || {});
       setBoard(game.board || {});
       setCurrentPlayer(game.currentPlayer || 'X');
     }
