@@ -10,6 +10,7 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+- **Firebase Migration Started** (July 15, 2025): Initiated complete migration from PostgreSQL to Firebase Firestore with authentication system updated to use Firebase Auth, created configuration files for both client and server, implemented Firebase storage class with error handling for gradual migration, updated authentication middleware to handle Firebase ID tokens, and prepared fallback mechanisms for development continuity
 - **Header Menu System** (July 15, 2025): Replaced logout button with hamburger menu dropdown in header containing theme selector, online players, profile settings, and logout - improved mobile experience with organized dropdown menu accessible from header while maintaining clean navigation
 - **Header Mobile Optimization** (July 15, 2025): Moved theme selector and online players button from crowded header to organized Settings card in sidebar - improved mobile responsiveness and cleaner navigation with dedicated settings section containing theme customization and player count display
 - **Block User Feature** (July 15, 2025): Added comprehensive user blocking system in chat - users can block/unblock other players, blocked users are visually indicated with red badges, messages from blocked users are automatically filtered out, chat input is disabled for blocked users, and blocked users have limited chat functionality while still appearing in online users list with unblock option
