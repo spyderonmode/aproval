@@ -87,34 +87,55 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const { targetUserId, message } = req.body;
       const senderId = req.user.userId;
       
-      // Get sender info
-      const senderInfo = onlineUsers.get(senderId);
+      // Get sender info (from onlineUsers or fetch from database)
+      let senderInfo = onlineUsers.get(senderId);
       if (!senderInfo) {
-        return res.status(400).json({ error: 'Sender not found' });
+        // If not in onlineUsers, get from database for in-game users
+        const senderData = await storage.getUser(senderId);
+        if (!senderData) {
+          return res.status(400).json({ error: 'Sender not found' });
+        }
+        senderInfo = {
+          userId: senderId,
+          username: senderData.username || senderData.id,
+          displayName: senderData.displayName || senderData.firstName || senderData.username,
+          roomId: undefined,
+          lastSeen: new Date()
+        };
+        console.log(`📨 Using database info for in-game sender: ${senderId}`);
       }
 
-      // Check if target user is online
-      const targetUser = onlineUsers.get(targetUserId);
-      if (!targetUser) {
-        return res.status(400).json({ error: 'Target user is not online' });
-      }
-
-      // Find target user's connection
+      // Find target user's connection first (they might be in-game but not in onlineUsers)
       const targetConnection = Array.from(connections.values()).find(conn => conn.userId === targetUserId);
       if (!targetConnection) {
         return res.status(400).json({ error: 'Target user connection not found' });
       }
 
-      // Send chat message to target user
-      targetConnection.ws.send(JSON.stringify({
-        type: 'chat_message_received',
-        message: {
-          senderId,
-          senderName: senderInfo.displayName || senderInfo.username,
-          message,
-          timestamp: new Date().toISOString()
+      // Check if target user is online or in-game
+      const targetUser = onlineUsers.get(targetUserId);
+      if (!targetUser) {
+        // If not in onlineUsers, check if they're connected via WebSocket for games
+        if (!targetConnection.ws || targetConnection.ws.readyState !== WebSocket.OPEN) {
+          return res.status(400).json({ error: 'Target user is not online' });
         }
-      }));
+        console.log(`📨 Sending chat message to in-game user: ${targetUserId}`);
+      }
+
+      // Send chat message to target user
+      if (targetConnection.ws.readyState === WebSocket.OPEN) {
+        targetConnection.ws.send(JSON.stringify({
+          type: 'chat_message_received',
+          message: {
+            senderId,
+            senderName: senderInfo.displayName || senderInfo.username,
+            message,
+            timestamp: new Date().toISOString()
+          }
+        }));
+        console.log(`📨 Chat message sent from ${senderId} to ${targetUserId}: ${message}`);
+      } else {
+        return res.status(400).json({ error: 'Target user connection is not active' });
+      }
 
       res.json({ success: true, message: 'Message sent successfully' });
     } catch (error) {
