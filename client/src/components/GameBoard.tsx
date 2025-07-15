@@ -202,7 +202,7 @@ export function GameBoard({ game, onGameOver, gameMode, user }: GameBoardProps) 
       }
       
       // For local games (AI and pass-play), handle moves locally
-      if (game.id === 'local-game') {
+      if (game.id.startsWith('local-game')) {
         return handleLocalMove(position);
       }
       
@@ -210,7 +210,7 @@ export function GameBoard({ game, onGameOver, gameMode, user }: GameBoardProps) 
     },
     onSuccess: (data) => {
       console.log('🎯 Move mutation success:', data);
-      if (game && game.id !== 'local-game') {
+      if (game && !game.id.startsWith('local-game')) {
         // For online games, the Home component will handle WebSocket updates
         // No need to update local state here
         console.log('✅ Move successful, WebSocket will handle board update');
@@ -243,7 +243,6 @@ export function GameBoard({ game, onGameOver, gameMode, user }: GameBoardProps) 
     // Sound effects removed as requested
     const newBoard = { ...board };
     newBoard[position.toString()] = currentPlayer;
-    setBoard(newBoard);
     setLastMove(position);
     
     // Check for win condition with winning line detection
@@ -298,6 +297,7 @@ export function GameBoard({ game, onGameOver, gameMode, user }: GameBoardProps) 
       return VALID_POSITIONS.every(pos => board[pos.toString()]);
     };
     
+    // Update board state once
     setBoard(newBoard);
     
     if (checkWin(newBoard, currentPlayer)) {

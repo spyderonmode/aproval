@@ -16,7 +16,7 @@ function Router() {
     <Switch>
       {isLoading || !isAuthenticated ? (
         <>
-          <Route path="/" component={Landing} />
+          <Route path="/" component={Auth} />
           <Route path="/auth" component={Auth} />
         </>
       ) : (
