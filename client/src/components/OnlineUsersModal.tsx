@@ -32,10 +32,7 @@ export function OnlineUsersModal({ open, onClose, currentRoom, user }: OnlineUse
 
   const sendMessageMutation = useMutation({
     mutationFn: async ({ targetUserId, message }: { targetUserId: string; message: string }) => {
-      return await apiRequest('/api/chat/send', {
-        method: 'POST',
-        body: { targetUserId, message }
-      });
+      return await apiRequest('POST', '/api/chat/send', { targetUserId, message });
     },
     onSuccess: () => {
       // Add the sent message to local chat
@@ -54,6 +51,7 @@ export function OnlineUsersModal({ open, onClose, currentRoom, user }: OnlineUse
       });
     },
     onError: (error: any) => {
+      console.error('Chat message error:', error);
       toast({
         title: "Error",
         description: error.message || "Failed to send message",
