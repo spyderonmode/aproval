@@ -60,13 +60,11 @@
   {
     "id": "c9122c48-3c24-4891-a6b5-f02aa8362af2",
     "username": "sam0100",
-    "password": "5dd4fcd7beff3ae9d30eff2e5c977b24ab9f5a7c520d5fcbf04720a0fe2c1c40",
+    "password": "3b11a134e2e65596f755f62c009da6295349bfb324ac9cffc0c2a8d9e7fdbe32",
     "email": "samil000828@gmail.com",
     "displayName": "sam0100",
     "profilePicture": null,
-    "isEmailVerified": false,
-    "emailVerificationToken": "f3a12bfa-029d-4ff7-bd3e-2d8334278872",
-    "emailVerificationExpiry": "2025-07-15T14:35:40.787Z",
+    "isEmailVerified": true,
     "createdAt": "2025-07-14T14:35:40.787Z"
   },
   {

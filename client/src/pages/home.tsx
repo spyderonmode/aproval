@@ -13,11 +13,12 @@ import { PlayerList } from "@/components/PlayerList";
 import { CreateRoomModal } from "@/components/CreateRoomModal";
 import { GameOverModal } from "@/components/GameOverModal";
 import { EmailVerificationModal } from "@/components/EmailVerificationModal";
+import { MatchmakingModal } from "@/components/MatchmakingModal";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { GamepadIcon, LogOut, User } from "lucide-react";
+import { GamepadIcon, LogOut, User, Zap, Loader2 } from "lucide-react";
 import { logout } from "@/lib/firebase";
 
 export default function Home() {
@@ -34,7 +35,8 @@ export default function Home() {
   const [gameResult, setGameResult] = useState<any>(null);
   const [isCreatingGame, setIsCreatingGame] = useState(false);
   const [showEmailVerification, setShowEmailVerification] = useState(false);
-  // Remove matchmaking state variables
+  const [showMatchmaking, setShowMatchmaking] = useState(false);
+  const [isMatchmaking, setIsMatchmaking] = useState(false);
 
   const { data: userStats } = useQuery({
     queryKey: ["/api/users", user?.id, "stats"],
@@ -183,7 +185,24 @@ export default function Home() {
             }, 2000);
           }
           break;
-        // Remove matchmaking WebSocket handlers
+        case 'match_found':
+          console.log('🎮 Match found:', lastMessage);
+          setIsMatchmaking(false);
+          setShowMatchmaking(false);
+          handleRoomJoin(lastMessage.room);
+          toast({
+            title: "Match Found!",
+            description: "You've been matched with an opponent. Game starting...",
+          });
+          break;
+        case 'matchmaking_response':
+          console.log('🎮 Matchmaking response:', lastMessage);
+          if (lastMessage.status === 'matched') {
+            setIsMatchmaking(false);
+            setShowMatchmaking(false);
+            handleRoomJoin(lastMessage.room);
+          }
+          break;
       }
     }
   }, [lastMessage, currentGame, currentRoom, user]);
@@ -246,7 +265,20 @@ export default function Home() {
     setCurrentGame(game);
   };
 
-  // Remove matchmaking functions - only keeping create room and join room
+  const handleMatchmakingStart = () => {
+    setShowMatchmaking(true);
+    setIsMatchmaking(true);
+  };
+
+  const handleMatchmakingClose = () => {
+    setShowMatchmaking(false);
+    setIsMatchmaking(false);
+  };
+
+  const handleMatchFound = (room: any) => {
+    setIsMatchmaking(false);
+    handleRoomJoin(room);
+  };
 
   // Initialize local game for AI and pass-play modes when no game exists
   const initializeLocalGame = () => {
@@ -600,13 +632,50 @@ export default function Home() {
             {selectedMode === 'online' && (
               <Card className="bg-slate-800 border-slate-700">
                 <CardHeader>
-                  <CardTitle className="text-lg">Online Room Management</CardTitle>
+                  <CardTitle className="text-lg">Online Multiplayer</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-4">
-                    <p className="text-sm text-gray-300">
-                      Create a room or join an existing room to play online with friends.
-                    </p>
+                    {!currentRoom && (
+                      <>
+                        <div className="p-4 bg-gradient-to-r from-blue-900/20 to-purple-900/20 rounded-lg border border-blue-500/20">
+                          <div className="text-center space-y-3">
+                            <div className="text-sm font-semibold text-blue-300">Quick Match</div>
+                            <p className="text-xs text-gray-400">
+                              Get matched with another player instantly
+                            </p>
+                            <Button 
+                              onClick={handleMatchmakingStart}
+                              className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
+                              disabled={isMatchmaking}
+                            >
+                              {isMatchmaking ? (
+                                <>
+                                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                                  Searching...
+                                </>
+                              ) : (
+                                <>
+                                  <Zap className="w-4 h-4 mr-2" />
+                                  Find Match
+                                </>
+                              )}
+                            </Button>
+                          </div>
+                        </div>
+                        
+                        <div className="text-center text-sm text-gray-500">
+                          <span>or</span>
+                        </div>
+                        
+                        <div className="text-center">
+                          <p className="text-sm text-gray-300 mb-2">
+                            Create or join a room to play with friends
+                          </p>
+                        </div>
+                      </>
+                    )}
+                    
                     {currentRoom && (
                       <div className="flex items-center space-x-2">
                         <div className="w-2 h-2 bg-green-500 rounded-full"></div>
@@ -698,6 +767,13 @@ export default function Home() {
           onClose={() => setShowEmailVerification(false)}
         />
       )}
+
+      <MatchmakingModal 
+        open={showMatchmaking}
+        onClose={handleMatchmakingClose}
+        onMatchFound={handleMatchFound}
+        user={user}
+      />
     </div>
   );
 }

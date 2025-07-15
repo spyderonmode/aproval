@@ -54,12 +54,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // Add to queue
       matchmakingQueue.push(userId);
+      console.log(`🎯 User ${userId} joined matchmaking queue. Queue size: ${matchmakingQueue.length}`);
       
       // Check if we can make a match (need 2 players)
       if (matchmakingQueue.length >= 2) {
         // Remove two players from queue
         const player1Id = matchmakingQueue.shift()!;
         const player2Id = matchmakingQueue.shift()!;
+        
+        console.log(`🎯 Match found! Pairing ${player1Id} vs ${player2Id}`);
         
         // Create room for matched players
         const room = await storage.createRoom({
@@ -108,6 +111,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         await notifyPlayer(player1Id);
         await notifyPlayer(player2Id);
         
+        console.log(`🎯 Match notifications sent to both players`);
+        
         // Return matched status to the player who just joined
         res.json({ status: 'matched', room: room });
         
@@ -138,6 +143,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const index = matchmakingQueue.indexOf(userId);
       if (index > -1) {
         matchmakingQueue.splice(index, 1);
+        console.log(`🎯 User ${userId} left matchmaking queue. Queue size: ${matchmakingQueue.length}`);
       }
       res.json({ message: 'Left matchmaking queue' });
     } catch (error) {
