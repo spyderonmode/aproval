@@ -320,7 +320,9 @@ export function GameBoard({ game, onGameOver, gameMode, user }: GameBoardProps) 
             condition: 'diagonal',
             board: newBoard,
             winningPositions,
-            game: game // Pass game object to prevent white screen
+            game: game, // Pass game object to prevent white screen
+            playerXInfo: game?.playerXInfo,
+            playerOInfo: game?.playerOInfo
           });
         }
       }, gameMode === 'ai' || gameMode === 'pass-play' ? 2500 : 0);
@@ -334,7 +336,9 @@ export function GameBoard({ game, onGameOver, gameMode, user }: GameBoardProps) 
           winnerName: null,
           condition: 'draw',
           board: newBoard,
-          game: game // Pass game object to prevent white screen
+          game: game, // Pass game object to prevent white screen
+          playerXInfo: game?.playerXInfo,
+          playerOInfo: game?.playerOInfo
         });
       }
       return;

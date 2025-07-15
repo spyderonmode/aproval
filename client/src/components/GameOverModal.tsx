@@ -15,7 +15,7 @@ export function GameOverModal({ open, onClose, result, onPlayAgain, isCreatingGa
 
   const isDraw = result.condition === 'draw';
   const winnerSymbol = result.winner;
-  const winnerInfo = result.winnerInfo;
+  const winnerInfo = result.winnerInfo || (winnerSymbol === 'X' ? result.playerXInfo : result.playerOInfo);
 
   return (
     <div 

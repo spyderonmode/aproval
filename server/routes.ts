@@ -589,6 +589,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           const winnerInfo = await storage.getUser(userId);
           
           // First broadcast the winning move with highlight
+          const nextPlayer = playerSymbol === 'X' ? 'O' : 'X';
           const moveMessage = JSON.stringify({
             type: 'winning_move',
             gameId,
