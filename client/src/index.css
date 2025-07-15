@@ -21,6 +21,43 @@
   animation: pulse-border-red 2s ease-in-out infinite;
 }
 
+/* Aurora Theme Animations */
+@keyframes aurora-shimmer {
+  0%, 100% { 
+    background-position: 0% 50%; 
+    box-shadow: 0 0 20px rgba(168, 85, 247, 0.4);
+  }
+  50% { 
+    background-position: 100% 50%; 
+    box-shadow: 0 0 30px rgba(168, 85, 247, 0.8);
+  }
+}
+
+@keyframes aurora-glow {
+  0%, 100% { 
+    text-shadow: 0 0 10px rgba(249, 168, 212, 0.8), 0 0 20px rgba(249, 168, 212, 0.6);
+  }
+  50% { 
+    text-shadow: 0 0 20px rgba(249, 168, 212, 1), 0 0 30px rgba(249, 168, 212, 0.8);
+  }
+}
+
+.aurora-board {
+  background: linear-gradient(-45deg, #581c87, #3730a3, #1e3a8a, #581c87);
+  background-size: 400% 400%;
+  animation: aurora-shimmer 4s ease-in-out infinite;
+}
+
+.aurora-cell {
+  background: linear-gradient(45deg, #7c3aed, #4f46e5, #3b82f6);
+  background-size: 200% 200%;
+  animation: aurora-shimmer 3s ease-in-out infinite;
+}
+
+.aurora-text {
+  animation: aurora-glow 2s ease-in-out infinite;
+}
+
 /* Fix modal white screen issue */
 [data-radix-dialog-content] {
   background-color: #1e293b !important;

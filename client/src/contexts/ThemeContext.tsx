@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 
-export type GameTheme = 'default' | 'neon' | 'ocean' | 'minimalist' | 'nature' | 'space';
+export type GameTheme = 'default' | 'neon' | 'aurora' | 'minimalist' | 'nature' | 'space';
 
 interface ThemeContextType {
   currentTheme: GameTheme;
@@ -47,18 +47,18 @@ const themes = {
     borderColor: 'border-cyan-500',
     winningCellStyle: 'bg-gradient-to-br from-cyan-400 to-pink-500 shadow-lg shadow-cyan-400/50 border-cyan-300'
   },
-  ocean: {
-    name: 'Ocean',
-    description: 'Deep sea blue theme',
-    boardStyle: 'bg-blue-900 border-blue-600 shadow-lg shadow-blue-600/20',
-    cellStyle: 'bg-blue-800 border-blue-500 text-blue-100 hover:bg-blue-700',
-    cellHoverStyle: 'hover:bg-blue-700',
-    playerXColor: 'text-cyan-300 drop-shadow-[0_0_6px_rgba(103,232,249,0.6)]',
-    playerOColor: 'text-teal-300 drop-shadow-[0_0_6px_rgba(94,234,212,0.6)]',
-    backgroundColor: 'bg-blue-950',
-    textColor: 'text-blue-100',
-    borderColor: 'border-blue-600',
-    winningCellStyle: 'bg-gradient-to-br from-cyan-400 to-teal-500 shadow-lg shadow-cyan-400/50'
+  aurora: {
+    name: 'Aurora',
+    description: 'Animated northern lights theme',
+    boardStyle: 'aurora-board border-purple-500 shadow-lg shadow-purple-500/30',
+    cellStyle: 'aurora-cell border-purple-400 text-white hover:shadow-lg hover:shadow-purple-400/50 transition-all duration-500',
+    cellHoverStyle: 'hover:shadow-lg hover:shadow-purple-400/50 transition-all duration-500',
+    playerXColor: 'text-pink-300 aurora-text',
+    playerOColor: 'text-green-300 aurora-text',
+    backgroundColor: 'bg-gradient-to-br from-purple-950 via-indigo-950 to-blue-950',
+    textColor: 'text-white',
+    borderColor: 'border-purple-500',
+    winningCellStyle: 'bg-gradient-to-br from-pink-400 via-purple-500 to-green-400 shadow-lg shadow-pink-400/50 animate-pulse border-pink-300'
   },
   minimalist: {
     name: 'Minimalist',
