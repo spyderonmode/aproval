@@ -124,15 +124,15 @@ export function OnlineUsersModal({ open, onClose, currentRoom }: OnlineUsersModa
                             <Badge variant="secondary">In Room</Badge>
                           )}
                           
-                          {currentRoom && !user.inRoom && (
+                          {currentRoom && (
                             <Button
                               size="sm"
                               variant="outline"
                               onClick={() => handleInvite(user.userId)}
-                              disabled={inviteMutation.isPending}
+                              disabled={inviteMutation.isPending || user.inRoom}
                             >
                               <UserPlus className="h-4 w-4 mr-1" />
-                              Invite
+                              {user.inRoom ? "In Room" : "Invite"}
                             </Button>
                           )}
                         </div>

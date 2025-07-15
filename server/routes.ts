@@ -52,18 +52,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const currentUserId = req.user.userId;
       const onlineUsersList = Array.from(onlineUsers.values())
-        .filter(user => user.userId !== currentUserId)
-        .map(user => ({
-          userId: user.userId,
-          username: user.username,
-          displayName: user.displayName,
-          inRoom: !!user.roomId,
-          lastSeen: user.lastSeen
-        }));
+        .filter(user => user.userId !== currentUserId);
+      
+      // Get complete user information from database
+      const usersWithProfiles = await Promise.all(
+        onlineUsersList.map(async (user) => {
+          const userInfo = await storage.getUser(user.userId);
+          return {
+            userId: user.userId,
+            username: userInfo?.username || user.username,
+            displayName: userInfo?.displayName || userInfo?.firstName || user.displayName,
+            firstName: userInfo?.firstName,
+            profilePicture: userInfo?.profilePicture,
+            profileImageUrl: userInfo?.profileImageUrl,
+            inRoom: !!user.roomId,
+            lastSeen: user.lastSeen
+          };
+        })
+      );
       
       res.json({
-        total: onlineUsersList.length,
-        users: onlineUsersList
+        total: usersWithProfiles.length,
+        users: usersWithProfiles
       });
     } catch (error) {
       console.error("Error fetching online users:", error);
