@@ -505,9 +505,6 @@ export default function Home() {
               </span>
             </div>
             <div className="flex items-center space-x-1 md:space-x-2">
-              <span className="text-xs md:text-sm text-gray-300 mr-2">
-                {user?.displayName || user?.firstName || user?.username || 'Player'}
-              </span>
               <div className={`w-2 h-2 rounded-full ${isConnected ? 'bg-green-500' : 'bg-red-500'}`}></div>
               <span className="text-xs md:text-sm text-gray-400">
                 {isConnected ? 'Online' : 'Offline'}
