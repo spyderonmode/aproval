@@ -41,7 +41,9 @@
     "isEmailVerified": false,
     "emailVerificationToken": "f3a06911-5106-472e-8985-c19fea0cf2c5",
     "emailVerificationExpiry": "2025-07-15T13:49:56.601Z",
-    "createdAt": "2025-07-14T13:49:56.601Z"
+    "createdAt": "2025-07-14T13:49:56.601Z",
+    "passwordResetToken": "e98d59b3-d10f-4139-ada1-9264f387d565",
+    "passwordResetExpiry": "2025-07-15T10:22:44.137Z"
   },
   {
     "id": "51844699-06cd-436e-80c1-c612a3a56b28",
@@ -102,5 +104,17 @@
     "emailVerificationToken": "21728949-38b8-433f-9fed-7d0bb39e6df1",
     "emailVerificationExpiry": "2025-07-16T09:06:11.346Z",
     "createdAt": "2025-07-15T09:06:11.346Z"
+  },
+  {
+    "id": "8d44fe25-2c05-4f90-b141-f755dfc13feb",
+    "username": "Yogesh",
+    "password": "44d8a37077a0371d348502162aa4547889de06ed8b045beedefa143c00c6945a",
+    "email": "dilwalahu@gmail.com",
+    "displayName": "Yogesh",
+    "profilePicture": null,
+    "isEmailVerified": false,
+    "emailVerificationToken": "4735d124-8870-4755-b8ee-28f203a3dc66",
+    "emailVerificationExpiry": "2025-07-16T09:24:03.783Z",
+    "createdAt": "2025-07-15T09:24:03.783Z"
   }
 ]
