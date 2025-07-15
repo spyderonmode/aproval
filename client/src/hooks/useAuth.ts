@@ -24,8 +24,10 @@ export function useAuth() {
     try {
       const currentUser = await getCurrentUser();
       setUser(currentUser);
+      setIsLoading(false);
     } catch (error) {
       setUser(null);
+      setIsLoading(false);
     }
   };
 

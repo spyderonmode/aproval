@@ -35,8 +35,8 @@ export default function Auth() {
           title: "Login successful",
           description: "Welcome back!",
         });
-        // Redirect to dashboard after successful login
-        setLocation("/");
+        // Force immediate redirect to dashboard
+        window.location.href = "/";
       } else {
         if (!email) {
           toast({
@@ -49,18 +49,15 @@ export default function Auth() {
         
         const user = await register({ username, password, email });
         setUser(user);
+        // Refresh user state to ensure authentication is properly updated
+        await refreshUser();
         toast({
           title: "Registration successful",
           description: "Welcome to TicTac 3x5!",
         });
         
-        // Show email verification modal since email is now always required
-        setShowEmailVerification(true);
-        
-        // Also redirect to dashboard after a short delay if email verification is not required
-        setTimeout(() => {
-          setLocation("/");
-        }, 2000);
+        // Force immediate redirect to dashboard
+        window.location.href = "/";
       }
     } catch (error) {
       toast({
