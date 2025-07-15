@@ -14,7 +14,7 @@ interface User {
   email?: string;
   displayName?: string;
   profilePicture?: string;
-  profileTheme?: string;
+
   isEmailVerified?: boolean;
   emailVerificationToken?: string;
   emailVerificationExpiry?: Date;
