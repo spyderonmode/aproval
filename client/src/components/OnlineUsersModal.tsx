@@ -23,6 +23,7 @@ export function OnlineUsersModal({ open, onClose, currentRoom, user }: OnlineUse
   const [selectedUser, setSelectedUser] = useState<any>(null);
   const [chatMessage, setChatMessage] = useState("");
   const [chatHistory, setChatHistory] = useState<Map<string, any[]>>(new Map());
+  const [unreadMessages, setUnreadMessages] = useState<Set<string>>(new Set());
 
   const { data: onlineUsers, isLoading } = useQuery({
     queryKey: ["/api/users/online"],
@@ -93,6 +94,11 @@ export function OnlineUsersModal({ open, onClose, currentRoom, user }: OnlineUse
           newHistory.set(data.message.senderId, [...userMessages, incomingMessage]);
           return newHistory;
         });
+        
+        // Mark as unread if not currently chatting with this user
+        if (!selectedUser || selectedUser.userId !== data.message.senderId) {
+          setUnreadMessages(prev => new Set(prev).add(data.message.senderId));
+        }
       }
     };
 
@@ -105,6 +111,13 @@ export function OnlineUsersModal({ open, onClose, currentRoom, user }: OnlineUse
           const newHistory = new Map(prev);
           newHistory.delete(data.userId);
           return newHistory;
+        });
+        
+        // Remove from unread messages
+        setUnreadMessages(prev => {
+          const newSet = new Set(prev);
+          newSet.delete(data.userId);
+          return newSet;
         });
         
         // If we're currently chatting with this user, go back to user list
@@ -126,6 +139,26 @@ export function OnlineUsersModal({ open, onClose, currentRoom, user }: OnlineUse
 
   // Get current chat messages for selected user
   const currentChatMessages = selectedUser ? chatHistory.get(selectedUser.userId) || [] : [];
+  
+  // Mark messages as read when user is selected
+  const handleUserSelect = (user: any) => {
+    setSelectedUser(user);
+    setUnreadMessages(prev => {
+      const newSet = new Set(prev);
+      newSet.delete(user.userId);
+      return newSet;
+    });
+  };
+  
+  // Sort users with unread messages first
+  const sortedUsers = onlineUsersData?.users?.slice().sort((a: any, b: any) => {
+    const aHasUnread = unreadMessages.has(a.userId);
+    const bHasUnread = unreadMessages.has(b.userId);
+    
+    if (aHasUnread && !bHasUnread) return -1;
+    if (!aHasUnread && bHasUnread) return 1;
+    return 0;
+  }) || [];
 
   const formatLastSeen = (lastSeen: string) => {
     const diff = Date.now() - new Date(lastSeen).getTime();
@@ -167,45 +200,53 @@ export function OnlineUsersModal({ open, onClose, currentRoom, user }: OnlineUse
               ) : (
                 <ScrollArea className="h-[400px] w-full">
                   <div className="space-y-2">
-                    {onlineUsers?.users?.length > 0 ? (
-                      onlineUsers.users.map((user: any) => (
-                        <Card key={user.userId} className="p-3 cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">
+                    {sortedUsers?.length > 0 ? (
+                      sortedUsers.filter((u: any) => u.userId !== (user?.userId || user?.id)).map((onlineUser: any) => (
+                        <Card key={onlineUser.userId} className={`p-3 cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors ${unreadMessages.has(onlineUser.userId) ? 'ring-2 ring-green-500' : ''}`}>
                           <div className="flex items-center justify-between">
                             <div className="flex items-center gap-3">
-                              {user.profilePicture || user.profileImageUrl ? (
-                                <img
-                                  src={user.profilePicture || user.profileImageUrl}
-                                  alt="Profile"
-                                  className="h-10 w-10 rounded-full object-cover"
-                                />
-                              ) : (
-                                <div className="h-10 w-10 rounded-full bg-blue-600 flex items-center justify-center">
-                                  <User className="h-5 w-5 text-white" />
-                                </div>
-                              )}
+                              <div className="relative">
+                                {onlineUser.profilePicture || onlineUser.profileImageUrl ? (
+                                  <img
+                                    src={onlineUser.profilePicture || onlineUser.profileImageUrl}
+                                    alt="Profile"
+                                    className="h-10 w-10 rounded-full object-cover"
+                                  />
+                                ) : (
+                                  <div className="h-10 w-10 rounded-full bg-blue-600 flex items-center justify-center">
+                                    <User className="h-5 w-5 text-white" />
+                                  </div>
+                                )}
+                                {unreadMessages.has(onlineUser.userId) && (
+                                  <div className="absolute -top-1 -right-1 w-3 h-3 bg-green-500 rounded-full border-2 border-white dark:border-gray-800"></div>
+                                )}
+                              </div>
                               <div>
-                                <h3 className="font-medium">
-                                  {user.displayName || user.firstName || user.username}
+                                <h3 className={`font-medium ${unreadMessages.has(onlineUser.userId) ? 'text-green-600 dark:text-green-400' : ''}`}>
+                                  {onlineUser.displayName || onlineUser.firstName || onlineUser.username}
                                 </h3>
                                 <div className="flex items-center gap-2 text-sm text-muted-foreground">
                                   <Clock className="h-3 w-3" />
-                                  {formatLastSeen(user.lastSeen)}
+                                  {unreadMessages.has(onlineUser.userId) ? 'New message' : formatLastSeen(onlineUser.lastSeen)}
                                 </div>
                               </div>
                             </div>
                             
                             <div className="flex items-center gap-2">
-                              {user.inRoom && (
+                              {onlineUser.inRoom && (
                                 <Badge variant="secondary">In Room</Badge>
                               )}
                               
                               <Button
                                 size="sm"
                                 variant="outline"
-                                onClick={() => setSelectedUser(user)}
+                                onClick={() => handleUserSelect(onlineUser)}
                               >
                                 <MessageCircle className="h-4 w-4 mr-1" />
                                 Chat
+                                {unreadMessages.has(onlineUser.userId) && (
+                                  <div className="ml-2 w-2 h-2 bg-green-500 rounded-full"></div>
+                                )}
                               </Button>
                             </div>
                           </div>
