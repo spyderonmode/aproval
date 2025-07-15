@@ -6,7 +6,7 @@ import { setupAuth, requireAuth } from "./firebase-auth";
 import { insertRoomSchema, insertGameSchema, insertMoveSchema } from "@shared/schema";
 import { AIPlayer } from "./aiPlayer";
 import { makeMove, checkWin, checkDraw, getOpponentSymbol, validateMove } from "./gameLogic";
-import { sendVerificationEmail, sendPasswordResetEmail, testSMTPConfig } from "./emailService";
+// Email services removed - using Firebase only
 
 interface WSConnection {
   ws: WebSocket;
@@ -19,17 +19,6 @@ interface WSConnection {
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Public endpoints (before auth middleware)
-  app.get('/api/test-smtp', async (req, res) => {
-    try {
-      const result = await testSMTPConfig();
-      res.json(result);
-    } catch (error: any) {
-      res.status(500).json({ 
-        success: false, 
-        error: error.message 
-      });
-    }
-  });
 
   // Auth middleware
   setupAuth(app);
@@ -87,155 +76,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   app.post('/api/auth/register', async (req, res) => {
-    try {
-      const { email, username } = req.body;
-      
-      if (!email || !username) {
-        return res.status(400).json({ 
-          success: false, 
-          error: 'Email and username are required' 
-        });
-      }
-      
-      // Generate verification token
-      const verificationToken = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
-      
-      // Send email verification
-      const emailResult = await sendVerificationEmail(email, username, verificationToken);
-      
-      if (emailResult.success) {
-        console.log('Verification email sent successfully to:', email);
-        res.status(200).json({ 
-          success: true,
-          message: 'Registration successful. Please check your email for verification.',
-          emailSent: true
-        });
-      } else {
-        console.warn('Failed to send verification email:', emailResult.error);
-        
-        // Auto-verify user when email sending fails to keep app functional
-        try {
-          await storage.upsertUser({ 
-            id: email, // Use email as ID for consistency
-            email: email,
-            firstName: username,
-            lastName: '',
-            profileImageUrl: '',
-            emailVerified: true,
-            verificationToken: null
-          });
-          
-          res.status(200).json({ 
-            success: true,
-            message: 'Registration successful. Email verification temporarily disabled.',
-            emailSent: false,
-            autoVerified: true,
-            error: 'SMTP server connection failed'
-          });
-        } catch (dbError) {
-          console.error('Database error during auto-verification:', dbError);
-          res.status(500).json({ 
-            success: false,
-            message: 'Registration failed due to database error.',
-            emailSent: false,
-            error: dbError.message
-          });
-        }
-      }
-    } catch (error: any) {
-      console.error('Registration error:', error);
-      res.status(500).json({ 
-        success: false, 
-        error: error.message 
-      });
-    }
+    res.status(200).json({ message: 'Firebase authentication is handled client-side' });
   });
 
   app.post('/api/auth/logout', async (req, res) => {
     res.status(200).json({ message: 'Firebase authentication is handled client-side' });
-  });
-
-
-
-  // Email verification endpoint
-  app.post('/api/auth/verify-email', async (req, res) => {
-    try {
-      const { email, username } = req.body;
-      
-      if (!email || !username) {
-        return res.status(400).json({ error: 'Email and username are required' });
-      }
-      
-      const verificationToken = Math.random().toString(36).substring(2, 15);
-      const emailResult = await sendVerificationEmail(email, username, verificationToken);
-      
-      if (emailResult.success) {
-        res.json({ message: 'Verification email sent successfully' });
-      } else {
-        res.status(500).json({ error: 'Failed to send verification email' });
-      }
-    } catch (error) {
-      console.error('Email verification error:', error);
-      res.status(500).json({ error: 'Failed to send verification email' });
-    }
-  });
-
-  // Password reset endpoint
-  app.post('/api/auth/forgot-password', async (req, res) => {
-    try {
-      const { email } = req.body;
-      
-      if (!email) {
-        return res.status(400).json({ error: 'Email is required' });
-      }
-      
-      const resetToken = Math.random().toString(36).substring(2, 15);
-      const username = email.split('@')[0]; // Extract username from email
-      const emailResult = await sendPasswordResetEmail(email, username, resetToken);
-      
-      if (emailResult.success) {
-        res.json({ message: 'Password reset email sent successfully' });
-      } else {
-        res.status(500).json({ error: 'Failed to send password reset email' });
-      }
-    } catch (error) {
-      console.error('Password reset error:', error);
-      res.status(500).json({ error: 'Failed to send password reset email' });
-    }
-  });
-
-  // Resend verification email
-  app.post('/api/auth/resend-verification', async (req, res) => {
-    try {
-      const { email, username } = req.body;
-      
-      if (!email || !username) {
-        return res.status(400).json({ error: 'Email and username are required' });
-      }
-      
-      const verificationToken = Math.random().toString(36).substring(2, 15);
-      const emailResult = await sendVerificationEmail(email, username, verificationToken);
-      
-      if (emailResult.success) {
-        res.json({ message: 'Verification email resent successfully' });
-      } else {
-        res.status(500).json({ error: 'Failed to resend verification email' });
-      }
-    } catch (error) {
-      console.error('Resend verification error:', error);
-      res.status(500).json({ error: 'Failed to resend verification email' });
-    }
-  });
-
-  // Test SMTP configuration
-  app.get('/api/test-smtp', requireAuth, async (req, res) => {
-    try {
-      const result = await testSMTPConfig();
-      res.json(result);
-    } catch (error) {
-      console.error('SMTP test error:', error);
-      res.status(500).json({ error: 'Failed to test SMTP configuration' });
-    }
   });
 
   // Error logging endpoint

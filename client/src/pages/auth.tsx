@@ -9,6 +9,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { EmailVerificationModal } from "@/components/EmailVerificationModal";
 import { ForgotPasswordModal } from "@/components/ForgotPasswordModal";
 import { GamepadIcon, Mail } from "lucide-react";
+import { login, register } from "@/lib/firebase";
 
 export default function Auth() {
   const [isLogin, setIsLogin] = useState(true);
@@ -28,40 +29,19 @@ export default function Auth() {
 
     try {
       if (isLogin) {
-        const response = await fetch('/api/auth/login', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ username, password })
+        // Use Firebase authentication directly
+        const user = await login({ username, password });
+        
+        toast({
+          title: "Login successful",
+          description: "Welcome back!",
         });
-
-        if (response.ok) {
-          toast({
-            title: "Login successful",
-            description: "Welcome back!",
-          });
-          // Force immediate redirect to dashboard
-          window.location.href = "/";
-        } else {
-          const errorData = await response.json();
-          
-          if (errorData.needsVerification) {
-            // User needs email verification
-            setRegistrationEmail(email || username); // Use email if available, otherwise username
-            setShowEmailVerification(true);
-            toast({
-              title: "Email verification required",
-              description: errorData.message || "Please verify your email before logging in.",
-              variant: "destructive",
-            });
-          } else {
-            toast({
-              title: "Login failed",
-              description: errorData.error || "Please check your credentials and try again.",
-              variant: "destructive",
-            });
-          }
-        }
+        
+        // Navigate to home page using wouter
+        setLocation("/");
+        
       } else {
+        // Registration with Firebase
         if (!email) {
           toast({
             title: "Email required",
@@ -71,30 +51,15 @@ export default function Auth() {
           return;
         }
         
-        const response = await fetch('/api/auth/register', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ username, password, email })
+        const user = await register({ username, password, email });
+        
+        toast({
+          title: "Registration successful",
+          description: "Welcome to TicTac 3x5!",
         });
-
-        if (response.ok) {
-          const data = await response.json();
-          setRegistrationEmail(email);
-          toast({
-            title: "Registration successful",
-            description: data.message || "Please verify your email to continue.",
-          });
-          
-          // Show email verification modal
-          setShowEmailVerification(true);
-        } else {
-          const errorData = await response.json();
-          toast({
-            title: "Registration failed",
-            description: errorData.error || "Please check your information and try again.",
-            variant: "destructive",
-          });
-        }
+        
+        // Navigate to home page using wouter
+        setLocation("/");
       }
     } catch (error) {
       toast({
