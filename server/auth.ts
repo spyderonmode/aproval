@@ -170,9 +170,35 @@ async function sendPasswordResetEmail(email: string, token: string): Promise<voi
   }
 }
 
+// Sync all existing JSON users to the database
+async function syncAllUsersToDatabase() {
+  const users = getUsers();
+  console.log(`🔄 Syncing ${users.length} users from JSON to Neon database...`);
+  
+  for (const user of users) {
+    try {
+      await storage.upsertUser({
+        id: user.id,
+        email: user.email || null,
+        firstName: user.displayName || user.username || 'Anonymous',
+        lastName: null,
+        profileImageUrl: user.profilePicture || null,
+      });
+      console.log(`✅ Synced user: ${user.username} (${user.id})`);
+    } catch (error) {
+      console.error(`❌ Failed to sync user ${user.username}:`, error);
+    }
+  }
+  
+  console.log('🎉 User sync completed!');
+}
+
 export function setupAuth(app: Express) {
   // Memory store for sessions
   const MemoryStoreSession = MemoryStore(session);
+  
+  // Sync all existing users to database on startup
+  syncAllUsersToDatabase();
   
   // Session middleware
   app.use(session({
@@ -522,6 +548,29 @@ export function setupAuth(app: Express) {
     } catch (error) {
       console.error('Error sending password reset email:', error);
       res.status(500).json({ error: 'Failed to send password reset email' });
+    }
+  });
+
+  // Manual sync endpoint (admin only)
+  app.post('/api/auth/sync-users', async (req, res) => {
+    if (!req.session.user) {
+      return res.status(401).json({ error: 'Not authenticated' });
+    }
+    
+    const userId = req.session.user.userId;
+    const user = getUserById(userId);
+    
+    // Only allow admin to manually sync
+    if (!user || user.username !== 'admin') {
+      return res.status(403).json({ error: 'Admin access required' });
+    }
+    
+    try {
+      await syncAllUsersToDatabase();
+      res.json({ message: 'All users synced successfully' });
+    } catch (error) {
+      console.error('Manual sync error:', error);
+      res.status(500).json({ error: 'Failed to sync users' });
     }
   });
 
