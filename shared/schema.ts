@@ -1,127 +1,190 @@
-// Firebase schema types - TypeScript interfaces for Firestore documents
+import {
+  pgTable,
+  text,
+  varchar,
+  timestamp,
+  jsonb,
+  index,
+  serial,
+  integer,
+  boolean,
+  uuid,
+} from "drizzle-orm/pg-core";
+import { relations } from "drizzle-orm";
+import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
-// User document structure for Firebase
-export interface User {
-  id: string;
-  email?: string;
-  firstName?: string;
-  lastName?: string;
-  profileImageUrl?: string;
-  wins?: number;
-  losses?: number;
-  draws?: number;
-  createdAt?: Date;
-  updatedAt?: Date;
-}
+// Session storage table - mandatory for Replit Auth
+export const sessions = pgTable(
+  "sessions",
+  {
+    sid: varchar("sid").primaryKey(),
+    sess: jsonb("sess").notNull(),
+    expire: timestamp("expire").notNull(),
+  },
+  (table) => [index("IDX_session_expire").on(table.expire)],
+);
 
-// Room document structure
-export interface Room {
-  id: string;
-  code: string;
-  name: string;
-  maxPlayers: number;
-  isPrivate: boolean;
-  ownerId: string;
-  status: string; // waiting, playing, finished
-  createdAt?: Date;
-  updatedAt?: Date;
-}
-
-// Game document structure
-export interface Game {
-  id: string;
-  roomId: string;
-  playerXId: string;
-  playerOId?: string;
-  board: Record<string, string>;
-  currentPlayer: string;
-  status: string; // active, finished
-  winnerId?: string;
-  winCondition?: string;
-  createdAt?: Date;
-  updatedAt?: Date;
-}
-
-// Move document structure
-export interface Move {
-  id: string;
-  gameId: string;
-  playerId: string;
-  position: number;
-  symbol: string;
-  createdAt?: Date;
-}
-
-// Room participant document structure
-export interface RoomParticipant {
-  id: string;
-  roomId: string;
-  userId: string;
-  role: string; // player, spectator
-  joinedAt?: Date;
-  user?: User; // populated when needed
-}
-
-// Blocked user document structure
-export interface BlockedUser {
-  id: string;
-  blockerId: string;
-  blockedId: string;
-  createdAt?: Date;
-}
-
-// Insert schemas using Zod for validation
-export const insertUserSchema = z.object({
-  id: z.string(),
-  email: z.string().email().optional(),
-  firstName: z.string().optional(),
-  lastName: z.string().optional(),
-  profileImageUrl: z.string().optional(),
-  wins: z.number().default(0),
-  losses: z.number().default(0),
-  draws: z.number().default(0),
+// User storage table - mandatory for Replit Auth
+export const users = pgTable("users", {
+  id: varchar("id").primaryKey().notNull(),
+  email: varchar("email").unique(),
+  firstName: varchar("first_name"),
+  lastName: varchar("last_name"),
+  profileImageUrl: varchar("profile_image_url"),
+  wins: integer("wins").default(0),
+  losses: integer("losses").default(0),
+  draws: integer("draws").default(0),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
 });
 
-export const insertRoomSchema = z.object({
-  code: z.string().min(4).max(8),
-  name: z.string().min(1),
-  maxPlayers: z.number().min(2).max(10).default(2),
-  isPrivate: z.boolean().default(false),
-  status: z.string().default("waiting"),
+export const rooms = pgTable("rooms", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  code: varchar("code", { length: 8 }).notNull().unique(),
+  name: varchar("name").notNull(),
+  maxPlayers: integer("max_players").default(2),
+  isPrivate: boolean("is_private").default(false),
+  ownerId: varchar("owner_id").references(() => users.id),
+  status: varchar("status").default("waiting"), // waiting, playing, finished
+  createdAt: timestamp("created_at").defaultNow(),
 });
 
-export const insertGameSchema = z.object({
-  roomId: z.string(),
-  playerXId: z.string(),
+export const games = pgTable("games", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  roomId: uuid("room_id").references(() => rooms.id),
+  playerXId: varchar("player_x_id").references(() => users.id),
+  playerOId: varchar("player_o_id").references(() => users.id),
+  currentPlayer: varchar("current_player").default("X"), // X or O
+  gameMode: varchar("game_mode").notNull(), // ai, pass-play, online
+  status: varchar("status").default("active"), // active, finished, abandoned
+  winnerId: varchar("winner_id").references(() => users.id),
+  winCondition: varchar("win_condition"), // horizontal, diagonal, draw
+  board: jsonb("board").default('{}'), // position -> player mapping
+  createdAt: timestamp("created_at").defaultNow(),
+  finishedAt: timestamp("finished_at"),
+});
+
+export const roomParticipants = pgTable("room_participants", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  roomId: uuid("room_id").references(() => rooms.id),
+  userId: varchar("user_id").references(() => users.id),
+  role: varchar("role").notNull(), // player, spectator
+  joinedAt: timestamp("joined_at").defaultNow(),
+});
+
+export const moves = pgTable("moves", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  gameId: uuid("game_id").references(() => games.id),
+  playerId: varchar("player_id").references(() => users.id),
+  position: integer("position").notNull(),
+  symbol: varchar("symbol").notNull(), // X or O
+  moveNumber: integer("move_number").notNull(),
+  timestamp: timestamp("timestamp").defaultNow(),
+});
+
+export const blockedUsers = pgTable("blocked_users", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  blockerId: varchar("blocker_id").references(() => users.id).notNull(),
+  blockedId: varchar("blocked_id").references(() => users.id).notNull(),
+  timestamp: timestamp("timestamp").defaultNow(),
+}, (table) => [
+  // Prevent duplicate blocks
+  index("unique_block").on(table.blockerId, table.blockedId),
+]);
+
+// Relations
+export const usersRelations = relations(users, ({ many }) => ({
+  ownedRooms: many(rooms),
+  gameParticipations: many(roomParticipants),
+  gamesAsX: many(games, { relationName: "playerX" }),
+  gamesAsO: many(games, { relationName: "playerO" }),
+  wonGames: many(games, { relationName: "winner" }),
+  moves: many(moves),
+  blockedUsers: many(blockedUsers, { relationName: "blocker" }),
+  blockedByUsers: many(blockedUsers, { relationName: "blocked" }),
+}));
+
+export const roomsRelations = relations(rooms, ({ one, many }) => ({
+  owner: one(users, { fields: [rooms.ownerId], references: [users.id] }),
+  participants: many(roomParticipants),
+  games: many(games),
+}));
+
+export const gamesRelations = relations(games, ({ one, many }) => ({
+  room: one(rooms, { fields: [games.roomId], references: [rooms.id] }),
+  playerX: one(users, { fields: [games.playerXId], references: [users.id], relationName: "playerX" }),
+  playerO: one(users, { fields: [games.playerOId], references: [users.id], relationName: "playerO" }),
+  winner: one(users, { fields: [games.winnerId], references: [users.id], relationName: "winner" }),
+  moves: many(moves),
+}));
+
+export const roomParticipantsRelations = relations(roomParticipants, ({ one }) => ({
+  room: one(rooms, { fields: [roomParticipants.roomId], references: [rooms.id] }),
+  user: one(users, { fields: [roomParticipants.userId], references: [users.id] }),
+}));
+
+export const movesRelations = relations(moves, ({ one }) => ({
+  game: one(games, { fields: [moves.gameId], references: [games.id] }),
+  player: one(users, { fields: [moves.playerId], references: [users.id] }),
+}));
+
+export const blockedUsersRelations = relations(blockedUsers, ({ one }) => ({
+  blocker: one(users, { fields: [blockedUsers.blockerId], references: [users.id], relationName: "blocker" }),
+  blocked: one(users, { fields: [blockedUsers.blockedId], references: [users.id], relationName: "blocked" }),
+}));
+
+// Schemas
+export const insertRoomSchema = createInsertSchema(rooms).pick({
+  name: true,
+  maxPlayers: true,
+  isPrivate: true,
+});
+
+export const insertGameSchema = createInsertSchema(games).pick({
+  roomId: true,
+  gameMode: true,
+}).extend({
+  playerXId: z.string().optional(),
   playerOId: z.string().optional(),
-  board: z.record(z.string()).default({}),
-  currentPlayer: z.string(),
-  status: z.string().default("active"),
-  winnerId: z.string().optional(),
-  winCondition: z.string().optional(),
+}).transform((data) => {
+  // Remove null values, keep undefined for optional fields
+  const cleaned = { ...data };
+  Object.keys(cleaned).forEach(key => {
+    if (cleaned[key as keyof typeof cleaned] === null) {
+      delete cleaned[key as keyof typeof cleaned];
+    }
+  });
+  return cleaned;
 });
 
-export const insertMoveSchema = z.object({
-  gameId: z.string(),
-  playerId: z.string(),
-  position: z.number().min(1).max(15),
-  symbol: z.string().length(1),
+export const insertMoveSchema = createInsertSchema(moves).pick({
+  gameId: true,
+  playerId: true,
+  position: true,
+  symbol: true,
+  moveNumber: true,
 });
 
-export const insertRoomParticipantSchema = z.object({
-  roomId: z.string(),
-  userId: z.string(),
-  role: z.string().default("player"),
+export const insertRoomParticipantSchema = createInsertSchema(roomParticipants).pick({
+  roomId: true,
+  userId: true,
+  role: true,
 });
 
-export const insertBlockedUserSchema = z.object({
-  blockerId: z.string(),
-  blockedId: z.string(),
+export const insertBlockedUserSchema = createInsertSchema(blockedUsers).pick({
+  blockerId: true,
+  blockedId: true,
 });
 
-// Type inference for inserts
-export type UpsertUser = z.infer<typeof insertUserSchema>;
+// Types
+export type UpsertUser = typeof users.$inferInsert;
+export type User = typeof users.$inferSelect;
+export type Room = typeof rooms.$inferSelect;
+export type Game = typeof games.$inferSelect;
+export type Move = typeof moves.$inferSelect;
+export type RoomParticipant = typeof roomParticipants.$inferSelect;
+export type BlockedUser = typeof blockedUsers.$inferSelect;
 export type InsertRoom = z.infer<typeof insertRoomSchema>;
 export type InsertGame = z.infer<typeof insertGameSchema>;
 export type InsertMove = z.infer<typeof insertMoveSchema>;

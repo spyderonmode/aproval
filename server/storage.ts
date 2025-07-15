@@ -1,4 +1,10 @@
 import {
+  users,
+  rooms,
+  games,
+  moves,
+  roomParticipants,
+  blockedUsers,
   type User,
   type UpsertUser,
   type Room,
@@ -12,8 +18,8 @@ import {
   type InsertRoomParticipant,
   type InsertBlockedUser,
 } from "@shared/schema";
-// Firebase storage implementation
-import { firebaseStorage } from "./firebase-storage";
+import { db } from "./db";
+import { eq, and, desc, count } from "drizzle-orm";
 
 export interface IStorage {
   // User operations - mandatory for Replit Auth
@@ -54,8 +60,6 @@ export interface IStorage {
   isUserBlocked(blockerId: string, blockedId: string): Promise<boolean>;
 }
 
-// PostgreSQL implementation - commented out for Firebase migration
-/*
 export class DatabaseStorage implements IStorage {
   // User operations
   async getUser(id: string): Promise<User | undefined> {
@@ -233,7 +237,5 @@ export class DatabaseStorage implements IStorage {
     return !!blocked;
   }
 }
-*/
 
-// Use Firebase storage instead of PostgreSQL
-export const storage = firebaseStorage;
+export const storage = new DatabaseStorage();

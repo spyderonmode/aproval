@@ -2,11 +2,10 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { WebSocketServer, WebSocket } from "ws";
 import { storage } from "./storage";
-import { setupAuth, requireAuth } from "./firebase-auth";
+import { setupAuth, requireAuth } from "./auth";
 import { insertRoomSchema, insertGameSchema, insertMoveSchema } from "@shared/schema";
 import { AIPlayer } from "./aiPlayer";
 import { makeMove, checkWin, checkDraw, getOpponentSymbol, validateMove } from "./gameLogic";
-// Email services removed - using Firebase only
 
 interface WSConnection {
   ws: WebSocket;
@@ -18,70 +17,14 @@ interface WSConnection {
 }
 
 export async function registerRoutes(app: Express): Promise<Server> {
-  // Public endpoints (before auth middleware)
-
   // Auth middleware
   setupAuth(app);
-
-  // Firebase auth user endpoint
-  app.get('/api/auth/user', requireAuth, async (req: any, res) => {
-    try {
-      const user = req.user;
-      if (!user) {
-        return res.status(401).json({ error: 'Not authenticated' });
-      }
-      
-      // Get full user data from storage
-      const userData = await storage.getUser(user.userId);
-      if (userData) {
-        res.json({
-          id: userData.id,
-          email: userData.email,
-          username: userData.email?.split('@')[0] || userData.firstName || userData.id,
-          displayName: userData.firstName || userData.email?.split('@')[0],
-          profilePicture: userData.profileImageUrl || '',
-          isEmailVerified: user.firebaseUser?.emailVerified || true,
-          wins: 0,
-          losses: 0,
-          draws: 0
-        });
-      } else {
-        res.json({
-          id: user.userId,
-          email: user.email,
-          username: user.username,
-          displayName: user.displayName,
-          profilePicture: '',
-          isEmailVerified: user.firebaseUser?.emailVerified || true,
-          wins: 0,
-          losses: 0,
-          draws: 0
-        });
-      }
-    } catch (error) {
-      console.error("Error fetching user:", error);
-      res.status(500).json({ error: "Failed to fetch user" });
-    }
-  });
 
   const connections = new Map<string, WSConnection>();
   const roomConnections = new Map<string, Set<string>>();
   const matchmakingQueue: string[] = []; // Queue of user IDs waiting for matches
   const onlineUsers = new Map<string, { userId: string; username: string; displayName: string; roomId?: string; lastSeen: Date }>();
   const userRoomStates = new Map<string, { roomId: string; gameId?: string; isInGame: boolean }>();
-
-  // Firebase auth routes (backward compatibility)
-  app.post('/api/auth/login', async (req, res) => {
-    res.status(200).json({ message: 'Firebase authentication is handled client-side' });
-  });
-
-  app.post('/api/auth/register', async (req, res) => {
-    res.status(200).json({ message: 'Firebase authentication is handled client-side' });
-  });
-
-  app.post('/api/auth/logout', async (req, res) => {
-    res.status(200).json({ message: 'Firebase authentication is handled client-side' });
-  });
 
   // Error logging endpoint
   app.post('/api/error-log', (req, res) => {

@@ -1,168 +1,78 @@
-import { initializeApp } from 'firebase/app';
-import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, User, onAuthStateChanged } from 'firebase/auth';
-import { getFirestore, doc, setDoc, getDoc, updateDoc, serverTimestamp } from 'firebase/firestore';
-import { firebaseConfig } from './firebase-config';
-
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
-export const auth = getAuth(app);
-export const db = getFirestore(app);
-
-// Authentication functions
+// Simple auth API calls
 export const login = async (credentials: { username: string; password: string }) => {
-  try {
-    // For backward compatibility, we'll use email/password authentication
-    // If username is provided, we'll treat it as email for now
-    const email = credentials.username.includes('@') ? credentials.username : `${credentials.username}@${firebaseConfig.projectId}.com`;
-    
-    const userCredential = await signInWithEmailAndPassword(auth, email, credentials.password);
-    const user = userCredential.user;
-    
-    // Get user profile from Firestore
-    const userDoc = await getDoc(doc(db, 'users', user.uid));
-    const userData = userDoc.data();
-    
-    return {
-      id: user.uid,
-      email: user.email,
-      username: userData?.username || user.email?.split('@')[0],
-      displayName: userData?.displayName || user.displayName,
-      profilePicture: userData?.profilePicture || user.photoURL,
-      isEmailVerified: user.emailVerified
-    };
-  } catch (error: any) {
-    throw new Error(error.message || 'Login failed');
+  const response = await fetch('/api/auth/login', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(credentials)
+  });
+  
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(errorData.error || 'Login failed');
   }
+  
+  return response.json();
 };
 
 export const register = async (credentials: { username: string; password: string; email: string }) => {
-  try {
-    const userCredential = await createUserWithEmailAndPassword(auth, credentials.email, credentials.password);
-    const user = userCredential.user;
-    
-    // Create user document in Firestore
-    await setDoc(doc(db, 'users', user.uid), {
-      id: user.uid,
-      username: credentials.username,
-      email: credentials.email,
-      displayName: credentials.username,
-      profilePicture: '',
-      isEmailVerified: user.emailVerified,
-      wins: 0,
-      losses: 0,
-      draws: 0,
-      createdAt: serverTimestamp(),
-      updatedAt: serverTimestamp()
-    });
-    
-    // Send email verification through backend
-    try {
-      await fetch('/api/auth/register', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
-          email: credentials.email, 
-          username: credentials.username 
-        })
-      });
-    } catch (emailError) {
-      console.warn('Email verification failed to send:', emailError);
-    }
-    
-    return {
-      id: user.uid,
-      email: user.email,
-      username: credentials.username,
-      displayName: credentials.username,
-      profilePicture: '',
-      isEmailVerified: user.emailVerified
-    };
-  } catch (error: any) {
-    throw new Error(error.message || 'Registration failed');
+  const response = await fetch('/api/auth/register', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(credentials)
+  });
+  
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(errorData.error || 'Registration failed');
   }
+  
+  return response.json();
 };
 
 export const sendEmailVerification = async (email: string) => {
-  // Firebase handles email verification automatically
-  // This is kept for backward compatibility
-  return { success: true };
+  const response = await fetch('/api/auth/send-verification', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email })
+  });
+  
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(errorData.message || 'Failed to send verification email');
+  }
+  
+  return response.json();
 };
 
 export const verifyEmail = async (token: string) => {
-  // Firebase handles email verification automatically
-  // This is kept for backward compatibility
-  return { success: true };
+  const response = await fetch('/api/auth/verify-email', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ token })
+  });
+  
+  if (!response.ok) {
+    throw new Error('Email verification failed');
+  }
+  
+  return response.json();
 };
 
 export const logout = async () => {
-  await signOut(auth);
+  await fetch('/api/auth/logout', { method: 'POST' });
   // Force page refresh after logout
   window.location.href = '/';
 };
 
 export const getCurrentUser = async () => {
   try {
-    const user = auth.currentUser;
-    if (!user) return null;
-    
-    // Get user profile from Firestore
-    const userDoc = await getDoc(doc(db, 'users', user.uid));
-    const userData = userDoc.data();
-    
-    return {
-      id: user.uid,
-      email: user.email,
-      username: userData?.username || user.email?.split('@')[0],
-      displayName: userData?.displayName || user.displayName,
-      profilePicture: userData?.profilePicture || user.photoURL,
-      isEmailVerified: user.emailVerified,
-      wins: userData?.wins || 0,
-      losses: userData?.losses || 0,
-      draws: userData?.draws || 0
-    };
+    const response = await fetch('/api/auth/user');
+    if (!response.ok) {
+      return null;
+    }
+    return response.json();
   } catch (error) {
     console.error('Error getting current user:', error);
     return null;
-  }
-};
-
-export const updateProfile = async (updates: { displayName?: string; profilePicture?: string }) => {
-  try {
-    const user = auth.currentUser;
-    if (!user) throw new Error('No user logged in');
-    
-    await updateDoc(doc(db, 'users', user.uid), {
-      ...updates,
-      updatedAt: serverTimestamp()
-    });
-    
-    return { success: true };
-  } catch (error: any) {
-    throw new Error(error.message || 'Failed to update profile');
-  }
-};
-
-export const uploadProfilePicture = async (file: File) => {
-  try {
-    const user = auth.currentUser;
-    if (!user) throw new Error('No user logged in');
-    
-    // Convert file to base64 for simple storage
-    const reader = new FileReader();
-    return new Promise((resolve, reject) => {
-      reader.onloadend = async () => {
-        try {
-          const base64Data = reader.result as string;
-          await updateProfile({ profilePicture: base64Data });
-          resolve(base64Data);
-        } catch (error) {
-          reject(error);
-        }
-      };
-      reader.onerror = reject;
-      reader.readAsDataURL(file);
-    });
-  } catch (error: any) {
-    throw new Error(error.message || 'Failed to upload profile picture');
   }
 };
