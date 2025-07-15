@@ -1,15 +1,56 @@
 import nodemailer from 'nodemailer';
+import { db } from './firebase-admin';
 
-// SMTP configuration
-const transporter = nodemailer.createTransporter({
-  host: process.env.SMTP_HOST || 'smtp.gmail.com',
-  port: parseInt(process.env.SMTP_PORT || '587'),
-  secure: process.env.SMTP_SECURE === 'true' || false,
-  auth: {
-    user: process.env.SMTP_USER,
-    pass: process.env.SMTP_PASS,
-  },
-});
+// Get SMTP configuration from Firebase or environment variables
+async function getSMTPConfig() {
+  try {
+    // First try to get from Firebase
+    if (db) {
+      const configDoc = await db.collection('config').doc('smtp').get();
+      if (configDoc.exists) {
+        const config = configDoc.data();
+        return {
+          host: config.host || 'smtp.gmail.com',
+          port: config.port || 587,
+          secure: config.secure || false,
+          auth: {
+            user: config.user,
+            pass: config.pass,
+          },
+        };
+      }
+    }
+    
+    // Fallback to environment variables
+    return {
+      host: process.env.SMTP_HOST || 'smtp.gmail.com',
+      port: parseInt(process.env.SMTP_PORT || '587'),
+      secure: process.env.SMTP_SECURE === 'true' || false,
+      auth: {
+        user: process.env.SMTP_USER,
+        pass: process.env.SMTP_PASS,
+      },
+    };
+  } catch (error) {
+    console.error('Error getting SMTP config:', error);
+    // Return environment variables as fallback
+    return {
+      host: process.env.SMTP_HOST || 'smtp.gmail.com',
+      port: parseInt(process.env.SMTP_PORT || '587'),
+      secure: process.env.SMTP_SECURE === 'true' || false,
+      auth: {
+        user: process.env.SMTP_USER,
+        pass: process.env.SMTP_PASS,
+      },
+    };
+  }
+}
+
+// Create transporter with dynamic config
+async function createTransporter() {
+  const config = await getSMTPConfig();
+  return nodemailer.createTransporter(config);
+}
 
 // Email templates
 export const emailTemplates = {
@@ -67,13 +108,16 @@ export const emailTemplates = {
 // Send email function
 export async function sendEmail(to: string, subject: string, html: string) {
   try {
-    if (!process.env.SMTP_USER || !process.env.SMTP_PASS) {
+    const transporter = await createTransporter();
+    const smtpConfig = await getSMTPConfig();
+    
+    if (!smtpConfig.auth.user || !smtpConfig.auth.pass) {
       console.warn('SMTP credentials not configured, email not sent');
       return { success: false, error: 'SMTP not configured' };
     }
 
     const mailOptions = {
-      from: `"TicTac 3x5" <${process.env.SMTP_USER}>`,
+      from: `"TicTac 3x5" <${smtpConfig.auth.user}>`,
       to,
       subject,
       html,
