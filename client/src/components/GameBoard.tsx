@@ -9,30 +9,31 @@ import { useWebSocket } from "@/hooks/useWebSocket";
 import { isUnauthorizedError } from "@/lib/authUtils";
 import { motion, AnimatePresence } from "framer-motion"; // Added back for winning line animation
 import { useTheme } from "@/contexts/ThemeContext";
-import { User } from "lucide-react";
+import { User, Smile } from "lucide-react";
+import { EmojiReactionPanel } from '@/components/EmojiReactionPanel';
 
 const VALID_POSITIONS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15];
 
-// Mood system for player emotions
-interface PlayerMood {
+// Player emoji reactions system
+interface PlayerReaction {
   emoji: string;
   label: string;
   duration: number;
 }
 
-const MOOD_EMOJIS = {
-  confident: { emoji: '😎', label: 'Confident', duration: 3000 },
-  happy: { emoji: '😊', label: 'Happy', duration: 2500 },
-  thinking: { emoji: '🤔', label: 'Thinking', duration: 2000 },
-  worried: { emoji: '😟', label: 'Worried', duration: 2500 },
-  frustrated: { emoji: '😤', label: 'Frustrated', duration: 3000 },
-  excited: { emoji: '🤩', label: 'Excited', duration: 2500 },
-  nervous: { emoji: '😰', label: 'Nervous', duration: 2000 },
-  surprised: { emoji: '😮', label: 'Surprised', duration: 2000 },
-  disappointed: { emoji: '😞', label: 'Disappointed', duration: 2500 },
-  celebrating: { emoji: '🎉', label: 'Celebrating', duration: 3000 },
-  focused: { emoji: '🎯', label: 'Focused', duration: 2000 },
-  competitive: { emoji: '🔥', label: 'Competitive', duration: 2500 }
+const REACTION_EMOJIS = {
+  laugh: { emoji: '😂', label: 'Laugh', duration: 4000 },
+  love: { emoji: '❤️', label: 'Love', duration: 3500 },
+  wow: { emoji: '😮', label: 'Wow', duration: 3000 },
+  angry: { emoji: '😠', label: 'Angry', duration: 3500 },
+  sad: { emoji: '😢', label: 'Sad', duration: 3000 },
+  cool: { emoji: '😎', label: 'Cool', duration: 3500 },
+  fire: { emoji: '🔥', label: 'Fire', duration: 4000 },
+  thumbsUp: { emoji: '👍', label: 'Thumbs Up', duration: 3000 },
+  thumbsDown: { emoji: '👎', label: 'Thumbs Down', duration: 3000 },
+  thinking: { emoji: '🤔', label: 'Thinking', duration: 3500 },
+  party: { emoji: '🎉', label: 'Party', duration: 4000 },
+  target: { emoji: '🎯', label: 'Target', duration: 3000 }
 };
 
 // Function to get winning positions for highlighting
@@ -184,10 +185,11 @@ export function GameBoard({ game, onGameOver, gameMode, user }: GameBoardProps) 
   
   const [opponent, setOpponent] = useState<any>(null);
   
-  // Mood tracking state
-  const [playerXMood, setPlayerXMood] = useState<PlayerMood | null>(null);
-  const [playerOMood, setPlayerOMood] = useState<PlayerMood | null>(null);
-  const [moodTimeouts, setMoodTimeouts] = useState<{ X?: NodeJS.Timeout; O?: NodeJS.Timeout }>({});
+  // Player reaction state
+  const [playerXReaction, setPlayerXReaction] = useState<PlayerReaction | null>(null);
+  const [playerOReaction, setPlayerOReaction] = useState<PlayerReaction | null>(null);
+  const [reactionTimeouts, setReactionTimeouts] = useState<{ X?: NodeJS.Timeout; O?: NodeJS.Timeout }>({});
+  const [showReactionPanel, setShowReactionPanel] = useState(false);
   
   // Update winning line when game has winning positions
   useEffect(() => {
@@ -215,55 +217,63 @@ export function GameBoard({ game, onGameOver, gameMode, user }: GameBoardProps) 
     }
   }, [game, user, gameMode]);
 
-  // Mood tracking functions
-  const setPlayerMood = (player: 'X' | 'O', moodType: keyof typeof MOOD_EMOJIS) => {
-    const mood = MOOD_EMOJIS[moodType];
+  // Player reaction functions
+  const setPlayerReaction = (player: 'X' | 'O', reactionType: keyof typeof REACTION_EMOJIS) => {
+    const reaction = REACTION_EMOJIS[reactionType];
     
     // Clear existing timeout
-    if (moodTimeouts[player]) {
-      clearTimeout(moodTimeouts[player]);
+    if (reactionTimeouts[player]) {
+      clearTimeout(reactionTimeouts[player]);
     }
     
-    // Set new mood
+    // Set new reaction
     if (player === 'X') {
-      setPlayerXMood(mood);
+      setPlayerXReaction(reaction);
     } else {
-      setPlayerOMood(mood);
+      setPlayerOReaction(reaction);
     }
     
-    // Clear mood after duration
+    // Clear reaction after duration
     const timeout = setTimeout(() => {
       if (player === 'X') {
-        setPlayerXMood(null);
+        setPlayerXReaction(null);
       } else {
-        setPlayerOMood(null);
+        setPlayerOReaction(null);
       }
-      setMoodTimeouts(prev => ({ ...prev, [player]: undefined }));
-    }, mood.duration);
+      setReactionTimeouts(prev => ({ ...prev, [player]: undefined }));
+    }, reaction.duration);
     
-    setMoodTimeouts(prev => ({ ...prev, [player]: timeout }));
+    setReactionTimeouts(prev => ({ ...prev, [player]: timeout }));
   };
 
-  const getRandomMood = (situation: 'winning' | 'losing' | 'move' | 'waiting'): keyof typeof MOOD_EMOJIS => {
-    const situationMoods = {
-      winning: ['confident', 'happy', 'excited', 'celebrating', 'competitive'],
-      losing: ['worried', 'frustrated', 'disappointed', 'nervous'],
-      move: ['thinking', 'focused', 'confident', 'competitive'],
-      waiting: ['thinking', 'focused', 'nervous', 'worried']
-    };
-    
-    const moods = situationMoods[situation];
-    return moods[Math.floor(Math.random() * moods.length)] as keyof typeof MOOD_EMOJIS;
+  const handleReactionClick = (emoji: string) => {
+    if (gameMode === 'online' && user) {
+      const userId = user.userId || user.id;
+      const isPlayerX = game.playerXId === userId;
+      const playerSymbol = isPlayerX ? 'X' : 'O';
+      // Find the reaction by emoji
+      const reactionType = Object.entries(REACTION_EMOJIS).find(([_, reaction]) => reaction.emoji === emoji)?.[0];
+      if (reactionType) {
+        setPlayerReaction(playerSymbol, reactionType as keyof typeof REACTION_EMOJIS);
+      }
+    } else {
+      // For local games, current player uses reaction
+      const reactionType = Object.entries(REACTION_EMOJIS).find(([_, reaction]) => reaction.emoji === emoji)?.[0];
+      if (reactionType) {
+        setPlayerReaction(currentPlayer, reactionType as keyof typeof REACTION_EMOJIS);
+      }
+    }
+    setShowReactionPanel(false);
   };
 
   // Cleanup timeouts on unmount
   useEffect(() => {
     return () => {
-      Object.values(moodTimeouts).forEach(timeout => {
+      Object.values(reactionTimeouts).forEach(timeout => {
         if (timeout) clearTimeout(timeout);
       });
     };
-  }, [moodTimeouts]);
+  }, [reactionTimeouts]);
 
 
 
@@ -344,13 +354,7 @@ export function GameBoard({ game, onGameOver, gameMode, user }: GameBoardProps) 
         // No need to update local state here
         console.log('✅ Move successful, WebSocket will handle board update');
         
-        // Set confident mood for player who just made a move
-        if (gameMode === 'online' && user) {
-          const userId = user.userId || user.id;
-          const isPlayerX = game.playerXId === userId;
-          const playerSymbol = isPlayerX ? 'X' : 'O';
-          setPlayerMood(playerSymbol, getRandomMood('move'));
-        }
+
       }
       // For online games, don't force board update since WebSocket handles it
       // For local games, board is already updated in handleLocalMove
@@ -517,13 +521,11 @@ export function GameBoard({ game, onGameOver, gameMode, user }: GameBoardProps) 
     const nextPlayer = currentPlayer === 'X' ? 'O' : 'X';
     setCurrentPlayer(nextPlayer);
     
-    // Set waiting mood for next player
-    setPlayerMood(nextPlayer, getRandomMood('waiting'));
+
     
     // Handle AI move
     if (gameMode === 'ai' && nextPlayer === 'O') {
-      // Set thinking mood for AI
-      setPlayerMood('O', 'thinking');
+
       setTimeout(() => {
         makeAIMove(newBoard);
       }, 1000); // Increased delay to reduce blinking
@@ -557,8 +559,7 @@ export function GameBoard({ game, onGameOver, gameMode, user }: GameBoardProps) 
     setBoard(newBoard);
     setLastMove(selectedMove);
     
-    // Set AI mood after making move
-    setPlayerMood('O', getRandomMood('move'));
+
     
     // Check for AI win using same logic
     const checkWin = (board: Record<string, string>, player: string) => {
@@ -606,10 +607,6 @@ export function GameBoard({ game, onGameOver, gameMode, user }: GameBoardProps) 
     };
     
     if (checkWin(newBoard, 'O')) {
-      // Set winning mood for AI
-      setPlayerMood('O', getRandomMood('winning'));
-      // Set losing mood for player
-      setPlayerMood('X', getRandomMood('losing'));
       
       // Show winning positions before game over
       const winningPositions = getWinningPositions(newBoard, 'O');
@@ -681,15 +678,7 @@ export function GameBoard({ game, onGameOver, gameMode, user }: GameBoardProps) 
     if (board[position.toString()]) {
       console.log('❌ Position already occupied');
       
-      // Set frustrated mood for player making invalid move
-      if (gameMode === 'online') {
-        const userId = user?.userId || user?.id;
-        const isPlayerX = game.playerXId === userId;
-        const playerSymbol = isPlayerX ? 'X' : 'O';
-        setPlayerMood(playerSymbol, 'frustrated');
-      } else {
-        setPlayerMood(currentPlayer, 'frustrated');
-      }
+
       
       toast({
         title: "Invalid move",
@@ -729,8 +718,7 @@ export function GameBoard({ game, onGameOver, gameMode, user }: GameBoardProps) 
       if (currentPlayer !== playerSymbol) {
         console.log('❌ Not your turn');
         
-        // Set nervous mood for player trying to move out of turn
-        setPlayerMood(playerSymbol, 'nervous');
+
         
         const currentPlayerName = currentPlayer === 'X' ? 
           (game.playerXInfo?.firstName || 'Player X') : 
@@ -857,18 +845,18 @@ export function GameBoard({ game, onGameOver, gameMode, user }: GameBoardProps) 
           <div className="flex flex-col space-y-3 text-right">
             {/* Player X - Top */}
             <div className="flex items-center justify-end space-x-2">
-              {/* Mood Indicator for Player X */}
+              {/* Reaction Indicator for Player X */}
               <AnimatePresence>
-                {playerXMood && (
+                {playerXReaction && (
                   <motion.div
                     initial={{ opacity: 0, scale: 0.5 }}
                     animate={{ opacity: 1, scale: 1 }}
                     exit={{ opacity: 0, scale: 0.5 }}
                     transition={{ duration: 0.3 }}
                     className="relative"
-                    title={playerXMood.label}
+                    title={playerXReaction.label}
                   >
-                    <span className="text-lg">{playerXMood.emoji}</span>
+                    <span className="text-lg">{playerXReaction.emoji}</span>
                   </motion.div>
                 )}
               </AnimatePresence>
@@ -894,18 +882,18 @@ export function GameBoard({ game, onGameOver, gameMode, user }: GameBoardProps) 
             
             {/* Player O - Bottom */}
             <div className="flex items-center justify-end space-x-2">
-              {/* Mood Indicator for Player O */}
+              {/* Reaction Indicator for Player O */}
               <AnimatePresence>
-                {playerOMood && (
+                {playerOReaction && (
                   <motion.div
                     initial={{ opacity: 0, scale: 0.5 }}
                     animate={{ opacity: 1, scale: 1 }}
                     exit={{ opacity: 0, scale: 0.5 }}
                     transition={{ duration: 0.3 }}
                     className="relative"
-                    title={playerOMood.label}
+                    title={playerOReaction.label}
                   >
-                    <span className="text-lg">{playerOMood.emoji}</span>
+                    <span className="text-lg">{playerOReaction.emoji}</span>
                   </motion.div>
                 )}
               </AnimatePresence>
@@ -970,7 +958,16 @@ export function GameBoard({ game, onGameOver, gameMode, user }: GameBoardProps) 
         </div>
 
         {/* Game Controls */}
-        <div className="mt-8 flex justify-center">
+        <div className="mt-8 flex justify-center space-x-4">
+          <Button 
+            variant="outline"
+            onClick={() => setShowReactionPanel(!showReactionPanel)}
+            className="flex items-center space-x-2"
+          >
+            <Smile className="w-4 h-4" />
+            <span>React</span>
+          </Button>
+          
           <Button 
             variant="destructive"
             onClick={resetGame}
@@ -979,8 +976,16 @@ export function GameBoard({ game, onGameOver, gameMode, user }: GameBoardProps) 
             Reset Game
           </Button>
         </div>
+        
+        {/* Emoji Reaction Panel */}
+        <div className="relative">
+          <EmojiReactionPanel
+            isOpen={showReactionPanel}
+            onReactionClick={handleReactionClick}
+            onClose={() => setShowReactionPanel(false)}
+          />
+        </div>
       </CardContent>
-
 
     </Card>
   );
