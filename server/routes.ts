@@ -1144,6 +1144,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
             onlineUsers.delete(connection.userId);
             userRoomStates.delete(connection.userId);
             
+            // Broadcast user offline event for chat history cleanup
+            const userOfflineMessage = JSON.stringify({
+              type: 'user_offline',
+              userId: connection.userId
+            });
+            
             // Broadcast updated online count
             const onlineCount = onlineUsers.size;
             const broadcastMessage = JSON.stringify({
@@ -1153,6 +1159,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
             
             connections.forEach(conn => {
               if (conn.ws.readyState === WebSocket.OPEN && conn.ws !== ws) {
+                conn.ws.send(userOfflineMessage);
                 conn.ws.send(broadcastMessage);
               }
             });

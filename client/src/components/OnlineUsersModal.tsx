@@ -22,7 +22,7 @@ export function OnlineUsersModal({ open, onClose, currentRoom, user }: OnlineUse
   const queryClient = useQueryClient();
   const [selectedUser, setSelectedUser] = useState<any>(null);
   const [chatMessage, setChatMessage] = useState("");
-  const [chatMessages, setChatMessages] = useState<any[]>([]);
+  const [chatHistory, setChatHistory] = useState<Map<string, any[]>>(new Map());
 
   const { data: onlineUsers, isLoading } = useQuery({
     queryKey: ["/api/users/online"],
@@ -35,20 +35,23 @@ export function OnlineUsersModal({ open, onClose, currentRoom, user }: OnlineUse
       return await apiRequest('POST', '/api/chat/send', { targetUserId, message });
     },
     onSuccess: () => {
-      // Add the sent message to local chat
-      const newMessage = {
-        fromMe: true,
-        message: chatMessage,
-        timestamp: new Date().toLocaleTimeString(),
-        userId: user?.userId || user?.id
-      };
-      setChatMessages(prev => [...prev, newMessage]);
+      if (selectedUser) {
+        // Add the sent message to chat history for this user
+        const newMessage = {
+          fromMe: true,
+          message: chatMessage,
+          timestamp: new Date().toLocaleTimeString(),
+          userId: user?.userId || user?.id
+        };
+        
+        setChatHistory(prev => {
+          const newHistory = new Map(prev);
+          const userMessages = newHistory.get(selectedUser.userId) || [];
+          newHistory.set(selectedUser.userId, [...userMessages, newMessage]);
+          return newHistory;
+        });
+      }
       setChatMessage("");
-      
-      toast({
-        title: "Message sent",
-        description: "Your message has been sent successfully.",
-      });
     },
     onError: (error: any) => {
       console.error('Chat message error:', error);
@@ -69,7 +72,7 @@ export function OnlineUsersModal({ open, onClose, currentRoom, user }: OnlineUse
     });
   };
 
-  // Handle incoming chat messages via a prop or global event system
+  // Handle incoming chat messages and user offline events
   useEffect(() => {
     const handleChatMessage = (event: CustomEvent) => {
       const data = event.detail;
@@ -83,27 +86,46 @@ export function OnlineUsersModal({ open, onClose, currentRoom, user }: OnlineUse
           senderName: data.message.senderName
         };
         
-        // Only add to chat if we're chatting with this user
-        if (selectedUser && selectedUser.userId === data.message.senderId) {
-          setChatMessages(prev => [...prev, incomingMessage]);
+        // Add to chat history for this sender
+        setChatHistory(prev => {
+          const newHistory = new Map(prev);
+          const userMessages = newHistory.get(data.message.senderId) || [];
+          newHistory.set(data.message.senderId, [...userMessages, incomingMessage]);
+          return newHistory;
+        });
+      }
+    };
+
+    const handleUserOffline = (event: CustomEvent) => {
+      const data = event.detail;
+      
+      if (data.type === 'user_offline') {
+        // Remove chat history for offline user
+        setChatHistory(prev => {
+          const newHistory = new Map(prev);
+          newHistory.delete(data.userId);
+          return newHistory;
+        });
+        
+        // If we're currently chatting with this user, go back to user list
+        if (selectedUser && selectedUser.userId === data.userId) {
+          setSelectedUser(null);
         }
       }
     };
 
-    // Listen for chat messages via custom events
+    // Listen for chat messages and user offline events
     window.addEventListener('chat_message_received', handleChatMessage as EventListener);
+    window.addEventListener('user_offline', handleUserOffline as EventListener);
     
     return () => {
       window.removeEventListener('chat_message_received', handleChatMessage as EventListener);
+      window.removeEventListener('user_offline', handleUserOffline as EventListener);
     };
   }, [selectedUser]);
 
-  // Reset chat messages when changing users
-  useEffect(() => {
-    if (selectedUser) {
-      setChatMessages([]);
-    }
-  }, [selectedUser]);
+  // Get current chat messages for selected user
+  const currentChatMessages = selectedUser ? chatHistory.get(selectedUser.userId) || [] : [];
 
   const formatLastSeen = (lastSeen: string) => {
     const diff = Date.now() - new Date(lastSeen).getTime();
@@ -228,8 +250,8 @@ export function OnlineUsersModal({ open, onClose, currentRoom, user }: OnlineUse
               
               <ScrollArea className="h-[300px] w-full">
                 <div className="space-y-2">
-                  {chatMessages.length > 0 ? (
-                    chatMessages.map((msg, index) => (
+                  {currentChatMessages.length > 0 ? (
+                    currentChatMessages.map((msg, index) => (
                       <div key={index} className={`p-2 rounded-lg ${msg.fromMe ? 'bg-blue-100 dark:bg-blue-900 ml-4' : 'bg-gray-100 dark:bg-gray-800 mr-4'}`}>
                         <div className="text-sm font-medium">{msg.fromMe ? 'You' : selectedUser.displayName || selectedUser.username}</div>
                         <div className="text-sm">{msg.message}</div>

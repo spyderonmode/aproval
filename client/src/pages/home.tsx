@@ -66,12 +66,12 @@ export default function Home() {
           window.dispatchEvent(new CustomEvent('chat_message_received', {
             detail: lastMessage
           }));
-          
-          // Show toast notification
-          toast({
-            title: "New message",
-            description: `${lastMessage.message.senderName}: ${lastMessage.message.message}`,
-          });
+          break;
+        case 'user_offline':
+          // Dispatch custom event for chat history cleanup
+          window.dispatchEvent(new CustomEvent('user_offline', {
+            detail: lastMessage
+          }));
           break;
         case 'game_started':
           console.log('🎮 Processing game_started message:', lastMessage);
