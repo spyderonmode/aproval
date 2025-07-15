@@ -132,7 +132,10 @@ export default function Home() {
               winner: lastMessage.winner,
               condition: lastMessage.condition,
               board: lastMessage.board,
-              winnerInfo: lastMessage.winnerInfo
+              winnerInfo: lastMessage.winnerInfo,
+              playerXInfo: currentGame.playerXInfo,
+              playerOInfo: currentGame.playerOInfo,
+              game: currentGame
             });
             setShowGameOver(true);
           }
