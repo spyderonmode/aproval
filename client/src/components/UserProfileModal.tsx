@@ -44,7 +44,9 @@ export function UserProfileModal({
     setLoading(true);
     setError(null);
     try {
+      console.log('Fetching online stats for user:', userId);
       const response = await apiRequest(`/api/users/${userId}/online-stats`);
+      console.log('Online stats response:', response);
       setStats(response);
     } catch (err) {
       setError('Failed to load player statistics');
