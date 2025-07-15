@@ -220,6 +220,96 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Start game in a room
+  app.post('/api/rooms/:roomId/start-game', requireAuth, async (req: any, res) => {
+    try {
+      const userId = req.user.userId;
+      const { roomId } = req.params;
+      
+      console.log('🎮 Room start-game request:', { roomId, userId });
+      
+      // Get the room to verify it exists
+      const room = await storage.getRoomById(roomId);
+      if (!room) {
+        return res.status(404).json({ message: "Room not found" });
+      }
+      
+      // Check if user is room owner (only room owner can start games)
+      if (room.ownerId !== userId) {
+        return res.status(403).json({ message: "Only room owner can start games" });
+      }
+      
+      // Check if there's already an active game in this room
+      const existingGame = await storage.getActiveGameByRoomId(roomId);
+      if (existingGame && existingGame.status === 'active') {
+        console.log('🎮 Active game already exists, ending it first');
+        // End the existing game
+        await storage.updateGameStatus(existingGame.id, 'finished');
+      }
+      
+      // Get room participants
+      const participants = await storage.getRoomParticipants(roomId);
+      const players = participants.filter(p => p.role === 'player');
+      
+      if (players.length < 2) {
+        return res.status(400).json({ message: "Need 2 players to start game" });
+      }
+      
+      // Create new game with room owner as X and other player as O
+      const otherPlayer = players.find(p => p.userId !== userId);
+      if (!otherPlayer) {
+        return res.status(400).json({ message: "Could not find opponent" });
+      }
+      
+      const gameData = {
+        roomId,
+        playerXId: userId,
+        playerOId: otherPlayer.userId,
+        gameMode: 'online' as const,
+        status: 'active' as const,
+        currentPlayer: 'X' as const,
+        board: {},
+      };
+      
+      const game = await storage.createGame(gameData);
+      console.log('🎮 New game created:', game.id);
+      
+      // Get player information
+      const playerXInfo = await storage.getUser(game.playerXId);
+      const playerOInfo = await storage.getUser(game.playerOId);
+      
+      const gameWithPlayers = {
+        ...game,
+        playerXInfo,
+        playerOInfo,
+      };
+      
+      // Broadcast to all room participants
+      if (roomConnections.has(roomId)) {
+        const roomUsers = roomConnections.get(roomId)!;
+        console.log(`🎮 Broadcasting game_started to ${roomUsers.size} users in room ${roomId}`);
+        
+        roomUsers.forEach(connectionId => {
+          const connection = connections.get(connectionId);
+          if (connection && connection.ws.readyState === WebSocket.OPEN) {
+            console.log(`🎮 Sending game_started to user: ${connection.userId}`);
+            connection.ws.send(JSON.stringify({
+              type: 'game_started',
+              game: gameWithPlayers,
+              gameId: game.id,
+              roomId: roomId,
+            }));
+          }
+        });
+      }
+      
+      res.json(gameWithPlayers);
+    } catch (error) {
+      console.error("Error starting room game:", error);
+      res.status(500).json({ message: "Failed to start game" });
+    }
+  });
+
   // Game routes
   app.post('/api/games', requireAuth, async (req: any, res) => {
     try {

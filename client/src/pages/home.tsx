@@ -20,7 +20,7 @@ import { logout } from "@/lib/firebase";
 
 export default function Home() {
   const { user } = useAuth();
-  const { isConnected, lastMessage, joinRoom, leaveRoom } = useWebSocket();
+  const { isConnected, lastMessage, joinRoom, leaveRoom, sendMessage } = useWebSocket();
   const { playSound } = useAudio();
   const [selectedMode, setSelectedMode] = useState<'ai' | 'pass-play' | 'online'>('ai');
   const [currentRoom, setCurrentRoom] = useState<any>(null);
@@ -53,6 +53,11 @@ export default function Home() {
               console.log('🎮 Game state update - prev:', prevGame, 'new:', lastMessage.game);
               return lastMessage.game;
             });
+            // Reset creating state since game was successfully created
+            setIsCreatingGame(false);
+            // Also reset game over state if it was showing
+            setShowGameOver(false);
+            setGameResult(null);
           }
           break;
         case 'move':
@@ -221,13 +226,8 @@ export default function Home() {
           console.log('🎮 New game created for play again:', newGame);
           setCurrentGame(newGame);
           
-          // Broadcast new game to all room participants
-          sendMessage({
-            type: 'game_started',
-            gameId: newGame.id,
-            roomId: currentRoom.id,
-            game: newGame
-          });
+          // No need to broadcast manually, server will handle it
+          console.log('🎮 Game created successfully, server will broadcast to all participants');
           
           playSound('gameStart');
         } else {
