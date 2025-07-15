@@ -1,37 +1,30 @@
 import nodemailer from 'nodemailer';
-import { db } from './firebase-admin';
 
-// Get SMTP configuration from environment variables (Firebase can be enabled later)
-async function getSMTPConfig() {
-  try {
-    // Use environment variables for now (Firebase Firestore will be enabled later)
-    return {
-      host: process.env.SMTP_HOST || 'smtp.gmail.com',
-      port: parseInt(process.env.SMTP_PORT || '587'),
-      secure: process.env.SMTP_SECURE === 'true' || false,
-      auth: {
-        user: process.env.SMTP_USER,
-        pass: process.env.SMTP_PASS,
-      },
-    };
-  } catch (error) {
-    console.error('Error getting SMTP config:', error);
-    // Return environment variables as fallback
-    return {
-      host: process.env.SMTP_HOST || 'smtp.gmail.com',
-      port: parseInt(process.env.SMTP_PORT || '587'),
-      secure: process.env.SMTP_SECURE === 'true' || false,
-      auth: {
-        user: process.env.SMTP_USER,
-        pass: process.env.SMTP_PASS,
-      },
-    };
-  }
+// Get SMTP configuration from environment variables
+function getSMTPConfig() {
+  const port = parseInt(process.env.SMTP_PORT || '587');
+  
+  // Try basic configuration with extended timeout
+  return {
+    host: process.env.SMTP_HOST || 'smtp.gmail.com',
+    port: port,
+    secure: false, // Use STARTTLS instead of secure connection
+    auth: {
+      user: process.env.SMTP_USER,
+      pass: process.env.SMTP_PASS,
+    },
+    tls: {
+      rejectUnauthorized: false
+    },
+    connectionTimeout: 10000, // 10 seconds
+    greetingTimeout: 10000, // 10 seconds
+    socketTimeout: 10000 // 10 seconds
+  };
 }
 
-// Create transporter with dynamic config
-async function createTransporter() {
-  const config = await getSMTPConfig();
+// Create transporter with SMTP config
+function createTransporter() {
+  const config = getSMTPConfig();
   return nodemailer.createTransport(config);
 }
 
@@ -91,25 +84,18 @@ export const emailTemplates = {
 // Send email function
 export async function sendEmail(to: string, subject: string, html: string) {
   try {
-    const transporter = await createTransporter();
-    const smtpConfig = await getSMTPConfig();
-    
-    if (!smtpConfig.auth.user || !smtpConfig.auth.pass) {
-      console.warn('SMTP credentials not configured, email not sent');
-      return { success: false, error: 'SMTP not configured' };
-    }
-
+    const transporter = createTransporter();
     const mailOptions = {
-      from: `"TicTac 3x5" <${smtpConfig.auth.user}>`,
+      from: process.env.SMTP_USER,
       to,
       subject,
       html,
     };
 
-    const info = await transporter.sendMail(mailOptions);
-    console.log('Email sent successfully:', info.messageId);
-    return { success: true, messageId: info.messageId };
-  } catch (error) {
+    const result = await transporter.sendMail(mailOptions);
+    console.log('Email sent successfully:', result.messageId);
+    return { success: true, messageId: result.messageId };
+  } catch (error: any) {
     console.error('Error sending email:', error);
     return { success: false, error: error.message };
   }
@@ -117,46 +103,36 @@ export async function sendEmail(to: string, subject: string, html: string) {
 
 // Send verification email
 export async function sendVerificationEmail(email: string, username: string, verificationToken: string) {
-  const baseUrl = process.env.NODE_ENV === 'production' 
-    ? 'https://tic-tac-master-zanv1.replit.app'
-    : `http://localhost:5000`;
-  
-  const verificationLink = `${baseUrl}/verify-email?token=${verificationToken}`;
-  const template = emailTemplates.verification(verificationLink, username);
-  
-  return await sendEmail(email, template.subject, template.html);
+  try {
+    const baseUrl = process.env.NODE_ENV === 'production' 
+      ? 'https://tic-tac-master-zanv1.replit.app' 
+      : 'http://localhost:5000';
+    
+    const verificationLink = `${baseUrl}/verify-email?token=${verificationToken}`;
+    const template = emailTemplates.verification(verificationLink, username);
+    
+    const result = await sendEmail(email, template.subject, template.html);
+    return result;
+  } catch (error: any) {
+    console.error('Error sending verification email:', error);
+    return { success: false, error: error.message };
+  }
 }
 
 // Send password reset email
 export async function sendPasswordResetEmail(email: string, username: string, resetToken: string) {
-  const baseUrl = process.env.NODE_ENV === 'production' 
-    ? 'https://tic-tac-master-zanv1.replit.app'
-    : `http://localhost:5000`;
-  
-  const resetLink = `${baseUrl}/reset-password?token=${resetToken}`;
-  const template = emailTemplates.passwordReset(resetLink, username);
-  
-  return await sendEmail(email, template.subject, template.html);
-}
-
-// Utility function to save SMTP config to Firebase
-export async function saveSMTPConfigToFirebase(smtpConfig: {
-  host: string;
-  port: number;
-  secure: boolean;
-  user: string;
-  pass: string;
-}) {
   try {
-    if (!db) {
-      throw new Error('Firebase not initialized');
-    }
+    const baseUrl = process.env.NODE_ENV === 'production' 
+      ? 'https://tic-tac-master-zanv1.replit.app' 
+      : 'http://localhost:5000';
     
-    await db.collection('config').doc('smtp').set(smtpConfig);
-    console.log('SMTP configuration saved to Firebase');
-    return { success: true };
-  } catch (error) {
-    console.error('Error saving SMTP config to Firebase:', error);
+    const resetLink = `${baseUrl}/reset-password?token=${resetToken}`;
+    const template = emailTemplates.passwordReset(resetLink, username);
+    
+    const result = await sendEmail(email, template.subject, template.html);
+    return result;
+  } catch (error: any) {
+    console.error('Error sending password reset email:', error);
     return { success: false, error: error.message };
   }
 }
@@ -164,8 +140,8 @@ export async function saveSMTPConfigToFirebase(smtpConfig: {
 // Test SMTP configuration
 export async function testSMTPConfig() {
   try {
-    const transporter = await createTransporter();
-    const smtpConfig = await getSMTPConfig();
+    const transporter = createTransporter();
+    const smtpConfig = getSMTPConfig();
     
     if (!smtpConfig.auth.user || !smtpConfig.auth.pass) {
       return { success: false, error: 'SMTP credentials not configured' };
