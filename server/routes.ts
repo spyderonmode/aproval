@@ -913,7 +913,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
     });
 
-    ws.on('close', () => {
+    ws.on('close', async () => {
       console.log(`🔌 WebSocket connection closed: ${connectionId}`);
       
       // Get user info before cleaning up
@@ -927,27 +927,31 @@ export async function registerRoutes(app: Express): Promise<Server> {
         if (roomUsers.has(connectionId)) {
           roomUsers.delete(connectionId);
           
-          // Notify other users in the room about player leaving
+          // Notify other users in the room about player leaving and end the room
           if (connection) {
-            const leaveMessage = JSON.stringify({
-              type: 'player_left',
+            // Get user info for notification
+            const userInfo = await storage.getUser(connection.userId);
+            const playerName = userInfo?.displayName || userInfo?.firstName || userInfo?.username || 'A player';
+            
+            const roomEndMessage = JSON.stringify({
+              type: 'room_ended',
               roomId,
               userId: connection.userId,
-              message: `Player left the room`
+              playerName,
+              message: `${playerName} left the room`
             });
             
+            // Broadcast room end to all remaining users
             roomUsers.forEach(remainingConnectionId => {
               const remainingConnection = connections.get(remainingConnectionId);
               if (remainingConnection && remainingConnection.ws.readyState === WebSocket.OPEN) {
-                remainingConnection.ws.send(leaveMessage);
+                remainingConnection.ws.send(roomEndMessage);
               }
             });
             
-            // If room becomes empty, mark it as ended
-            if (roomUsers.size === 0) {
-              console.log(`🏠 Room ${roomId} has ended - no more users`);
-              roomConnections.delete(roomId);
-            }
+            // Clear the room immediately when someone leaves
+            console.log(`🏠 Room ${roomId} ended - player ${playerName} left`);
+            roomConnections.delete(roomId);
           }
         }
       }

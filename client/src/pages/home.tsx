@@ -151,6 +151,11 @@ export default function Home() {
           // Handle room ending - redirect to main menu
           if (currentRoom && lastMessage.roomId === currentRoom.id) {
             console.log('🎮 Room ended, redirecting to main menu');
+            toast({
+              title: "Room Ended",
+              description: `${lastMessage.playerName || 'A player'} left the room. Returning to main menu.`,
+              duration: 3000,
+            });
             resetToMainMenu();
           }
           break;

@@ -22,7 +22,19 @@ export function GameOverModal({ open, onClose, result, onPlayAgain, isCreatingGa
   // Super simple logic - no complex conditionals
   const isDraw = result.condition === 'draw';
   const winner = result.winner;
-  const winnerName = result.winnerName || (winner === 'X' ? 'Player X' : winner === 'O' ? 'AI' : 'Unknown');
+  
+  // Get proper player names and info
+  const getPlayerDisplayName = (symbol: string) => {
+    if (symbol === 'X') {
+      return result.playerXInfo?.displayName || result.playerXInfo?.firstName || result.playerXInfo?.username || 'Player X';
+    } else if (symbol === 'O') {
+      return result.playerOInfo?.displayName || result.playerOInfo?.firstName || result.playerOInfo?.username || 'Player O';
+    }
+    return 'Unknown';
+  };
+  
+  const winnerName = getPlayerDisplayName(winner);
+  const winnerInfo = winner === 'X' ? result.playerXInfo : result.playerOInfo;
 
   return (
     <div 
@@ -80,21 +92,41 @@ export function GameOverModal({ open, onClose, result, onPlayAgain, isCreatingGa
             </div>
           ) : (
             <div>
+              {/* Winner profile picture or symbol */}
               <div 
                 style={{
-                  width: '64px',
-                  height: '64px',
+                  width: '80px',
+                  height: '80px',
                   margin: '0 auto 16px',
                   backgroundColor: winner === 'X' ? '#3b82f6' : '#ef4444',
                   borderRadius: '50%',
                   display: 'flex',
                   alignItems: 'center',
-                  justifyContent: 'center'
+                  justifyContent: 'center',
+                  overflow: 'hidden',
+                  border: '4px solid #fbbf24'
                 }}
               >
-                <span style={{ fontSize: '32px', color: 'white', fontWeight: 'bold' }}>
-                  {winner}
-                </span>
+                {winnerInfo?.profilePicture ? (
+                  <img 
+                    src={winnerInfo.profilePicture} 
+                    alt={winnerName}
+                    style={{
+                      width: '100%',
+                      height: '100%',
+                      objectFit: 'cover'
+                    }}
+                  />
+                ) : (
+                  <span style={{ fontSize: '32px', color: 'white', fontWeight: 'bold' }}>
+                    {winner}
+                  </span>
+                )}
+              </div>
+              
+              {/* Crown icon for winner */}
+              <div style={{ marginBottom: '16px' }}>
+                <span style={{ fontSize: '24px' }}>👑</span>
               </div>
               
               <p style={{ fontSize: '20px', color: 'white', marginBottom: '16px' }}>
