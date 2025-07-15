@@ -59,6 +59,9 @@ export interface IStorage {
   unblockUser(blockerId: string, blockedId: string): Promise<void>;
   getBlockedUsers(userId: string): Promise<BlockedUser[]>;
   isUserBlocked(blockerId: string, blockedId: string): Promise<boolean>;
+  
+  // Player Rankings
+  getPlayerRankings(sortBy: string): Promise<any[]>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -211,47 +214,16 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getOnlineGameStats(userId: string): Promise<{ wins: number; losses: number; draws: number; totalGames: number }> {
-    // Get stats from online multiplayer games only (gameMode = 'online')
-    const [winGames] = await db
-      .select({ count: sql<number>`count(*)` })
-      .from(games)
-      .where(and(
-        eq(games.gameMode, 'online'),
-        eq(games.status, 'finished'),
-        eq(games.winnerId, userId)
-      ));
+    // Since we're properly updating user stats in the database, just return the user's stats
+    // This represents their online game performance since we only update stats for online games
+    const user = await this.getUser(userId);
+    if (!user) {
+      return { wins: 0, losses: 0, draws: 0, totalGames: 0 };
+    }
 
-    const [lossGames] = await db
-      .select({ count: sql<number>`count(*)` })
-      .from(games)
-      .where(and(
-        eq(games.gameMode, 'online'),
-        eq(games.status, 'finished'),
-        or(
-          eq(games.playerXId, userId),
-          eq(games.playerOId, userId)
-        ),
-        ne(games.winnerId, userId),
-        isNotNull(games.winnerId)
-      ));
-
-    const [drawGames] = await db
-      .select({ count: sql<number>`count(*)` })
-      .from(games)
-      .where(and(
-        eq(games.gameMode, 'online'),
-        eq(games.status, 'finished'),
-        or(
-          eq(games.playerXId, userId),
-          eq(games.playerOId, userId)
-        ),
-        isNull(games.winnerId),
-        eq(games.winCondition, 'draw')
-      ));
-
-    const wins = winGames?.count || 0;
-    const losses = lossGames?.count || 0;
-    const draws = drawGames?.count || 0;
+    const wins = user.wins || 0;
+    const losses = user.losses || 0;
+    const draws = user.draws || 0;
 
     return {
       wins,
@@ -287,6 +259,140 @@ export class DatabaseStorage implements IStorage {
       .from(blockedUsers)
       .where(and(eq(blockedUsers.blockerId, blockerId), eq(blockedUsers.blockedId, blockedId)));
     return !!blocked;
+  }
+
+  async getPlayerRankings(sortBy: string): Promise<any[]> {
+    try {
+      // Get all users with their online game stats
+      const usersWithStats = await db.select({
+        userId: users.id,
+        displayName: users.displayName,
+        firstName: users.firstName,
+        lastName: users.lastName,
+        profileImageUrl: users.profileImageUrl,
+        wins: users.wins,
+        losses: users.losses,
+        draws: users.draws,
+        createdAt: users.createdAt
+      })
+      .from(users)
+      .where(
+        sql`${users.wins} + ${users.losses} + ${users.draws} > 0`
+      );
+
+      // Calculate rankings with additional metrics
+      const rankings = await Promise.all(
+        usersWithStats.map(async (user, index) => {
+          const totalGames = user.wins + user.losses + user.draws;
+          const winRate = totalGames > 0 ? (user.wins / totalGames) * 100 : 0;
+          
+          // Get recent games for streak calculation
+          const recentGames = await db.select({
+            winnerId: games.winnerId,
+            status: games.status,
+            createdAt: games.createdAt
+          })
+          .from(games)
+          .where(
+            and(
+              or(
+                eq(games.playerXId, user.userId),
+                eq(games.playerOId, user.userId)
+              ),
+              eq(games.gameMode, 'online'),
+              eq(games.status, 'finished')
+            )
+          )
+          .orderBy(desc(games.createdAt))
+          .limit(10);
+
+          // Calculate current streak
+          let streak = 0;
+          let streakType: 'win' | 'loss' | 'draw' = 'win';
+          
+          if (recentGames.length > 0) {
+            const latestGame = recentGames[0];
+            if (latestGame.winnerId === user.userId) {
+              streakType = 'win';
+            } else if (latestGame.winnerId === null) {
+              streakType = 'draw';
+            } else {
+              streakType = 'loss';
+            }
+
+            // Count consecutive games with same result
+            for (const game of recentGames) {
+              let gameResult: 'win' | 'loss' | 'draw';
+              if (game.winnerId === user.userId) {
+                gameResult = 'win';
+              } else if (game.winnerId === null) {
+                gameResult = 'draw';
+              } else {
+                gameResult = 'loss';
+              }
+
+              if (gameResult === streakType) {
+                streak++;
+              } else {
+                break;
+              }
+            }
+          }
+
+          return {
+            userId: user.userId,
+            displayName: user.displayName,
+            firstName: user.firstName,
+            lastName: user.lastName,
+            profileImageUrl: user.profileImageUrl,
+            wins: user.wins,
+            losses: user.losses,
+            draws: user.draws,
+            totalGames,
+            winRate,
+            streak,
+            streakType,
+            rankChange: 0, // Would need previous rankings to calculate
+            createdAt: user.createdAt
+          };
+        })
+      );
+
+      // Sort rankings based on sortBy parameter
+      let sortedRankings;
+      switch (sortBy) {
+        case 'wins':
+          sortedRankings = rankings.sort((a, b) => {
+            if (b.wins !== a.wins) return b.wins - a.wins;
+            return b.winRate - a.winRate; // Secondary sort by win rate
+          });
+          break;
+        case 'totalGames':
+          sortedRankings = rankings.sort((a, b) => {
+            if (b.totalGames !== a.totalGames) return b.totalGames - a.totalGames;
+            return b.winRate - a.winRate; // Secondary sort by win rate
+          });
+          break;
+        case 'winRate':
+        default:
+          sortedRankings = rankings.sort((a, b) => {
+            if (b.winRate !== a.winRate) return b.winRate - a.winRate;
+            if (b.totalGames !== a.totalGames) return b.totalGames - a.totalGames; // Secondary sort by total games
+            return b.wins - a.wins; // Tertiary sort by wins
+          });
+          break;
+      }
+
+      // Add rank numbers
+      return sortedRankings.map((player, index) => ({
+        ...player,
+        rank: index + 1
+      }));
+      
+    } catch (error) {
+      console.error('Error fetching player rankings:', error);
+      throw error;
+    }
   }
 }
 

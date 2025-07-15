@@ -61,6 +61,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Player rankings route
+  app.get('/api/rankings', requireAuth, async (req: any, res) => {
+    try {
+      const sortBy = req.query.sortBy || 'winRate';
+      const rankings = await storage.getPlayerRankings(sortBy as string);
+      res.json(rankings);
+    } catch (error) {
+      console.error("Error fetching player rankings:", error);
+      res.status(500).json({ message: "Failed to fetch player rankings" });
+    }
+  });
+
   // Get online users
   app.get('/api/users/online', requireAuth, async (req: any, res) => {
     try {
