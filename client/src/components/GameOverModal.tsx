@@ -21,7 +21,14 @@ export function GameOverModal({ open, onClose, result, onPlayAgain, isCreatingGa
 
   const isDraw = result.condition === 'draw';
   const winnerSymbol = result.winner;
-  const winnerInfo = result.winnerInfo || (winnerSymbol === 'X' ? result.playerXInfo : result.playerOInfo);
+  
+  // Simplified winner display - no complex player info needed for local modes
+  const getWinnerName = () => {
+    if (result.winnerName) return result.winnerName;
+    if (winnerSymbol === 'X') return 'Player X';
+    if (winnerSymbol === 'O') return 'Player O';
+    return 'Unknown';
+  };
 
   return (
     <div 
@@ -80,36 +87,25 @@ export function GameOverModal({ open, onClose, result, onPlayAgain, isCreatingGa
           ) : (
             <div>
               <div style={{ width: '64px', height: '64px', margin: '0 auto 16px' }}>
-                {winnerInfo?.profileImageUrl || winnerInfo?.profilePicture ? (
-                  <img 
-                    src={winnerInfo.profileImageUrl || winnerInfo.profilePicture} 
-                    alt="Winner" 
-                    style={{
-                      width: '64px',
-                      height: '64px',
-                      borderRadius: '50%',
-                      objectFit: 'cover'
-                    }}
-                  />
-                ) : (
-                  <div 
-                    style={{
-                      width: '64px',
-                      height: '64px',
-                      backgroundColor: '#3b82f6',
-                      borderRadius: '50%',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center'
-                    }}
-                  >
-                    <User style={{ width: '32px', height: '32px', color: 'white' }} />
-                  </div>
-                )}
+                <div 
+                  style={{
+                    width: '64px',
+                    height: '64px',
+                    backgroundColor: winnerSymbol === 'X' ? '#3b82f6' : '#ef4444',
+                    borderRadius: '50%',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center'
+                  }}
+                >
+                  <span style={{ fontSize: '32px', color: 'white', fontWeight: 'bold' }}>
+                    {winnerSymbol === 'X' ? 'X' : 'O'}
+                  </span>
+                </div>
               </div>
               
               <p style={{ fontSize: '20px', color: 'white', marginBottom: '16px' }}>
-                {result.winnerName || `Player ${winnerSymbol}`} Wins!
+                {getWinnerName()} Wins!
               </p>
               
               {result.condition && result.condition !== 'draw' && (

@@ -314,9 +314,18 @@ export function GameBoard({ game, onGameOver, gameMode, user }: GameBoardProps) 
       // Add delay before showing game over for AI and pass-play
       setTimeout(() => {
         if (onGameOver) {
+          const winnerName = currentPlayer === 'X' ? 'Player X' : (gameMode === 'ai' ? 'AI' : 'Player O');
+          console.log('🎮 GameBoard sending win result:', {
+            winner: currentPlayer,
+            winnerName,
+            condition: 'diagonal',
+            board: newBoard,
+            winningPositions,
+            game: game
+          });
           onGameOver({
             winner: currentPlayer,
-            winnerName: currentPlayer === 'X' ? 'Player X' : (gameMode === 'ai' ? 'AI' : 'Player O'),
+            winnerName,
             condition: 'diagonal',
             board: newBoard,
             winningPositions,
@@ -332,6 +341,13 @@ export function GameBoard({ game, onGameOver, gameMode, user }: GameBoardProps) 
     
     if (checkDraw(newBoard)) {
       if (onGameOver) {
+        console.log('🎮 GameBoard sending draw result:', {
+          winner: null,
+          winnerName: null,
+          condition: 'draw',
+          board: newBoard,
+          game: game
+        });
         onGameOver({
           winner: null,
           winnerName: null,
@@ -438,6 +454,14 @@ export function GameBoard({ game, onGameOver, gameMode, user }: GameBoardProps) 
       // Add delay before showing game over for AI mode
       setTimeout(() => {
         if (onGameOver) {
+          console.log('🎮 GameBoard sending AI win result:', {
+            winner: 'O',
+            winnerName: 'AI',
+            condition: 'diagonal',
+            board: newBoard,
+            winningPositions,
+            game: game
+          });
           onGameOver({
             winner: 'O',
             winnerName: 'AI',
