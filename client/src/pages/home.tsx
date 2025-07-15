@@ -197,7 +197,7 @@ export default function Home() {
     if (selectedMode === 'ai' || selectedMode === 'pass-play') {
       console.log('🎮 Initializing local game for mode:', selectedMode);
       const newGame = {
-        id: 'local-game',
+        id: `local-game-${Date.now()}`,
         board: {},
         currentPlayer: 'X',
         status: 'active',
@@ -323,7 +323,7 @@ export default function Home() {
     } else {
       // For AI and pass-play modes, restart locally
       const newGame = {
-        id: Date.now().toString(),
+        id: `local-game-${Date.now()}`,
         board: {},
         currentPlayer: 'X',
         status: 'active',
@@ -332,6 +332,7 @@ export default function Home() {
         playerXInfo: user,
         playerOInfo: selectedMode === 'ai' ? { username: 'AI', displayName: 'AI Player' } : null,
         gameMode: selectedMode,
+        aiDifficulty,
         createdAt: new Date().toISOString()
       };
       
@@ -354,7 +355,7 @@ export default function Home() {
             <div className="w-8 h-8 md:w-10 md:h-10 bg-primary rounded-lg flex items-center justify-center">
               <GamepadIcon className="w-4 h-4 md:w-6 md:h-6 text-white" />
             </div>
-            <h1 className="text-lg md:text-xl font-bold">TicTac 3x5</h1>
+            <h1 className="text-lg md:text-xl font-bold">Player Dashboard</h1>
           </div>
           
           {/* User Profile */}
