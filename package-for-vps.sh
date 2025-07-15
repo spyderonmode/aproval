@@ -10,9 +10,13 @@ cd tictac-vps-deploy
 
 # Copy necessary files
 echo "📋 Copying project files..."
+
+# Copy main directories with all game logic
 cp -r ../client ./
 cp -r ../server ./
 cp -r ../shared ./
+
+# Copy configuration files
 cp ../package.json ./
 cp ../package-lock.json ./
 cp ../tsconfig.json ./
@@ -23,6 +27,19 @@ cp ../components.json ./
 cp ../drizzle.config.ts ./
 cp ../ecosystem.config.js ./
 cp ../deployment-guide.md ./
+
+# Copy additional files if they exist
+[ -f ../.gitignore ] && cp ../.gitignore ./
+[ -f ../README.md ] && cp ../README.md ./
+[ -f ../replit.md ] && cp ../replit.md ./
+
+echo "✅ Copied all project files including:"
+echo "   🎮 Game Logic: server/gameLogic.ts, server/aiPlayer.ts"
+echo "   🎯 Game Components: client/src/components/GameBoard.tsx, RoomManager.tsx"
+echo "   🔄 Real-time: server/routes.ts (WebSocket), client/src/hooks/useWebSocket.ts"
+echo "   🎵 Audio: client/src/hooks/useAudio.ts"
+echo "   🔐 Auth: server/auth.ts, server/emailService.ts"
+echo "   💾 Database: server/storage.ts, shared/schema.ts"
 
 # Create production scripts
 echo "⚙️ Creating production scripts..."
