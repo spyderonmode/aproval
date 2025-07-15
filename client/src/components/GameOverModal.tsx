@@ -119,9 +119,9 @@ export function GameOverModal({ open, onClose, result, onPlayAgain, isCreatingGa
                   border: '4px solid #fbbf24'
                 }}
               >
-                {isOnlineGame && winnerInfo?.profilePicture ? (
+                {isOnlineGame && (winnerInfo?.profilePicture || winnerInfo?.profileImageUrl) ? (
                   <img 
-                    src={winnerInfo.profilePicture} 
+                    src={winnerInfo.profilePicture || winnerInfo.profileImageUrl} 
                     alt={winnerName}
                     style={{
                       width: '100%',
