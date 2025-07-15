@@ -10,6 +10,7 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+- **Email/Username Login & Production URLs** (July 15, 2025): Updated login system to support both username and email authentication, modified email verification and password reset URLs to use production domain (tic-tac-master-zanv1.replit.app) instead of localhost
 - **Forgot Password System** (July 15, 2025): Added complete forgot password functionality with password reset endpoints, email templates for password reset, forgot password modal in auth page, dedicated reset password page, secure token-based reset system with 1-hour expiry, and SMTP email integration for password reset emails
 - **Mandatory Email Verification** (July 15, 2025): Implemented mandatory email verification system requiring users to verify their email before accessing the application, added email verification endpoints and resend functionality, created email verification modal and dedicated verification page, updated authentication flow to block unverified users, and integrated SMTP email service for verification emails
 - **Animated Borders & Spectator Limit** (July 15, 2025): Added animated pulsing borders to occupied cells using framer-motion with alternating colors based on player (blue for X, red for O), increased spectator limit from default to 50 users per room for better viewing capacity, enhanced visual feedback for active game cells with smooth border animations

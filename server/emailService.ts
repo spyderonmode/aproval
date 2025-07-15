@@ -45,7 +45,7 @@ export class EmailService {
   }
 
   async sendVerificationEmail(email: string, token: string): Promise<boolean> {
-    const verificationUrl = `${process.env.REPLIT_DOMAIN || 'http://localhost:5000'}/verify-email?token=${token}`;
+    const verificationUrl = `https://tic-tac-master-zanv1.replit.app/verify-email?token=${token}`;
     
     const html = `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
@@ -74,7 +74,7 @@ export class EmailService {
   }
 
   async sendPasswordResetEmail(email: string, token: string): Promise<boolean> {
-    const resetUrl = `${process.env.REPLIT_DOMAIN || 'http://localhost:5000'}/reset-password?token=${token}`;
+    const resetUrl = `https://tic-tac-master-zanv1.replit.app/reset-password?token=${token}`;
     
     const html = `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
