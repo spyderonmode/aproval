@@ -604,9 +604,20 @@ export function GameBoard({ game, onGameOver, gameMode, user }: GameBoardProps) 
             'rgb(34, 197, 94)',
             'transparent'
           ]
+        } : !isEmpty ? {
+          borderColor: [
+            symbol === 'X' ? 'rgb(59, 130, 246)' : 'rgb(239, 68, 68)', // blue-500 or red-500
+            'transparent',
+            symbol === 'X' ? 'rgb(59, 130, 246)' : 'rgb(239, 68, 68)',
+            'transparent'
+          ]
         } : {}}
         transition={isWinningCell ? {
           duration: 1.5,
+          repeat: Infinity,
+          ease: "easeInOut"
+        } : !isEmpty ? {
+          duration: 2,
           repeat: Infinity,
           ease: "easeInOut"
         } : {}}

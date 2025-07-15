@@ -196,9 +196,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Room is full" });
       }
       
-      // Check total room capacity based on maxPlayers setting
-      const totalCapacity = parseInt(room.maxPlayers || '2');
-      const maxSpectators = totalCapacity > 2 ? totalCapacity - 2 : 0;
+      // Check spectator limit - allow up to 50 spectators per room
+      const maxSpectators = 50;
       const spectatorCount = participants.filter(p => p.role === 'spectator').length;
       
       if (role === 'spectator' && spectatorCount >= maxSpectators) {

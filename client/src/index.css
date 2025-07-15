@@ -2,6 +2,16 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Animated border for occupied cells */
+@keyframes pulse-border {
+  0%, 100% { border-color: transparent; }
+  50% { border-color: currentColor; }
+}
+
+.animate-pulse-border {
+  animation: pulse-border 2s ease-in-out infinite;
+}
+
 /* Fix modal white screen issue */
 [data-radix-dialog-content] {
   background-color: #1e293b !important;
