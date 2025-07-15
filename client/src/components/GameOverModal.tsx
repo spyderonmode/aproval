@@ -36,9 +36,11 @@ export function GameOverModal({ open, onClose, result, onPlayAgain, isCreatingGa
     
     // For online games, use actual player info
     if (symbol === 'X') {
-      return result.playerXInfo?.displayName || result.playerXInfo?.firstName || result.playerXInfo?.username || 'Player X';
+      const playerX = result.playerXInfo;
+      return playerX?.displayName || playerX?.firstName || playerX?.username || 'Player X';
     } else if (symbol === 'O') {
-      return result.playerOInfo?.displayName || result.playerOInfo?.firstName || result.playerOInfo?.username || 'Player O';
+      const playerO = result.playerOInfo;
+      return playerO?.displayName || playerO?.firstName || playerO?.username || 'Player O';
     }
     return 'Unknown';
   };
@@ -148,8 +150,10 @@ export function GameOverModal({ open, onClose, result, onPlayAgain, isCreatingGa
         <div style={{ display: 'flex', justifyContent: 'center', gap: '12px' }}>
           <button
             onClick={() => {
+              console.log('🏠 Main Menu button clicked from GameOverModal');
               onClose();
               if (onMainMenu) {
+                console.log('🏠 Calling onMainMenu from GameOverModal');
                 onMainMenu();
               }
             }}

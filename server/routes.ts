@@ -629,7 +629,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
                 connection.ws.send(JSON.stringify({
                   type: 'game_over',
                   gameId,
-                  winner: userId,
+                  winner: playerSymbol, // Send the symbol (X or O) instead of userId
                   condition: winResult.condition,
                   board: newBoard,
                   winnerInfo: winnerInfo ? {
