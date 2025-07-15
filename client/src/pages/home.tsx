@@ -11,7 +11,7 @@ import { ProfileManager } from "@/components/ProfileManager";
 import { RoomManager } from "@/components/RoomManager";
 import { PlayerList } from "@/components/PlayerList";
 import { CreateRoomModal } from "@/components/CreateRoomModal";
-// Removed GameOverModal import to prevent white screen
+import { GameOverModal } from "@/components/GameOverModal";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -192,10 +192,13 @@ export default function Home() {
   };
 
   const resetToMainMenu = () => {
+    console.log('🏠 resetToMainMenu called');
+    
     // Leave room if currently in one - this will trigger room end notification
     if (currentRoom) {
       console.log('🏠 Leaving room from main menu:', currentRoom.id);
       console.log('🏠 User info:', user);
+      console.log('🏠 WebSocket connected:', isConnected);
       
       // Send explicit leave message to notify other players FIRST
       const leaveMessage = {
@@ -208,16 +211,25 @@ export default function Home() {
       console.log('🏠 Sending leave message:', leaveMessage);
       sendMessage(leaveMessage);
       
-      // Then leave the room
-      leaveRoom(currentRoom.id);
+      // Small delay to ensure message is sent before cleanup
+      setTimeout(() => {
+        console.log('🏠 Cleaning up after leave message sent');
+        setCurrentRoom(null);
+        setCurrentGame(null);
+        setShowGameOver(false);
+        setGameResult(null);
+        setIsCreatingGame(false);
+        setSelectedMode('ai');
+      }, 100);
+    } else {
+      console.log('🏠 No current room, just resetting state');
+      setCurrentRoom(null);
+      setCurrentGame(null);
+      setShowGameOver(false);
+      setGameResult(null);
+      setIsCreatingGame(false);
+      setSelectedMode('ai');
     }
-    
-    setCurrentRoom(null);
-    setCurrentGame(null);
-    setShowGameOver(false);
-    setGameResult(null);
-    setIsCreatingGame(false);
-    setSelectedMode('ai');
   };
 
   const handleGameStart = (game: any) => {
@@ -646,38 +658,14 @@ export default function Home() {
         onRoomCreated={handleRoomJoin}
       />
 
-      {showGameOver && gameResult && (
-        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(0,0,0,0.8)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 9999 }}>
-          <div style={{ backgroundColor: 'white', padding: '20px', borderRadius: '8px', textAlign: 'center' }}>
-            <h2 style={{ color: 'black', marginBottom: '16px' }}>Game Over!</h2>
-            {gameResult.condition === 'draw' ? (
-              <p style={{ color: 'black' }}>It's a Draw!</p>
-            ) : (
-              <p style={{ color: 'black' }}>{gameResult.winnerName || `Player ${gameResult.winner}`} Wins!</p>
-            )}
-            <div style={{ marginTop: '20px', display: 'flex', gap: '10px', justifyContent: 'center' }}>
-              <button 
-                onClick={() => {
-                  setShowGameOver(false);
-                  setGameResult(null);
-                  setCurrentGame(null);
-                  setCurrentRoom(null);
-                  setSelectedMode('ai');
-                }}
-                style={{ padding: '8px 16px', backgroundColor: '#666', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer' }}
-              >
-                Main Menu
-              </button>
-              <button 
-                onClick={handlePlayAgain}
-                style={{ padding: '8px 16px', backgroundColor: '#3b82f6', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer' }}
-              >
-                Play Again
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      <GameOverModal 
+        open={showGameOver}
+        onClose={() => setShowGameOver(false)}
+        result={gameResult}
+        onPlayAgain={handlePlayAgain}
+        isCreatingGame={isCreatingGame}
+        onMainMenu={resetToMainMenu}
+      />
     </div>
   );
 }
