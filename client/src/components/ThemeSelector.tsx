@@ -22,6 +22,9 @@ export function ThemeSelector() {
   const handleThemeSelect = (theme: GameTheme) => {
     setTheme(theme);
     setOpen(false);
+    // Close the header sidebar after theme selection
+    const closeEvent = new CustomEvent('closeHeaderSidebar');
+    window.dispatchEvent(closeEvent);
   };
 
   return (

@@ -57,22 +57,32 @@ export default function Home() {
     }
   }, [user]);
 
-  // Close header sidebar when clicking outside
+  // Close header sidebar when clicking outside or via custom event
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (headerSidebarRef.current && !headerSidebarRef.current.contains(event.target as Node)) {
-        // Check if the click is on a theme selector dialog
+        // Check if the click is on a theme selector dialog or any other modal
         const target = event.target as Element;
-        if (target.closest('[data-radix-portal]') || target.closest('[role="dialog"]')) {
-          return; // Don't close sidebar if clicking on a dialog
+        if (target.closest('[data-radix-portal]') || 
+            target.closest('[role="dialog"]') ||
+            target.closest('[data-state="open"]')) {
+          return; // Don't close sidebar if clicking on a dialog or modal
         }
         setShowHeaderSidebar(false);
       }
     };
 
+    const handleCloseHeaderSidebar = () => {
+      setShowHeaderSidebar(false);
+    };
+
     if (showHeaderSidebar) {
       document.addEventListener('mousedown', handleClickOutside);
-      return () => document.removeEventListener('mousedown', handleClickOutside);
+      window.addEventListener('closeHeaderSidebar', handleCloseHeaderSidebar);
+      return () => {
+        document.removeEventListener('mousedown', handleClickOutside);
+        window.removeEventListener('closeHeaderSidebar', handleCloseHeaderSidebar);
+      };
     }
   }, [showHeaderSidebar]);
 
@@ -584,12 +594,9 @@ export default function Home() {
                         size="sm"
                         onClick={(e) => {
                           e.stopPropagation();
-                          setShowHeaderSidebar(false);
-                          // Give a small delay to ensure sidebar is closed before opening theme selector
-                          setTimeout(() => {
-                            const event = new CustomEvent('openThemeSelector');
-                            window.dispatchEvent(event);
-                          }, 100);
+                          // Don't close the sidebar, just open theme selector
+                          const event = new CustomEvent('openThemeSelector');
+                          window.dispatchEvent(event);
                         }}
                         className="bg-slate-700 border-slate-600 text-white hover:bg-slate-600 text-xs"
                       >
