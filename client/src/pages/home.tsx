@@ -3,7 +3,7 @@ import { useWebSocket } from "@/hooks/useWebSocket";
 import { useToast } from "@/hooks/use-toast";
 // useAudio hook removed as sound effects are removed
 import { useQuery } from "@tanstack/react-query";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { GameBoard } from "@/components/GameBoard";
 import { GameModeSelector } from "@/components/GameModeSelector";
 import { ProfileManager } from "@/components/ProfileManager";
@@ -20,7 +20,7 @@ import { ThemeSelector } from "@/components/ThemeSelector";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { GamepadIcon, LogOut, User, Zap, Loader2, Users, Settings } from "lucide-react";
+import { GamepadIcon, LogOut, User, Zap, Loader2, Users, Settings, Menu, X, Palette } from "lucide-react";
 import { logout } from "@/lib/firebase";
 
 export default function Home() {
@@ -42,6 +42,8 @@ export default function Home() {
   const [showOnlineUsers, setShowOnlineUsers] = useState(false);
   const [onlineUserCount, setOnlineUserCount] = useState(0);
   const [showProfile, setShowProfile] = useState(false);
+  const [showHeaderSidebar, setShowHeaderSidebar] = useState(false);
+  const headerSidebarRef = useRef<HTMLDivElement>(null);
 
   const { data: userStats } = useQuery({
     queryKey: ["/api/users", user?.id, "stats"],
@@ -54,6 +56,20 @@ export default function Home() {
       setShowEmailVerification(true);
     }
   }, [user]);
+
+  // Close header sidebar when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (headerSidebarRef.current && !headerSidebarRef.current.contains(event.target as Node)) {
+        setShowHeaderSidebar(false);
+      }
+    };
+
+    if (showHeaderSidebar) {
+      document.addEventListener('mousedown', handleClickOutside);
+      return () => document.removeEventListener('mousedown', handleClickOutside);
+    }
+  }, [showHeaderSidebar]);
 
   useEffect(() => {
     if (lastMessage) {
@@ -529,16 +545,92 @@ export default function Home() {
                 {isConnected ? 'Online' : 'Offline'}
               </span>
             </div>
-            <Button 
-              variant="outline" 
-              size="sm"
-              onClick={() => logout()}
-              className="bg-slate-700 border-slate-600 text-white hover:bg-slate-600 px-2 md:px-4 py-1 md:py-2"
-            >
-              <LogOut className="w-3 h-3 md:w-4 md:h-4 mr-1 md:mr-2" />
-              <span className="hidden sm:inline">Logout</span>
-              <span className="sm:hidden">Out</span>
-            </Button>
+            <div className="relative" ref={headerSidebarRef}>
+              <Button 
+                variant="outline" 
+                size="sm"
+                onClick={() => setShowHeaderSidebar(!showHeaderSidebar)}
+                className="bg-slate-700 border-slate-600 text-white hover:bg-slate-600 px-2 md:px-4 py-1 md:py-2"
+              >
+                {showHeaderSidebar ? (
+                  <X className="w-3 h-3 md:w-4 md:h-4" />
+                ) : (
+                  <Menu className="w-3 h-3 md:w-4 md:h-4" />
+                )}
+                <span className="hidden sm:inline ml-1 md:ml-2">Menu</span>
+              </Button>
+              
+              {/* Header Sidebar */}
+              {showHeaderSidebar && (
+                <div className="absolute right-0 top-full mt-2 w-64 bg-slate-800 border border-slate-700 rounded-lg shadow-lg z-50">
+                  <div className="p-4 space-y-4">
+                    <div className="text-sm font-medium text-gray-300 border-b border-slate-700 pb-2">
+                      Quick Actions
+                    </div>
+                    
+                    {/* Theme Selector */}
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center space-x-2">
+                        <Palette className="w-4 h-4 text-gray-400" />
+                        <span className="text-sm text-gray-300">Theme</span>
+                      </div>
+                      <ThemeSelector />
+                    </div>
+                    
+                    {/* Online Players */}
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center space-x-2">
+                        <Users className="w-4 h-4 text-gray-400" />
+                        <span className="text-sm text-gray-300">Online Players</span>
+                      </div>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => {
+                          setShowOnlineUsers(true);
+                          setShowHeaderSidebar(false);
+                        }}
+                        className="bg-slate-700 border-slate-600 text-white hover:bg-slate-600 text-xs"
+                      >
+                        {onlineUserCount} Players
+                      </Button>
+                    </div>
+                    
+                    {/* Profile Settings */}
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center space-x-2">
+                        <Settings className="w-4 h-4 text-gray-400" />
+                        <span className="text-sm text-gray-300">Profile Settings</span>
+                      </div>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => {
+                          setShowProfile(true);
+                          setShowHeaderSidebar(false);
+                        }}
+                        className="bg-slate-700 border-slate-600 text-white hover:bg-slate-600 text-xs"
+                      >
+                        Settings
+                      </Button>
+                    </div>
+                    
+                    {/* Logout */}
+                    <div className="border-t border-slate-700 pt-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => logout()}
+                        className="w-full bg-red-700 border-red-600 text-white hover:bg-red-600 justify-start"
+                      >
+                        <LogOut className="w-4 h-4 mr-2" />
+                        Logout
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </nav>
@@ -633,38 +725,7 @@ export default function Home() {
               </CardContent>
             </Card>
 
-            {/* Settings */}
-            <Card className="bg-slate-800 border-slate-700">
-              <CardHeader>
-                <CardTitle className="text-lg flex items-center space-x-2">
-                  <Settings className="w-5 h-5" />
-                  <span>Settings</span>
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  {/* Theme Selector */}
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-gray-300">Theme</span>
-                    <ThemeSelector />
-                  </div>
-                  
-                  {/* Online Players */}
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-gray-300">Online Players</span>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => setShowOnlineUsers(true)}
-                      className="bg-slate-700 border-slate-600 text-white hover:bg-slate-600"
-                    >
-                      <Users className="w-4 h-4 mr-2" />
-                      {onlineUserCount} Players
-                    </Button>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+
 
             {/* Game Mode Selection */}
             <GameModeSelector 
@@ -831,6 +892,12 @@ export default function Home() {
         user={user}
       />
 
+      {showProfile && (
+        <ProfileManager 
+          user={user}
+          onClose={() => setShowProfile(false)}
+        />
+      )}
 
     </div>
   );
