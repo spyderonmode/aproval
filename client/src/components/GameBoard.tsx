@@ -8,9 +8,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useWebSocket } from "@/hooks/useWebSocket";
 import { isUnauthorizedError } from "@/lib/authUtils";
 import { motion } from "framer-motion"; // Added back for winning line animation
-import { Input } from "@/components/ui/input";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { MessageCircle, Send, User, X } from "lucide-react";
+import { User } from "lucide-react";
 
 const VALID_POSITIONS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15];
 
@@ -161,11 +159,6 @@ export function GameBoard({ game, onGameOver, gameMode, user }: GameBoardProps) 
   const [winningLine, setWinningLine] = useState<number[] | null>(null);
   const [lastMove, setLastMove] = useState<number | null>(null);
   
-  // Chat state for online games
-  const [showChat, setShowChat] = useState(false);
-  const [chatMessage, setChatMessage] = useState("");
-  const [chatHistory, setChatHistory] = useState<any[]>([]);
-  const [messageStatus, setMessageStatus] = useState<'idle' | 'sending' | 'sent' | 'error'>('idle');
   const [opponent, setOpponent] = useState<any>(null);
   
   // Update winning line when game has winning positions
@@ -193,89 +186,9 @@ export function GameBoard({ game, onGameOver, gameMode, user }: GameBoardProps) 
     }
   }, [game, user, gameMode]);
 
-  // Chat message mutation
-  const sendChatMutation = useMutation({
-    mutationFn: async ({ targetUserId, message }: { targetUserId: string; message: string }) => {
-      return await apiRequest('POST', '/api/chat/send', { targetUserId, message });
-    },
-    onSuccess: () => {
-      setMessageStatus('sent');
-      setTimeout(() => setMessageStatus('idle'), 2000);
-    },
-    onError: (error: any) => {
-      setMessageStatus('error');
-      setTimeout(() => setMessageStatus('idle'), 3000);
-      
-      if (isUnauthorizedError(error)) {
-        toast({
-          title: "Unauthorized",
-          description: "You are logged out. Logging in again...",
-          variant: "destructive",
-        });
-        setTimeout(() => {
-          window.location.href = "/api/login";
-        }, 500);
-        return;
-      }
-      toast({
-        title: "Error",
-        description: "Failed to send message. Please try again.",
-        variant: "destructive",
-      });
-    }
-  });
 
-  // Handle chat message sending
-  const handleSendMessage = () => {
-    if (!chatMessage.trim() || !opponent) return;
-    
-    setMessageStatus('sending');
-    
-    // Add message to chat history immediately for instant feedback
-    const newMessage = {
-      fromMe: true,
-      message: chatMessage.trim(),
-      timestamp: new Date().toLocaleTimeString(),
-      userId: user?.id,
-      senderName: 'You'
-    };
-    
-    setChatHistory(prev => [...prev, newMessage]);
-    setChatMessage('');
-    
-    sendChatMutation.mutate({
-      targetUserId: opponent.id || opponent.userId,
-      message: newMessage.message
-    });
-  };
 
-  // Handle incoming chat messages
-  useEffect(() => {
-    const handleChatMessage = (event: CustomEvent) => {
-      const data = event.detail;
-      
-      if (data.type === 'chat_message_received' && opponent) {
-        // Only show messages from the current opponent
-        if (data.message.senderId === (opponent.id || opponent.userId)) {
-          const incomingMessage = {
-            fromMe: false,
-            message: data.message.message,
-            timestamp: new Date(data.message.timestamp).toLocaleTimeString(),
-            userId: data.message.senderId,
-            senderName: data.message.senderName
-          };
-          
-          setChatHistory(prev => [...prev, incomingMessage]);
-        }
-      }
-    };
 
-    window.addEventListener('chat_message_received', handleChatMessage as EventListener);
-    
-    return () => {
-      window.removeEventListener('chat_message_received', handleChatMessage as EventListener);
-    };
-  }, [opponent]);
 
   useEffect(() => {
     if (game) {
@@ -853,7 +766,7 @@ export function GameBoard({ game, onGameOver, gameMode, user }: GameBoardProps) 
         </div>
 
         {/* Game Controls */}
-        <div className="mt-8 flex justify-center gap-4">
+        <div className="mt-8 flex justify-center">
           <Button 
             variant="destructive"
             onClick={resetGame}
@@ -861,86 +774,10 @@ export function GameBoard({ game, onGameOver, gameMode, user }: GameBoardProps) 
           >
             Reset Game
           </Button>
-          {gameMode === 'online' && opponent && (
-            <Button
-              variant="outline"
-              onClick={() => setShowChat(!showChat)}
-              className="flex items-center gap-2 relative"
-            >
-              <MessageCircle className="h-4 w-4" />
-              {showChat ? 'Hide Chat' : 'Show Chat'}
-              {messageStatus === 'sending' && (
-                <div className="absolute -top-1 -right-1 w-2 h-2 bg-yellow-500 rounded-full animate-pulse"></div>
-              )}
-              {messageStatus === 'sent' && (
-                <div className="absolute -top-1 -right-1 w-2 h-2 bg-green-500 rounded-full"></div>
-              )}
-              {messageStatus === 'error' && (
-                <div className="absolute -top-1 -right-1 w-2 h-2 bg-red-500 rounded-full"></div>
-              )}
-            </Button>
-          )}
         </div>
       </CardContent>
 
-      {/* Compact Chat Panel for Online Games */}
-      {gameMode === 'online' && opponent && showChat && (
-        <div className="border-t border-slate-700 bg-slate-900 p-3">
-          <div className="flex items-center gap-2 mb-2">
-            <MessageCircle className="h-4 w-4 text-blue-400" />
-            <span className="text-sm font-medium text-white">
-              Chat with {opponent.firstName || opponent.displayName || opponent.username}
-            </span>
-          </div>
-          
-          {/* Compact Chat Messages */}
-          <div className="h-24 overflow-y-auto border border-slate-600 rounded p-2 bg-slate-800 mb-2">
-            {chatHistory.length > 0 ? (
-              chatHistory.map((msg, index) => (
-                <div key={index} className={`text-xs mb-1 ${msg.fromMe ? 'text-blue-300' : 'text-gray-300'}`}>
-                  <span className="font-medium">{msg.fromMe ? 'You' : (opponent.firstName || opponent.displayName || opponent.username)}: </span>
-                  {msg.message}
-                </div>
-              ))
-            ) : (
-              <div className="text-xs text-gray-400">No messages yet</div>
-            )}
-          </div>
 
-          {/* Compact Message Input */}
-          <div className="flex gap-2">
-            <Input
-              value={chatMessage}
-              onChange={(e) => setChatMessage(e.target.value)}
-              placeholder="Type message..."
-              className="flex-1 h-8 text-sm bg-slate-800 border-slate-600 text-white placeholder-gray-400"
-              onKeyPress={(e) => {
-                if (e.key === 'Enter') {
-                  handleSendMessage();
-                }
-              }}
-              disabled={sendChatMutation.isPending}
-            />
-            <Button
-              size="sm"
-              onClick={handleSendMessage}
-              disabled={!chatMessage.trim() || sendChatMutation.isPending}
-              className={`h-8 px-2 text-white ${
-                messageStatus === 'sending' ? 'bg-yellow-600' :
-                messageStatus === 'sent' ? 'bg-green-600' :
-                messageStatus === 'error' ? 'bg-red-600' :
-                'bg-blue-600 hover:bg-blue-700'
-              }`}
-            >
-              {messageStatus === 'sending' ? (
-                <div className="h-3 w-3 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-              ) : (
-                <Send className="h-3 w-3" />
-              )}
-            </Button>
-          </div>
-        </div>
-      )}
     </Card>
   );
 }
