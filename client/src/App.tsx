@@ -64,10 +64,8 @@ function Router() {
     );
   }
 
-  // If user is authenticated but email is not verified, redirect to auth for verification
-  if (isAuthenticated && user && !user.isEmailVerified) {
-    return <Auth />;
-  }
+  // Allow users to access the app even if email is not verified
+  // Email verification is handled within the Home component itself
 
   return (
     <Switch>

@@ -266,14 +266,14 @@ export function setupAuth(app: Express) {
       return res.status(401).json({ error: 'Invalid username/email or password' });
     }
 
-    // Check if email is verified (mandatory)
-    if (!user.isEmailVerified) {
-      return res.status(403).json({ 
-        error: 'Email verification required',
-        message: 'Please verify your email before logging in. Check your email for the verification link.',
-        needsVerification: true 
-      });
-    }
+    // Email verification is optional - users can still access the app
+    // if (!user.isEmailVerified) {
+    //   return res.status(403).json({ 
+    //     error: 'Email verification required',
+    //     message: 'Please verify your email before logging in. Check your email for the verification link.',
+    //     needsVerification: true 
+    //   });
+    // }
 
     // Ensure user exists in database
     try {
