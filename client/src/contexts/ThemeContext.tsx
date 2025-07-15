@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 
-export type GameTheme = 'default' | 'neon' | 'aurora' | 'minimalist' | 'nature' | 'space';
+export type GameTheme = 'default' | 'neon' | 'autumn' | 'minimalist' | 'nature' | 'space';
 
 interface ThemeContextType {
   currentTheme: GameTheme;
@@ -47,18 +47,18 @@ const themes = {
     borderColor: 'border-cyan-500',
     winningCellStyle: 'bg-gradient-to-br from-cyan-400 to-pink-500 shadow-lg shadow-cyan-400/50 border-cyan-300'
   },
-  aurora: {
-    name: 'Aurora',
-    description: 'Animated northern lights theme',
-    boardStyle: 'aurora-board border-purple-500 shadow-lg shadow-purple-500/30',
-    cellStyle: 'aurora-cell border-purple-400 text-white hover:shadow-lg hover:shadow-purple-400/50 transition-all duration-500',
-    cellHoverStyle: 'hover:shadow-lg hover:shadow-purple-400/50 transition-all duration-500',
-    playerXColor: 'text-pink-300 aurora-text',
-    playerOColor: 'text-green-300 aurora-text',
-    backgroundColor: 'bg-gradient-to-br from-purple-950 via-indigo-950 to-blue-950',
-    textColor: 'text-white',
-    borderColor: 'border-purple-500',
-    winningCellStyle: 'bg-gradient-to-br from-pink-400 via-purple-500 to-green-400 shadow-lg shadow-pink-400/50 animate-pulse border-pink-300'
+  autumn: {
+    name: 'Autumn',
+    description: 'Warm autumn colors theme',
+    boardStyle: 'bg-gradient-to-br from-orange-100 to-amber-100 border-orange-300 shadow-lg shadow-orange-200/50',
+    cellStyle: 'bg-gradient-to-br from-orange-50 to-amber-50 border-orange-200 text-orange-900 hover:from-orange-100 hover:to-amber-100 transition-all duration-300',
+    cellHoverStyle: 'hover:from-orange-100 hover:to-amber-100 transition-all duration-300',
+    playerXColor: 'text-red-700 font-semibold',
+    playerOColor: 'text-amber-700 font-semibold',
+    backgroundColor: 'bg-gradient-to-br from-orange-50 to-amber-50',
+    textColor: 'text-orange-900',
+    borderColor: 'border-orange-300',
+    winningCellStyle: 'bg-gradient-to-br from-red-200 to-orange-200 shadow-md shadow-red-200/50 border-red-300'
   },
   minimalist: {
     name: 'Minimalist',
