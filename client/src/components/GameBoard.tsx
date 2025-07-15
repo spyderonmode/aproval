@@ -7,7 +7,7 @@ import { useToast } from "@/hooks/use-toast";
 // useAudio hook removed as sound effects are removed
 import { useWebSocket } from "@/hooks/useWebSocket";
 import { isUnauthorizedError } from "@/lib/authUtils";
-// Removed framer-motion animations for instant move display
+import { motion } from "framer-motion"; // Added back for winning line animation
 
 const VALID_POSITIONS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15];
 
