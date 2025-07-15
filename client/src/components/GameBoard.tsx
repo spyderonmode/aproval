@@ -313,24 +313,30 @@ export function GameBoard({ game, onGameOver, gameMode, user }: GameBoardProps) 
       
       // Add delay before showing game over for AI and pass-play
       setTimeout(() => {
-        onGameOver({
-          winner: currentPlayer,
-          winnerName: winnerInfo,
-          condition: 'diagonal',
-          board: newBoard,
-          winningPositions
-        });
+        if (onGameOver) {
+          onGameOver({
+            winner: currentPlayer,
+            winnerName: winnerInfo,
+            condition: 'diagonal',
+            board: newBoard,
+            winningPositions,
+            game: game // Pass game object to prevent white screen
+          });
+        }
       }, gameMode === 'ai' || gameMode === 'pass-play' ? 2500 : 0);
       return;
     }
     
     if (checkDraw(newBoard)) {
-      onGameOver({
-        winner: null,
-        winnerName: null,
-        condition: 'draw',
-        board: newBoard
-      });
+      if (onGameOver) {
+        onGameOver({
+          winner: null,
+          winnerName: null,
+          condition: 'draw',
+          board: newBoard,
+          game: game // Pass game object to prevent white screen
+        });
+      }
       return;
     }
     

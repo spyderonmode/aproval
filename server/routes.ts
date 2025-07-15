@@ -509,7 +509,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.log(`- Board: ${JSON.stringify(game.board)}`);
 
       if (game.status !== 'active') {
-        return res.status(400).json({ message: "Game is not active" });
+        console.log(`❌ MOVE REJECTED: Game status is ${game.status}, not active`);
+        return res.status(400).json({ message: `Game is not active (status: ${game.status})` });
       }
 
       // Validate it's the player's turn

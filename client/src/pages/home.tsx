@@ -247,8 +247,30 @@ export default function Home() {
     }
   }, [user]);
 
+  // Update AI difficulty when changed
+  useEffect(() => {
+    if (currentGame && selectedMode === 'ai') {
+      console.log('🎮 AI difficulty changed, updating game');
+      const updatedGame = {
+        ...currentGame,
+        aiDifficulty,
+        playerOInfo: {
+          displayName: `AI (${aiDifficulty})`,
+          firstName: `AI (${aiDifficulty})`,
+          username: `AI (${aiDifficulty})`
+        }
+      };
+      setCurrentGame(updatedGame);
+    }
+  }, [aiDifficulty, selectedMode]);
+
   const handleGameOver = (result: any) => {
     // Sound effects removed as requested
+    console.log('🎮 Game over result:', result);
+    // Ensure game stays available to prevent white screen
+    if (result.game) {
+      setCurrentGame(result.game);
+    }
     setGameResult(result);
     setShowGameOver(true);
   };
