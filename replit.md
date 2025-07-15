@@ -10,6 +10,7 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+- **Custom Theme System** (July 15, 2025): Added comprehensive theme system with 6 visual styles (Default, Neon, Retro, Minimalist, Nature, Space) - players can customize game board appearance, colors, and styling through theme selector in header. Themes persist in localStorage and dynamically update all game components including cells, player indicators, and UI elements
 - **Chat System Removed from Game Board** (July 15, 2025): Removed in-game chat functionality from the game board component to keep the gaming experience focused and clean. Chat functionality remains available in the main lobby through the Online Players modal
 - **Unread Message Indicator** (July 15, 2025): Added red circular badge on Chat buttons showing number of unread messages, with automatic clearing when starting a conversation and proper cleanup when users go offline
 - **Real-time Chat System** (July 15, 2025): Replaced invitation system with comprehensive chat functionality - players can now message each other in real-time through the Online Players modal, with proper message display, WebSocket integration, and custom event handling for seamless communication

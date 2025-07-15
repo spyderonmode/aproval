@@ -15,6 +15,7 @@ import { GameOverModal } from "@/components/GameOverModal";
 import { EmailVerificationModal } from "@/components/EmailVerificationModal";
 import { MatchmakingModal } from "@/components/MatchmakingModal";
 import { OnlineUsersModal } from "@/components/OnlineUsersModal";
+import { ThemeSelector } from "@/components/ThemeSelector";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -531,6 +532,7 @@ export default function Home() {
                 {isConnected ? 'Online' : 'Offline'}
               </span>
             </div>
+            <ThemeSelector />
             <Button
               variant="outline"
               size="sm"

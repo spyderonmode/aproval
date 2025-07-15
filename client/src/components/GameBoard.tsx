@@ -8,6 +8,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useWebSocket } from "@/hooks/useWebSocket";
 import { isUnauthorizedError } from "@/lib/authUtils";
 import { motion } from "framer-motion"; // Added back for winning line animation
+import { useTheme } from "@/contexts/ThemeContext";
 import { User } from "lucide-react";
 
 const VALID_POSITIONS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15];
@@ -168,6 +169,7 @@ export function GameBoard({ game, onGameOver, gameMode, user }: GameBoardProps) 
     }
   }, [game?.winningPositions]);
   const { toast } = useToast();
+  const { currentTheme, themes } = useTheme();
   // Sound effects removed as requested
   const { lastMessage } = useWebSocket();
   const queryClient = useQueryClient();
@@ -594,11 +596,10 @@ export function GameBoard({ game, onGameOver, gameMode, user }: GameBoardProps) 
       <motion.div
         key={position}
         className={`
-          w-10 h-10 sm:w-12 sm:h-12 md:w-16 md:h-16 bg-slate-700 rounded-lg flex items-center justify-center cursor-pointer 
-          border-2 border-transparent hover:border-primary
-          ${isEmpty ? 'hover:bg-slate-600' : 'cursor-not-allowed'}
+          w-10 h-10 sm:w-12 sm:h-12 md:w-16 md:h-16 ${theme.cellStyle} rounded-lg flex items-center justify-center cursor-pointer 
+          ${isEmpty ? theme.cellHoverStyle : 'cursor-not-allowed'}
           ${makeMoveMutation.isPending ? 'opacity-50' : ''}
-          ${isWinningCell ? 'bg-green-600 border-green-400' : ''}
+          ${isWinningCell ? theme.winningCellStyle : ''}
           ${isLastMove ? 'ring-2 ring-yellow-400' : ''}
           ${!isEmpty && !isWinningCell && symbol === 'X' ? 'animate-pulse-border-x' : ''}
           ${!isEmpty && !isWinningCell && symbol === 'O' ? 'animate-pulse-border-o' : ''}
@@ -637,13 +638,13 @@ export function GameBoard({ game, onGameOver, gameMode, user }: GameBoardProps) 
         {symbol && (
           <span
             className={`text-lg sm:text-xl md:text-2xl font-bold ${
-              symbol === 'X' ? 'text-blue-500' : 'text-red-500'
+              symbol === 'X' ? theme.playerXColor : theme.playerOColor
             }`}
           >
             {symbol}
           </span>
         )}
-        <span className="text-xs text-gray-500 absolute mt-8 sm:mt-10 md:mt-12">{position}</span>
+        <span className={`text-xs ${theme.textColor} opacity-50 absolute mt-8 sm:mt-10 md:mt-12`}>{position}</span>
       </motion.div>
     );
   };
@@ -676,15 +677,17 @@ export function GameBoard({ game, onGameOver, gameMode, user }: GameBoardProps) 
     };
   };
 
+  const theme = themes[currentTheme];
+  
   return (
-    <Card className="bg-slate-800 border-slate-700">
+    <Card className={`${theme.boardStyle}`}>
       <CardHeader>
         <div className="flex items-start justify-between">
-          <CardTitle className="text-2xl">Game Board</CardTitle>
+          <CardTitle className={`text-2xl ${theme.textColor}`}>Game Board</CardTitle>
           <div className="flex flex-col space-y-3 text-right">
             {/* Player X - Top */}
             <div className="flex items-center justify-end space-x-2">
-              <span className="text-sm text-gray-300 max-w-24 truncate">
+              <span className={`text-sm ${theme.textColor} max-w-24 truncate`}>
                 {gameMode === 'online' 
                   ? (game?.playerXInfo?.firstName || game?.playerXInfo?.displayName || game?.playerXInfo?.username || 'Player X')
                   : 'Player X'}
@@ -705,7 +708,7 @@ export function GameBoard({ game, onGameOver, gameMode, user }: GameBoardProps) 
             
             {/* Player O - Bottom */}
             <div className="flex items-center justify-end space-x-2">
-              <span className="text-sm text-gray-300 max-w-24 truncate">
+              <span className={`text-sm ${theme.textColor} max-w-24 truncate`}>
                 {gameMode === 'online' 
                   ? (game?.playerOInfo?.firstName || game?.playerOInfo?.displayName || game?.playerOInfo?.username || 'Player O')
                   : (gameMode === 'ai' ? 'AI' : 'Player O')}
@@ -729,12 +732,12 @@ export function GameBoard({ game, onGameOver, gameMode, user }: GameBoardProps) 
       
       <CardContent>
         {/* Current Player Indicator */}
-        <div className="mb-6 p-4 bg-slate-700 rounded-lg">
+        <div className={`mb-6 p-4 ${theme.cellStyle.split(' ')[0]} ${theme.borderColor} border rounded-lg`}>
           <div className="flex items-center justify-center space-x-3">
             <div className={`w-4 h-4 rounded-full ${
               currentPlayer === 'X' ? 'bg-blue-500' : 'bg-red-500'
             }`}></div>
-            <span className="text-lg font-medium">
+            <span className={`text-lg font-medium ${theme.textColor}`}>
               {gameMode === 'online' 
                 ? (currentPlayer === 'X' 
                     ? (game?.playerXInfo?.firstName || game?.playerXInfo?.displayName || game?.playerXInfo?.username || 'Player X')
