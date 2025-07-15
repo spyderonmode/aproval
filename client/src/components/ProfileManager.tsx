@@ -8,7 +8,6 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
 import { isUnauthorizedError } from "@/lib/authUtils";
-
 import { User, Upload, X } from "lucide-react";
 
 interface ProfileManagerProps {
@@ -200,8 +199,6 @@ export function ProfileManager({ user, onClose }: ProfileManagerProps) {
               className="bg-gray-100 dark:bg-gray-800"
             />
           </div>
-
-
 
           <div className="flex justify-end space-x-2 pt-4">
             <Button type="button" variant="outline" onClick={onClose}>

@@ -10,7 +10,6 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
-- **Customizable Profile Theme System** (July 15, 2025): Implemented complete theme customization system with color picker, allowing users to personalize their profile with custom colors. Features include 6 preset themes, custom color picker for 5 color properties, live preview, and proper database storage
 - **Profile Update Session Fix** (July 15, 2025): Fixed issue where users were getting logged out after updating their profile (display name/profile picture). Updated profile endpoint to sync changes to both JSON file and database, and properly maintain session data to keep users logged in after profile updates
 - **Complete Matchmaking System** (July 15, 2025): Implemented full matchmaking system with Quick Match button, real-time search modal with timer and progress bar, automatic player pairing when 2 players search, WebSocket-based match notifications, and automatic room creation for matched players
 - **Email/Username Login & Production URLs** (July 15, 2025): Updated login system to support both username and email authentication, modified email verification and password reset URLs to use production domain (tic-tac-master-zanv1.replit.app) instead of localhost

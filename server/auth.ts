@@ -14,7 +14,6 @@ interface User {
   email?: string;
   displayName?: string;
   profilePicture?: string;
-
   isEmailVerified?: boolean;
   emailVerificationToken?: string;
   emailVerificationExpiry?: Date;
@@ -222,7 +221,6 @@ export function setupAuth(app: Express) {
           firstName: user.displayName || user.username || 'Anonymous',
           lastName: null,
           profileImageUrl: user.profilePicture || null,
-          profileTheme: user.profileTheme || null,
         });
       } catch (error) {
         console.error('Error syncing new user to database:', error);
@@ -285,7 +283,6 @@ export function setupAuth(app: Express) {
         firstName: user.displayName || user.username || 'Anonymous',
         lastName: null,
         profileImageUrl: user.profilePicture || null,
-        profileTheme: user.profileTheme || null,
       });
       console.log('User synced to database:', user.id);
     } catch (error) {
@@ -326,7 +323,6 @@ export function setupAuth(app: Express) {
       username: user.username,
       displayName: user.displayName,
       profilePicture: user.profilePicture,
-      profileTheme: user.profileTheme,
       email: user.email,
       isEmailVerified: user.isEmailVerified
     });
@@ -412,14 +408,13 @@ export function setupAuth(app: Express) {
       return res.status(401).json({ error: 'Not authenticated' });
     }
     
-    const { displayName, profilePicture, profileTheme } = req.body;
+    const { displayName, profilePicture } = req.body;
     const userId = req.session.user.userId;
     
     try {
       const updates: Partial<User> = {};
       if (displayName !== undefined) updates.displayName = displayName;
       if (profilePicture !== undefined) updates.profilePicture = profilePicture;
-      if (profileTheme !== undefined) updates.profileTheme = profileTheme;
       
       // Update user in JSON file
       const updatedUser = updateUser(userId, updates);
@@ -435,7 +430,6 @@ export function setupAuth(app: Express) {
           firstName: updatedUser.displayName || updatedUser.username || 'Anonymous',
           lastName: null,
           profileImageUrl: updatedUser.profilePicture || null,
-          profileTheme: updatedUser.profileTheme || null,
         });
         console.log('User profile synced to database:', updatedUser.id);
       } catch (error) {
@@ -447,8 +441,7 @@ export function setupAuth(app: Express) {
       req.session.user = {
         ...req.session.user,
         displayName: updatedUser.displayName,
-        profilePicture: updatedUser.profilePicture,
-        profileTheme: updatedUser.profileTheme
+        profilePicture: updatedUser.profilePicture
       };
       
       res.json({
@@ -456,7 +449,6 @@ export function setupAuth(app: Express) {
         username: updatedUser.username,
         displayName: updatedUser.displayName,
         profilePicture: updatedUser.profilePicture,
-        profileTheme: updatedUser.profileTheme,
         email: updatedUser.email,
         isEmailVerified: updatedUser.isEmailVerified
       });
