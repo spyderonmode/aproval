@@ -51,7 +51,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get('/api/users/:id/online-stats', requireAuth, async (req: any, res) => {
     try {
       const userId = req.params.id;
+      console.log('Fetching online stats for user:', userId);
       const stats = await storage.getOnlineGameStats(userId);
+      console.log('Retrieved stats:', stats);
       res.json(stats);
     } catch (error) {
       console.error("Error fetching online game stats:", error);
@@ -62,7 +64,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Get online users
   app.get('/api/users/online', requireAuth, async (req: any, res) => {
     try {
-      const currentUserId = req.user.userId;
+      const currentUserId = req.session.user.userId;
       const onlineUsersList = Array.from(onlineUsers.values())
         .filter(user => user.userId !== currentUserId);
       
@@ -97,7 +99,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post('/api/users/block', requireAuth, async (req: any, res) => {
     try {
       const { userId } = req.body;
-      const blockerId = req.user.userId;
+      const blockerId = req.session.user.userId;
       
       if (blockerId === userId) {
         return res.status(400).json({ error: 'Cannot block yourself' });
@@ -115,7 +117,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post('/api/users/unblock', requireAuth, async (req: any, res) => {
     try {
       const { userId } = req.body;
-      const blockerId = req.user.userId;
+      const blockerId = req.session.user.userId;
       
       await storage.unblockUser(blockerId, userId);
       res.json({ success: true, message: 'User unblocked successfully' });
@@ -128,7 +130,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Get blocked users endpoint
   app.get('/api/users/blocked', requireAuth, async (req: any, res) => {
     try {
-      const userId = req.user.userId;
+      const userId = req.session.user.userId;
       const blockedUsers = await storage.getBlockedUsers(userId);
       res.json(blockedUsers);
     } catch (error) {
@@ -141,7 +143,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post('/api/chat/send', requireAuth, async (req: any, res) => {
     try {
       const { targetUserId, message } = req.body;
-      const senderId = req.user.userId;
+      const senderId = req.session.user.userId;
 
       // Check if sender is blocked by target user
       const isBlocked = await storage.isUserBlocked(targetUserId, senderId);
@@ -212,7 +214,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Online matchmaking endpoint
   app.post('/api/matchmaking/join', requireAuth, async (req: any, res) => {
     try {
-      const userId = req.user.userId;
+      const userId = req.session.user.userId;
       
       // Check if user is already in queue
       if (matchmakingQueue.includes(userId)) {
@@ -306,7 +308,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Leave matchmaking queue
   app.post('/api/matchmaking/leave', requireAuth, async (req: any, res) => {
     try {
-      const userId = req.user.userId;
+      const userId = req.session.user.userId;
       const index = matchmakingQueue.indexOf(userId);
       if (index > -1) {
         matchmakingQueue.splice(index, 1);
@@ -322,7 +324,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Room routes
   app.post('/api/rooms', requireAuth, async (req: any, res) => {
     try {
-      const userId = req.user.userId;
+      const userId = req.session.user.userId;
       const roomData = insertRoomSchema.parse(req.body);
       
       const room = await storage.createRoom({
@@ -346,7 +348,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post('/api/rooms/:code/join', requireAuth, async (req: any, res) => {
     try {
-      const userId = req.user.userId;
+      const userId = req.session.user.userId;
       const { code } = req.params;
       const { role = 'player' } = req.body;
 
@@ -404,7 +406,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Start game in a room
   app.post('/api/rooms/:roomId/start-game', requireAuth, async (req: any, res) => {
     try {
-      const userId = req.user.userId;
+      const userId = req.session.user.userId;
       const { roomId } = req.params;
       
       console.log('🎮 Room start-game request:', { roomId, userId });
@@ -498,7 +500,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Game routes
   app.post('/api/games', requireAuth, async (req: any, res) => {
     try {
-      const userId = req.user.userId;
+      const userId = req.session.user.userId;
       console.log('Game creation request:', req.body);
       console.log('User ID:', userId);
       
@@ -668,7 +670,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post('/api/games/:id/moves', requireAuth, async (req: any, res) => {
     try {
-      const userId = req.user.userId;
+      const userId = req.session.user.userId;
       const { id: gameId } = req.params;
       const { position } = req.body;
 
