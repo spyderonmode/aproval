@@ -110,19 +110,27 @@ export default function Home() {
           console.log('🎮 Current room ID:', currentRoom?.id);
           console.log('🎮 Message room ID:', lastMessage.roomId);
           console.log('🎮 Game data:', lastMessage.game);
+          console.log('🎮 Current user ID:', user?.userId || user?.id);
           // Handle game start from WebSocket - ensure both players transition
           if (lastMessage.roomId === currentRoom?.id) {
             console.log('🎮 Setting current game from WebSocket:', lastMessage.game);
             console.log('🎮 New game ID:', lastMessage.game.id);
             console.log('🎮 Previous game ID:', currentGame?.id);
+            console.log('🎮 Game status:', lastMessage.game.status);
+            console.log('🎮 Game board:', lastMessage.game.board);
+            console.log('🎮 Player X ID:', lastMessage.game.playerXId);
+            console.log('🎮 Player O ID:', lastMessage.game.playerOId);
+            console.log('🎮 Current player:', lastMessage.game.currentPlayer);
             // Force complete state update to ensure game appears
             setCurrentGame(prevGame => {
               console.log('🎮 Game state update - prev:', prevGame, 'new:', lastMessage.game);
               // Force a complete new game object to ensure React re-renders
-              return {
+              const newGame = {
                 ...lastMessage.game,
                 timestamp: Date.now() // Force re-render
               };
+              console.log('🎮 Final game object being set:', newGame);
+              return newGame;
             });
             // Reset creating state since game was successfully created
             setIsCreatingGame(false);
@@ -686,7 +694,7 @@ export default function Home() {
                   </span>
                 </div>
                 <GameBoard 
-                  key={`${currentGame?.id}-${JSON.stringify(currentGame?.board)}`}
+                  key={`${currentGame?.id}-${currentGame?.timestamp || Date.now()}`}
                   game={currentGame}
                   onGameOver={handleGameOver}
                   gameMode={selectedMode}

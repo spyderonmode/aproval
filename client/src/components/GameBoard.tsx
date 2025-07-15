@@ -195,6 +195,7 @@ export function GameBoard({ game, onGameOver, gameMode, user }: GameBoardProps) 
   useEffect(() => {
     if (game) {
       console.log('🎮 Game prop changed:', game);
+      console.log('🎮 Game ID:', game.id);
       console.log('📋 Setting board to:', game.board || {});
       console.log('👤 Player X Info:', game.playerXInfo);
       console.log('👤 Player O Info:', game.playerOInfo);
@@ -205,6 +206,11 @@ export function GameBoard({ game, onGameOver, gameMode, user }: GameBoardProps) 
         return newBoard;
       });
       setCurrentPlayer(game.currentPlayer || 'X');
+      // Clear winning line and last move for new games
+      if (game.board && Object.keys(game.board).length === 0) {
+        setWinningLine(null);
+        setLastMove(null);
+      }
     }
   }, [game]);
 
@@ -231,6 +237,15 @@ export function GameBoard({ game, onGameOver, gameMode, user }: GameBoardProps) 
       
       console.log('🎯 Making move with game ID:', game.id);
       console.log('🎯 Current game state:', game);
+      console.log('🎯 Game status:', game.status);
+      console.log('🎯 Game board:', game.board);
+      
+      // Additional safety check - ensure we have the latest game state
+      if (game.status === 'finished') {
+        console.log('❌ Attempting to move on finished game:', game.id);
+        throw new Error('Game is finished');
+      }
+      
       return await apiRequest('POST', `/api/games/${game.id}/moves`, { position });
     },
     onSuccess: (data) => {
