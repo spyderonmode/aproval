@@ -199,12 +199,10 @@ export function GameBoard({ game, onGameOver, gameMode, user }: GameBoardProps) 
       console.log('📋 Setting board to:', game.board || {});
       console.log('👤 Player X Info:', game.playerXInfo);
       console.log('👤 Player O Info:', game.playerOInfo);
-      // Force board state update
-      setBoard(prevBoard => {
-        const newBoard = game.board || {};
-        console.log('📋 Board update - prev:', prevBoard, 'new:', newBoard);
-        return newBoard;
-      });
+      // Force board state update - always update regardless of previous state
+      const newBoard = game.board || {};
+      console.log('📋 Board update - setting to:', newBoard);
+      setBoard(newBoard);
       setCurrentPlayer(game.currentPlayer || 'X');
       // Clear winning line and last move for new games
       if (game.board && Object.keys(game.board).length === 0) {
@@ -212,7 +210,7 @@ export function GameBoard({ game, onGameOver, gameMode, user }: GameBoardProps) 
         setLastMove(null);
       }
     }
-  }, [game]);
+  }, [game, game?.board, game?.currentPlayer]);
 
   // Remove WebSocket handling from GameBoard - it's now handled in Home component
   // This prevents double handling and state conflicts
@@ -255,6 +253,8 @@ export function GameBoard({ game, onGameOver, gameMode, user }: GameBoardProps) 
         // No need to update local state here
         console.log('✅ Move successful, WebSocket will handle board update');
       }
+      // Force a re-render to ensure the board shows the latest state
+      setBoard(prevBoard => ({ ...prevBoard }));
     },
     onError: (error) => {
       console.log('❌ Move mutation error:', error);
@@ -337,7 +337,8 @@ export function GameBoard({ game, onGameOver, gameMode, user }: GameBoardProps) 
       return VALID_POSITIONS.every(pos => board[pos.toString()]);
     };
     
-    // Update board state once
+    // Update board state and force render
+    console.log('🎮 LocalMove: Updating board from', board, 'to', newBoard);
     setBoard(newBoard);
     
     if (checkWin(newBoard, currentPlayer)) {
@@ -429,7 +430,9 @@ export function GameBoard({ game, onGameOver, gameMode, user }: GameBoardProps) 
     const newBoard = { ...currentBoard };
     newBoard[selectedMove.toString()] = 'O';
     
+    console.log('🎮 AI Move: Updating board from', currentBoard, 'to', newBoard);
     setBoard(newBoard);
+    setLastMove(selectedMove);
     
     // Check for AI win using same logic
     const checkWin = (board: Record<string, string>, player: string) => {
