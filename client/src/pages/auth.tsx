@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
 import { EmailVerificationModal } from "@/components/EmailVerificationModal";
+import { ForgotPasswordModal } from "@/components/ForgotPasswordModal";
 import { GamepadIcon, Mail } from "lucide-react";
 
 export default function Auth() {
@@ -16,6 +17,7 @@ export default function Auth() {
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [showEmailVerification, setShowEmailVerification] = useState(false);
+  const [showForgotPassword, setShowForgotPassword] = useState(false);
   const [registrationEmail, setRegistrationEmail] = useState("");
   const { toast } = useToast();
   const [, setLocation] = useLocation();
@@ -182,7 +184,18 @@ export default function Auth() {
               </Button>
             </form>
             
-            <div className="text-center">
+            <div className="text-center space-y-2">
+              {isLogin && (
+                <Button
+                  type="button"
+                  variant="link"
+                  className="text-slate-400 hover:text-white text-sm"
+                  onClick={() => setShowForgotPassword(true)}
+                >
+                  Forgot password?
+                </Button>
+              )}
+              
               <Button
                 type="button"
                 variant="link"
@@ -203,6 +216,13 @@ export default function Auth() {
           <EmailVerificationModal 
             email={registrationEmail}
             onClose={() => setShowEmailVerification(false)}
+          />
+        )}
+        
+        {/* Forgot Password Modal */}
+        {showForgotPassword && (
+          <ForgotPasswordModal 
+            onClose={() => setShowForgotPassword(false)}
           />
         )}
       </div>

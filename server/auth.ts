@@ -17,6 +17,8 @@ interface User {
   isEmailVerified?: boolean;
   emailVerificationToken?: string;
   emailVerificationExpiry?: Date;
+  passwordResetToken?: string;
+  passwordResetExpiry?: Date;
   createdAt: string;
 }
 
@@ -149,6 +151,21 @@ async function sendVerificationEmail(email: string, token: string): Promise<void
     await emailService.sendVerificationEmail(email, token);
   } catch (error) {
     console.error('Failed to send verification email:', error);
+    throw error;
+  }
+}
+
+async function sendPasswordResetEmail(email: string, token: string): Promise<void> {
+  const emailService = createEmailService();
+  if (!emailService) {
+    console.log('Email service not configured - password reset email not sent');
+    return;
+  }
+  
+  try {
+    await emailService.sendPasswordResetEmail(email, token);
+  } catch (error) {
+    console.error('Failed to send password reset email:', error);
     throw error;
   }
 }
@@ -438,6 +455,81 @@ export function setupAuth(app: Express) {
     } catch (error) {
       console.error('Error sending verification email:', error);
       res.status(500).json({ error: 'Failed to send verification email' });
+    }
+  });
+
+  // Forgot password endpoint
+  app.post('/api/auth/forgot-password', async (req, res) => {
+    const { email } = req.body;
+
+    if (!email) {
+      return res.status(400).json({ error: 'Email is required' });
+    }
+
+    const user = findUserByEmail(email);
+    if (!user) {
+      // Don't reveal if email exists or not for security
+      return res.json({ message: 'If an account with this email exists, a password reset link has been sent.' });
+    }
+
+    try {
+      const resetToken = crypto.randomUUID();
+      const resetExpiry = new Date(Date.now() + 60 * 60 * 1000); // 1 hour
+
+      updateUser(user.id, {
+        passwordResetToken: resetToken,
+        passwordResetExpiry: resetExpiry
+      });
+
+      await sendPasswordResetEmail(email, resetToken);
+
+      res.json({ message: 'If an account with this email exists, a password reset link has been sent.' });
+    } catch (error) {
+      console.error('Error sending password reset email:', error);
+      res.status(500).json({ error: 'Failed to send password reset email' });
+    }
+  });
+
+  // Reset password endpoint
+  app.post('/api/auth/reset-password', async (req, res) => {
+    const { token, newPassword } = req.body;
+
+    if (!token || !newPassword) {
+      return res.status(400).json({ error: 'Token and new password are required' });
+    }
+
+    if (newPassword.length < 6) {
+      return res.status(400).json({ error: 'Password must be at least 6 characters long' });
+    }
+
+    const users = getUsers();
+    const user = users.find(u => u.passwordResetToken === token);
+
+    if (!user) {
+      return res.status(400).json({ error: 'Invalid or expired reset token' });
+    }
+
+    // Check if token is expired
+    if (user.passwordResetExpiry && new Date() > new Date(user.passwordResetExpiry)) {
+      return res.status(400).json({ error: 'Reset token has expired' });
+    }
+
+    try {
+      // Update password and clear reset token
+      const updatedUser = updateUser(user.id, {
+        password: hashPassword(newPassword),
+        passwordResetToken: undefined,
+        passwordResetExpiry: undefined
+      });
+
+      if (!updatedUser) {
+        return res.status(500).json({ error: 'Failed to update password' });
+      }
+
+      res.json({ message: 'Password has been reset successfully. You can now log in with your new password.' });
+    } catch (error) {
+      console.error('Error resetting password:', error);
+      res.status(500).json({ error: 'Failed to reset password' });
     }
   });
 

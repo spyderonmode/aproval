@@ -72,6 +72,36 @@ export class EmailService {
       text: `Please verify your email by clicking this link: ${verificationUrl}`,
     });
   }
+
+  async sendPasswordResetEmail(email: string, token: string): Promise<boolean> {
+    const resetUrl = `${process.env.REPLIT_DOMAIN || 'http://localhost:5000'}/reset-password?token=${token}`;
+    
+    const html = `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+        <h2 style="color: #dc2626;">Password Reset - TicTac 3x5</h2>
+        <p>You requested a password reset for your TicTac 3x5 account.</p>
+        <p>Click the button below to reset your password:</p>
+        <div style="text-align: center; margin: 30px 0;">
+          <a href="${resetUrl}" 
+             style="background-color: #dc2626; color: white; padding: 12px 24px; text-decoration: none; border-radius: 5px; display: inline-block;">
+            Reset Password
+          </a>
+        </div>
+        <p>Or copy and paste this link into your browser:</p>
+        <p style="color: #666; word-break: break-all;">${resetUrl}</p>
+        <p style="color: #666; font-size: 12px; margin-top: 30px;">
+          This link will expire in 1 hour. If you didn't request a password reset, you can safely ignore this email.
+        </p>
+      </div>
+    `;
+
+    return await this.sendEmail({
+      to: email,
+      subject: 'Password Reset - TicTac 3x5',
+      html,
+      text: `Reset your password by clicking this link: ${resetUrl}`,
+    });
+  }
 }
 
 // Create email service instance if SMTP settings are provided

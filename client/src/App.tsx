@@ -8,6 +8,7 @@ import Landing from "@/pages/landing";
 import Home from "@/pages/home";
 import Auth from "@/pages/auth";
 import VerifyEmail from "@/pages/verify-email";
+import ResetPassword from "@/pages/reset-password";
 import NotFound from "@/pages/not-found";
 import { Component } from "react";
 
@@ -74,6 +75,7 @@ function Router() {
         {isAuthenticated && user?.isEmailVerified ? <Home /> : <Auth />}
       </Route>
       <Route path="/verify-email" component={VerifyEmail} />
+      <Route path="/reset-password" component={ResetPassword} />
       <Route path="/not-found" component={NotFound} />
       <Route path="/">
         {isAuthenticated && user?.isEmailVerified ? <Home /> : <Auth />}
