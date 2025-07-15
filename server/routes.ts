@@ -572,8 +572,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
             }
           };
           
-          // Always broadcast game_started to ensure both players receive it
-          console.log('🎮 Broadcasting game_started for existing game to room:', gameData.roomId);
+          // Reset game state and broadcast to ensure clean start
+          await storage.updateGameBoard(existingGame.id, {});
+          await storage.updateCurrentPlayer(existingGame.id, 'X');
+          
+          // Get fresh game state after reset
+          const refreshedGame = await storage.getGameById(existingGame.id);
+          const refreshedGameWithPlayers = {
+            ...refreshedGame,
+            playerXInfo,
+            playerOInfo: playerOInfo || { 
+              id: 'AI', 
+              firstName: 'AI', 
+              lastName: 'Player',
+              profileImageUrl: null 
+            }
+          };
+          
+          console.log('🎮 Broadcasting game_started for refreshed game to room:', gameData.roomId);
           if (roomConnections.has(gameData.roomId)) {
             const roomUsers = roomConnections.get(gameData.roomId)!;
             console.log(`🎮 Broadcasting to ${roomUsers.size} users in room`);
@@ -583,14 +599,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
                 console.log(`🎮 Sending game_started to user: ${connection.userId}`);
                 connection.ws.send(JSON.stringify({
                   type: 'game_started',
-                  game: gameWithPlayers,
+                  game: refreshedGameWithPlayers,
+                  gameId: refreshedGame.id,
                   roomId: gameData.roomId,
                 }));
               }
             });
           }
           
-          return res.json(gameWithPlayers);
+          return res.json(refreshedGameWithPlayers);
         }
         
         // Get room participants and assign as players
@@ -601,16 +618,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
           return res.status(400).json({ message: "Need 2 players to start online game" });
         }
         
-        // Assign players: current user as X, other player as O
-        const otherPlayer = players.find(p => p.userId !== userId);
-        if (!otherPlayer) {
-          return res.status(400).json({ message: "Could not find opponent" });
+        // Assign players consistently: sort by userId to ensure same assignment every time
+        const sortedPlayers = players.sort((a, b) => a.userId.localeCompare(b.userId));
+        const playerX = sortedPlayers[0];
+        const playerO = sortedPlayers[1];
+        
+        if (!playerX || !playerO) {
+          return res.status(400).json({ message: "Could not find both players" });
         }
         
         gameCreateData = {
           ...gameData,
-          playerXId: userId,
-          playerOId: otherPlayer.userId,
+          playerXId: playerX.userId,
+          playerOId: playerO.userId,
         };
       } else {
         // Pass-play mode: current user starts as X, O will be filled in during play
