@@ -45,9 +45,20 @@ export function UserProfileModal({
     setError(null);
     try {
       console.log('Fetching online stats for user:', userId);
-      const response = await apiRequest(`/api/users/${userId}/online-stats`);
-      console.log('Online stats response:', response);
-      setStats(response);
+      const response = await fetch(`/api/users/${userId}/online-stats`, {
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+      
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      }
+      
+      const data = await response.json();
+      console.log('Online stats response:', data);
+      setStats(data);
     } catch (err) {
       setError('Failed to load player statistics');
       console.error('Error fetching online stats:', err);
