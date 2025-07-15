@@ -10,7 +10,7 @@ import { ProfileManager } from "@/components/ProfileManager";
 import { RoomManager } from "@/components/RoomManager";
 import { PlayerList } from "@/components/PlayerList";
 import { CreateRoomModal } from "@/components/CreateRoomModal";
-import { GameOverModal } from "@/components/GameOverModal";
+// Removed GameOverModal import to prevent white screen
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -634,14 +634,38 @@ export default function Home() {
         onRoomCreated={handleRoomJoin}
       />
 
-      <GameOverModal 
-        open={showGameOver}
-        onClose={() => setShowGameOver(false)}
-        result={gameResult}
-        onPlayAgain={handlePlayAgain}
-        isCreatingGame={isCreatingGame}
-        onMainMenu={resetToMainMenu}
-      />
+      {showGameOver && gameResult && (
+        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(0,0,0,0.8)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 9999 }}>
+          <div style={{ backgroundColor: 'white', padding: '20px', borderRadius: '8px', textAlign: 'center' }}>
+            <h2 style={{ color: 'black', marginBottom: '16px' }}>Game Over!</h2>
+            {gameResult.condition === 'draw' ? (
+              <p style={{ color: 'black' }}>It's a Draw!</p>
+            ) : (
+              <p style={{ color: 'black' }}>{gameResult.winnerName || `Player ${gameResult.winner}`} Wins!</p>
+            )}
+            <div style={{ marginTop: '20px', display: 'flex', gap: '10px', justifyContent: 'center' }}>
+              <button 
+                onClick={() => {
+                  setShowGameOver(false);
+                  setGameResult(null);
+                  setCurrentGame(null);
+                  setCurrentRoom(null);
+                  setSelectedMode('ai');
+                }}
+                style={{ padding: '8px 16px', backgroundColor: '#666', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer' }}
+              >
+                Main Menu
+              </button>
+              <button 
+                onClick={handlePlayAgain}
+                style={{ padding: '8px 16px', backgroundColor: '#3b82f6', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer' }}
+              >
+                Play Again
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
