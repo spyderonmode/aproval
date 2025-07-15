@@ -222,6 +222,7 @@ export function setupAuth(app: Express) {
           firstName: user.displayName || user.username || 'Anonymous',
           lastName: null,
           profileImageUrl: user.profilePicture || null,
+          profileTheme: user.profileTheme || null,
         });
       } catch (error) {
         console.error('Error syncing new user to database:', error);
@@ -284,6 +285,7 @@ export function setupAuth(app: Express) {
         firstName: user.displayName || user.username || 'Anonymous',
         lastName: null,
         profileImageUrl: user.profilePicture || null,
+        profileTheme: user.profileTheme || null,
       });
       console.log('User synced to database:', user.id);
     } catch (error) {
@@ -324,6 +326,7 @@ export function setupAuth(app: Express) {
       username: user.username,
       displayName: user.displayName,
       profilePicture: user.profilePicture,
+      profileTheme: user.profileTheme,
       email: user.email,
       isEmailVerified: user.isEmailVerified
     });
@@ -432,6 +435,7 @@ export function setupAuth(app: Express) {
           firstName: updatedUser.displayName || updatedUser.username || 'Anonymous',
           lastName: null,
           profileImageUrl: updatedUser.profilePicture || null,
+          profileTheme: updatedUser.profileTheme || null,
         });
         console.log('User profile synced to database:', updatedUser.id);
       } catch (error) {
