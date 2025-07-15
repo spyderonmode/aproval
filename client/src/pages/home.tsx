@@ -106,6 +106,20 @@ export default function Home() {
             // Sound effects removed as requested
           }
           break;
+        case 'winning_move':
+          // Handle winning move with position highlighting
+          if (currentGame && lastMessage.gameId === currentGame.id) {
+            console.log('🎮 Winning move received:', lastMessage);
+            setCurrentGame(prevGame => ({
+              ...prevGame,
+              board: lastMessage.board,
+              currentPlayer: lastMessage.currentPlayer,
+              lastMove: lastMessage.position,
+              winningPositions: lastMessage.winningPositions,
+              timestamp: Date.now()
+            }));
+          }
+          break;
         case 'game_over':
           // Handle game over from WebSocket
           if (currentGame && lastMessage.gameId === currentGame.id) {
@@ -120,6 +134,20 @@ export default function Home() {
               winnerInfo: lastMessage.winnerInfo
             });
             setShowGameOver(true);
+          }
+          break;
+        case 'player_left':
+          // Handle player leaving room
+          if (currentRoom && lastMessage.roomId === currentRoom.id) {
+            console.log('🎮 Player left room:', lastMessage);
+            // Show notification about player leaving
+          }
+          break;
+        case 'room_ended':
+          // Handle room ending - redirect to main menu
+          if (currentRoom && lastMessage.roomId === currentRoom.id) {
+            console.log('🎮 Room ended, redirecting to main menu');
+            resetToMainMenu();
           }
           break;
         // Remove matchmaking WebSocket handlers
@@ -140,6 +168,11 @@ export default function Home() {
   };
 
   const resetToMainMenu = () => {
+    // Leave room if currently in one
+    if (currentRoom) {
+      leaveRoom(currentRoom.id);
+    }
+    
     setCurrentRoom(null);
     setCurrentGame(null);
     setShowGameOver(false);
@@ -177,6 +210,13 @@ export default function Home() {
       initializeLocalGame();
     }
   }, [selectedMode, currentGame, user]);
+  
+  // Fix white screen issue by ensuring game exists for all modes
+  useEffect(() => {
+    if (!currentGame && !currentRoom && selectedMode !== 'online') {
+      initializeLocalGame();
+    }
+  }, [currentGame, currentRoom, selectedMode, user]);
 
   const handleGameOver = (result: any) => {
     // Sound effects removed as requested

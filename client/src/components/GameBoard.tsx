@@ -11,6 +11,49 @@ import { isUnauthorizedError } from "@/lib/authUtils";
 
 const VALID_POSITIONS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15];
 
+// Function to get winning positions for highlighting
+const getWinningPositions = (board: Record<string, string>, player: string): number[] => {
+  // Check horizontal wins
+  const rows = [
+    [1, 2, 3, 4, 5],
+    [6, 7, 8, 9, 10],
+    [11, 12, 13, 14, 15]
+  ];
+  
+  for (const row of rows) {
+    for (let i = 0; i <= row.length - 4; i++) {
+      const positions = row.slice(i, i + 4);
+      if (positions.every(pos => board[pos.toString()] === player)) {
+        return positions;
+      }
+    }
+  }
+  
+  // Check vertical wins
+  const columns = [
+    [1, 6, 11], [2, 7, 12], [3, 8, 13], [4, 9, 14], [5, 10, 15]
+  ];
+  
+  for (const column of columns) {
+    if (column.every(pos => board[pos.toString()] === player)) {
+      return column;
+    }
+  }
+  
+  // Check diagonal wins
+  const diagonals = [
+    [1, 7, 13], [2, 8, 14], [3, 7, 11], [4, 8, 12]
+  ];
+  
+  for (const diagonal of diagonals) {
+    if (diagonal.every(pos => board[pos.toString()] === player)) {
+      return diagonal;
+    }
+  }
+  
+  return [];
+};
+
 interface GameBoardProps {
   game: any;
   onGameOver: (result: any) => void;
@@ -23,6 +66,13 @@ export function GameBoard({ game, onGameOver, gameMode, user }: GameBoardProps) 
   const [currentPlayer, setCurrentPlayer] = useState<'X' | 'O'>('X');
   const [winningLine, setWinningLine] = useState<number[] | null>(null);
   const [lastMove, setLastMove] = useState<number | null>(null);
+  
+  // Update winning line when game has winning positions
+  useEffect(() => {
+    if (game?.winningPositions) {
+      setWinningLine(game.winningPositions);
+    }
+  }, [game?.winningPositions]);
   const { toast } = useToast();
   // Sound effects removed as requested
   const { lastMessage } = useWebSocket();
@@ -164,12 +214,22 @@ export function GameBoard({ game, onGameOver, gameMode, user }: GameBoardProps) 
         ? (game?.playerXInfo?.firstName || game?.playerXInfo?.displayName || game?.playerXInfo?.username || 'Player X')
         : (game?.playerOInfo?.firstName || game?.playerOInfo?.displayName || game?.playerOInfo?.username || (gameMode === 'ai' ? 'AI' : 'Player O'));
       
-      onGameOver({
-        winner: currentPlayer,
-        winnerName: winnerInfo,
-        condition: 'diagonal',
-        board: newBoard
-      });
+      // Show winning positions before game over
+      const winningPositions = getWinningPositions(newBoard, currentPlayer);
+      if (winningPositions.length > 0) {
+        setWinningLine(winningPositions);
+      }
+      
+      // Add delay before showing game over for AI and pass-play
+      setTimeout(() => {
+        onGameOver({
+          winner: currentPlayer,
+          winnerName: winnerInfo,
+          condition: 'diagonal',
+          board: newBoard,
+          winningPositions
+        });
+      }, gameMode === 'ai' || gameMode === 'pass-play' ? 2500 : 0);
       return;
     }
     
@@ -254,11 +314,22 @@ export function GameBoard({ game, onGameOver, gameMode, user }: GameBoardProps) 
     };
     
     if (checkWin(newBoard, 'O')) {
-      onGameOver({
-        winner: 'O',
-        condition: 'diagonal',
-        board: newBoard
-      });
+      // Show winning positions before game over
+      const winningPositions = getWinningPositions(newBoard, 'O');
+      if (winningPositions.length > 0) {
+        setWinningLine(winningPositions);
+      }
+      
+      // Add delay before showing game over for AI mode
+      setTimeout(() => {
+        onGameOver({
+          winner: 'O',
+          winnerName: 'AI',
+          condition: 'diagonal',
+          board: newBoard,
+          winningPositions
+        });
+      }, 2500);
       return;
     }
     

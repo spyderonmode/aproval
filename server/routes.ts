@@ -581,30 +581,53 @@ export async function registerRoutes(app: Express): Promise<Server> {
           await storage.updateRoomStatus(game.roomId, 'finished');
         }
         
-        // Broadcast game over to room with winner info
+        // Broadcast game over to room with winner info after 2-3 second delay
         if (game.roomId && roomConnections.has(game.roomId)) {
           const roomUsers = roomConnections.get(game.roomId)!;
           // Get winner profile information
           const winnerInfo = await storage.getUser(userId);
+          
+          // First broadcast the winning move with highlight
+          const moveMessage = JSON.stringify({
+            type: 'winning_move',
+            gameId,
+            position,
+            player: playerSymbol,
+            board: newBoard,
+            currentPlayer: nextPlayer,
+            winningPositions: winResult.winningPositions || [],
+            roomId: game.roomId
+          });
+          
           roomUsers.forEach(connectionId => {
             const connection = connections.get(connectionId);
             if (connection && connection.ws.readyState === WebSocket.OPEN) {
-              connection.ws.send(JSON.stringify({
-                type: 'game_over',
-                gameId,
-                winner: userId,
-                condition: winResult.condition,
-                board: newBoard,
-                winnerInfo: winnerInfo ? {
-                  displayName: winnerInfo.displayName,
-                  firstName: winnerInfo.firstName,
-                  username: winnerInfo.username,
-                  profilePicture: winnerInfo.profilePicture,
-                  profileImageUrl: winnerInfo.profileImageUrl
-                } : null
-              }));
+              connection.ws.send(moveMessage);
             }
           });
+          
+          // Then broadcast game over after 2.5 seconds
+          setTimeout(() => {
+            roomUsers.forEach(connectionId => {
+              const connection = connections.get(connectionId);
+              if (connection && connection.ws.readyState === WebSocket.OPEN) {
+                connection.ws.send(JSON.stringify({
+                  type: 'game_over',
+                  gameId,
+                  winner: userId,
+                  condition: winResult.condition,
+                  board: newBoard,
+                  winnerInfo: winnerInfo ? {
+                    displayName: winnerInfo.displayName,
+                    firstName: winnerInfo.firstName,
+                    username: winnerInfo.username,
+                    profilePicture: winnerInfo.profilePicture,
+                    profileImageUrl: winnerInfo.profileImageUrl
+                  } : null
+                }));
+              }
+            });
+          }, 2500);
         }
       } else if (checkDraw(newBoard)) {
         await storage.updateGameStatus(gameId, 'finished', undefined, 'draw');
@@ -644,7 +667,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
         // Broadcast move to room AFTER updating current player (INCLUDING SPECTATORS)
         if (game.roomId && roomConnections.has(game.roomId)) {
           const roomUsers = roomConnections.get(game.roomId)!;
-          console.log(`- Room has ${roomUsers.size} connected users`);
           
           // Get player information for the move broadcast (parallel fetch for speed)
           const [playerXInfo, playerOInfo] = await Promise.all([
@@ -677,18 +699,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
             } : null
           });
           
-          let broadcastCount = 0;
+          // Faster broadcast without extensive logging
           roomUsers.forEach(connectionId => {
             const connection = connections.get(connectionId);
             if (connection && connection.ws.readyState === WebSocket.OPEN) {
-              // Reduced logging for faster processing
               connection.ws.send(moveMessage);
-              broadcastCount++;
             }
           });
-          console.log(`- Successfully broadcast to ${broadcastCount} users`);
-        } else {
-          console.log(`❌ Room not found or no connections: ${game.roomId}`);
         }
         
         // Handle AI move if it's AI mode
@@ -886,17 +903,43 @@ export async function registerRoutes(app: Express): Promise<Server> {
     });
 
     ws.on('close', () => {
+      console.log(`🔌 WebSocket connection closed: ${connectionId}`);
+      
+      // Get user info before cleaning up
       const connection = connections.get(connectionId);
-      if (connection && connection.roomId) {
-        const roomUsers = roomConnections.get(connection.roomId);
-        if (roomUsers) {
+      
+      // Clean up connection
+      connections.delete(connectionId);
+      
+      // Remove from room connections and notify other users
+      for (const [roomId, roomUsers] of roomConnections.entries()) {
+        if (roomUsers.has(connectionId)) {
           roomUsers.delete(connectionId);
-          if (roomUsers.size === 0) {
-            roomConnections.delete(connection.roomId);
+          
+          // Notify other users in the room about player leaving
+          if (connection) {
+            const leaveMessage = JSON.stringify({
+              type: 'player_left',
+              roomId,
+              userId: connection.userId,
+              message: `Player left the room`
+            });
+            
+            roomUsers.forEach(remainingConnectionId => {
+              const remainingConnection = connections.get(remainingConnectionId);
+              if (remainingConnection && remainingConnection.ws.readyState === WebSocket.OPEN) {
+                remainingConnection.ws.send(leaveMessage);
+              }
+            });
+            
+            // If room becomes empty, mark it as ended
+            if (roomUsers.size === 0) {
+              console.log(`🏠 Room ${roomId} has ended - no more users`);
+              roomConnections.delete(roomId);
+            }
           }
         }
       }
-      connections.delete(connectionId);
     });
   });
 

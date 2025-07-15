@@ -119,20 +119,70 @@ export function checkDiagonalWin(board: GameBoard, player: string): boolean {
   return false;
 }
 
-export function checkWin(board: GameBoard, player: string): { winner: boolean; condition: WinCondition } {
-  if (checkHorizontalWin(board, player)) {
-    return { winner: true, condition: 'horizontal' };
+export function checkWin(board: GameBoard, player: string): { winner: boolean; condition: WinCondition; winningPositions?: number[] } {
+  // Check horizontal wins
+  const horizontalWin = checkHorizontalWinWithPositions(board, player);
+  if (horizontalWin.winner) {
+    return { winner: true, condition: 'horizontal', winningPositions: horizontalWin.positions };
   }
   
-  if (checkVerticalWin(board, player)) {
-    return { winner: true, condition: 'vertical' };
+  // Check vertical wins
+  const verticalWin = checkVerticalWinWithPositions(board, player);
+  if (verticalWin.winner) {
+    return { winner: true, condition: 'vertical', winningPositions: verticalWin.positions };
   }
   
-  if (checkDiagonalWin(board, player)) {
-    return { winner: true, condition: 'diagonal' };
+  // Check diagonal wins
+  const diagonalWin = checkDiagonalWinWithPositions(board, player);
+  if (diagonalWin.winner) {
+    return { winner: true, condition: 'diagonal', winningPositions: diagonalWin.positions };
   }
   
   return { winner: false, condition: null };
+}
+
+function checkHorizontalWinWithPositions(board: GameBoard, player: string): { winner: boolean; positions?: number[] } {
+  const rows = [
+    [1, 2, 3, 4, 5],
+    [6, 7, 8, 9, 10],
+    [11, 12, 13, 14, 15]
+  ];
+  
+  for (const row of rows) {
+    for (let i = 0; i <= row.length - 4; i++) {
+      const positions = row.slice(i, i + 4);
+      if (positions.every(pos => board[pos.toString()] === player)) {
+        return { winner: true, positions };
+      }
+    }
+  }
+  return { winner: false };
+}
+
+function checkVerticalWinWithPositions(board: GameBoard, player: string): { winner: boolean; positions?: number[] } {
+  const columns = [
+    [1, 6, 11], [2, 7, 12], [3, 8, 13], [4, 9, 14], [5, 10, 15]
+  ];
+  
+  for (const column of columns) {
+    if (column.every(pos => board[pos.toString()] === player)) {
+      return { winner: true, positions: column };
+    }
+  }
+  return { winner: false };
+}
+
+function checkDiagonalWinWithPositions(board: GameBoard, player: string): { winner: boolean; positions?: number[] } {
+  const validDiagonals = [
+    [1, 7, 13], [2, 8, 14], [3, 7, 11], [4, 8, 12]
+  ];
+  
+  for (const diagonal of validDiagonals) {
+    if (diagonal.every(pos => board[pos.toString()] === player)) {
+      return { winner: true, positions: diagonal };
+    }
+  }
+  return { winner: false };
 }
 
 export function checkDraw(board: GameBoard): boolean {
