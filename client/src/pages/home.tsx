@@ -132,15 +132,23 @@ export default function Home() {
             console.log('🎮 Winner info from server:', lastMessage.winnerInfo);
             console.log('🎮 Player X Info:', lastMessage.playerXInfo || currentGame.playerXInfo);
             console.log('🎮 Player O Info:', lastMessage.playerOInfo || currentGame.playerOInfo);
-            setGameResult({
+            
+            // Create comprehensive result object with all player info
+            const gameResult = {
               winner: lastMessage.winner,
               condition: lastMessage.condition,
               board: lastMessage.board,
               winnerInfo: lastMessage.winnerInfo,
               playerXInfo: lastMessage.playerXInfo || currentGame.playerXInfo,
               playerOInfo: lastMessage.playerOInfo || currentGame.playerOInfo,
-              game: currentGame
-            });
+              game: {
+                ...currentGame,
+                gameMode: currentGame.gameMode || 'online'
+              }
+            };
+            
+            console.log('🎮 Setting complete game result:', gameResult);
+            setGameResult(gameResult);
             setShowGameOver(true);
           }
           break;
@@ -152,15 +160,18 @@ export default function Home() {
           }
           break;
         case 'room_ended':
-          // Handle room ending - redirect to main menu
+          // Handle room ending - refresh the page
           if (currentRoom && lastMessage.roomId === currentRoom.id) {
-            console.log('🎮 Room ended, redirecting to main menu');
+            console.log('🎮 Room ended, refreshing page');
             toast({
               title: "Room Ended",
-              description: `${lastMessage.playerName || 'A player'} left the room. Returning to main menu.`,
-              duration: 3000,
+              description: `${lastMessage.playerName || 'A player'} left the room. Refreshing page...`,
+              duration: 2000,
             });
-            resetToMainMenu();
+            // Auto-refresh the page after a short delay
+            setTimeout(() => {
+              window.location.reload();
+            }, 2000);
           }
           break;
         // Remove matchmaking WebSocket handlers
@@ -184,15 +195,21 @@ export default function Home() {
     // Leave room if currently in one - this will trigger room end notification
     if (currentRoom) {
       console.log('🏠 Leaving room from main menu:', currentRoom.id);
-      leaveRoom(currentRoom.id);
+      console.log('🏠 User info:', user);
       
-      // Send explicit leave message to notify other players
-      sendMessage({
+      // Send explicit leave message to notify other players FIRST
+      const leaveMessage = {
         type: 'leave_room',
         roomId: currentRoom.id,
         userId: user?.userId || user?.id,
         playerName: user?.displayName || user?.firstName || user?.username || 'Player'
-      });
+      };
+      
+      console.log('🏠 Sending leave message:', leaveMessage);
+      sendMessage(leaveMessage);
+      
+      // Then leave the room
+      leaveRoom(currentRoom.id);
     }
     
     setCurrentRoom(null);
