@@ -1,14 +1,13 @@
 import { useState, useRef } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { apiRequest } from "@/lib/queryClient";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
-import { isUnauthorizedError } from "@/lib/authUtils";
 import { User, Upload, X } from "lucide-react";
+import { updateProfile, uploadProfilePicture } from "@/lib/firebase";
 
 interface ProfileManagerProps {
   user: any;
@@ -26,18 +25,10 @@ export function ProfileManager({ user, open = false, onClose }: ProfileManagerPr
 
   const updateProfileMutation = useMutation({
     mutationFn: async (data: { displayName?: string; profilePicture?: string }) => {
-      const response = await apiRequest('PUT', '/api/auth/profile', data);
-      return response.json();
+      await updateProfile(data);
+      return data;
     },
-    onSuccess: (updatedUser) => {
-      // Update the user data in the cache
-      queryClient.setQueryData(['/api/auth/user'], updatedUser);
-      
-      // Also invalidate and refetch to ensure fresh data
-      queryClient.invalidateQueries({
-        queryKey: ['/api/auth/user']
-      });
-      
+    onSuccess: () => {
       toast({
         title: "Profile updated",
         description: "Your profile has been updated successfully",
@@ -45,17 +36,6 @@ export function ProfileManager({ user, open = false, onClose }: ProfileManagerPr
       onClose?.();
     },
     onError: (error) => {
-      if (isUnauthorizedError(error)) {
-        toast({
-          title: "Unauthorized",
-          description: "You are logged out. Logging in again...",
-          variant: "destructive",
-        });
-        setTimeout(() => {
-          window.location.href = "/api/login";
-        }, 500);
-        return;
-      }
       toast({
         title: "Error",
         description: error.message,

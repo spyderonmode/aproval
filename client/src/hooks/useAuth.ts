@@ -22,6 +22,7 @@ export function useAuth() {
             username: userData?.username || firebaseUser.email?.split('@')[0],
             displayName: userData?.displayName || firebaseUser.displayName,
             profilePicture: userData?.profilePicture || firebaseUser.photoURL,
+            profileImageUrl: userData?.profilePicture || firebaseUser.photoURL, // For backward compatibility
             isEmailVerified: firebaseUser.emailVerified,
             wins: userData?.wins || 0,
             losses: userData?.losses || 0,

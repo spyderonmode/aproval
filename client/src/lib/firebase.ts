@@ -126,7 +126,7 @@ export const getCurrentUser = async () => {
   }
 };
 
-export const updateUserProfile = async (updates: { displayName?: string; profilePicture?: string }) => {
+export const updateProfile = async (updates: { displayName?: string; profilePicture?: string }) => {
   try {
     const user = auth.currentUser;
     if (!user) throw new Error('No user logged in');
@@ -139,5 +139,30 @@ export const updateUserProfile = async (updates: { displayName?: string; profile
     return { success: true };
   } catch (error: any) {
     throw new Error(error.message || 'Failed to update profile');
+  }
+};
+
+export const uploadProfilePicture = async (file: File) => {
+  try {
+    const user = auth.currentUser;
+    if (!user) throw new Error('No user logged in');
+    
+    // Convert file to base64 for simple storage
+    const reader = new FileReader();
+    return new Promise((resolve, reject) => {
+      reader.onloadend = async () => {
+        try {
+          const base64Data = reader.result as string;
+          await updateProfile({ profilePicture: base64Data });
+          resolve(base64Data);
+        } catch (error) {
+          reject(error);
+        }
+      };
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+  } catch (error: any) {
+    throw new Error(error.message || 'Failed to upload profile picture');
   }
 };
