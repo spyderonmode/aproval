@@ -7,7 +7,7 @@ import { useToast } from "@/hooks/use-toast";
 // useAudio hook removed as sound effects are removed
 import { useWebSocket } from "@/hooks/useWebSocket";
 import { isUnauthorizedError } from "@/lib/authUtils";
-import { motion, AnimatePresence } from "framer-motion";
+// Removed framer-motion animations for instant move display
 
 const VALID_POSITIONS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15];
 
@@ -361,40 +361,29 @@ export function GameBoard({ game, onGameOver, gameMode, user }: GameBoardProps) 
     const isLastMove = lastMove === position;
     
     return (
-      <motion.div
+      <div
         key={position}
         className={`
           w-10 h-10 sm:w-12 sm:h-12 md:w-16 md:h-16 bg-slate-700 rounded-lg flex items-center justify-center cursor-pointer 
-          border-2 border-transparent hover:border-primary transition-all duration-200
+          border-2 border-transparent hover:border-primary
           ${isEmpty ? 'hover:bg-slate-600' : 'cursor-not-allowed'}
           ${makeMoveMutation.isPending ? 'opacity-50' : ''}
           ${isWinningCell ? 'bg-green-600 border-green-400' : ''}
           ${isLastMove ? 'ring-2 ring-yellow-400' : ''}
         `}
         onClick={() => handleCellClick(position)}
-        initial={{ scale: 0 }}
-        animate={{ scale: 1 }}
-        transition={{ duration: 0.2 }}
-        whileHover={{ scale: isEmpty ? 1.02 : 1 }}
-        whileTap={{ scale: 0.98 }}
       >
-        <AnimatePresence>
-          {symbol && (
-            <motion.span
-              className={`text-lg sm:text-xl md:text-2xl font-bold ${
-                symbol === 'X' ? 'text-blue-500' : 'text-red-500'
-              }`}
-              initial={{ scale: 0 }}
-              animate={{ scale: 1 }}
-              exit={{ scale: 0 }}
-              transition={{ duration: 0.2 }}
-            >
-              {symbol}
-            </motion.span>
-          )}
-        </AnimatePresence>
+        {symbol && (
+          <span
+            className={`text-lg sm:text-xl md:text-2xl font-bold ${
+              symbol === 'X' ? 'text-blue-500' : 'text-red-500'
+            }`}
+          >
+            {symbol}
+          </span>
+        )}
         <span className="text-xs text-gray-500 absolute mt-8 sm:mt-10 md:mt-12">{position}</span>
-      </motion.div>
+      </div>
     );
   };
 
