@@ -56,6 +56,8 @@ export function OnlineUsersModal({ open, onClose, currentRoom }: OnlineUsersModa
   });
 
   const handleInvite = (targetUserId: string) => {
+    console.log('🔍 handleInvite called:', { targetUserId, currentRoom });
+    
     if (!currentRoom) {
       toast({
         title: "Error",
@@ -65,6 +67,7 @@ export function OnlineUsersModal({ open, onClose, currentRoom }: OnlineUsersModa
       return;
     }
 
+    console.log('🔍 Sending invitation to:', targetUserId, 'for room:', currentRoom.id);
     inviteMutation.mutate({ targetUserId, roomId: currentRoom.id });
   };
 
@@ -93,10 +96,16 @@ export function OnlineUsersModal({ open, onClose, currentRoom }: OnlineUsersModa
         </DialogHeader>
         
         <div className="space-y-4">
-          {!currentRoom && (
+          {!currentRoom ? (
             <div className="bg-blue-50 dark:bg-blue-950 border border-blue-200 dark:border-blue-800 rounded-lg p-3">
               <p className="text-sm text-blue-800 dark:text-blue-200">
-                Create or join a room to invite other players to play with you.
+                <strong>To invite players:</strong> First create or join a room using the "Create Room" button or by entering a room code. Once you're in a room, you can invite other players to join your game.
+              </p>
+            </div>
+          ) : (
+            <div className="bg-green-50 dark:bg-green-950 border border-green-200 dark:border-green-800 rounded-lg p-3">
+              <p className="text-sm text-green-800 dark:text-green-200">
+                <strong>Room:</strong> {currentRoom.name} ({currentRoom.code}) - You can now invite players to your room!
               </p>
             </div>
           )}
