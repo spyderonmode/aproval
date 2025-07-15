@@ -123,8 +123,7 @@ export function CreateRoomModal({ open, onClose, onRoomCreated }: CreateRoomModa
               </SelectTrigger>
               <SelectContent className="bg-slate-700 border-slate-600">
                 <SelectItem value="2">2 Players</SelectItem>
-                <SelectItem value="4">2 Players + 2 Spectators</SelectItem>
-                <SelectItem value="6">2 Players + 4 Spectators</SelectItem>
+                <SelectItem value="52">2 Players + 50 Spectators</SelectItem>
               </SelectContent>
             </Select>
           </div>

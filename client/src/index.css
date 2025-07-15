@@ -3,13 +3,22 @@
 @tailwind utilities;
 
 /* Animated border for occupied cells */
-@keyframes pulse-border {
+@keyframes pulse-border-blue {
   0%, 100% { border-color: transparent; }
-  50% { border-color: currentColor; }
+  50% { border-color: rgb(59, 130, 246); }
 }
 
-.animate-pulse-border {
-  animation: pulse-border 2s ease-in-out infinite;
+@keyframes pulse-border-red {
+  0%, 100% { border-color: transparent; }
+  50% { border-color: rgb(239, 68, 68); }
+}
+
+.animate-pulse-border-x {
+  animation: pulse-border-blue 2s ease-in-out infinite;
+}
+
+.animate-pulse-border-o {
+  animation: pulse-border-red 2s ease-in-out infinite;
 }
 
 /* Fix modal white screen issue */
