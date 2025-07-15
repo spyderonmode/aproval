@@ -14,11 +14,13 @@ import { CreateRoomModal } from "@/components/CreateRoomModal";
 import { GameOverModal } from "@/components/GameOverModal";
 import { EmailVerificationModal } from "@/components/EmailVerificationModal";
 import { MatchmakingModal } from "@/components/MatchmakingModal";
+import { OnlineUsersModal } from "@/components/OnlineUsersModal";
+import { InvitationNotification } from "@/components/InvitationNotification";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { GamepadIcon, LogOut, User, Zap, Loader2 } from "lucide-react";
+import { GamepadIcon, LogOut, User, Zap, Loader2, Users, UserPlus } from "lucide-react";
 import { logout } from "@/lib/firebase";
 
 export default function Home() {
@@ -37,6 +39,10 @@ export default function Home() {
   const [showEmailVerification, setShowEmailVerification] = useState(false);
   const [showMatchmaking, setShowMatchmaking] = useState(false);
   const [isMatchmaking, setIsMatchmaking] = useState(false);
+  const [showOnlineUsers, setShowOnlineUsers] = useState(false);
+  const [onlineUserCount, setOnlineUserCount] = useState(0);
+  const [invitations, setInvitations] = useState<any[]>([]);
+  const [showProfile, setShowProfile] = useState(false);
 
   const { data: userStats } = useQuery({
     queryKey: ["/api/users", user?.id, "stats"],
@@ -54,6 +60,16 @@ export default function Home() {
     if (lastMessage) {
       console.log('🎮 Home received WebSocket message:', lastMessage);
       switch (lastMessage.type) {
+        case 'online_users_update':
+          setOnlineUserCount(lastMessage.count);
+          break;
+        case 'invitation_received':
+          setInvitations(prev => [...prev, lastMessage.invitation]);
+          toast({
+            title: "Room invitation received",
+            description: `${lastMessage.invitation.senderName} invited you to join "${lastMessage.invitation.roomName}"`,
+          });
+          break;
         case 'game_started':
           console.log('🎮 Processing game_started message:', lastMessage);
           console.log('🎮 Current room ID:', currentRoom?.id);
@@ -471,6 +487,30 @@ export default function Home() {
     }, 1000);
   };
 
+  const handleInvitationAccept = (roomId: string) => {
+    // Remove the accepted invitation
+    setInvitations(prev => prev.filter(inv => inv.roomId !== roomId));
+    
+    // Navigate to the room - this will be handled by the room join logic
+    fetch(`/api/rooms/${roomId}`)
+      .then(res => res.json())
+      .then(room => {
+        handleRoomJoin(room);
+      })
+      .catch(err => {
+        console.error('Failed to join room:', err);
+        toast({
+          title: "Error",
+          description: "Failed to join the room",
+          variant: "destructive",
+        });
+      });
+  };
+
+  const handleInvitationDismiss = (invitation: any) => {
+    setInvitations(prev => prev.filter(inv => inv.roomId !== invitation.roomId));
+  };
+
   return (
     <div className="min-h-screen bg-slate-900 text-white">
       {/* Navigation Header */}
@@ -510,6 +550,17 @@ export default function Home() {
                 {isConnected ? 'Online' : 'Offline'}
               </span>
             </div>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setShowOnlineUsers(true)}
+              className="bg-slate-700 border-slate-600 text-white hover:bg-slate-600 px-2 md:px-4 py-1 md:py-2"
+            >
+              <Users className="w-3 h-3 md:w-4 md:h-4 mr-1 md:mr-2" />
+              <span className="hidden sm:inline">Players</span>
+              <span className="sm:hidden">({onlineUserCount})</span>
+              <span className="hidden sm:inline">({onlineUserCount})</span>
+            </Button>
             <Button 
               variant="outline" 
               size="sm"
@@ -771,6 +822,24 @@ export default function Home() {
         onMatchFound={handleMatchFound}
         user={user}
       />
+
+      <OnlineUsersModal 
+        open={showOnlineUsers}
+        onClose={() => setShowOnlineUsers(false)}
+        currentRoom={currentRoom}
+      />
+
+      {/* Invitation Notifications */}
+      <div className="fixed bottom-4 right-4 space-y-2 z-50">
+        {invitations.map((invitation, index) => (
+          <InvitationNotification
+            key={`${invitation.roomId}-${invitation.timestamp}`}
+            invitation={invitation}
+            onAccept={handleInvitationAccept}
+            onDismiss={() => handleInvitationDismiss(invitation)}
+          />
+        ))}
+      </div>
     </div>
   );
 }

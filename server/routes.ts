@@ -11,6 +11,9 @@ interface WSConnection {
   ws: WebSocket;
   userId: string;
   roomId?: string;
+  username?: string;
+  displayName?: string;
+  lastSeen?: Date;
 }
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -20,6 +23,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   const connections = new Map<string, WSConnection>();
   const roomConnections = new Map<string, Set<string>>();
   const matchmakingQueue: string[] = []; // Queue of user IDs waiting for matches
+  const onlineUsers = new Map<string, { userId: string; username: string; displayName: string; roomId?: string; lastSeen: Date }>();
+  const userRoomStates = new Map<string, { roomId: string; gameId?: string; isInGame: boolean }>();
 
   // Error logging endpoint
   app.post('/api/error-log', (req, res) => {
@@ -39,6 +44,79 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error fetching user stats:", error);
       res.status(500).json({ message: "Failed to fetch user stats" });
+    }
+  });
+
+  // Get online users
+  app.get('/api/users/online', requireAuth, async (req: any, res) => {
+    try {
+      const currentUserId = req.user.userId;
+      const onlineUsersList = Array.from(onlineUsers.values())
+        .filter(user => user.userId !== currentUserId)
+        .map(user => ({
+          userId: user.userId,
+          username: user.username,
+          displayName: user.displayName,
+          inRoom: !!user.roomId,
+          lastSeen: user.lastSeen
+        }));
+      
+      res.json({
+        total: onlineUsersList.length,
+        users: onlineUsersList
+      });
+    } catch (error) {
+      console.error("Error fetching online users:", error);
+      res.status(500).json({ message: "Failed to fetch online users" });
+    }
+  });
+
+  // Send invitation
+  app.post('/api/invitations/send', requireAuth, async (req: any, res) => {
+    try {
+      const { targetUserId, roomId } = req.body;
+      const senderId = req.user.userId;
+      
+      // Get sender info
+      const senderInfo = onlineUsers.get(senderId);
+      if (!senderInfo) {
+        return res.status(400).json({ error: 'Sender not found' });
+      }
+
+      // Check if target user is online
+      const targetUser = onlineUsers.get(targetUserId);
+      if (!targetUser) {
+        return res.status(400).json({ error: 'Target user is not online' });
+      }
+
+      // Find target user's connection
+      const targetConnection = Array.from(connections.values()).find(conn => conn.userId === targetUserId);
+      if (!targetConnection) {
+        return res.status(400).json({ error: 'Target user connection not found' });
+      }
+
+      // Get room info
+      const room = await storage.getRoomById(roomId);
+      if (!room) {
+        return res.status(400).json({ error: 'Room not found' });
+      }
+
+      // Send invitation notification
+      targetConnection.ws.send(JSON.stringify({
+        type: 'invitation_received',
+        invitation: {
+          senderId,
+          senderName: senderInfo.displayName || senderInfo.username,
+          roomId,
+          roomName: room.name,
+          timestamp: new Date().toISOString()
+        }
+      }));
+
+      res.json({ success: true, message: 'Invitation sent successfully' });
+    } catch (error) {
+      console.error("Error sending invitation:", error);
+      res.status(500).json({ message: "Failed to send invitation" });
     }
   });
 
@@ -879,10 +957,39 @@ export async function registerRoutes(app: Express): Promise<Server> {
         switch (data.type) {
           case 'auth':
             console.log(`🔐 WebSocket auth: ${data.userId} -> ${connectionId}`);
+            
+            // Get user info for online tracking
+            const userInfo = await storage.getUser(data.userId);
+            
             connections.set(connectionId, {
               ws,
               userId: data.userId,
+              username: userInfo?.username || 'Anonymous',
+              displayName: userInfo?.displayName || userInfo?.firstName || 'Anonymous',
+              lastSeen: new Date()
             });
+            
+            // Update online users list
+            onlineUsers.set(data.userId, {
+              userId: data.userId,
+              username: userInfo?.username || 'Anonymous',
+              displayName: userInfo?.displayName || userInfo?.firstName || 'Anonymous',
+              lastSeen: new Date()
+            });
+            
+            // Broadcast updated online count to all connected users
+            const onlineCount = onlineUsers.size;
+            const broadcastMessage = JSON.stringify({
+              type: 'online_users_update',
+              count: onlineCount
+            });
+            
+            connections.forEach(conn => {
+              if (conn.ws.readyState === WebSocket.OPEN) {
+                conn.ws.send(broadcastMessage);
+              }
+            });
+            
             break;
             
           case 'join_room':
@@ -890,6 +997,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
             if (connection) {
               console.log(`🏠 User ${connection.userId} joining room ${data.roomId} via connection ${connectionId}`);
               connection.roomId = data.roomId;
+              
+              // Update user's room state
+              const existingState = userRoomStates.get(connection.userId);
+              const activeGame = await storage.getActiveGameByRoomId(data.roomId);
+              
+              userRoomStates.set(connection.userId, {
+                roomId: data.roomId,
+                gameId: activeGame?.id,
+                isInGame: activeGame?.status === 'active'
+              });
+              
+              // Update online user room info
+              const onlineUser = onlineUsers.get(connection.userId);
+              if (onlineUser) {
+                onlineUser.roomId = data.roomId;
+              }
+              
               if (!roomConnections.has(data.roomId)) {
                 roomConnections.set(data.roomId, new Set());
               }
@@ -925,10 +1049,34 @@ export async function registerRoutes(app: Express): Promise<Server> {
               
               console.log(`🏠 Processing leave_room message for ${playerName} in room ${roomId}`);
               
+              // Check if user is in an active game - if so, don't remove them yet
+              const userState = userRoomStates.get(userId);
+              const activeGame = await storage.getActiveGameByRoomId(roomId);
+              
+              if (activeGame && activeGame.status === 'active' && 
+                  (activeGame.playerXId === userId || activeGame.playerOId === userId)) {
+                console.log(`🏠 User ${playerName} is in active game - not removing from room yet`);
+                // Don't remove from room, just mark as temporarily disconnected
+                const onlineUser = onlineUsers.get(userId);
+                if (onlineUser) {
+                  onlineUser.lastSeen = new Date();
+                }
+                return;
+              }
+              
               // Remove from room connections
               const roomUsers = roomConnections.get(roomId);
               if (roomUsers) {
                 roomUsers.delete(connectionId);
+                
+                // Update online user room info
+                const onlineUser = onlineUsers.get(userId);
+                if (onlineUser) {
+                  onlineUser.roomId = undefined;
+                }
+                
+                // Remove from user room states
+                userRoomStates.delete(userId);
                 
                 // Send room end notification to all remaining users
                 if (roomUsers.size > 0) {
@@ -971,39 +1119,85 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Get user info before cleaning up
       const connection = connections.get(connectionId);
       
+      if (connection) {
+        // Check if user has other active connections
+        const userHasOtherConnections = Array.from(connections.values()).some(
+          conn => conn.userId === connection.userId && conn.ws !== ws
+        );
+        
+        // Only remove from online users if no other connections exist
+        if (!userHasOtherConnections) {
+          // Check if user is in active game - if so, don't remove them completely
+          const userState = userRoomStates.get(connection.userId);
+          if (userState && userState.isInGame) {
+            console.log(`🏠 User ${connection.userId} disconnected but is in active game - keeping in room`);
+            // Update last seen time but don't remove
+            const onlineUser = onlineUsers.get(connection.userId);
+            if (onlineUser) {
+              onlineUser.lastSeen = new Date();
+            }
+          } else {
+            // Remove from online users if not in active game
+            onlineUsers.delete(connection.userId);
+            userRoomStates.delete(connection.userId);
+            
+            // Broadcast updated online count
+            const onlineCount = onlineUsers.size;
+            const broadcastMessage = JSON.stringify({
+              type: 'online_users_update',
+              count: onlineCount
+            });
+            
+            connections.forEach(conn => {
+              if (conn.ws.readyState === WebSocket.OPEN && conn.ws !== ws) {
+                conn.ws.send(broadcastMessage);
+              }
+            });
+          }
+        }
+      }
+      
       // Clean up connection
       connections.delete(connectionId);
       
-      // Remove from room connections and notify other users
-      for (const [roomId, roomUsers] of roomConnections.entries()) {
-        if (roomUsers.has(connectionId)) {
-          roomUsers.delete(connectionId);
-          
-          // Notify other users in the room about player leaving and end the room
-          if (connection) {
-            // Get user info for notification
-            const userInfo = await storage.getUser(connection.userId);
-            const playerName = userInfo?.displayName || userInfo?.firstName || userInfo?.username || 'A player';
+      // Remove from room connections only if user doesn't have other connections
+      if (connection && !Array.from(connections.values()).some(conn => conn.userId === connection.userId)) {
+        for (const [roomId, roomUsers] of roomConnections.entries()) {
+          if (roomUsers.has(connectionId)) {
+            roomUsers.delete(connectionId);
             
-            const roomEndMessage = JSON.stringify({
-              type: 'room_ended',
-              roomId,
-              userId: connection.userId,
-              playerName,
-              message: `${playerName} left the room`
-            });
+            // Check if user is in active game before notifying room end
+            const userState = userRoomStates.get(connection.userId);
+            const activeGame = await storage.getActiveGameByRoomId(roomId);
             
-            // Broadcast room end to all remaining users
-            roomUsers.forEach(remainingConnectionId => {
-              const remainingConnection = connections.get(remainingConnectionId);
-              if (remainingConnection && remainingConnection.ws.readyState === WebSocket.OPEN) {
-                remainingConnection.ws.send(roomEndMessage);
+            if (!(activeGame && activeGame.status === 'active' && 
+                  (activeGame.playerXId === connection.userId || activeGame.playerOId === connection.userId))) {
+              // Only notify room end if user is not in active game
+              const userInfo = await storage.getUser(connection.userId);
+              const playerName = userInfo?.displayName || userInfo?.firstName || userInfo?.username || 'A player';
+              
+              const roomEndMessage = JSON.stringify({
+                type: 'room_ended',
+                roomId,
+                userId: connection.userId,
+                playerName,
+                message: `${playerName} left the room`
+              });
+              
+              // Broadcast room end to all remaining users
+              roomUsers.forEach(remainingConnectionId => {
+                const remainingConnection = connections.get(remainingConnectionId);
+                if (remainingConnection && remainingConnection.ws.readyState === WebSocket.OPEN) {
+                  remainingConnection.ws.send(roomEndMessage);
+                }
+              });
+              
+              // Clear the room if no users left
+              if (roomUsers.size === 0) {
+                roomConnections.delete(roomId);
+                console.log(`🏠 Room ${roomId} cleared - no users remaining`);
               }
-            });
-            
-            // Clear the room immediately when someone leaves
-            console.log(`🏠 Room ${roomId} ended - player ${playerName} left`);
-            roomConnections.delete(roomId);
+            }
           }
         }
       }
