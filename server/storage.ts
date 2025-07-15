@@ -1,10 +1,4 @@
 import {
-  users,
-  rooms,
-  games,
-  moves,
-  roomParticipants,
-  blockedUsers,
   type User,
   type UpsertUser,
   type Room,
