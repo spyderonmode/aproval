@@ -18,7 +18,7 @@ export function ThemeSelector() {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant="outline" size="sm" className="gap-2">
+        <Button variant="outline" size="sm" className="gap-2 bg-slate-700 border-slate-600 text-white hover:bg-slate-600">
           <Palette className="h-4 w-4" />
           Theme: {themes[currentTheme].name}
         </Button>

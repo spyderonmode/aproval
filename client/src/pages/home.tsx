@@ -522,9 +522,6 @@ export default function Home() {
               <span className="text-sm md:text-base text-gray-300 hidden sm:block">
                 {user?.displayName || user?.firstName || user?.username || 'Player'}
               </span>
-              <span className="text-xs text-gray-500 hidden lg:block">
-                ({user?.userId || user?.id})
-              </span>
             </div>
             <div className="flex items-center space-x-1 md:space-x-2">
               <div className={`w-2 h-2 rounded-full ${isConnected ? 'bg-green-500' : 'bg-red-500'}`}></div>

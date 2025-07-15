@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 
-export type GameTheme = 'default' | 'neon' | 'retro' | 'minimalist' | 'nature' | 'space';
+export type GameTheme = 'default' | 'neon' | 'ocean' | 'minimalist' | 'nature' | 'space';
 
 interface ThemeContextType {
   currentTheme: GameTheme;
@@ -47,18 +47,18 @@ const themes = {
     borderColor: 'border-cyan-500',
     winningCellStyle: 'bg-gradient-to-br from-cyan-400 to-pink-500 shadow-lg shadow-cyan-400/50 border-cyan-300'
   },
-  retro: {
-    name: 'Retro',
-    description: 'Vintage arcade style',
-    boardStyle: 'bg-amber-900 border-amber-600 shadow-lg',
-    cellStyle: 'bg-amber-800 border-amber-500 text-amber-100 hover:bg-amber-700',
-    cellHoverStyle: 'hover:bg-amber-700',
-    playerXColor: 'text-yellow-300 font-bold',
-    playerOColor: 'text-orange-300 font-bold',
-    backgroundColor: 'bg-amber-950',
-    textColor: 'text-amber-100',
-    borderColor: 'border-amber-600',
-    winningCellStyle: 'bg-gradient-to-br from-yellow-400 to-orange-600 shadow-lg shadow-yellow-400/50'
+  ocean: {
+    name: 'Ocean',
+    description: 'Deep sea blue theme',
+    boardStyle: 'bg-blue-900 border-blue-600 shadow-lg shadow-blue-600/20',
+    cellStyle: 'bg-blue-800 border-blue-500 text-blue-100 hover:bg-blue-700',
+    cellHoverStyle: 'hover:bg-blue-700',
+    playerXColor: 'text-cyan-300 drop-shadow-[0_0_6px_rgba(103,232,249,0.6)]',
+    playerOColor: 'text-teal-300 drop-shadow-[0_0_6px_rgba(94,234,212,0.6)]',
+    backgroundColor: 'bg-blue-950',
+    textColor: 'text-blue-100',
+    borderColor: 'border-blue-600',
+    winningCellStyle: 'bg-gradient-to-br from-cyan-400 to-teal-500 shadow-lg shadow-cyan-400/50'
   },
   minimalist: {
     name: 'Minimalist',
