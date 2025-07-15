@@ -14,6 +14,7 @@ interface User {
   email?: string;
   displayName?: string;
   profilePicture?: string;
+  profileTheme?: string;
   isEmailVerified?: boolean;
   emailVerificationToken?: string;
   emailVerificationExpiry?: Date;
@@ -408,13 +409,14 @@ export function setupAuth(app: Express) {
       return res.status(401).json({ error: 'Not authenticated' });
     }
     
-    const { displayName, profilePicture } = req.body;
+    const { displayName, profilePicture, profileTheme } = req.body;
     const userId = req.session.user.userId;
     
     try {
       const updates: Partial<User> = {};
       if (displayName !== undefined) updates.displayName = displayName;
       if (profilePicture !== undefined) updates.profilePicture = profilePicture;
+      if (profileTheme !== undefined) updates.profileTheme = profileTheme;
       
       // Update user in JSON file
       const updatedUser = updateUser(userId, updates);
@@ -441,7 +443,8 @@ export function setupAuth(app: Express) {
       req.session.user = {
         ...req.session.user,
         displayName: updatedUser.displayName,
-        profilePicture: updatedUser.profilePicture
+        profilePicture: updatedUser.profilePicture,
+        profileTheme: updatedUser.profileTheme
       };
       
       res.json({
@@ -449,6 +452,7 @@ export function setupAuth(app: Express) {
         username: updatedUser.username,
         displayName: updatedUser.displayName,
         profilePicture: updatedUser.profilePicture,
+        profileTheme: updatedUser.profileTheme,
         email: updatedUser.email,
         isEmailVerified: updatedUser.isEmailVerified
       });
