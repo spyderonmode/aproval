@@ -127,6 +127,9 @@ export default function Home() {
               // Force a complete new game object to ensure React re-renders
               const newGame = {
                 ...lastMessage.game,
+                status: 'active',
+                board: {},
+                currentPlayer: 'X',
                 timestamp: Date.now() // Force re-render
               };
               console.log('🎮 Final game object being set:', newGame);
@@ -477,6 +480,10 @@ export default function Home() {
       // For online mode, create a new game in the same room
       try {
         console.log('🎮 Creating new game for room:', currentRoom.id);
+        
+        // Clear the current game first to prevent using finished game
+        setCurrentGame(null);
+        
         const response = await fetch(`/api/rooms/${currentRoom.id}/start-game`, {
           method: 'POST',
           headers: {
@@ -487,17 +494,28 @@ export default function Home() {
         if (response.ok) {
           const newGame = await response.json();
           console.log('🎮 New game created for play again:', newGame);
-          setCurrentGame(newGame);
-
-          // No need to broadcast manually, server will handle it
+          
+          // Ensure the game has a fresh status
+          const gameWithFreshStatus = {
+            ...newGame,
+            status: 'active',
+            board: {},
+            currentPlayer: 'X'
+          };
+          
+          setCurrentGame(gameWithFreshStatus);
           console.log('🎮 Game created successfully, server will broadcast to all participants');
 
           // Sound effects removed as requested
         } else {
           console.error('Failed to create new game:', response.status);
+          // Reset game state on error
+          setCurrentGame(null);
         }
       } catch (error) {
         console.error('Error starting new game:', error);
+        // Reset game state on error
+        setCurrentGame(null);
       }
     } else {
       // For AI and pass-play modes, restart locally
