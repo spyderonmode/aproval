@@ -280,8 +280,14 @@ export default function Home() {
   }, [aiDifficulty, selectedMode, user]);
 
   const handleGameOver = (result: any) => {
-    // Sound effects removed as requested
-    console.log('🎮 Game over result:', result);
+    console.log('🎮 handleGameOver called with result:', result);
+    
+    // Ensure we have a valid result object
+    if (!result) {
+      console.error('🎮 handleGameOver: No result provided');
+      return;
+    }
+    
     // Ensure game stays available to prevent white screen
     if (result.game) {
       console.log('🎮 Preserving game state for game over modal:', result.game);
@@ -292,7 +298,22 @@ export default function Home() {
       console.log('🎮 Using current game state for game over modal:', currentGame);
       result.game = currentGame;
     }
-    setGameResult(result);
+    
+    // Force result to have required properties
+    const safeResult = {
+      winner: result.winner || null,
+      winnerName: result.winnerName || (result.winner === 'X' ? 'Player X' : result.winner === 'O' ? 'AI' : null),
+      condition: result.condition || 'unknown',
+      board: result.board || currentGame?.board || {},
+      game: result.game || currentGame,
+      playerXInfo: result.playerXInfo || { displayName: 'Player X' },
+      playerOInfo: result.playerOInfo || { displayName: 'AI' },
+      winnerInfo: result.winnerInfo || null,
+      winningPositions: result.winningPositions || []
+    };
+    
+    console.log('🎮 Setting safe game result:', safeResult);
+    setGameResult(safeResult);
     setShowGameOver(true);
   };
 

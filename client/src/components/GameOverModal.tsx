@@ -1,4 +1,4 @@
-import { Home, User, RefreshCw } from "lucide-react";
+import { Home, RefreshCw } from "lucide-react";
 
 interface GameOverModalProps {
   open: boolean;
@@ -10,7 +10,7 @@ interface GameOverModalProps {
 }
 
 export function GameOverModal({ open, onClose, result, onPlayAgain, isCreatingGame = false, onMainMenu }: GameOverModalProps) {
-  // Always check if we have open and result before rendering
+  // Simple safety checks
   if (!open) return null;
   if (!result) {
     console.error('GameOverModal: No result provided');
@@ -19,16 +19,10 @@ export function GameOverModal({ open, onClose, result, onPlayAgain, isCreatingGa
   
   console.log('GameOverModal rendering with result:', result);
 
+  // Super simple logic - no complex conditionals
   const isDraw = result.condition === 'draw';
-  const winnerSymbol = result.winner;
-  
-  // Simplified winner display - no complex player info needed for local modes
-  const getWinnerName = () => {
-    if (result.winnerName) return result.winnerName;
-    if (winnerSymbol === 'X') return 'Player X';
-    if (winnerSymbol === 'O') return 'Player O';
-    return 'Unknown';
-  };
+  const winner = result.winner;
+  const winnerName = result.winnerName || (winner === 'X' ? 'Player X' : winner === 'O' ? 'AI' : 'Unknown');
 
   return (
     <div 
@@ -86,33 +80,30 @@ export function GameOverModal({ open, onClose, result, onPlayAgain, isCreatingGa
             </div>
           ) : (
             <div>
-              <div style={{ width: '64px', height: '64px', margin: '0 auto 16px' }}>
-                <div 
-                  style={{
-                    width: '64px',
-                    height: '64px',
-                    backgroundColor: winnerSymbol === 'X' ? '#3b82f6' : '#ef4444',
-                    borderRadius: '50%',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center'
-                  }}
-                >
-                  <span style={{ fontSize: '32px', color: 'white', fontWeight: 'bold' }}>
-                    {winnerSymbol === 'X' ? 'X' : 'O'}
-                  </span>
-                </div>
+              <div 
+                style={{
+                  width: '64px',
+                  height: '64px',
+                  margin: '0 auto 16px',
+                  backgroundColor: winner === 'X' ? '#3b82f6' : '#ef4444',
+                  borderRadius: '50%',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center'
+                }}
+              >
+                <span style={{ fontSize: '32px', color: 'white', fontWeight: 'bold' }}>
+                  {winner}
+                </span>
               </div>
               
               <p style={{ fontSize: '20px', color: 'white', marginBottom: '16px' }}>
-                {getWinnerName()} Wins!
+                {winnerName} Wins!
               </p>
               
-              {result.condition && result.condition !== 'draw' && (
-                <p style={{ fontSize: '14px', color: '#9ca3af' }}>
-                  {result.condition === 'horizontal' ? 'Horizontal line' : 'Diagonal line'}
-                </p>
-              )}
+              <p style={{ fontSize: '14px', color: '#9ca3af' }}>
+                {result.condition === 'horizontal' ? 'Horizontal line' : 'Diagonal line'}
+              </p>
             </div>
           )}
         </div>
