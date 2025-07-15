@@ -15,12 +15,11 @@ import { GameOverModal } from "@/components/GameOverModal";
 import { EmailVerificationModal } from "@/components/EmailVerificationModal";
 import { MatchmakingModal } from "@/components/MatchmakingModal";
 import { OnlineUsersModal } from "@/components/OnlineUsersModal";
-import { InvitationNotification } from "@/components/InvitationNotification";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { GamepadIcon, LogOut, User, Zap, Loader2, Users, UserPlus } from "lucide-react";
+import { GamepadIcon, LogOut, User, Zap, Loader2, Users } from "lucide-react";
 import { logout } from "@/lib/firebase";
 
 export default function Home() {
@@ -41,7 +40,6 @@ export default function Home() {
   const [isMatchmaking, setIsMatchmaking] = useState(false);
   const [showOnlineUsers, setShowOnlineUsers] = useState(false);
   const [onlineUserCount, setOnlineUserCount] = useState(0);
-  const [invitations, setInvitations] = useState<any[]>([]);
   const [showProfile, setShowProfile] = useState(false);
 
   const { data: userStats } = useQuery({
@@ -63,11 +61,11 @@ export default function Home() {
         case 'online_users_update':
           setOnlineUserCount(lastMessage.count);
           break;
-        case 'invitation_received':
-          setInvitations(prev => [...prev, lastMessage.invitation]);
+        case 'chat_message_received':
+          // Handle chat messages - show notification
           toast({
-            title: "Room invitation received",
-            description: `${lastMessage.invitation.senderName} invited you to join "${lastMessage.invitation.roomName}"`,
+            title: "New message",
+            description: `${lastMessage.message.senderName}: ${lastMessage.message.message}`,
           });
           break;
         case 'game_started':
@@ -487,29 +485,7 @@ export default function Home() {
     }, 1000);
   };
 
-  const handleInvitationAccept = (roomId: string) => {
-    // Remove the accepted invitation
-    setInvitations(prev => prev.filter(inv => inv.roomId !== roomId));
-    
-    // Navigate to the room - this will be handled by the room join logic
-    fetch(`/api/rooms/${roomId}`)
-      .then(res => res.json())
-      .then(room => {
-        handleRoomJoin(room);
-      })
-      .catch(err => {
-        console.error('Failed to join room:', err);
-        toast({
-          title: "Error",
-          description: "Failed to join the room",
-          variant: "destructive",
-        });
-      });
-  };
 
-  const handleInvitationDismiss = (invitation: any) => {
-    setInvitations(prev => prev.filter(inv => inv.roomId !== invitation.roomId));
-  };
 
   return (
     <div className="min-h-screen bg-slate-900 text-white">
@@ -827,19 +803,10 @@ export default function Home() {
         open={showOnlineUsers}
         onClose={() => setShowOnlineUsers(false)}
         currentRoom={currentRoom}
+        user={user}
       />
 
-      {/* Invitation Notifications */}
-      <div className="fixed bottom-4 right-4 space-y-2 z-50">
-        {invitations.map((invitation, index) => (
-          <InvitationNotification
-            key={`${invitation.roomId}-${invitation.timestamp}`}
-            invitation={invitation}
-            onAccept={handleInvitationAccept}
-            onDismiss={() => handleInvitationDismiss(invitation)}
-          />
-        ))}
-      </div>
+
     </div>
   );
 }

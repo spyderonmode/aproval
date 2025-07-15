@@ -81,10 +81,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Send invitation
-  app.post('/api/invitations/send', requireAuth, async (req: any, res) => {
+  // Send chat message
+  app.post('/api/chat/send', requireAuth, async (req: any, res) => {
     try {
-      const { targetUserId, roomId } = req.body;
+      const { targetUserId, message } = req.body;
       const senderId = req.user.userId;
       
       // Get sender info
@@ -105,28 +105,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ error: 'Target user connection not found' });
       }
 
-      // Get room info
-      const room = await storage.getRoomById(roomId);
-      if (!room) {
-        return res.status(400).json({ error: 'Room not found' });
-      }
-
-      // Send invitation notification
+      // Send chat message to target user
       targetConnection.ws.send(JSON.stringify({
-        type: 'invitation_received',
-        invitation: {
+        type: 'chat_message_received',
+        message: {
           senderId,
           senderName: senderInfo.displayName || senderInfo.username,
-          roomId,
-          roomName: room.name,
+          message,
           timestamp: new Date().toISOString()
         }
       }));
 
-      res.json({ success: true, message: 'Invitation sent successfully' });
+      res.json({ success: true, message: 'Message sent successfully' });
     } catch (error) {
-      console.error("Error sending invitation:", error);
-      res.status(500).json({ message: "Failed to send invitation" });
+      console.error("Error sending chat message:", error);
+      res.status(500).json({ message: "Failed to send chat message" });
     }
   });
 

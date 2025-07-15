@@ -5,19 +5,24 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
-import { User, UserPlus, Clock, Users } from "lucide-react";
+import { User, MessageCircle, Clock, Users, Send } from "lucide-react";
 
 interface OnlineUsersModalProps {
   open: boolean;
   onClose: () => void;
   currentRoom?: any;
+  user?: any;
 }
 
-export function OnlineUsersModal({ open, onClose, currentRoom }: OnlineUsersModalProps) {
+export function OnlineUsersModal({ open, onClose, currentRoom, user }: OnlineUsersModalProps) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const [selectedUser, setSelectedUser] = useState<any>(null);
+  const [chatMessage, setChatMessage] = useState("");
+  const [chatMessages, setChatMessages] = useState<any[]>([]);
 
   const { data: onlineUsers, isLoading } = useQuery({
     queryKey: ["/api/users/online"],
@@ -25,51 +30,79 @@ export function OnlineUsersModal({ open, onClose, currentRoom }: OnlineUsersModa
     enabled: open,
   });
 
-  // Debug logging
-  React.useEffect(() => {
-    if (open) {
-      console.log('🔍 OnlineUsersModal - currentRoom:', currentRoom);
-      console.log('🔍 OnlineUsersModal - onlineUsers:', onlineUsers);
-    }
-  }, [open, currentRoom, onlineUsers]);
-
-  const inviteMutation = useMutation({
-    mutationFn: async ({ targetUserId, roomId }: { targetUserId: string; roomId: string }) => {
-      return await apiRequest('/api/invitations/send', {
+  const sendMessageMutation = useMutation({
+    mutationFn: async ({ targetUserId, message }: { targetUserId: string; message: string }) => {
+      return await apiRequest('/api/chat/send', {
         method: 'POST',
-        body: { targetUserId, roomId }
+        body: { targetUserId, message }
       });
     },
     onSuccess: () => {
+      // Add the sent message to local chat
+      const newMessage = {
+        fromMe: true,
+        message: chatMessage,
+        timestamp: new Date().toLocaleTimeString(),
+        userId: user?.userId || user?.id
+      };
+      setChatMessages(prev => [...prev, newMessage]);
+      setChatMessage("");
+      
       toast({
-        title: "Invitation sent",
-        description: "The player has been invited to your room.",
+        title: "Message sent",
+        description: "Your message has been sent successfully.",
       });
     },
     onError: (error: any) => {
       toast({
         title: "Error",
-        description: error.message || "Failed to send invitation",
+        description: error.message || "Failed to send message",
         variant: "destructive",
       });
     },
   });
 
-  const handleInvite = (targetUserId: string) => {
-    console.log('🔍 handleInvite called:', { targetUserId, currentRoom });
+  const handleSendMessage = () => {
+    if (!chatMessage.trim() || !selectedUser) return;
     
-    if (!currentRoom) {
-      toast({
-        title: "Error",
-        description: "You must be in a room to send invitations",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    console.log('🔍 Sending invitation to:', targetUserId, 'for room:', currentRoom.id);
-    inviteMutation.mutate({ targetUserId, roomId: currentRoom.id });
+    sendMessageMutation.mutate({ 
+      targetUserId: selectedUser.userId, 
+      message: chatMessage.trim() 
+    });
   };
+
+  // Handle incoming chat messages
+  useEffect(() => {
+    const handleMessage = (event: any) => {
+      const data = JSON.parse(event.data);
+      
+      if (data.type === 'chat_message_received') {
+        const incomingMessage = {
+          fromMe: false,
+          message: data.message.message,
+          timestamp: new Date(data.message.timestamp).toLocaleTimeString(),
+          userId: data.message.senderId,
+          senderName: data.message.senderName
+        };
+        
+        setChatMessages(prev => [...prev, incomingMessage]);
+        
+        // Show toast notification if not currently chatting with this user
+        if (!selectedUser || selectedUser.userId !== data.message.senderId) {
+          toast({
+            title: "New message",
+            description: `${data.message.senderName}: ${data.message.message}`,
+          });
+        }
+      }
+    };
+
+    // Add WebSocket listener if available
+    if (window.WebSocket && open) {
+      // This would need to be connected to the existing WebSocket in the home component
+      // For now, we'll handle it through the parent component
+    }
+  }, [selectedUser, open, toast]);
 
   const formatLastSeen = (lastSeen: string) => {
     const diff = Date.now() - new Date(lastSeen).getTime();
@@ -96,80 +129,136 @@ export function OnlineUsersModal({ open, onClose, currentRoom }: OnlineUsersModa
         </DialogHeader>
         
         <div className="space-y-4">
-          {!currentRoom ? (
-            <div className="bg-blue-50 dark:bg-blue-950 border border-blue-200 dark:border-blue-800 rounded-lg p-3">
-              <p className="text-sm text-blue-800 dark:text-blue-200">
-                <strong>To invite players:</strong> First create or join a room using the "Create Room" button or by entering a room code. Once you're in a room, you can invite other players to join your game.
-              </p>
-            </div>
-          ) : (
-            <div className="bg-green-50 dark:bg-green-950 border border-green-200 dark:border-green-800 rounded-lg p-3">
-              <p className="text-sm text-green-800 dark:text-green-200">
-                <strong>Room:</strong> {currentRoom.name} ({currentRoom.code}) - You can now invite players to your room!
-              </p>
-            </div>
-          )}
-          
-          {isLoading ? (
-            <div className="flex items-center justify-center py-8">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-            </div>
-          ) : (
-            <ScrollArea className="h-[400px] w-full">
-              <div className="space-y-2">
-                {onlineUsers?.users?.length > 0 ? (
-                  onlineUsers.users.map((user: any) => (
-                    <Card key={user.userId} className="p-3">
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-3">
-                          {user.profilePicture || user.profileImageUrl ? (
-                            <img
-                              src={user.profilePicture || user.profileImageUrl}
-                              alt="Profile"
-                              className="h-10 w-10 rounded-full object-cover"
-                            />
-                          ) : (
-                            <div className="h-10 w-10 rounded-full bg-blue-600 flex items-center justify-center">
-                              <User className="h-5 w-5 text-white" />
+          {!selectedUser ? (
+            <>
+              <div className="bg-blue-50 dark:bg-blue-950 border border-blue-200 dark:border-blue-800 rounded-lg p-3">
+                <p className="text-sm text-blue-800 dark:text-blue-200">
+                  <strong>Online Players:</strong> Click on a player to start chatting with them.
+                </p>
+              </div>
+              
+              {isLoading ? (
+                <div className="flex items-center justify-center py-8">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+                </div>
+              ) : (
+                <ScrollArea className="h-[400px] w-full">
+                  <div className="space-y-2">
+                    {onlineUsers?.users?.length > 0 ? (
+                      onlineUsers.users.map((user: any) => (
+                        <Card key={user.userId} className="p-3 cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-3">
+                              {user.profilePicture || user.profileImageUrl ? (
+                                <img
+                                  src={user.profilePicture || user.profileImageUrl}
+                                  alt="Profile"
+                                  className="h-10 w-10 rounded-full object-cover"
+                                />
+                              ) : (
+                                <div className="h-10 w-10 rounded-full bg-blue-600 flex items-center justify-center">
+                                  <User className="h-5 w-5 text-white" />
+                                </div>
+                              )}
+                              <div>
+                                <h3 className="font-medium">
+                                  {user.displayName || user.firstName || user.username}
+                                </h3>
+                                <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                                  <Clock className="h-3 w-3" />
+                                  {formatLastSeen(user.lastSeen)}
+                                </div>
+                              </div>
                             </div>
-                          )}
-                          <div>
-                            <h3 className="font-medium">
-                              {user.displayName || user.firstName || user.username}
-                            </h3>
-                            <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                              <Clock className="h-3 w-3" />
-                              {formatLastSeen(user.lastSeen)}
+                            
+                            <div className="flex items-center gap-2">
+                              {user.inRoom && (
+                                <Badge variant="secondary">In Room</Badge>
+                              )}
+                              
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                onClick={() => setSelectedUser(user)}
+                              >
+                                <MessageCircle className="h-4 w-4 mr-1" />
+                                Chat
+                              </Button>
                             </div>
                           </div>
-                        </div>
-                        
-                        <div className="flex items-center gap-2">
-                          {user.inRoom && (
-                            <Badge variant="secondary">In Room</Badge>
-                          )}
-                          
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            onClick={() => handleInvite(user.userId)}
-                            disabled={inviteMutation.isPending || user.inRoom || !currentRoom}
-                            title={!currentRoom ? "You must be in a room to send invitations" : user.inRoom ? "User is already in a room" : "Invite to your room"}
-                          >
-                            <UserPlus className="h-4 w-4 mr-1" />
-                            {user.inRoom ? "In Room" : "Invite"}
-                          </Button>
-                        </div>
+                        </Card>
+                      ))
+                    ) : (
+                      <div className="text-center py-8 text-muted-foreground">
+                        No other players online
                       </div>
-                    </Card>
-                  ))
-                ) : (
-                  <div className="text-center py-8 text-muted-foreground">
-                    No other players online
+                    )}
                   </div>
-                )}
+                </ScrollArea>
+              )}
+            </>
+          ) : (
+            <div className="space-y-4">
+              <div className="flex items-center gap-3 pb-3 border-b">
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => setSelectedUser(null)}
+                >
+                  ← Back
+                </Button>
+                <div className="flex items-center gap-3">
+                  {selectedUser.profilePicture || selectedUser.profileImageUrl ? (
+                    <img
+                      src={selectedUser.profilePicture || selectedUser.profileImageUrl}
+                      alt="Profile"
+                      className="h-8 w-8 rounded-full object-cover"
+                    />
+                  ) : (
+                    <div className="h-8 w-8 rounded-full bg-blue-600 flex items-center justify-center">
+                      <User className="h-4 w-4 text-white" />
+                    </div>
+                  )}
+                  <span className="font-medium">
+                    {selectedUser.displayName || selectedUser.firstName || selectedUser.username}
+                  </span>
+                </div>
               </div>
-            </ScrollArea>
+              
+              <ScrollArea className="h-[300px] w-full">
+                <div className="space-y-2">
+                  {chatMessages.length > 0 ? (
+                    chatMessages.map((msg, index) => (
+                      <div key={index} className={`p-2 rounded-lg ${msg.fromMe ? 'bg-blue-100 dark:bg-blue-900 ml-4' : 'bg-gray-100 dark:bg-gray-800 mr-4'}`}>
+                        <div className="text-sm font-medium">{msg.fromMe ? 'You' : selectedUser.displayName || selectedUser.username}</div>
+                        <div className="text-sm">{msg.message}</div>
+                        <div className="text-xs text-muted-foreground mt-1">{msg.timestamp}</div>
+                      </div>
+                    ))
+                  ) : (
+                    <div className="text-center py-8 text-muted-foreground">
+                      No messages yet. Start a conversation!
+                    </div>
+                  )}
+                </div>
+              </ScrollArea>
+              
+              <div className="flex gap-2">
+                <Input
+                  value={chatMessage}
+                  onChange={(e) => setChatMessage(e.target.value)}
+                  placeholder="Type a message..."
+                  onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
+                />
+                <Button
+                  size="sm"
+                  onClick={handleSendMessage}
+                  disabled={!chatMessage.trim() || sendMessageMutation.isPending}
+                >
+                  <Send className="h-4 w-4" />
+                </Button>
+              </div>
+            </div>
           )}
         </div>
       </DialogContent>
