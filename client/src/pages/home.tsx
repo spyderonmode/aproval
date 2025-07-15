@@ -694,7 +694,7 @@ export default function Home() {
                   </span>
                 </div>
                 <GameBoard 
-                  key={`${currentGame?.id}-${currentGame?.timestamp || Date.now()}`}
+                  key={currentGame?.id}
                   game={currentGame}
                   onGameOver={handleGameOver}
                   gameMode={selectedMode}
