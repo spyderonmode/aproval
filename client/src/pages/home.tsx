@@ -113,10 +113,16 @@ export default function Home() {
           // Handle game start from WebSocket - ensure both players transition
           if (lastMessage.roomId === currentRoom?.id) {
             console.log('🎮 Setting current game from WebSocket:', lastMessage.game);
+            console.log('🎮 New game ID:', lastMessage.game.id);
+            console.log('🎮 Previous game ID:', currentGame?.id);
             // Force complete state update to ensure game appears
             setCurrentGame(prevGame => {
               console.log('🎮 Game state update - prev:', prevGame, 'new:', lastMessage.game);
-              return lastMessage.game;
+              // Force a complete new game object to ensure React re-renders
+              return {
+                ...lastMessage.game,
+                timestamp: Date.now() // Force re-render
+              };
             });
             // Reset creating state since game was successfully created
             setIsCreatingGame(false);

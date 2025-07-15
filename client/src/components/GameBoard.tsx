@@ -229,6 +229,8 @@ export function GameBoard({ game, onGameOver, gameMode, user }: GameBoardProps) 
         return handleLocalMove(position);
       }
       
+      console.log('🎯 Making move with game ID:', game.id);
+      console.log('🎯 Current game state:', game);
       return await apiRequest('POST', `/api/games/${game.id}/moves`, { position });
     },
     onSuccess: (data) => {
