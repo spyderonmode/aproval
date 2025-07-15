@@ -8,6 +8,9 @@ import { useToast } from "@/hooks/use-toast";
 import { useWebSocket } from "@/hooks/useWebSocket";
 import { isUnauthorizedError } from "@/lib/authUtils";
 import { motion } from "framer-motion"; // Added back for winning line animation
+import { Input } from "@/components/ui/input";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { MessageCircle, Send, User, X } from "lucide-react";
 
 const VALID_POSITIONS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15];
 
@@ -158,6 +161,12 @@ export function GameBoard({ game, onGameOver, gameMode, user }: GameBoardProps) 
   const [winningLine, setWinningLine] = useState<number[] | null>(null);
   const [lastMove, setLastMove] = useState<number | null>(null);
   
+  // Chat state for online games
+  const [showChat, setShowChat] = useState(false);
+  const [chatMessage, setChatMessage] = useState("");
+  const [chatHistory, setChatHistory] = useState<any[]>([]);
+  const [opponent, setOpponent] = useState<any>(null);
+  
   // Update winning line when game has winning positions
   useEffect(() => {
     if (game?.winningPositions) {
@@ -168,6 +177,94 @@ export function GameBoard({ game, onGameOver, gameMode, user }: GameBoardProps) 
   // Sound effects removed as requested
   const { lastMessage } = useWebSocket();
   const queryClient = useQueryClient();
+
+  // Determine opponent for online games
+  useEffect(() => {
+    if (gameMode === 'online' && game && user) {
+      const userIsPlayerX = game.playerXId === (user.userId || user.id);
+      const userIsPlayerO = game.playerOId === (user.userId || user.id);
+      
+      if (userIsPlayerX && game.playerOInfo) {
+        setOpponent(game.playerOInfo);
+      } else if (userIsPlayerO && game.playerXInfo) {
+        setOpponent(game.playerXInfo);
+      }
+    }
+  }, [game, user, gameMode]);
+
+  // Chat message mutation
+  const sendChatMutation = useMutation({
+    mutationFn: async ({ targetUserId, message }: { targetUserId: string; message: string }) => {
+      return await apiRequest('POST', '/api/chat/send', { targetUserId, message });
+    },
+    onSuccess: () => {
+      // Add sent message to chat history
+      const newMessage = {
+        fromMe: true,
+        message: chatMessage,
+        timestamp: new Date().toLocaleTimeString(),
+        userId: user?.userId || user?.id
+      };
+      setChatHistory(prev => [...prev, newMessage]);
+      setChatMessage("");
+    },
+    onError: (error: any) => {
+      if (isUnauthorizedError(error)) {
+        toast({
+          title: "Unauthorized",
+          description: "You are logged out. Logging in again...",
+          variant: "destructive",
+        });
+        setTimeout(() => {
+          window.location.href = "/api/login";
+        }, 500);
+        return;
+      }
+      toast({
+        title: "Error",
+        description: "Failed to send message. Please try again.",
+        variant: "destructive",
+      });
+    }
+  });
+
+  // Handle chat message sending
+  const handleSendMessage = () => {
+    if (!chatMessage.trim() || !opponent) return;
+    
+    sendChatMutation.mutate({
+      targetUserId: opponent.id || opponent.userId,
+      message: chatMessage.trim()
+    });
+  };
+
+  // Handle incoming chat messages
+  useEffect(() => {
+    const handleChatMessage = (event: CustomEvent) => {
+      const data = event.detail;
+      
+      if (data.type === 'chat_message_received' && opponent) {
+        // Only show messages from the current opponent
+        if (data.message.senderId === (opponent.id || opponent.userId)) {
+          const incomingMessage = {
+            fromMe: false,
+            message: data.message.message,
+            timestamp: new Date(data.message.timestamp).toLocaleTimeString(),
+            userId: data.message.senderId,
+            senderName: data.message.senderName
+          };
+          
+          setChatHistory(prev => [...prev, incomingMessage]);
+        }
+      }
+    };
+
+    window.addEventListener('chat_message_received', handleChatMessage as EventListener);
+    
+    return () => {
+      window.removeEventListener('chat_message_received', handleChatMessage as EventListener);
+    };
+  }, [opponent]);
 
   useEffect(() => {
     if (game) {
@@ -661,46 +758,59 @@ export function GameBoard({ game, onGameOver, gameMode, user }: GameBoardProps) 
         <div className="flex items-center justify-between">
           <CardTitle className="text-2xl">Game Board</CardTitle>
           <div className="flex items-center space-x-4">
-            <div className="flex items-center space-x-2">
-              <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
+            {gameMode === 'online' && opponent && (
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => setShowChat(!showChat)}
+                className="flex items-center gap-2"
+              >
+                <MessageCircle className="h-4 w-4" />
+                Chat
+              </Button>
+            )}
+            <div className="flex items-center space-x-4">
               <div className="flex items-center space-x-2">
-                {gameMode === 'online' && (game?.playerXInfo?.profileImageUrl || game?.playerXInfo?.profilePicture) ? (
-                  <img 
-                    src={game.playerXInfo.profileImageUrl || game.playerXInfo.profilePicture} 
-                    alt="Player X" 
-                    className="w-6 h-6 rounded-full object-cover"
-                  />
-                ) : (
-                  <div className="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center">
-                    <span className="text-xs text-white font-bold">X</span>
-                  </div>
-                )}
-                <span className="text-sm text-gray-300">
-                  {gameMode === 'online' 
-                    ? (game?.playerXInfo?.firstName || game?.playerXInfo?.displayName || game?.playerXInfo?.username || 'Player X')
-                    : 'Player X'}
-                </span>
+                <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
+                <div className="flex items-center space-x-2">
+                  {gameMode === 'online' && (game?.playerXInfo?.profileImageUrl || game?.playerXInfo?.profilePicture) ? (
+                    <img 
+                      src={game.playerXInfo.profileImageUrl || game.playerXInfo.profilePicture} 
+                      alt="Player X" 
+                      className="w-6 h-6 rounded-full object-cover"
+                    />
+                  ) : (
+                    <div className="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center">
+                      <span className="text-xs text-white font-bold">X</span>
+                    </div>
+                  )}
+                  <span className="text-sm text-gray-300">
+                    {gameMode === 'online' 
+                      ? (game?.playerXInfo?.firstName || game?.playerXInfo?.displayName || game?.playerXInfo?.username || 'Player X')
+                      : 'Player X'}
+                  </span>
+                </div>
               </div>
-            </div>
-            <div className="flex items-center space-x-2">
-              <div className="w-3 h-3 bg-red-500 rounded-full"></div>
               <div className="flex items-center space-x-2">
-                {gameMode === 'online' && (game?.playerOInfo?.profileImageUrl || game?.playerOInfo?.profilePicture) ? (
-                  <img 
-                    src={game.playerOInfo.profileImageUrl || game.playerOInfo.profilePicture} 
-                    alt="Player O" 
-                    className="w-6 h-6 rounded-full object-cover"
-                  />
-                ) : (
-                  <div className="w-6 h-6 bg-red-500 rounded-full flex items-center justify-center">
-                    <span className="text-xs text-white font-bold">O</span>
-                  </div>
-                )}
-                <span className="text-sm text-gray-300">
-                  {gameMode === 'online' 
-                    ? (game?.playerOInfo?.firstName || game?.playerOInfo?.displayName || game?.playerOInfo?.username || 'Player O')
-                    : (gameMode === 'ai' ? 'AI' : 'Player O')}
-                </span>
+                <div className="w-3 h-3 bg-red-500 rounded-full"></div>
+                <div className="flex items-center space-x-2">
+                  {gameMode === 'online' && (game?.playerOInfo?.profileImageUrl || game?.playerOInfo?.profilePicture) ? (
+                    <img 
+                      src={game.playerOInfo.profileImageUrl || game.playerOInfo.profilePicture} 
+                      alt="Player O" 
+                      className="w-6 h-6 rounded-full object-cover"
+                    />
+                  ) : (
+                    <div className="w-6 h-6 bg-red-500 rounded-full flex items-center justify-center">
+                      <span className="text-xs text-white font-bold">O</span>
+                    </div>
+                  )}
+                  <span className="text-sm text-gray-300">
+                    {gameMode === 'online' 
+                      ? (game?.playerOInfo?.firstName || game?.playerOInfo?.displayName || game?.playerOInfo?.username || 'Player O')
+                      : (gameMode === 'ai' ? 'AI' : 'Player O')}
+                  </span>
+                </div>
               </div>
             </div>
           </div>
@@ -755,6 +865,75 @@ export function GameBoard({ game, onGameOver, gameMode, user }: GameBoardProps) 
           </Button>
         </div>
       </CardContent>
+
+      {/* Chat Panel for Online Games */}
+      {gameMode === 'online' && opponent && showChat && (
+        <div className="border-t border-slate-700 bg-slate-900">
+          <div className="p-4">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-2">
+                <MessageCircle className="h-5 w-5 text-blue-400" />
+                <h3 className="text-lg font-semibold text-white">
+                  Chat with {opponent.firstName || opponent.displayName || opponent.username}
+                </h3>
+              </div>
+              <Button
+                size="sm"
+                variant="ghost"
+                onClick={() => setShowChat(false)}
+              >
+                <X className="h-4 w-4" />
+              </Button>
+            </div>
+            
+            <div className="space-y-3">
+              {/* Chat Messages */}
+              <ScrollArea className="h-64 w-full border border-slate-600 rounded-lg p-3 bg-slate-800">
+                <div className="space-y-2">
+                  {chatHistory.length > 0 ? (
+                    chatHistory.map((msg, index) => (
+                      <div key={index} className={`p-2 rounded-lg ${msg.fromMe ? 'bg-blue-900 ml-4' : 'bg-slate-700 mr-4'}`}>
+                        <div className="text-sm font-medium text-white">
+                          {msg.fromMe ? 'You' : (opponent.firstName || opponent.displayName || opponent.username)}
+                        </div>
+                        <div className="text-sm text-gray-300">{msg.message}</div>
+                        <div className="text-xs text-gray-400 mt-1">{msg.timestamp}</div>
+                      </div>
+                    ))
+                  ) : (
+                    <div className="text-center py-8 text-gray-400">
+                      No messages yet. Start the conversation!
+                    </div>
+                  )}
+                </div>
+              </ScrollArea>
+
+              {/* Message Input */}
+              <div className="flex gap-2">
+                <Input
+                  value={chatMessage}
+                  onChange={(e) => setChatMessage(e.target.value)}
+                  placeholder="Type a message..."
+                  className="flex-1 bg-slate-800 border-slate-600 text-white placeholder-gray-400"
+                  onKeyPress={(e) => {
+                    if (e.key === 'Enter') {
+                      handleSendMessage();
+                    }
+                  }}
+                />
+                <Button
+                  size="sm"
+                  onClick={handleSendMessage}
+                  disabled={!chatMessage.trim() || sendChatMutation.isPending}
+                  className="bg-blue-600 hover:bg-blue-700 text-white"
+                >
+                  <Send className="h-4 w-4" />
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </Card>
   );
 }

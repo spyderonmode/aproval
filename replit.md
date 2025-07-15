@@ -10,6 +10,7 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+- **In-Game Chat System** (July 15, 2025): Added chat functionality during online games - players can open a chat panel directly from the game board, send messages while playing, and see real-time conversation history with their opponent
 - **Unread Message Indicator** (July 15, 2025): Added red circular badge on Chat buttons showing number of unread messages, with automatic clearing when starting a conversation and proper cleanup when users go offline
 - **Real-time Chat System** (July 15, 2025): Replaced invitation system with comprehensive chat functionality - players can now message each other in real-time through the Online Players modal, with proper message display, WebSocket integration, and custom event handling for seamless communication
 - **Header Display Fix** (July 15, 2025): Fixed duplicate player name display in the header by removing redundant user name element, ensuring clean single display of player information
