@@ -61,6 +61,11 @@ export default function Home() {
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (headerSidebarRef.current && !headerSidebarRef.current.contains(event.target as Node)) {
+        // Check if the click is on a theme selector dialog
+        const target = event.target as Element;
+        if (target.closest('[data-radix-portal]') || target.closest('[role="dialog"]')) {
+          return; // Don't close sidebar if clicking on a dialog
+        }
         setShowHeaderSidebar(false);
       }
     };
@@ -574,7 +579,23 @@ export default function Home() {
                         <Palette className="w-4 h-4 text-gray-400" />
                         <span className="text-sm text-gray-300">Theme</span>
                       </div>
-                      <ThemeSelector />
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setShowHeaderSidebar(false);
+                          // Give a small delay to ensure sidebar is closed before opening theme selector
+                          setTimeout(() => {
+                            const event = new CustomEvent('openThemeSelector');
+                            window.dispatchEvent(event);
+                          }, 100);
+                        }}
+                        className="bg-slate-700 border-slate-600 text-white hover:bg-slate-600 text-xs"
+                      >
+                        <Palette className="h-3 w-3 mr-1" />
+                        Change
+                      </Button>
                     </div>
                     
                     {/* Online Players */}

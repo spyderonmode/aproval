@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useTheme, GameTheme } from '@/contexts/ThemeContext';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -10,6 +10,15 @@ export function ThemeSelector() {
   const { currentTheme, setTheme, themes } = useTheme();
   const [open, setOpen] = useState(false);
 
+  useEffect(() => {
+    const handleOpenThemeSelector = () => {
+      setOpen(true);
+    };
+
+    window.addEventListener('openThemeSelector', handleOpenThemeSelector);
+    return () => window.removeEventListener('openThemeSelector', handleOpenThemeSelector);
+  }, []);
+
   const handleThemeSelect = (theme: GameTheme) => {
     setTheme(theme);
     setOpen(false);
@@ -17,12 +26,6 @@ export function ThemeSelector() {
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button variant="outline" size="sm" className="gap-2 bg-slate-700 border-slate-600 text-white hover:bg-slate-600">
-          <Palette className="h-4 w-4" />
-          Theme: {themes[currentTheme].name}
-        </Button>
-      </DialogTrigger>
       <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Choose Your Theme</DialogTitle>
