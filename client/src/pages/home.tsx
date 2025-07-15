@@ -269,7 +269,13 @@ export default function Home() {
     console.log('🎮 Game over result:', result);
     // Ensure game stays available to prevent white screen
     if (result.game) {
+      console.log('🎮 Preserving game state for game over modal:', result.game);
       setCurrentGame(result.game);
+    }
+    // Preserve game state even if not in result
+    if (!result.game && currentGame) {
+      console.log('🎮 Using current game state for game over modal:', currentGame);
+      result.game = currentGame;
     }
     setGameResult(result);
     setShowGameOver(true);

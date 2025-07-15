@@ -51,7 +51,9 @@ export function useWebSocket() {
     };
 
     ws.current.onclose = () => {
+      console.log('🔌 WebSocket connection closed');
       setIsConnected(false);
+      // Don't clear game state on connection close to prevent white screen
     };
 
     ws.current.onerror = (error) => {
