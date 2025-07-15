@@ -22,7 +22,16 @@ class GameErrorBoundary extends Component<{ children: React.ReactNode }, { hasEr
   }
 
   componentDidCatch(error: Error, errorInfo: any) {
-    console.error('🚨 Game crashed with error:', error, errorInfo);
+    console.error('🚨 Game crashed with error:', error);
+    console.error('🚨 Error info:', errorInfo);
+    console.error('🚨 Error stack:', error.stack);
+    
+    // Log to server as well for debugging
+    fetch('/api/error-log', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ error: error.message, stack: error.stack, info: errorInfo })
+    }).catch(() => {});
   }
 
   render() {

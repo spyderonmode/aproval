@@ -313,27 +313,22 @@ export function GameBoard({ game, onGameOver, gameMode, user }: GameBoardProps) 
       
       // Add delay before showing game over for AI and pass-play
       setTimeout(() => {
-        if (onGameOver) {
-          const winnerName = currentPlayer === 'X' ? 'Player X' : (gameMode === 'ai' ? 'AI' : 'Player O');
-          console.log('🎮 GameBoard sending win result:', {
-            winner: currentPlayer,
-            winnerName,
-            condition: 'diagonal',
-            board: newBoard,
-            winningPositions,
-            game: game
-          });
-          onGameOver({
-            winner: currentPlayer,
-            winnerName,
-            condition: 'diagonal',
-            board: newBoard,
-            winningPositions,
-            game: game, // Pass game object to prevent white screen
-            playerXInfo: { displayName: 'Player X' },
-            playerOInfo: { displayName: gameMode === 'ai' ? 'AI' : 'Player O' },
-            winnerInfo: null // Keep simple for local modes
-          });
+        try {
+          if (onGameOver) {
+            const winnerName = currentPlayer === 'X' ? 'Player X' : (gameMode === 'ai' ? 'AI' : 'Player O');
+            console.log('🎮 GameBoard sending win result:', {
+              winner: currentPlayer,
+              winnerName,
+              condition: 'diagonal'
+            });
+            onGameOver({
+              winner: currentPlayer,
+              winnerName,
+              condition: 'diagonal'
+            });
+          }
+        } catch (error) {
+          console.error('🚨 Error in game over handler:', error);
         }
       }, gameMode === 'ai' || gameMode === 'pass-play' ? 2500 : 0);
       return;
@@ -341,23 +336,20 @@ export function GameBoard({ game, onGameOver, gameMode, user }: GameBoardProps) 
     
     if (checkDraw(newBoard)) {
       if (onGameOver) {
-        console.log('🎮 GameBoard sending draw result:', {
-          winner: null,
-          winnerName: null,
-          condition: 'draw',
-          board: newBoard,
-          game: game
-        });
-        onGameOver({
-          winner: null,
-          winnerName: null,
-          condition: 'draw',
-          board: newBoard,
-          game: game, // Pass game object to prevent white screen
-          playerXInfo: { displayName: 'Player X' },
-          playerOInfo: { displayName: gameMode === 'ai' ? 'AI' : 'Player O' },
-          winnerInfo: null
-        });
+        try {
+          console.log('🎮 GameBoard sending draw result:', {
+            winner: null,
+            winnerName: null,
+            condition: 'draw'
+          });
+          onGameOver({
+            winner: null,
+            winnerName: null,
+            condition: 'draw'
+          });
+        } catch (error) {
+          console.error('🚨 Error in draw handler:', error);
+        }
       }
       return;
     }
@@ -454,25 +446,20 @@ export function GameBoard({ game, onGameOver, gameMode, user }: GameBoardProps) 
       // Add delay before showing game over for AI mode
       setTimeout(() => {
         if (onGameOver) {
-          console.log('🎮 GameBoard sending AI win result:', {
-            winner: 'O',
-            winnerName: 'AI',
-            condition: 'diagonal',
-            board: newBoard,
-            winningPositions,
-            game: game
-          });
-          onGameOver({
-            winner: 'O',
-            winnerName: 'AI',
-            condition: 'diagonal',
-            board: newBoard,
-            winningPositions,
-            game: game, // Pass game object to prevent white screen
-            playerXInfo: { displayName: 'Player X' },
-            playerOInfo: { displayName: 'AI' },
-            winnerInfo: null // Keep simple for local modes
-          });
+          try {
+            console.log('🎮 GameBoard sending AI win result:', {
+              winner: 'O',
+              winnerName: 'AI',
+              condition: 'diagonal'
+            });
+            onGameOver({
+              winner: 'O',
+              winnerName: 'AI',
+              condition: 'diagonal'
+            });
+          } catch (error) {
+            console.error('🚨 Error in AI win handler:', error);
+          }
         }
       }, 2500);
       return;
@@ -480,16 +467,15 @@ export function GameBoard({ game, onGameOver, gameMode, user }: GameBoardProps) 
     
     if (checkDraw(newBoard)) {
       if (onGameOver) {
-        onGameOver({
-          winner: null,
-          winnerName: null,
-          condition: 'draw',
-          board: newBoard,
-          game: game, // Pass game object to prevent white screen
-          playerXInfo: { displayName: 'Player X' },
-          playerOInfo: { displayName: 'AI' },
-          winnerInfo: null
-        });
+        try {
+          onGameOver({
+            winner: null,
+            winnerName: null,
+            condition: 'draw'
+          });
+        } catch (error) {
+          console.error('🚨 Error in AI draw handler:', error);
+        }
       }
       return;
     }
