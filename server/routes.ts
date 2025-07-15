@@ -915,13 +915,42 @@ export async function registerRoutes(app: Express): Promise<Server> {
           case 'leave_room':
             const conn = connections.get(connectionId);
             if (conn && conn.roomId) {
-              const roomUsers = roomConnections.get(conn.roomId);
+              const roomId = conn.roomId;
+              const { userId, playerName } = data;
+              
+              console.log(`🏠 Processing leave_room message for ${playerName} in room ${roomId}`);
+              
+              // Remove from room connections
+              const roomUsers = roomConnections.get(roomId);
               if (roomUsers) {
                 roomUsers.delete(connectionId);
+                
+                // Send room end notification to all remaining users
+                if (roomUsers.size > 0) {
+                  const roomEndMessage = JSON.stringify({
+                    type: 'room_ended',
+                    roomId,
+                    userId,
+                    playerName,
+                    message: `${playerName} left the room`
+                  });
+                  
+                  console.log(`🏠 Broadcasting room end to ${roomUsers.size} remaining users`);
+                  roomUsers.forEach(remainingConnectionId => {
+                    const remainingConnection = connections.get(remainingConnectionId);
+                    if (remainingConnection && remainingConnection.ws.readyState === WebSocket.OPEN) {
+                      remainingConnection.ws.send(roomEndMessage);
+                    }
+                  });
+                }
+                
+                // Clear the room if no users left
                 if (roomUsers.size === 0) {
-                  roomConnections.delete(conn.roomId);
+                  roomConnections.delete(roomId);
+                  console.log(`🏠 Room ${roomId} cleared - no users remaining`);
                 }
               }
+              
               conn.roomId = undefined;
             }
             break;

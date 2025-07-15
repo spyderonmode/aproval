@@ -181,9 +181,18 @@ export default function Home() {
   };
 
   const resetToMainMenu = () => {
-    // Leave room if currently in one
+    // Leave room if currently in one - this will trigger room end notification
     if (currentRoom) {
+      console.log('🏠 Leaving room from main menu:', currentRoom.id);
       leaveRoom(currentRoom.id);
+      
+      // Send explicit leave message to notify other players
+      sendMessage({
+        type: 'leave_room',
+        roomId: currentRoom.id,
+        userId: user?.userId || user?.id,
+        playerName: user?.displayName || user?.firstName || user?.username || 'Player'
+      });
     }
     
     setCurrentRoom(null);
