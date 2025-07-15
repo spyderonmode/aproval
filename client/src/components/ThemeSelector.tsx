@@ -12,6 +12,7 @@ export function ThemeSelector() {
 
   useEffect(() => {
     const handleOpenThemeSelector = () => {
+      console.log('Theme selector opening...');
       setOpen(true);
     };
 

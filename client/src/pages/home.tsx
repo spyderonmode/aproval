@@ -594,11 +594,12 @@ export default function Home() {
                         size="sm"
                         onClick={(e) => {
                           e.stopPropagation();
+                          console.log('Theme change button clicked');
                           // Don't close the sidebar, just open theme selector
                           const event = new CustomEvent('openThemeSelector');
                           window.dispatchEvent(event);
                         }}
-                        className="bg-slate-700 border-slate-600 text-white hover:bg-slate-600 text-xs"
+                        className="bg-slate-700 border-slate-600 text-white hover:bg-slate-600 text-xs cursor-pointer"
                       >
                         <Palette className="h-3 w-3 mr-1" />
                         Change
@@ -929,6 +930,8 @@ export default function Home() {
         open={showProfile}
         onClose={() => setShowProfile(false)}
       />
+
+      <ThemeSelector />
 
     </div>
   );
