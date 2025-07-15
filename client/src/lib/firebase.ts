@@ -55,6 +55,20 @@ export const register = async (credentials: { username: string; password: string
       updatedAt: serverTimestamp()
     });
     
+    // Send email verification through backend
+    try {
+      await fetch('/api/auth/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+          email: credentials.email, 
+          username: credentials.username 
+        })
+      });
+    } catch (emailError) {
+      console.warn('Email verification failed to send:', emailError);
+    }
+    
     return {
       id: user.uid,
       email: user.email,

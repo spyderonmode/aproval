@@ -1,27 +1,10 @@
 import nodemailer from 'nodemailer';
 import { db } from './firebase-admin';
 
-// Get SMTP configuration from Firebase or environment variables
+// Get SMTP configuration from environment variables (Firebase can be enabled later)
 async function getSMTPConfig() {
   try {
-    // First try to get from Firebase
-    if (db) {
-      const configDoc = await db.collection('config').doc('smtp').get();
-      if (configDoc.exists) {
-        const config = configDoc.data();
-        return {
-          host: config.host || 'smtp.gmail.com',
-          port: config.port || 587,
-          secure: config.secure || false,
-          auth: {
-            user: config.user,
-            pass: config.pass,
-          },
-        };
-      }
-    }
-    
-    // Fallback to environment variables
+    // Use environment variables for now (Firebase Firestore will be enabled later)
     return {
       host: process.env.SMTP_HOST || 'smtp.gmail.com',
       port: parseInt(process.env.SMTP_PORT || '587'),
@@ -49,7 +32,7 @@ async function getSMTPConfig() {
 // Create transporter with dynamic config
 async function createTransporter() {
   const config = await getSMTPConfig();
-  return nodemailer.createTransporter(config);
+  return nodemailer.createTransport(config);
 }
 
 // Email templates
@@ -154,4 +137,45 @@ export async function sendPasswordResetEmail(email: string, username: string, re
   const template = emailTemplates.passwordReset(resetLink, username);
   
   return await sendEmail(email, template.subject, template.html);
+}
+
+// Utility function to save SMTP config to Firebase
+export async function saveSMTPConfigToFirebase(smtpConfig: {
+  host: string;
+  port: number;
+  secure: boolean;
+  user: string;
+  pass: string;
+}) {
+  try {
+    if (!db) {
+      throw new Error('Firebase not initialized');
+    }
+    
+    await db.collection('config').doc('smtp').set(smtpConfig);
+    console.log('SMTP configuration saved to Firebase');
+    return { success: true };
+  } catch (error) {
+    console.error('Error saving SMTP config to Firebase:', error);
+    return { success: false, error: error.message };
+  }
+}
+
+// Test SMTP configuration
+export async function testSMTPConfig() {
+  try {
+    const transporter = await createTransporter();
+    const smtpConfig = await getSMTPConfig();
+    
+    if (!smtpConfig.auth.user || !smtpConfig.auth.pass) {
+      return { success: false, error: 'SMTP credentials not configured' };
+    }
+    
+    await transporter.verify();
+    console.log('SMTP configuration is valid');
+    return { success: true, message: 'SMTP configuration is valid' };
+  } catch (error: any) {
+    console.error('SMTP configuration test failed:', error);
+    return { success: false, error: error.message };
+  }
 }
