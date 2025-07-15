@@ -23,6 +23,7 @@ export function OnlineUsersModal({ open, onClose, currentRoom, user }: OnlineUse
   const [selectedUser, setSelectedUser] = useState<any>(null);
   const [chatMessage, setChatMessage] = useState("");
   const [chatHistory, setChatHistory] = useState<Map<string, any[]>>(new Map());
+  const [unreadMessages, setUnreadMessages] = useState<Map<string, number>>(new Map());
 
   const { data: onlineUsers, isLoading } = useQuery({
     queryKey: ["/api/users/online"],
@@ -93,6 +94,16 @@ export function OnlineUsersModal({ open, onClose, currentRoom, user }: OnlineUse
           newHistory.set(data.message.senderId, [...userMessages, incomingMessage]);
           return newHistory;
         });
+        
+        // Add to unread messages count if not currently chatting with this user
+        if (!selectedUser || selectedUser.userId !== data.message.senderId) {
+          setUnreadMessages(prev => {
+            const newUnread = new Map(prev);
+            const currentCount = newUnread.get(data.message.senderId) || 0;
+            newUnread.set(data.message.senderId, currentCount + 1);
+            return newUnread;
+          });
+        }
       }
     };
 
@@ -105,6 +116,13 @@ export function OnlineUsersModal({ open, onClose, currentRoom, user }: OnlineUse
           const newHistory = new Map(prev);
           newHistory.delete(data.userId);
           return newHistory;
+        });
+        
+        // Remove unread messages for offline user
+        setUnreadMessages(prev => {
+          const newUnread = new Map(prev);
+          newUnread.delete(data.userId);
+          return newUnread;
         });
         
         // If we're currently chatting with this user, go back to user list
@@ -126,6 +144,17 @@ export function OnlineUsersModal({ open, onClose, currentRoom, user }: OnlineUse
 
   // Get current chat messages for selected user
   const currentChatMessages = selectedUser ? chatHistory.get(selectedUser.userId) || [] : [];
+
+  // Function to start chat with a user and clear unread messages
+  const startChatWithUser = (user: any) => {
+    setSelectedUser(user);
+    // Clear unread messages for this user
+    setUnreadMessages(prev => {
+      const newUnread = new Map(prev);
+      newUnread.delete(user.userId);
+      return newUnread;
+    });
+  };
 
   const formatLastSeen = (lastSeen: string) => {
     const diff = Date.now() - new Date(lastSeen).getTime();
@@ -202,10 +231,16 @@ export function OnlineUsersModal({ open, onClose, currentRoom, user }: OnlineUse
                               <Button
                                 size="sm"
                                 variant="outline"
-                                onClick={() => setSelectedUser(user)}
+                                onClick={() => startChatWithUser(user)}
+                                className="relative"
                               >
                                 <MessageCircle className="h-4 w-4 mr-1" />
                                 Chat
+                                {unreadMessages.get(user.userId) && (
+                                  <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                                    {unreadMessages.get(user.userId)}
+                                  </span>
+                                )}
                               </Button>
                             </div>
                           </div>
