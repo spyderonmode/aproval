@@ -1,5 +1,6 @@
 import { useAuth } from "@/hooks/useAuth";
 import { useWebSocket } from "@/hooks/useWebSocket";
+import { useToast } from "@/hooks/use-toast";
 // useAudio hook removed as sound effects are removed
 import { useQuery } from "@tanstack/react-query";
 import { useState, useEffect } from "react";
@@ -21,6 +22,7 @@ import { logout } from "@/lib/firebase";
 export default function Home() {
   const { user } = useAuth();
   const { isConnected, lastMessage, joinRoom, leaveRoom, sendMessage } = useWebSocket();
+  const { toast } = useToast();
   // Sound effects removed as requested
   const [selectedMode, setSelectedMode] = useState<'ai' | 'pass-play' | 'online'>('ai');
   const [aiDifficulty, setAiDifficulty] = useState<'easy' | 'medium' | 'hard'>('medium');

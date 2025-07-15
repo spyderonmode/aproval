@@ -23,8 +23,18 @@ export function GameOverModal({ open, onClose, result, onPlayAgain, isCreatingGa
   const isDraw = result.condition === 'draw';
   const winner = result.winner;
   
-  // Get proper player names and info
+  // Get proper player names and info - only for online games
+  const isOnlineGame = result.game?.gameMode === 'online';
+  
   const getPlayerDisplayName = (symbol: string) => {
+    if (!isOnlineGame) {
+      // For AI and pass-play modes, use simple names
+      if (symbol === 'X') return 'Player X';
+      if (symbol === 'O') return result.game?.gameMode === 'ai' ? 'AI' : 'Player O';
+      return 'Unknown';
+    }
+    
+    // For online games, use actual player info
     if (symbol === 'X') {
       return result.playerXInfo?.displayName || result.playerXInfo?.firstName || result.playerXInfo?.username || 'Player X';
     } else if (symbol === 'O') {
@@ -34,7 +44,7 @@ export function GameOverModal({ open, onClose, result, onPlayAgain, isCreatingGa
   };
   
   const winnerName = getPlayerDisplayName(winner);
-  const winnerInfo = winner === 'X' ? result.playerXInfo : result.playerOInfo;
+  const winnerInfo = isOnlineGame ? (winner === 'X' ? result.playerXInfo : result.playerOInfo) : null;
 
   return (
     <div 
@@ -107,7 +117,7 @@ export function GameOverModal({ open, onClose, result, onPlayAgain, isCreatingGa
                   border: '4px solid #fbbf24'
                 }}
               >
-                {winnerInfo?.profilePicture ? (
+                {isOnlineGame && winnerInfo?.profilePicture ? (
                   <img 
                     src={winnerInfo.profilePicture} 
                     alt={winnerName}

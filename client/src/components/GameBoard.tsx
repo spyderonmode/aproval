@@ -570,7 +570,7 @@ export function GameBoard({ game, onGameOver, gameMode, user }: GameBoardProps) 
     const isLastMove = lastMove === position;
     
     return (
-      <div
+      <motion.div
         key={position}
         className={`
           w-10 h-10 sm:w-12 sm:h-12 md:w-16 md:h-16 bg-slate-700 rounded-lg flex items-center justify-center cursor-pointer 
@@ -581,6 +581,19 @@ export function GameBoard({ game, onGameOver, gameMode, user }: GameBoardProps) 
           ${isLastMove ? 'ring-2 ring-yellow-400' : ''}
         `}
         onClick={() => handleCellClick(position)}
+        animate={isWinningCell ? {
+          scale: [1, 1.1, 1],
+          boxShadow: [
+            '0 0 0 rgba(34, 197, 94, 0)',
+            '0 0 20px rgba(34, 197, 94, 0.6)',
+            '0 0 0 rgba(34, 197, 94, 0)'
+          ]
+        } : {}}
+        transition={isWinningCell ? {
+          duration: 0.8,
+          repeat: Infinity,
+          repeatType: "reverse"
+        } : {}}
       >
         {symbol && (
           <span
@@ -592,7 +605,7 @@ export function GameBoard({ game, onGameOver, gameMode, user }: GameBoardProps) 
           </span>
         )}
         <span className="text-xs text-gray-500 absolute mt-8 sm:mt-10 md:mt-12">{position}</span>
-      </div>
+      </motion.div>
     );
   };
 
