@@ -134,11 +134,6 @@ export function GameOverModal({ open, onClose, result, onPlayAgain, isCreatingGa
                 )}
               </div>
               
-              {/* Crown icon for winner */}
-              <div style={{ marginBottom: '16px' }}>
-                <span style={{ fontSize: '24px' }}>👑</span>
-              </div>
-              
               <p style={{ fontSize: '20px', color: 'white', marginBottom: '16px' }}>
                 {winnerName} Wins!
               </p>

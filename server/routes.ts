@@ -618,7 +618,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
           });
           
           // Then broadcast game over after 2.5 seconds
-          setTimeout(() => {
+          setTimeout(async () => {
+            // Get both player information
+            const playerXInfo = await storage.getUser(game.playerXId);
+            const playerOInfo = game.playerOId !== 'AI' ? await storage.getUser(game.playerOId) : null;
+            
             roomUsers.forEach(connectionId => {
               const connection = connections.get(connectionId);
               if (connection && connection.ws.readyState === WebSocket.OPEN) {
@@ -634,6 +638,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
                     username: winnerInfo.username,
                     profilePicture: winnerInfo.profilePicture,
                     profileImageUrl: winnerInfo.profileImageUrl
+                  } : null,
+                  playerXInfo: playerXInfo ? {
+                    displayName: playerXInfo.displayName,
+                    firstName: playerXInfo.firstName,
+                    username: playerXInfo.username,
+                    profilePicture: playerXInfo.profilePicture,
+                    profileImageUrl: playerXInfo.profileImageUrl
+                  } : null,
+                  playerOInfo: playerOInfo ? {
+                    displayName: playerOInfo.displayName,
+                    firstName: playerOInfo.firstName,
+                    username: playerOInfo.username,
+                    profilePicture: playerOInfo.profilePicture,
+                    profileImageUrl: playerOInfo.profileImageUrl
                   } : null
                 }));
               }

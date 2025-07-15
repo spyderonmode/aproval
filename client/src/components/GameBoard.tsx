@@ -582,17 +582,33 @@ export function GameBoard({ game, onGameOver, gameMode, user }: GameBoardProps) 
         `}
         onClick={() => handleCellClick(position)}
         animate={isWinningCell ? {
-          scale: [1, 1.1, 1],
+          scale: [1, 1.05, 1.1, 1.05, 1],
+          backgroundColor: [
+            'rgb(51, 65, 85)', // slate-700
+            'rgb(34, 197, 94)', // green-500
+            'rgb(16, 185, 129)', // emerald-500
+            'rgb(34, 197, 94)', // green-500
+            'rgb(51, 65, 85)'  // slate-700
+          ],
           boxShadow: [
             '0 0 0 rgba(34, 197, 94, 0)',
-            '0 0 20px rgba(34, 197, 94, 0.6)',
+            '0 0 30px rgba(34, 197, 94, 0.8)',
+            '0 0 40px rgba(16, 185, 129, 0.9)',
+            '0 0 30px rgba(34, 197, 94, 0.8)',
             '0 0 0 rgba(34, 197, 94, 0)'
+          ],
+          borderColor: [
+            'transparent',
+            'rgb(34, 197, 94)',
+            'rgb(16, 185, 129)',
+            'rgb(34, 197, 94)',
+            'transparent'
           ]
         } : {}}
         transition={isWinningCell ? {
-          duration: 0.8,
+          duration: 1.5,
           repeat: Infinity,
-          repeatType: "reverse"
+          ease: "easeInOut"
         } : {}}
       >
         {symbol && (

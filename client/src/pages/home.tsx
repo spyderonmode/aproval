@@ -130,13 +130,15 @@ export default function Home() {
             const userId = user?.userId || user?.id;
             console.log('🎮 Game over message received:', lastMessage);
             console.log('🎮 Winner info from server:', lastMessage.winnerInfo);
+            console.log('🎮 Player X Info:', lastMessage.playerXInfo || currentGame.playerXInfo);
+            console.log('🎮 Player O Info:', lastMessage.playerOInfo || currentGame.playerOInfo);
             setGameResult({
               winner: lastMessage.winner,
               condition: lastMessage.condition,
               board: lastMessage.board,
               winnerInfo: lastMessage.winnerInfo,
-              playerXInfo: currentGame.playerXInfo,
-              playerOInfo: currentGame.playerOInfo,
+              playerXInfo: lastMessage.playerXInfo || currentGame.playerXInfo,
+              playerOInfo: lastMessage.playerOInfo || currentGame.playerOInfo,
               game: currentGame
             });
             setShowGameOver(true);
