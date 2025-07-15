@@ -645,23 +645,44 @@ export async function registerRoutes(app: Express): Promise<Server> {
         if (game.roomId && roomConnections.has(game.roomId)) {
           const roomUsers = roomConnections.get(game.roomId)!;
           console.log(`- Room has ${roomUsers.size} connected users`);
+          
+          // Get player information for the move broadcast (parallel fetch for speed)
+          const [playerXInfo, playerOInfo] = await Promise.all([
+            storage.getUser(game.playerXId),
+            game.playerOId !== 'AI' ? storage.getUser(game.playerOId) : Promise.resolve(null)
+          ]);
+          
+          // Prepare the message once to avoid JSON.stringify overhead
+          const moveMessage = JSON.stringify({
+            type: 'move',
+            gameId,
+            roomId: game.roomId,
+            position,
+            player: playerSymbol,
+            board: newBoard,
+            currentPlayer: nextPlayer,
+            playerXInfo: playerXInfo ? {
+              displayName: playerXInfo.displayName,
+              firstName: playerXInfo.firstName,
+              username: playerXInfo.username,
+              profilePicture: playerXInfo.profilePicture,
+              profileImageUrl: playerXInfo.profileImageUrl
+            } : null,
+            playerOInfo: playerOInfo ? {
+              displayName: playerOInfo.displayName,
+              firstName: playerOInfo.firstName,
+              username: playerOInfo.username,
+              profilePicture: playerOInfo.profilePicture,
+              profileImageUrl: playerOInfo.profileImageUrl
+            } : null
+          });
+          
           let broadcastCount = 0;
           roomUsers.forEach(connectionId => {
             const connection = connections.get(connectionId);
             if (connection && connection.ws.readyState === WebSocket.OPEN) {
-              console.log(`- Sending move to user: ${connection.userId}`);
-              connection.ws.send(JSON.stringify({
-                type: 'move',
-                gameId,
-                roomId: game.roomId, // Add roomId for spectators
-                position,
-                player: playerSymbol,
-                board: newBoard,
-                currentPlayer: nextPlayer, // Next player's turn
-                // Add player info so spectators can see names
-                playerXInfo: game.playerXInfo,
-                playerOInfo: game.playerOInfo
-              }));
+              // Reduced logging for faster processing
+              connection.ws.send(moveMessage);
               broadcastCount++;
             }
           });

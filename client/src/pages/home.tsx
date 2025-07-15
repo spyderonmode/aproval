@@ -6,7 +6,7 @@ import { useState, useEffect } from "react";
 import { GameBoard } from "@/components/GameBoard";
 import { GameModeSelector } from "@/components/GameModeSelector";
 import { ProfileManager } from "@/components/ProfileManager";
-import { AudioControls } from "@/components/AudioControls";
+// AudioControls component removed as requested
 import { RoomManager } from "@/components/RoomManager";
 import { PlayerList } from "@/components/PlayerList";
 import { CreateRoomModal } from "@/components/CreateRoomModal";
@@ -440,8 +440,7 @@ export default function Home() {
               <PlayerList roomId={currentRoom.id} />
             )}
 
-            {/* Audio Controls */}
-            <AudioControls />
+            {/* Audio Controls removed as requested */}
 
             {/* Game Statistics */}
             <Card className="bg-slate-800 border-slate-700">
