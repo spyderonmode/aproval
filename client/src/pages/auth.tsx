@@ -135,11 +135,13 @@ export default function Auth() {
           <CardContent className="space-y-4">
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="username" className="text-slate-300">Username</Label>
+                <Label htmlFor="username" className="text-slate-300">
+                  {isLogin ? "Username or Email" : "Username"}
+                </Label>
                 <Input
                   id="username"
                   type="text"
-                  placeholder="Enter your username"
+                  placeholder={isLogin ? "Enter your username or email" : "Enter your username"}
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
                   required

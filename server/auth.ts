@@ -253,12 +253,17 @@ export function setupAuth(app: Express) {
     const { username, password } = req.body;
 
     if (!username || !password) {
-      return res.status(400).json({ error: 'Username and password are required' });
+      return res.status(400).json({ error: 'Username/email and password are required' });
     }
 
-    const user = findUserByUsername(username);
+    // Try to find user by username first, then by email
+    let user = findUserByUsername(username);
+    if (!user) {
+      user = findUserByEmail(username);
+    }
+
     if (!user || user.password !== hashPassword(password)) {
-      return res.status(401).json({ error: 'Invalid credentials' });
+      return res.status(401).json({ error: 'Invalid username/email or password' });
     }
 
     // Check if email is verified (mandatory)
