@@ -758,59 +758,46 @@ export function GameBoard({ game, onGameOver, gameMode, user }: GameBoardProps) 
         <div className="flex items-center justify-between">
           <CardTitle className="text-2xl">Game Board</CardTitle>
           <div className="flex items-center space-x-4">
-            {gameMode === 'online' && opponent && (
-              <Button
-                size="sm"
-                variant="outline"
-                onClick={() => setShowChat(!showChat)}
-                className="flex items-center gap-2"
-              >
-                <MessageCircle className="h-4 w-4" />
-                Chat
-              </Button>
-            )}
-            <div className="flex items-center space-x-4">
+            <div className="flex items-center space-x-2">
+              <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
               <div className="flex items-center space-x-2">
-                <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
-                <div className="flex items-center space-x-2">
-                  {gameMode === 'online' && (game?.playerXInfo?.profileImageUrl || game?.playerXInfo?.profilePicture) ? (
-                    <img 
-                      src={game.playerXInfo.profileImageUrl || game.playerXInfo.profilePicture} 
-                      alt="Player X" 
-                      className="w-6 h-6 rounded-full object-cover"
-                    />
-                  ) : (
-                    <div className="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center">
-                      <span className="text-xs text-white font-bold">X</span>
-                    </div>
-                  )}
-                  <span className="text-sm text-gray-300">
-                    {gameMode === 'online' 
-                      ? (game?.playerXInfo?.firstName || game?.playerXInfo?.displayName || game?.playerXInfo?.username || 'Player X')
-                      : 'Player X'}
-                  </span>
-                </div>
+                {gameMode === 'online' && (game?.playerXInfo?.profileImageUrl || game?.playerXInfo?.profilePicture) ? (
+                  <img 
+                    src={game.playerXInfo.profileImageUrl || game.playerXInfo.profilePicture} 
+                    alt="Player X" 
+                    className="w-6 h-6 rounded-full object-cover"
+                  />
+                ) : (
+                  <div className="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center">
+                    <span className="text-xs text-white font-bold">X</span>
+                  </div>
+                )}
+                <span className="text-sm text-gray-300">
+                  {gameMode === 'online' 
+                    ? (game?.playerXInfo?.firstName || game?.playerXInfo?.displayName || game?.playerXInfo?.username || 'Player X')
+                    : 'Player X'}
+                </span>
               </div>
+            </div>
+            <div className="flex items-center space-x-2">
+              <div className="w-3 h-3 bg-red-500 rounded-full"></div>
               <div className="flex items-center space-x-2">
-                <div className="w-3 h-3 bg-red-500 rounded-full"></div>
-                <div className="flex items-center space-x-2">
-                  {gameMode === 'online' && (game?.playerOInfo?.profileImageUrl || game?.playerOInfo?.profilePicture) ? (
-                    <img 
-                      src={game.playerOInfo.profileImageUrl || game.playerOInfo.profilePicture} 
-                      alt="Player O" 
-                      className="w-6 h-6 rounded-full object-cover"
-                    />
-                  ) : (
-                    <div className="w-6 h-6 bg-red-500 rounded-full flex items-center justify-center">
-                      <span className="text-xs text-white font-bold">O</span>
-                    </div>
-                  )}
-                  <span className="text-sm text-gray-300">
-                    {gameMode === 'online' 
-                      ? (game?.playerOInfo?.firstName || game?.playerOInfo?.displayName || game?.playerOInfo?.username || 'Player O')
-                      : (gameMode === 'ai' ? 'AI' : 'Player O')}
-                  </span>
-                </div>
+                {gameMode === 'online' && (game?.playerOInfo?.profileImageUrl || game?.playerOInfo?.profilePicture) ? (
+                  <img 
+                    src={game.playerOInfo.profileImageUrl || game.playerOInfo.profilePicture} 
+                    alt="Player O" 
+                    className="w-6 h-6 rounded-full object-cover"
+                  />
+                ) : (
+                  <div className="w-6 h-6 bg-red-500 rounded-full flex items-center justify-center">
+                    <span className="text-xs text-white font-bold">O</span>
+                  </div>
+                )}
+                <span className="text-sm text-gray-300">
+                  {gameMode === 'online' 
+                    ? (game?.playerOInfo?.firstName || game?.playerOInfo?.displayName || game?.playerOInfo?.username || 'Player O')
+                    : (gameMode === 'ai' ? 'AI' : 'Player O')}
+                </span>
               </div>
             </div>
           </div>
@@ -855,7 +842,7 @@ export function GameBoard({ game, onGameOver, gameMode, user }: GameBoardProps) 
         </div>
 
         {/* Game Controls */}
-        <div className="mt-8 flex justify-center">
+        <div className="mt-8 flex justify-center gap-4">
           <Button 
             variant="destructive"
             onClick={resetGame}
@@ -863,6 +850,16 @@ export function GameBoard({ game, onGameOver, gameMode, user }: GameBoardProps) 
           >
             Reset Game
           </Button>
+          {gameMode === 'online' && opponent && (
+            <Button
+              variant="outline"
+              onClick={() => setShowChat(!showChat)}
+              className="flex items-center gap-2"
+            >
+              <MessageCircle className="h-4 w-4" />
+              {showChat ? 'Hide Chat' : 'Show Chat'}
+            </Button>
+          )}
         </div>
       </CardContent>
 
