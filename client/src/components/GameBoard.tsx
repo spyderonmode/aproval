@@ -4,7 +4,7 @@ import { apiRequest } from "@/lib/queryClient";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
-import { useAudio } from "@/hooks/useAudio";
+// useAudio hook removed as sound effects are removed
 import { useWebSocket } from "@/hooks/useWebSocket";
 import { isUnauthorizedError } from "@/lib/authUtils";
 import { motion, AnimatePresence } from "framer-motion";
@@ -24,7 +24,7 @@ export function GameBoard({ game, onGameOver, gameMode, user }: GameBoardProps) 
   const [winningLine, setWinningLine] = useState<number[] | null>(null);
   const [lastMove, setLastMove] = useState<number | null>(null);
   const { toast } = useToast();
-  const { playSound } = useAudio();
+  // Sound effects removed as requested
   const { lastMessage } = useWebSocket();
   const queryClient = useQueryClient();
 
@@ -99,7 +99,7 @@ export function GameBoard({ game, onGameOver, gameMode, user }: GameBoardProps) 
   const handleLocalMove = (position: number) => {
     if (!game) return;
     
-    playSound('move');
+    // Sound effects removed as requested
     const newBoard = { ...board };
     newBoard[position.toString()] = currentPlayer;
     setBoard(newBoard);
@@ -202,7 +202,7 @@ export function GameBoard({ game, onGameOver, gameMode, user }: GameBoardProps) 
     // Simple AI: random move
     const randomMove = availableMoves[Math.floor(Math.random() * availableMoves.length)];
     
-    playSound('move');
+    // Sound effects removed as requested
     const newBoard = { ...currentBoard };
     newBoard[randomMove.toString()] = 'O';
     
@@ -343,7 +343,7 @@ export function GameBoard({ game, onGameOver, gameMode, user }: GameBoardProps) 
     }
 
     console.log('✅ Making move on position:', position);
-    playSound('move');
+    // Sound effects removed as requested
     makeMoveMutation.mutate(position);
   };
 

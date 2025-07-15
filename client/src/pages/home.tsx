@@ -1,6 +1,6 @@
 import { useAuth } from "@/hooks/useAuth";
 import { useWebSocket } from "@/hooks/useWebSocket";
-import { useAudio } from "@/hooks/useAudio";
+// useAudio hook removed as sound effects are removed
 import { useQuery } from "@tanstack/react-query";
 import { useState, useEffect } from "react";
 import { GameBoard } from "@/components/GameBoard";
@@ -21,7 +21,7 @@ import { logout } from "@/lib/firebase";
 export default function Home() {
   const { user } = useAuth();
   const { isConnected, lastMessage, joinRoom, leaveRoom, sendMessage } = useWebSocket();
-  const { playSound } = useAudio();
+  // Sound effects removed as requested
   const [selectedMode, setSelectedMode] = useState<'ai' | 'pass-play' | 'online'>('ai');
   const [currentRoom, setCurrentRoom] = useState<any>(null);
   const [currentGame, setCurrentGame] = useState<any>(null);
@@ -75,8 +75,7 @@ export default function Home() {
               playerOInfo: lastMessage.playerOInfo || prevGame.playerOInfo,
               timestamp: Date.now() // Force re-render
             }));
-            // Play move sound with slight delay to ensure it's heard
-            setTimeout(() => playSound('move'), 100);
+            // Sound effects removed as requested
           } else if (currentRoom && (lastMessage.roomId === currentRoom.id || lastMessage.gameId)) {
             // If we're in the room but don't have currentGame set, set it from the move message
             console.log('🎮 Spectator receiving move for room game');
@@ -104,22 +103,14 @@ export default function Home() {
                 timestamp: Date.now()
               }));
             }
-            // Play move sound with slight delay to ensure it's heard
-            setTimeout(() => playSound('move'), 100);
+            // Sound effects removed as requested
           }
           break;
         case 'game_over':
           // Handle game over from WebSocket
           if (currentGame && lastMessage.gameId === currentGame.id) {
-            // Play appropriate sound based on result
+            // Sound effects removed as requested
             const userId = user?.userId || user?.id;
-            if (lastMessage.winner === userId) {
-              playSound('win');
-            } else if (lastMessage.winner === null) {
-              playSound('draw');
-            } else {
-              playSound('lose');
-            }
             console.log('🎮 Game over message received:', lastMessage);
             console.log('🎮 Winner info from server:', lastMessage.winnerInfo);
             setGameResult({
@@ -134,7 +125,7 @@ export default function Home() {
         // Remove matchmaking WebSocket handlers
       }
     }
-  }, [lastMessage, currentGame, currentRoom, user, playSound]);
+  }, [lastMessage, currentGame, currentRoom, user]);
 
   const handleRoomJoin = (room: any) => {
     setCurrentRoom(room);
@@ -188,14 +179,7 @@ export default function Home() {
   }, [selectedMode, currentGame, user]);
 
   const handleGameOver = (result: any) => {
-    // Play appropriate sound based on result
-    if (result.winner === 'X') {
-      playSound('win');
-    } else if (result.winner === 'O') {
-      playSound('lose');
-    } else {
-      playSound('draw');
-    }
+    // Sound effects removed as requested
     setGameResult(result);
     setShowGameOver(true);
   };
@@ -229,7 +213,7 @@ export default function Home() {
           // No need to broadcast manually, server will handle it
           console.log('🎮 Game created successfully, server will broadcast to all participants');
           
-          playSound('gameStart');
+          // Sound effects removed as requested
         } else {
           console.error('Failed to create new game:', response.status);
         }
@@ -252,7 +236,7 @@ export default function Home() {
       };
       
       setCurrentGame(newGame);
-      playSound('gameStart');
+      // Sound effects removed as requested
     }
     
     // Reset creating state after a short delay
@@ -411,7 +395,7 @@ export default function Home() {
             <GameModeSelector 
               selectedMode={selectedMode}
               onModeChange={(mode) => {
-                playSound('click');
+                // Sound effects removed as requested
                 setSelectedMode(mode);
               }}
             />

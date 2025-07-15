@@ -234,9 +234,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "Room not found" });
       }
       
-      // Check if user is room owner (only room owner can start games)
-      if (room.ownerId !== userId) {
-        return res.status(403).json({ message: "Only room owner can start games" });
+      // Check if user is a player in the room (both players can start games)
+      const participants = await storage.getRoomParticipants(roomId);
+      const isPlayer = participants.some(p => p.userId === userId && p.role === 'player');
+      if (!isPlayer) {
+        return res.status(403).json({ message: "Only players can start games" });
       }
       
       // Check if there's already an active game in this room
@@ -247,24 +249,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
         await storage.updateGameStatus(existingGame.id, 'finished');
       }
       
-      // Get room participants
-      const participants = await storage.getRoomParticipants(roomId);
+      // Get room participants (reuse from above)
       const players = participants.filter(p => p.role === 'player');
       
       if (players.length < 2) {
         return res.status(400).json({ message: "Need 2 players to start game" });
       }
       
-      // Create new game with room owner as X and other player as O
-      const otherPlayer = players.find(p => p.userId !== userId);
-      if (!otherPlayer) {
-        return res.status(400).json({ message: "Could not find opponent" });
+      // Create new game with consistent player assignments
+      const sortedPlayers = players.sort((a, b) => a.userId.localeCompare(b.userId));
+      const playerX = sortedPlayers[0];
+      const playerO = sortedPlayers[1];
+      
+      if (!playerX || !playerO) {
+        return res.status(400).json({ message: "Could not find both players" });
       }
       
       const gameData = {
         roomId,
-        playerXId: userId,
-        playerOId: otherPlayer.userId,
+        playerXId: playerX.userId,
+        playerOId: playerO.userId,
         gameMode: 'online' as const,
         status: 'active' as const,
         currentPlayer: 'X' as const,
