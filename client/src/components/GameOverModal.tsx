@@ -1,4 +1,3 @@
-import React from "react";
 import { Home, User, RefreshCw } from "lucide-react";
 
 interface GameOverModalProps {
@@ -11,7 +10,14 @@ interface GameOverModalProps {
 }
 
 export function GameOverModal({ open, onClose, result, onPlayAgain, isCreatingGame = false, onMainMenu }: GameOverModalProps) {
-  if (!open || !result) return null;
+  // Always check if we have open and result before rendering
+  if (!open) return null;
+  if (!result) {
+    console.error('GameOverModal: No result provided');
+    return null;
+  }
+  
+  console.log('GameOverModal rendering with result:', result);
 
   const isDraw = result.condition === 'draw';
   const winnerSymbol = result.winner;

@@ -1,9 +1,7 @@
-import React from "react";
-
 interface SimpleModalProps {
   open: boolean;
   onClose: () => void;
-  children: React.ReactNode;
+  children: any;
 }
 
 export function SimpleModal({ open, onClose, children }: SimpleModalProps) {
