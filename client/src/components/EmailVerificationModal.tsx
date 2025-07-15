@@ -1,10 +1,8 @@
-import { useState } from "react";
+import { useState } from 'react';
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import { useToast } from "@/hooks/use-toast";
-import { sendEmailVerification } from "@/lib/firebase";
 import { Mail, CheckCircle } from "lucide-react";
 
 interface EmailVerificationModalProps {
@@ -13,80 +11,99 @@ interface EmailVerificationModalProps {
 }
 
 export function EmailVerificationModal({ email, onClose }: EmailVerificationModalProps) {
-  const [isLoading, setIsLoading] = useState(false);
-  const [isSent, setIsSent] = useState(false);
+  const [isResending, setIsResending] = useState(false);
+  const [resendSuccess, setResendSuccess] = useState(false);
   const { toast } = useToast();
 
-  const handleSendVerification = async () => {
-    setIsLoading(true);
+  const handleResendVerification = async () => {
+    setIsResending(true);
     try {
-      await sendEmailVerification(email);
-      setIsSent(true);
-      toast({
-        title: "Verification email sent",
-        description: "Please check your email for the verification link",
+      const response = await fetch('/api/auth/resend-verification', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email })
       });
+
+      if (response.ok) {
+        setResendSuccess(true);
+        toast({
+          title: "Email Sent",
+          description: "Verification email has been resent successfully.",
+        });
+      } else {
+        const errorData = await response.json();
+        toast({
+          title: "Error",
+          description: errorData.error || "Failed to resend verification email.",
+          variant: "destructive",
+        });
+      }
     } catch (error) {
       toast({
-        title: "Failed to send verification email",
-        description: "Please try again later or contact support",
+        title: "Error",
+        description: "Failed to resend verification email. Please try again.",
         variant: "destructive",
       });
     } finally {
-      setIsLoading(false);
+      setIsResending(false);
     }
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-      <Card className="bg-slate-800 border-slate-700 max-w-md w-full">
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+      <Card className="w-full max-w-md mx-4 bg-slate-800 border-slate-700">
         <CardHeader className="text-center">
-          <div className="flex justify-center mb-4">
-            <div className="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center">
-              <Mail className="w-6 h-6 text-white" />
-            </div>
+          <div className="mx-auto mb-4 p-3 bg-blue-100 rounded-full w-fit">
+            <Mail className="h-8 w-8 text-blue-600" />
           </div>
-          <CardTitle className="text-xl text-white">Email Verification</CardTitle>
+          <CardTitle className="text-white text-xl">Email Verification Required</CardTitle>
+          <CardDescription className="text-slate-300">
+            Please verify your email address to continue
+          </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          {!isSent ? (
-            <>
-              <p className="text-slate-300 text-center">
-                Would you like to verify your email address to secure your account?
-              </p>
-              <div className="bg-slate-700 p-3 rounded-lg">
-                <Label className="text-slate-300 text-sm">Email Address</Label>
-                <p className="text-white font-medium">{email}</p>
-              </div>
-              <div className="flex space-x-2">
-                <Button
-                  onClick={handleSendVerification}
-                  disabled={isLoading}
-                  className="w-full bg-blue-600 hover:bg-blue-700"
-                >
-                  {isLoading ? "Sending..." : "Send Verification"}
-                </Button>
-              </div>
-              <p className="text-sm text-slate-400 text-center mt-2">
-                Email verification is required to access the dashboard
-              </p>
-            </>
-          ) : (
-            <>
-              <div className="text-center">
-                <CheckCircle className="w-16 h-16 text-green-500 mx-auto mb-4" />
-                <p className="text-slate-300 mb-4">
-                  Verification email sent! Check your inbox and click the link to verify your account.
-                </p>
-                <Button
-                  onClick={onClose}
-                  className="bg-green-600 hover:bg-green-700"
-                >
-                  Continue to Game
-                </Button>
-              </div>
-            </>
+          <Alert className="bg-slate-700 border-slate-600">
+            <CheckCircle className="h-4 w-4 text-green-400" />
+            <AlertDescription className="text-slate-300">
+              A verification email has been sent to <strong className="text-white">{email}</strong>
+            </AlertDescription>
+          </Alert>
+          
+          <div className="text-sm text-slate-400 text-center">
+            Check your email inbox and click the verification link to activate your account.
+          </div>
+          
+          {resendSuccess && (
+            <Alert className="bg-green-900 border-green-700">
+              <CheckCircle className="h-4 w-4 text-green-400" />
+              <AlertDescription className="text-green-300">
+                Verification email has been resent successfully!
+              </AlertDescription>
+            </Alert>
           )}
+          
+          <div className="flex flex-col gap-2">
+            <Button
+              onClick={handleResendVerification}
+              disabled={isResending}
+              variant="outline"
+              className="w-full border-slate-600 text-slate-300 hover:bg-slate-700"
+            >
+              {isResending ? 'Resending...' : 'Resend Verification Email'}
+            </Button>
+            
+            <Button
+              onClick={onClose}
+              variant="secondary"
+              className="w-full bg-slate-700 hover:bg-slate-600 text-white"
+            >
+              Back to Login
+            </Button>
+          </div>
+          
+          <div className="text-xs text-slate-500 text-center">
+            Didn't receive the email? Check your spam folder or try resending.
+          </div>
         </CardContent>
       </Card>
     </div>

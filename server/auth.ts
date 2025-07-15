@@ -191,8 +191,10 @@ export function setupAuth(app: Express) {
 
     try {
       const user = await createUser(username, password, email);
-      const sessionData = { userId: user.id, username: user.username };
-      req.session.user = sessionData;
+      
+      // DO NOT create session until email is verified
+      // const sessionData = { userId: user.id, username: user.username };
+      // req.session.user = sessionData;
       
       // Sync user to database
       try {
@@ -207,12 +209,13 @@ export function setupAuth(app: Express) {
         console.error('Error syncing new user to database:', error);
       }
       
-      // If email is provided, send verification email
+      // Send verification email (mandatory)
       if (email && user.emailVerificationToken) {
         try {
           await sendVerificationEmail(email, user.emailVerificationToken);
         } catch (error) {
           console.error('Failed to send verification email:', error);
+          return res.status(500).json({ error: 'Failed to send verification email. Please try again.' });
         }
       }
       
@@ -220,7 +223,8 @@ export function setupAuth(app: Express) {
         id: user.id, 
         username: user.username,
         email: user.email,
-        isEmailVerified: user.isEmailVerified 
+        isEmailVerified: user.isEmailVerified,
+        message: 'Registration successful! Please check your email to verify your account before logging in.'
       });
     } catch (error) {
       res.status(500).json({ error: 'Failed to create user' });
@@ -238,6 +242,15 @@ export function setupAuth(app: Express) {
     const user = findUserByUsername(username);
     if (!user || user.password !== hashPassword(password)) {
       return res.status(401).json({ error: 'Invalid credentials' });
+    }
+
+    // Check if email is verified (mandatory)
+    if (!user.isEmailVerified) {
+      return res.status(403).json({ 
+        error: 'Email verification required',
+        message: 'Please verify your email before logging in. Check your email for the verification link.',
+        needsVerification: true 
+      });
     }
 
     // Ensure user exists in database
@@ -258,7 +271,7 @@ export function setupAuth(app: Express) {
     const sessionData = { userId: user.id, username: user.username };
     req.session.user = sessionData;
     
-    res.json({ id: user.id, username: user.username });
+    res.json({ id: user.id, username: user.username, email: user.email, isEmailVerified: user.isEmailVerified });
   });
 
   // Logout endpoint
@@ -291,6 +304,80 @@ export function setupAuth(app: Express) {
       email: user.email,
       isEmailVerified: user.isEmailVerified
     });
+  });
+
+  // Email verification endpoint
+  app.post('/api/auth/verify-email', async (req, res) => {
+    const { token } = req.body;
+
+    if (!token) {
+      return res.status(400).json({ error: 'Verification token is required' });
+    }
+
+    const users = getUsers();
+    const user = users.find(u => u.emailVerificationToken === token);
+    
+    if (!user) {
+      return res.status(400).json({ error: 'Invalid or expired verification token' });
+    }
+
+    // Check if token is expired
+    if (user.emailVerificationExpiry && new Date() > new Date(user.emailVerificationExpiry)) {
+      return res.status(400).json({ error: 'Verification token has expired' });
+    }
+
+    // Mark user as verified
+    const updatedUser = updateUser(user.id, {
+      isEmailVerified: true,
+      emailVerificationToken: undefined,
+      emailVerificationExpiry: undefined
+    });
+
+    if (!updatedUser) {
+      return res.status(500).json({ error: 'Failed to verify email' });
+    }
+
+    res.json({ message: 'Email verified successfully! You can now log in.' });
+  });
+
+  // Resend verification email endpoint
+  app.post('/api/auth/resend-verification', async (req, res) => {
+    const { email } = req.body;
+
+    if (!email) {
+      return res.status(400).json({ error: 'Email is required' });
+    }
+
+    const user = findUserByEmail(email);
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    if (user.isEmailVerified) {
+      return res.status(400).json({ error: 'Email is already verified' });
+    }
+
+    // Generate new verification token
+    const newToken = crypto.randomUUID();
+    const newExpiry = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 hours
+
+    const updatedUser = updateUser(user.id, {
+      emailVerificationToken: newToken,
+      emailVerificationExpiry: newExpiry
+    });
+
+    if (!updatedUser) {
+      return res.status(500).json({ error: 'Failed to generate new verification token' });
+    }
+
+    // Send verification email
+    try {
+      await sendVerificationEmail(email, newToken);
+      res.json({ message: 'Verification email sent successfully' });
+    } catch (error) {
+      console.error('Failed to send verification email:', error);
+      res.status(500).json({ error: 'Failed to send verification email' });
+    }
   });
 
   // Update user profile endpoint
@@ -351,48 +438,6 @@ export function setupAuth(app: Express) {
     } catch (error) {
       console.error('Error sending verification email:', error);
       res.status(500).json({ error: 'Failed to send verification email' });
-    }
-  });
-
-  // Verify email
-  app.post('/api/auth/verify-email', async (req, res) => {
-    const { token } = req.body;
-    
-    if (!token) {
-      return res.status(400).json({ error: 'Token is required' });
-    }
-    
-    const users = getUsers();
-    const user = users.find(u => u.emailVerificationToken === token);
-    
-    if (!user) {
-      return res.status(400).json({ error: 'Invalid verification token' });
-    }
-    
-    if (user.emailVerificationExpiry && new Date() > user.emailVerificationExpiry) {
-      return res.status(400).json({ error: 'Verification token expired' });
-    }
-    
-    try {
-      updateUser(user.id, {
-        isEmailVerified: true,
-        emailVerificationToken: undefined,
-        emailVerificationExpiry: undefined
-      });
-      
-      // Update database
-      await storage.upsertUser({
-        id: user.id,
-        email: user.email || null,
-        firstName: null,
-        lastName: null,
-        profileImageUrl: null,
-      });
-      
-      res.json({ message: 'Email verified successfully' });
-    } catch (error) {
-      console.error('Error verifying email:', error);
-      res.status(500).json({ error: 'Failed to verify email' });
     }
   });
 

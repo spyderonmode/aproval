@@ -5,7 +5,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
-import { login, register } from "@/lib/firebase";
 import { useAuth } from "@/hooks/useAuth";
 import { EmailVerificationModal } from "@/components/EmailVerificationModal";
 import { GamepadIcon, Mail } from "lucide-react";
@@ -17,8 +16,8 @@ export default function Auth() {
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [showEmailVerification, setShowEmailVerification] = useState(false);
+  const [registrationEmail, setRegistrationEmail] = useState("");
   const { toast } = useToast();
-  const { setUser, refreshUser } = useAuth();
   const [, setLocation] = useLocation();
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -27,16 +26,39 @@ export default function Auth() {
 
     try {
       if (isLogin) {
-        const user = await login({ username, password });
-        setUser(user);
-        // Refresh user state to ensure authentication is properly updated
-        await refreshUser();
-        toast({
-          title: "Login successful",
-          description: "Welcome back!",
+        const response = await fetch('/api/auth/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username, password })
         });
-        // Force immediate redirect to dashboard
-        window.location.href = "/";
+
+        if (response.ok) {
+          toast({
+            title: "Login successful",
+            description: "Welcome back!",
+          });
+          // Force immediate redirect to dashboard
+          window.location.href = "/";
+        } else {
+          const errorData = await response.json();
+          
+          if (errorData.needsVerification) {
+            // User needs email verification
+            setRegistrationEmail(email || username); // Use email if available, otherwise username
+            setShowEmailVerification(true);
+            toast({
+              title: "Email verification required",
+              description: errorData.message || "Please verify your email before logging in.",
+              variant: "destructive",
+            });
+          } else {
+            toast({
+              title: "Login failed",
+              description: errorData.error || "Please check your credentials and try again.",
+              variant: "destructive",
+            });
+          }
+        }
       } else {
         if (!email) {
           toast({
@@ -47,17 +69,30 @@ export default function Auth() {
           return;
         }
         
-        const user = await register({ username, password, email });
-        setUser(user);
-        // Refresh user state to ensure authentication is properly updated
-        await refreshUser();
-        toast({
-          title: "Registration successful",
-          description: "Please verify your email to continue.",
+        const response = await fetch('/api/auth/register', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username, password, email })
         });
-        
-        // Show email verification modal instead of redirecting
-        setShowEmailVerification(true);
+
+        if (response.ok) {
+          const data = await response.json();
+          setRegistrationEmail(email);
+          toast({
+            title: "Registration successful",
+            description: data.message || "Please verify your email to continue.",
+          });
+          
+          // Show email verification modal
+          setShowEmailVerification(true);
+        } else {
+          const errorData = await response.json();
+          toast({
+            title: "Registration failed",
+            description: errorData.error || "Please check your information and try again.",
+            variant: "destructive",
+          });
+        }
       }
     } catch (error) {
       toast({
@@ -166,11 +201,8 @@ export default function Auth() {
         {/* Email Verification Modal */}
         {showEmailVerification && (
           <EmailVerificationModal 
-            email={email}
-            onClose={() => {
-              setShowEmailVerification(false);
-              setLocation("/");
-            }}
+            email={registrationEmail}
+            onClose={() => setShowEmailVerification(false)}
           />
         )}
       </div>
