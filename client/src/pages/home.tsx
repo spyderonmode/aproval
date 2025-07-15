@@ -289,6 +289,22 @@ export default function Home() {
     }
   }, [currentGame, currentRoom, selectedMode, user]);
 
+  // Add effect to prevent game state loss on WebSocket reconnections
+  useEffect(() => {
+    if (currentGame && currentRoom && !isConnected) {
+      console.log('🔌 WebSocket disconnected but have game/room, maintaining state');
+      // Don't reset game state on WebSocket disconnection
+    }
+  }, [isConnected, currentGame, currentRoom]);
+
+  // Auto-rejoin room when WebSocket reconnects
+  useEffect(() => {
+    if (isConnected && currentRoom) {
+      console.log('🔌 WebSocket reconnected, rejoining room:', currentRoom.id);
+      joinRoom(currentRoom.id);
+    }
+  }, [isConnected, currentRoom]);
+
   // Force game initialization when user becomes available
   useEffect(() => {
     if (user && !currentGame && !currentRoom && selectedMode !== 'online') {

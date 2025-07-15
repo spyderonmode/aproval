@@ -78,5 +78,17 @@
     "emailVerificationToken": "91335539-30a2-4fc0-8304-e066db7a5bc9",
     "emailVerificationExpiry": "2025-07-15T14:41:38.147Z",
     "createdAt": "2025-07-14T14:41:27.170Z"
+  },
+  {
+    "id": "c556b97e-61ed-446e-920c-e552a70e231a",
+    "username": "player1",
+    "password": "ef92b778bafe771e89245b89ecbc08a44a4e166c06659911881f383d4473e94f",
+    "email": "player1@example.com",
+    "displayName": "player1",
+    "profilePicture": null,
+    "isEmailVerified": false,
+    "emailVerificationToken": "9c256d0a-b8b9-459d-a0e8-036159995ec7",
+    "emailVerificationExpiry": "2025-07-16T08:02:33.929Z",
+    "createdAt": "2025-07-15T08:02:33.929Z"
   }
 ]
