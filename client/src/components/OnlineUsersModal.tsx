@@ -8,7 +8,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
-import { User, MessageCircle, Clock, Users, Send } from "lucide-react";
+import { User, MessageCircle, Clock, Users, Send, UserX, UserCheck } from "lucide-react";
 
 interface OnlineUsersModalProps {
   open: boolean;
@@ -24,12 +24,26 @@ export function OnlineUsersModal({ open, onClose, currentRoom, user }: OnlineUse
   const [chatMessage, setChatMessage] = useState("");
   const [chatHistory, setChatHistory] = useState<Map<string, any[]>>(new Map());
   const [unreadMessages, setUnreadMessages] = useState<Map<string, number>>(new Map());
+  const [blockedUsers, setBlockedUsers] = useState<Set<string>>(new Set());
 
   const { data: onlineUsers, isLoading } = useQuery({
     queryKey: ["/api/users/online"],
     refetchInterval: 5000, // Refresh every 5 seconds
     enabled: open,
   });
+
+  // Fetch blocked users
+  const { data: blockedUsersData } = useQuery({
+    queryKey: ["/api/users/blocked"],
+    enabled: open,
+  });
+
+  // Update blocked users state when data changes
+  useEffect(() => {
+    if (blockedUsersData) {
+      setBlockedUsers(new Set(blockedUsersData.map((blocked: any) => blocked.blockedId)));
+    }
+  }, [blockedUsersData]);
 
   const sendMessageMutation = useMutation({
     mutationFn: async ({ targetUserId, message }: { targetUserId: string; message: string }) => {
@@ -64,6 +78,52 @@ export function OnlineUsersModal({ open, onClose, currentRoom, user }: OnlineUse
     },
   });
 
+  const blockUserMutation = useMutation({
+    mutationFn: async (userId: string) => {
+      return await apiRequest('POST', '/api/users/block', { userId });
+    },
+    onSuccess: (_, userId) => {
+      setBlockedUsers(prev => new Set(prev).add(userId));
+      queryClient.invalidateQueries({ queryKey: ["/api/users/blocked"] });
+      toast({
+        title: "User blocked",
+        description: "User has been blocked successfully",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to block user",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const unblockUserMutation = useMutation({
+    mutationFn: async (userId: string) => {
+      return await apiRequest('POST', '/api/users/unblock', { userId });
+    },
+    onSuccess: (_, userId) => {
+      setBlockedUsers(prev => {
+        const newSet = new Set(prev);
+        newSet.delete(userId);
+        return newSet;
+      });
+      queryClient.invalidateQueries({ queryKey: ["/api/users/blocked"] });
+      toast({
+        title: "User unblocked",
+        description: "User has been unblocked successfully",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to unblock user",
+        variant: "destructive",
+      });
+    },
+  });
+
   const handleSendMessage = () => {
     if (!chatMessage.trim() || !selectedUser) return;
     
@@ -73,12 +133,25 @@ export function OnlineUsersModal({ open, onClose, currentRoom, user }: OnlineUse
     });
   };
 
+  const handleBlockUser = (userId: string) => {
+    blockUserMutation.mutate(userId);
+  };
+
+  const handleUnblockUser = (userId: string) => {
+    unblockUserMutation.mutate(userId);
+  };
+
   // Handle incoming chat messages and user offline events
   useEffect(() => {
     const handleChatMessage = (event: CustomEvent) => {
       const data = event.detail;
       
       if (data.type === 'chat_message_received') {
+        // Check if sender is blocked
+        if (blockedUsers.has(data.message.senderId)) {
+          return; // Ignore messages from blocked users
+        }
+        
         const incomingMessage = {
           fromMe: false,
           message: data.message.message,
@@ -197,55 +270,76 @@ export function OnlineUsersModal({ open, onClose, currentRoom, user }: OnlineUse
                 <ScrollArea className="h-[400px] w-full">
                   <div className="space-y-2">
                     {onlineUsers?.users?.length > 0 ? (
-                      onlineUsers.users.map((user: any) => (
-                        <Card key={user.userId} className="p-3 cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">
-                          <div className="flex items-center justify-between">
-                            <div className="flex items-center gap-3">
-                              {user.profilePicture || user.profileImageUrl ? (
-                                <img
-                                  src={user.profilePicture || user.profileImageUrl}
-                                  alt="Profile"
-                                  className="h-10 w-10 rounded-full object-cover"
-                                />
-                              ) : (
-                                <div className="h-10 w-10 rounded-full bg-blue-600 flex items-center justify-center">
-                                  <User className="h-5 w-5 text-white" />
-                                </div>
-                              )}
-                              <div>
-                                <h3 className="font-medium">
-                                  {user.displayName || user.firstName || user.username}
-                                </h3>
-                                <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                                  <Clock className="h-3 w-3" />
-                                  {formatLastSeen(user.lastSeen)}
+                      onlineUsers.users.map((user: any) => {
+                        const isBlocked = blockedUsers.has(user.userId);
+                        return (
+                          <Card key={user.userId} className={`p-3 cursor-pointer transition-colors ${isBlocked ? 'opacity-50 border-red-200 dark:border-red-800' : 'hover:bg-slate-50 dark:hover:bg-slate-800'}`}>
+                            <div className="flex items-center justify-between">
+                              <div className="flex items-center gap-3">
+                                {user.profilePicture || user.profileImageUrl ? (
+                                  <img
+                                    src={user.profilePicture || user.profileImageUrl}
+                                    alt="Profile"
+                                    className="h-10 w-10 rounded-full object-cover"
+                                  />
+                                ) : (
+                                  <div className="h-10 w-10 rounded-full bg-blue-600 flex items-center justify-center">
+                                    <User className="h-5 w-5 text-white" />
+                                  </div>
+                                )}
+                                <div>
+                                  <h3 className="font-medium flex items-center gap-2">
+                                    {user.displayName || user.firstName || user.username}
+                                    {isBlocked && (
+                                      <Badge variant="destructive" className="text-xs">
+                                        Blocked
+                                      </Badge>
+                                    )}
+                                  </h3>
+                                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                                    <Clock className="h-3 w-3" />
+                                    {formatLastSeen(user.lastSeen)}
+                                  </div>
                                 </div>
                               </div>
-                            </div>
-                            
-                            <div className="flex items-center gap-2">
-                              {user.inRoom && (
-                                <Badge variant="secondary">In Room</Badge>
-                              )}
                               
-                              <Button
-                                size="sm"
-                                variant="outline"
-                                onClick={() => startChatWithUser(user)}
-                                className="relative"
-                              >
-                                <MessageCircle className="h-4 w-4 mr-1" />
-                                Chat
-                                {unreadMessages.get(user.userId) && (
-                                  <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
-                                    {unreadMessages.get(user.userId)}
-                                  </span>
+                              <div className="flex items-center gap-2">
+                                {user.inRoom && (
+                                  <Badge variant="secondary">In Room</Badge>
                                 )}
-                              </Button>
+                                
+                                {isBlocked ? (
+                                  <Button
+                                    size="sm"
+                                    variant="outline"
+                                    onClick={() => handleUnblockUser(user.userId)}
+                                    disabled={unblockUserMutation.isPending}
+                                    className="text-green-600 hover:text-green-700"
+                                  >
+                                    <UserCheck className="h-4 w-4 mr-1" />
+                                    Unblock
+                                  </Button>
+                                ) : (
+                                  <Button
+                                    size="sm"
+                                    variant="outline"
+                                    onClick={() => startChatWithUser(user)}
+                                    className="relative"
+                                  >
+                                    <MessageCircle className="h-4 w-4 mr-1" />
+                                    Chat
+                                    {unreadMessages.get(user.userId) && (
+                                      <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                                        {unreadMessages.get(user.userId)}
+                                      </span>
+                                    )}
+                                  </Button>
+                                )}
+                              </div>
                             </div>
-                          </div>
-                        </Card>
-                      ))
+                          </Card>
+                        );
+                      })
                     ) : (
                       <div className="text-center py-8 text-muted-foreground">
                         No other players online
@@ -257,29 +351,57 @@ export function OnlineUsersModal({ open, onClose, currentRoom, user }: OnlineUse
             </>
           ) : (
             <div className="space-y-4">
-              <div className="flex items-center gap-3 pb-3 border-b">
-                <Button
-                  size="sm"
-                  variant="outline"
-                  onClick={() => setSelectedUser(null)}
-                >
-                  ← Back
-                </Button>
+              <div className="flex items-center justify-between pb-3 border-b">
                 <div className="flex items-center gap-3">
-                  {selectedUser.profilePicture || selectedUser.profileImageUrl ? (
-                    <img
-                      src={selectedUser.profilePicture || selectedUser.profileImageUrl}
-                      alt="Profile"
-                      className="h-8 w-8 rounded-full object-cover"
-                    />
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => setSelectedUser(null)}
+                  >
+                    ← Back
+                  </Button>
+                  <div className="flex items-center gap-3">
+                    {selectedUser.profilePicture || selectedUser.profileImageUrl ? (
+                      <img
+                        src={selectedUser.profilePicture || selectedUser.profileImageUrl}
+                        alt="Profile"
+                        className="h-8 w-8 rounded-full object-cover"
+                      />
+                    ) : (
+                      <div className="h-8 w-8 rounded-full bg-blue-600 flex items-center justify-center">
+                        <User className="h-4 w-4 text-white" />
+                      </div>
+                    )}
+                    <span className="font-medium">
+                      {selectedUser.displayName || selectedUser.firstName || selectedUser.username}
+                    </span>
+                  </div>
+                </div>
+                
+                <div className="flex items-center gap-2">
+                  {blockedUsers.has(selectedUser.userId) ? (
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => handleUnblockUser(selectedUser.userId)}
+                      disabled={unblockUserMutation.isPending}
+                      className="text-green-600 hover:text-green-700"
+                    >
+                      <UserCheck className="h-4 w-4 mr-1" />
+                      Unblock
+                    </Button>
                   ) : (
-                    <div className="h-8 w-8 rounded-full bg-blue-600 flex items-center justify-center">
-                      <User className="h-4 w-4 text-white" />
-                    </div>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => handleBlockUser(selectedUser.userId)}
+                      disabled={blockUserMutation.isPending}
+                      className="text-red-600 hover:text-red-700"
+                    >
+                      <UserX className="h-4 w-4 mr-1" />
+                      Block
+                    </Button>
                   )}
-                  <span className="font-medium">
-                    {selectedUser.displayName || selectedUser.firstName || selectedUser.username}
-                  </span>
                 </div>
               </div>
               
@@ -301,21 +423,29 @@ export function OnlineUsersModal({ open, onClose, currentRoom, user }: OnlineUse
                 </div>
               </ScrollArea>
               
-              <div className="flex gap-2">
-                <Input
-                  value={chatMessage}
-                  onChange={(e) => setChatMessage(e.target.value)}
-                  placeholder="Type a message..."
-                  onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
-                />
-                <Button
-                  size="sm"
-                  onClick={handleSendMessage}
-                  disabled={!chatMessage.trim() || sendMessageMutation.isPending}
-                >
-                  <Send className="h-4 w-4" />
-                </Button>
-              </div>
+              {blockedUsers.has(selectedUser.userId) ? (
+                <div className="bg-gray-100 dark:bg-gray-800 rounded-lg p-3 text-center">
+                  <p className="text-sm text-gray-600 dark:text-gray-400">
+                    You have blocked this user. Unblock to send messages.
+                  </p>
+                </div>
+              ) : (
+                <div className="flex gap-2">
+                  <Input
+                    value={chatMessage}
+                    onChange={(e) => setChatMessage(e.target.value)}
+                    placeholder="Type a message..."
+                    onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
+                  />
+                  <Button
+                    size="sm"
+                    onClick={handleSendMessage}
+                    disabled={!chatMessage.trim() || sendMessageMutation.isPending}
+                  >
+                    <Send className="h-4 w-4" />
+                  </Button>
+                </div>
+              )}
             </div>
           )}
         </div>

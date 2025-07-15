@@ -4,16 +4,19 @@ import {
   games,
   moves,
   roomParticipants,
+  blockedUsers,
   type User,
   type UpsertUser,
   type Room,
   type Game,
   type Move,
   type RoomParticipant,
+  type BlockedUser,
   type InsertRoom,
   type InsertGame,
   type InsertMove,
   type InsertRoomParticipant,
+  type InsertBlockedUser,
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, and, desc, count } from "drizzle-orm";
@@ -49,6 +52,12 @@ export interface IStorage {
   // Statistics
   updateUserStats(userId: string, result: 'win' | 'loss' | 'draw'): Promise<void>;
   getUserStats(userId: string): Promise<{ wins: number; losses: number; draws: number }>;
+  
+  // Blocked Users
+  blockUser(blockerId: string, blockedId: string): Promise<BlockedUser>;
+  unblockUser(blockerId: string, blockedId: string): Promise<void>;
+  getBlockedUsers(userId: string): Promise<BlockedUser[]>;
+  isUserBlocked(blockerId: string, blockedId: string): Promise<boolean>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -198,6 +207,34 @@ export class DatabaseStorage implements IStorage {
       losses: user?.losses || 0,
       draws: user?.draws || 0,
     };
+  }
+
+  // Blocked Users methods
+  async blockUser(blockerId: string, blockedId: string): Promise<BlockedUser> {
+    const [blocked] = await db
+      .insert(blockedUsers)
+      .values({ blockerId, blockedId })
+      .onConflictDoNothing()
+      .returning();
+    return blocked;
+  }
+
+  async unblockUser(blockerId: string, blockedId: string): Promise<void> {
+    await db
+      .delete(blockedUsers)
+      .where(and(eq(blockedUsers.blockerId, blockerId), eq(blockedUsers.blockedId, blockedId)));
+  }
+
+  async getBlockedUsers(userId: string): Promise<BlockedUser[]> {
+    return await db.select().from(blockedUsers).where(eq(blockedUsers.blockerId, userId));
+  }
+
+  async isUserBlocked(blockerId: string, blockedId: string): Promise<boolean> {
+    const [blocked] = await db
+      .select()
+      .from(blockedUsers)
+      .where(and(eq(blockedUsers.blockerId, blockerId), eq(blockedUsers.blockedId, blockedId)));
+    return !!blocked;
   }
 }
 

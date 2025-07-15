@@ -10,6 +10,7 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+- **Block User Feature** (July 15, 2025): Added comprehensive user blocking system in chat - users can block/unblock other players, blocked users are visually indicated with red badges, messages from blocked users are automatically filtered out, chat input is disabled for blocked users, and blocked users have limited chat functionality while still appearing in online users list with unblock option
 - **Autumn Theme Addition** (July 15, 2025): Replaced Aurora theme with smooth Autumn theme featuring warm orange and amber colors, subtle gradients, and gentle transitions - designed to be easy on the eyes with no distracting animations or bright effects
 - **Custom Theme System** (July 15, 2025): Added comprehensive theme system with 6 visual styles (Default, Neon, Autumn, Minimalist, Nature, Space) - players can customize game board appearance, colors, and styling through theme selector in header. Themes persist in localStorage and dynamically update all game components including cells, player indicators, and UI elements
 - **Chat System Removed from Game Board** (July 15, 2025): Removed in-game chat functionality from the game board component to keep the gaming experience focused and clean. Chat functionality remains available in the main lobby through the Online Players modal

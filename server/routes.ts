@@ -81,11 +81,67 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Block user endpoint
+  app.post('/api/users/block', requireAuth, async (req: any, res) => {
+    try {
+      const { userId } = req.body;
+      const blockerId = req.user.userId;
+      
+      if (blockerId === userId) {
+        return res.status(400).json({ error: 'Cannot block yourself' });
+      }
+      
+      await storage.blockUser(blockerId, userId);
+      res.json({ success: true, message: 'User blocked successfully' });
+    } catch (error) {
+      console.error("Error blocking user:", error);
+      res.status(500).json({ message: "Failed to block user" });
+    }
+  });
+
+  // Unblock user endpoint
+  app.post('/api/users/unblock', requireAuth, async (req: any, res) => {
+    try {
+      const { userId } = req.body;
+      const blockerId = req.user.userId;
+      
+      await storage.unblockUser(blockerId, userId);
+      res.json({ success: true, message: 'User unblocked successfully' });
+    } catch (error) {
+      console.error("Error unblocking user:", error);
+      res.status(500).json({ message: "Failed to unblock user" });
+    }
+  });
+
+  // Get blocked users endpoint
+  app.get('/api/users/blocked', requireAuth, async (req: any, res) => {
+    try {
+      const userId = req.user.userId;
+      const blockedUsers = await storage.getBlockedUsers(userId);
+      res.json(blockedUsers);
+    } catch (error) {
+      console.error("Error getting blocked users:", error);
+      res.status(500).json({ message: "Failed to get blocked users" });
+    }
+  });
+
   // Send chat message
   app.post('/api/chat/send', requireAuth, async (req: any, res) => {
     try {
       const { targetUserId, message } = req.body;
       const senderId = req.user.userId;
+
+      // Check if sender is blocked by target user
+      const isBlocked = await storage.isUserBlocked(targetUserId, senderId);
+      if (isBlocked) {
+        return res.status(403).json({ error: 'You are blocked by this user' });
+      }
+
+      // Check if target user is blocked by sender
+      const hasBlocked = await storage.isUserBlocked(senderId, targetUserId);
+      if (hasBlocked) {
+        return res.status(403).json({ error: 'You have blocked this user' });
+      }
       
       // Get sender info (from onlineUsers or fetch from database)
       let senderInfo = onlineUsers.get(senderId);

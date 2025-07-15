@@ -83,6 +83,16 @@ export const moves = pgTable("moves", {
   timestamp: timestamp("timestamp").defaultNow(),
 });
 
+export const blockedUsers = pgTable("blocked_users", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  blockerId: varchar("blocker_id").references(() => users.id).notNull(),
+  blockedId: varchar("blocked_id").references(() => users.id).notNull(),
+  timestamp: timestamp("timestamp").defaultNow(),
+}, (table) => [
+  // Prevent duplicate blocks
+  index("unique_block").on(table.blockerId, table.blockedId),
+]);
+
 // Relations
 export const usersRelations = relations(users, ({ many }) => ({
   ownedRooms: many(rooms),
@@ -91,6 +101,8 @@ export const usersRelations = relations(users, ({ many }) => ({
   gamesAsO: many(games, { relationName: "playerO" }),
   wonGames: many(games, { relationName: "winner" }),
   moves: many(moves),
+  blockedUsers: many(blockedUsers, { relationName: "blocker" }),
+  blockedByUsers: many(blockedUsers, { relationName: "blocked" }),
 }));
 
 export const roomsRelations = relations(rooms, ({ one, many }) => ({
@@ -115,6 +127,11 @@ export const roomParticipantsRelations = relations(roomParticipants, ({ one }) =
 export const movesRelations = relations(moves, ({ one }) => ({
   game: one(games, { fields: [moves.gameId], references: [games.id] }),
   player: one(users, { fields: [moves.playerId], references: [users.id] }),
+}));
+
+export const blockedUsersRelations = relations(blockedUsers, ({ one }) => ({
+  blocker: one(users, { fields: [blockedUsers.blockerId], references: [users.id], relationName: "blocker" }),
+  blocked: one(users, { fields: [blockedUsers.blockedId], references: [users.id], relationName: "blocked" }),
 }));
 
 // Schemas
@@ -155,6 +172,11 @@ export const insertRoomParticipantSchema = createInsertSchema(roomParticipants).
   role: true,
 });
 
+export const insertBlockedUserSchema = createInsertSchema(blockedUsers).pick({
+  blockerId: true,
+  blockedId: true,
+});
+
 // Types
 export type UpsertUser = typeof users.$inferInsert;
 export type User = typeof users.$inferSelect;
@@ -162,7 +184,9 @@ export type Room = typeof rooms.$inferSelect;
 export type Game = typeof games.$inferSelect;
 export type Move = typeof moves.$inferSelect;
 export type RoomParticipant = typeof roomParticipants.$inferSelect;
+export type BlockedUser = typeof blockedUsers.$inferSelect;
 export type InsertRoom = z.infer<typeof insertRoomSchema>;
 export type InsertGame = z.infer<typeof insertGameSchema>;
 export type InsertMove = z.infer<typeof insertMoveSchema>;
 export type InsertRoomParticipant = z.infer<typeof insertRoomParticipantSchema>;
+export type InsertBlockedUser = z.infer<typeof insertBlockedUserSchema>;
