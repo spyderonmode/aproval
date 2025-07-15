@@ -54,6 +54,97 @@ const getWinningPositions = (board: Record<string, string>, player: string): num
   return [];
 };
 
+// AI helper functions for different difficulty levels
+const findBestMove = (board: Record<string, string>, availableMoves: number[]): number | null => {
+  // Try to win first
+  for (const move of availableMoves) {
+    const testBoard = { ...board, [move.toString()]: 'O' };
+    if (checkWinSimple(testBoard, 'O')) {
+      return move;
+    }
+  }
+  
+  // Try to block player win
+  for (const move of availableMoves) {
+    const testBoard = { ...board, [move.toString()]: 'X' };
+    if (checkWinSimple(testBoard, 'X')) {
+      return move;
+    }
+  }
+  
+  return null;
+};
+
+const findBestMoveHard = (board: Record<string, string>, availableMoves: number[]): number | null => {
+  // Try to win first
+  for (const move of availableMoves) {
+    const testBoard = { ...board, [move.toString()]: 'O' };
+    if (checkWinSimple(testBoard, 'O')) {
+      return move;
+    }
+  }
+  
+  // Try to block player win
+  for (const move of availableMoves) {
+    const testBoard = { ...board, [move.toString()]: 'X' };
+    if (checkWinSimple(testBoard, 'X')) {
+      return move;
+    }
+  }
+  
+  // Strategic positioning: prefer center and corners
+  const strategicMoves = [8, 1, 3, 11, 13, 7, 9]; // Center first, then corners and edges
+  for (const move of strategicMoves) {
+    if (availableMoves.includes(move)) {
+      return move;
+    }
+  }
+  
+  return null;
+};
+
+const checkWinSimple = (board: Record<string, string>, player: string): boolean => {
+  // Check horizontal (4 in a row)
+  const rows = [
+    [1, 2, 3, 4, 5],
+    [6, 7, 8, 9, 10],
+    [11, 12, 13, 14, 15]
+  ];
+  
+  for (const row of rows) {
+    for (let i = 0; i <= row.length - 4; i++) {
+      const positions = row.slice(i, i + 4);
+      if (positions.every(pos => board[pos.toString()] === player)) {
+        return true;
+      }
+    }
+  }
+  
+  // Check vertical (3 in a column)
+  const columns = [
+    [1, 6, 11], [2, 7, 12], [3, 8, 13], [4, 9, 14], [5, 10, 15]
+  ];
+  
+  for (const column of columns) {
+    if (column.every(pos => board[pos.toString()] === player)) {
+      return true;
+    }
+  }
+  
+  // Check diagonal (3 in diagonal, excluding columns 5, 10, 15)
+  const diagonals = [
+    [1, 7, 13], [2, 8, 14], [3, 7, 11], [4, 8, 12]
+  ];
+  
+  for (const diagonal of diagonals) {
+    if (diagonal.every(pos => board[pos.toString()] === player)) {
+      return true;
+    }
+  }
+  
+  return false;
+};
+
 interface GameBoardProps {
   game: any;
   onGameOver: (result: any) => void;
@@ -259,12 +350,24 @@ export function GameBoard({ game, onGameOver, gameMode, user }: GameBoardProps) 
     const availableMoves = VALID_POSITIONS.filter(pos => !currentBoard[pos.toString()]);
     if (availableMoves.length === 0) return;
     
-    // Simple AI: random move
-    const randomMove = availableMoves[Math.floor(Math.random() * availableMoves.length)];
+    // AI difficulty-based move selection
+    const difficulty = game?.aiDifficulty || 'medium';
+    let selectedMove;
+    
+    if (difficulty === 'easy') {
+      // Easy: Random move
+      selectedMove = availableMoves[Math.floor(Math.random() * availableMoves.length)];
+    } else if (difficulty === 'medium') {
+      // Medium: Try to win or block, otherwise random
+      selectedMove = findBestMove(currentBoard, availableMoves) || availableMoves[Math.floor(Math.random() * availableMoves.length)];
+    } else {
+      // Hard: More strategic play
+      selectedMove = findBestMoveHard(currentBoard, availableMoves) || availableMoves[Math.floor(Math.random() * availableMoves.length)];
+    }
     
     // Sound effects removed as requested
     const newBoard = { ...currentBoard };
-    newBoard[randomMove.toString()] = 'O';
+    newBoard[selectedMove.toString()] = 'O';
     
     setBoard(newBoard);
     

@@ -23,6 +23,7 @@ export default function Home() {
   const { isConnected, lastMessage, joinRoom, leaveRoom, sendMessage } = useWebSocket();
   // Sound effects removed as requested
   const [selectedMode, setSelectedMode] = useState<'ai' | 'pass-play' | 'online'>('ai');
+  const [aiDifficulty, setAiDifficulty] = useState<'easy' | 'medium' | 'hard'>('medium');
   const [currentRoom, setCurrentRoom] = useState<any>(null);
   const [currentGame, setCurrentGame] = useState<any>(null);
   const [showCreateRoom, setShowCreateRoom] = useState(false);
@@ -191,15 +192,33 @@ export default function Home() {
   // Initialize local game for AI and pass-play modes when no game exists
   const initializeLocalGame = () => {
     if (selectedMode === 'ai' || selectedMode === 'pass-play') {
+      console.log('🎮 Initializing local game for mode:', selectedMode);
       const newGame = {
         id: 'local-game',
         board: {},
         currentPlayer: 'X',
         status: 'active',
         gameMode: selectedMode,
+        aiDifficulty,
         playerXId: user?.userId || user?.id,
-        playerOId: selectedMode === 'ai' ? 'ai' : 'player2'
+        playerOId: selectedMode === 'ai' ? 'ai' : 'player2',
+        playerXInfo: {
+          displayName: user?.displayName || user?.firstName || user?.username || 'Player X',
+          firstName: user?.firstName || user?.displayName || user?.username || 'Player X',
+          username: user?.username || 'Player X',
+          profilePicture: user?.profilePicture || user?.profileImageUrl
+        },
+        playerOInfo: selectedMode === 'ai' ? {
+          displayName: `AI (${aiDifficulty})`,
+          firstName: `AI (${aiDifficulty})`,
+          username: `AI (${aiDifficulty})`
+        } : {
+          displayName: 'Player O',
+          firstName: 'Player O',
+          username: 'Player O'
+        }
       };
+      console.log('🎮 Created local game:', newGame);
       setCurrentGame(newGame);
     }
   };
@@ -213,10 +232,20 @@ export default function Home() {
   
   // Fix white screen issue by ensuring game exists for all modes
   useEffect(() => {
+    console.log('🎮 Effect check - currentGame:', !!currentGame, 'currentRoom:', !!currentRoom, 'selectedMode:', selectedMode);
     if (!currentGame && !currentRoom && selectedMode !== 'online') {
+      console.log('🎮 White screen fix - initializing local game');
       initializeLocalGame();
     }
   }, [currentGame, currentRoom, selectedMode, user]);
+
+  // Force game initialization when user becomes available
+  useEffect(() => {
+    if (user && !currentGame && !currentRoom && selectedMode !== 'online') {
+      console.log('🎮 User available - initializing local game');
+      initializeLocalGame();
+    }
+  }, [user]);
 
   const handleGameOver = (result: any) => {
     // Sound effects removed as requested
@@ -438,6 +467,8 @@ export default function Home() {
                 // Sound effects removed as requested
                 setSelectedMode(mode);
               }}
+              aiDifficulty={aiDifficulty}
+              onDifficultyChange={setAiDifficulty}
             />
 
             {/* Online Room Management */}
