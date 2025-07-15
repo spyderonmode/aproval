@@ -451,15 +451,7 @@ export function GameBoard({ game, onGameOver, gameMode, user }: GameBoardProps) 
     console.log('🎮 LocalMove: Updating board from', board, 'to', newBoard);
     setBoard(newBoard);
     
-    // Trigger mood reaction after move
-    setPlayerMood(currentPlayer, getRandomMood('move'));
-    
     if (checkWin(newBoard, currentPlayer)) {
-      // Set winning mood for current player
-      setPlayerMood(currentPlayer, getRandomMood('winning'));
-      // Set losing mood for opponent
-      const opponent = currentPlayer === 'X' ? 'O' : 'X';
-      setPlayerMood(opponent, getRandomMood('losing'));
       const winnerInfo = currentPlayer === 'X' 
         ? (game?.playerXInfo?.firstName || game?.playerXInfo?.displayName || game?.playerXInfo?.username || 'Player X')
         : (game?.playerOInfo?.firstName || game?.playerOInfo?.displayName || game?.playerOInfo?.username || (gameMode === 'ai' ? 'AI' : 'Player O'));
@@ -494,10 +486,6 @@ export function GameBoard({ game, onGameOver, gameMode, user }: GameBoardProps) 
     }
     
     if (checkDraw(newBoard)) {
-      // Set disappointed mood for both players on draw
-      setPlayerMood('X', 'disappointed');
-      setPlayerMood('O', 'disappointed');
-      
       if (onGameOver) {
         try {
           console.log('🎮 GameBoard sending draw result:', {
@@ -637,9 +625,7 @@ export function GameBoard({ game, onGameOver, gameMode, user }: GameBoardProps) 
     }
     
     if (checkDraw(newBoard)) {
-      // Set disappointed mood for both players on draw
-      setPlayerMood('X', 'disappointed');
-      setPlayerMood('O', 'disappointed');
+
       
       if (onGameOver) {
         try {
@@ -849,14 +835,36 @@ export function GameBoard({ game, onGameOver, gameMode, user }: GameBoardProps) 
               <AnimatePresence>
                 {playerXReaction && (
                   <motion.div
-                    initial={{ opacity: 0, scale: 0.5 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    exit={{ opacity: 0, scale: 0.5 }}
-                    transition={{ duration: 0.3 }}
+                    initial={{ opacity: 0, scale: 0.5, y: 20 }}
+                    animate={{ 
+                      opacity: 1, 
+                      scale: [1, 1.2, 1], 
+                      y: 0,
+                      rotate: [0, -10, 10, 0]
+                    }}
+                    exit={{ opacity: 0, scale: 0.5, y: -20 }}
+                    transition={{ 
+                      duration: 0.5,
+                      scale: { duration: 0.6, ease: "easeInOut" },
+                      rotate: { duration: 0.8, ease: "easeInOut" }
+                    }}
                     className="relative"
                     title={playerXReaction.label}
                   >
-                    <span className="text-lg">{playerXReaction.emoji}</span>
+                    <motion.span 
+                      className="text-lg"
+                      animate={{ 
+                        scale: [1, 1.1, 1],
+                        filter: ["brightness(1)", "brightness(1.2)", "brightness(1)"]
+                      }}
+                      transition={{ 
+                        duration: 2,
+                        repeat: Infinity,
+                        ease: "easeInOut"
+                      }}
+                    >
+                      {playerXReaction.emoji}
+                    </motion.span>
                   </motion.div>
                 )}
               </AnimatePresence>
@@ -886,14 +894,36 @@ export function GameBoard({ game, onGameOver, gameMode, user }: GameBoardProps) 
               <AnimatePresence>
                 {playerOReaction && (
                   <motion.div
-                    initial={{ opacity: 0, scale: 0.5 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    exit={{ opacity: 0, scale: 0.5 }}
-                    transition={{ duration: 0.3 }}
+                    initial={{ opacity: 0, scale: 0.5, y: 20 }}
+                    animate={{ 
+                      opacity: 1, 
+                      scale: [1, 1.2, 1], 
+                      y: 0,
+                      rotate: [0, -10, 10, 0]
+                    }}
+                    exit={{ opacity: 0, scale: 0.5, y: -20 }}
+                    transition={{ 
+                      duration: 0.5,
+                      scale: { duration: 0.6, ease: "easeInOut" },
+                      rotate: { duration: 0.8, ease: "easeInOut" }
+                    }}
                     className="relative"
                     title={playerOReaction.label}
                   >
-                    <span className="text-lg">{playerOReaction.emoji}</span>
+                    <motion.span 
+                      className="text-lg"
+                      animate={{ 
+                        scale: [1, 1.1, 1],
+                        filter: ["brightness(1)", "brightness(1.2)", "brightness(1)"]
+                      }}
+                      transition={{ 
+                        duration: 2,
+                        repeat: Infinity,
+                        ease: "easeInOut"
+                      }}
+                    >
+                      {playerOReaction.emoji}
+                    </motion.span>
                   </motion.div>
                 )}
               </AnimatePresence>

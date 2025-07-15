@@ -44,10 +44,19 @@ export function EmojiReactionPanel({ onReactionClick, onClose, isOpen }: EmojiRe
                     variant="ghost"
                     size="sm"
                     onClick={() => onReactionClick(reaction.emoji)}
-                    className="h-10 w-10 text-xl hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                    className="h-10 w-10 text-xl hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors hover:scale-110 transform duration-150"
                     title={reaction.label}
                   >
-                    {reaction.emoji}
+                    <motion.span
+                      whileHover={{ 
+                        scale: 1.2, 
+                        rotate: [0, -5, 5, 0],
+                        transition: { duration: 0.3 }
+                      }}
+                      whileTap={{ scale: 0.9 }}
+                    >
+                      {reaction.emoji}
+                    </motion.span>
                   </Button>
                 ))}
               </div>
