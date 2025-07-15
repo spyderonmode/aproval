@@ -90,5 +90,17 @@
     "emailVerificationToken": "9c256d0a-b8b9-459d-a0e8-036159995ec7",
     "emailVerificationExpiry": "2025-07-16T08:02:33.929Z",
     "createdAt": "2025-07-15T08:02:33.929Z"
+  },
+  {
+    "id": "147ec428-2800-4e37-a01e-17420d527028",
+    "username": "yogesh",
+    "password": "e995346a13f21511feb37080ea6dd1919242513db1defafe419f42a614d9bc63",
+    "email": "Hellowolrd09@gmail.com",
+    "displayName": "yogesh",
+    "profilePicture": null,
+    "isEmailVerified": false,
+    "emailVerificationToken": "21728949-38b8-433f-9fed-7d0bb39e6df1",
+    "emailVerificationExpiry": "2025-07-16T09:06:11.346Z",
+    "createdAt": "2025-07-15T09:06:11.346Z"
   }
 ]
