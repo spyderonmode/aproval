@@ -47,6 +47,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Online game stats route
+  app.get('/api/users/:id/online-stats', requireAuth, async (req: any, res) => {
+    try {
+      const userId = req.params.id;
+      const stats = await storage.getOnlineGameStats(userId);
+      res.json(stats);
+    } catch (error) {
+      console.error("Error fetching online game stats:", error);
+      res.status(500).json({ message: "Failed to fetch online game stats" });
+    }
+  });
+
   // Get online users
   app.get('/api/users/online', requireAuth, async (req: any, res) => {
     try {

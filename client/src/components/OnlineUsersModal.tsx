@@ -8,7 +8,8 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
-import { User, MessageCircle, Clock, Users, Send, UserX, UserCheck } from "lucide-react";
+import { User, MessageCircle, Clock, Users, Send, UserX, UserCheck, Eye } from "lucide-react";
+import { UserProfileModal } from "./UserProfileModal";
 
 interface OnlineUsersModalProps {
   open: boolean;
@@ -25,6 +26,8 @@ export function OnlineUsersModal({ open, onClose, currentRoom, user }: OnlineUse
   const [chatHistory, setChatHistory] = useState<Map<string, any[]>>(new Map());
   const [unreadMessages, setUnreadMessages] = useState<Map<string, number>>(new Map());
   const [blockedUsers, setBlockedUsers] = useState<Set<string>>(new Set());
+  const [profileUser, setProfileUser] = useState<any>(null);
+  const [showProfileModal, setShowProfileModal] = useState(false);
 
   const { data: onlineUsers, isLoading } = useQuery({
     queryKey: ["/api/users/online"],
@@ -139,6 +142,11 @@ export function OnlineUsersModal({ open, onClose, currentRoom, user }: OnlineUse
 
   const handleUnblockUser = (userId: string) => {
     unblockUserMutation.mutate(userId);
+  };
+
+  const handleViewProfile = (user: any) => {
+    setProfileUser(user);
+    setShowProfileModal(true);
   };
 
   // Handle incoming chat messages and user offline events
@@ -308,6 +316,16 @@ export function OnlineUsersModal({ open, onClose, currentRoom, user }: OnlineUse
                                   <Badge variant="secondary">In Room</Badge>
                                 )}
                                 
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  onClick={() => handleViewProfile(user)}
+                                  className="text-blue-600 hover:text-blue-700"
+                                >
+                                  <Eye className="h-4 w-4 mr-1" />
+                                  Profile
+                                </Button>
+                                
                                 {isBlocked ? (
                                   <Button
                                     size="sm"
@@ -450,6 +468,19 @@ export function OnlineUsersModal({ open, onClose, currentRoom, user }: OnlineUse
           )}
         </div>
       </DialogContent>
+      
+      {/* Profile Modal */}
+      {profileUser && (
+        <UserProfileModal
+          open={showProfileModal}
+          onClose={() => setShowProfileModal(false)}
+          userId={profileUser.userId}
+          username={profileUser.username}
+          displayName={profileUser.displayName || profileUser.firstName || profileUser.username}
+          profilePicture={profileUser.profilePicture}
+          profileImageUrl={profileUser.profileImageUrl}
+        />
+      )}
     </Dialog>
   );
 }

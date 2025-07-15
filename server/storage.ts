@@ -19,7 +19,7 @@ import {
   type InsertBlockedUser,
 } from "@shared/schema";
 import { db } from "./db";
-import { eq, and, desc, count } from "drizzle-orm";
+import { eq, and, desc, count, or, ne, isNull, isNotNull, sql } from "drizzle-orm";
 
 export interface IStorage {
   // User operations - mandatory for Replit Auth
@@ -52,6 +52,7 @@ export interface IStorage {
   // Statistics
   updateUserStats(userId: string, result: 'win' | 'loss' | 'draw'): Promise<void>;
   getUserStats(userId: string): Promise<{ wins: number; losses: number; draws: number }>;
+  getOnlineGameStats(userId: string): Promise<{ wins: number; losses: number; draws: number; totalGames: number }>;
   
   // Blocked Users
   blockUser(blockerId: string, blockedId: string): Promise<BlockedUser>;
@@ -206,6 +207,57 @@ export class DatabaseStorage implements IStorage {
       wins: user?.wins || 0,
       losses: user?.losses || 0,
       draws: user?.draws || 0,
+    };
+  }
+
+  async getOnlineGameStats(userId: string): Promise<{ wins: number; losses: number; draws: number; totalGames: number }> {
+    // Get stats from online multiplayer games only (gameMode = 'online')
+    const [winGames] = await db
+      .select({ count: sql<number>`count(*)` })
+      .from(games)
+      .where(and(
+        eq(games.gameMode, 'online'),
+        eq(games.status, 'finished'),
+        eq(games.winnerId, userId)
+      ));
+
+    const [lossGames] = await db
+      .select({ count: sql<number>`count(*)` })
+      .from(games)
+      .where(and(
+        eq(games.gameMode, 'online'),
+        eq(games.status, 'finished'),
+        or(
+          eq(games.playerXId, userId),
+          eq(games.playerOId, userId)
+        ),
+        ne(games.winnerId, userId),
+        isNotNull(games.winnerId)
+      ));
+
+    const [drawGames] = await db
+      .select({ count: sql<number>`count(*)` })
+      .from(games)
+      .where(and(
+        eq(games.gameMode, 'online'),
+        eq(games.status, 'finished'),
+        or(
+          eq(games.playerXId, userId),
+          eq(games.playerOId, userId)
+        ),
+        isNull(games.winnerId),
+        eq(games.winCondition, 'draw')
+      ));
+
+    const wins = winGames?.count || 0;
+    const losses = lossGames?.count || 0;
+    const draws = drawGames?.count || 0;
+
+    return {
+      wins,
+      losses,
+      draws,
+      totalGames: wins + losses + draws
     };
   }
 
