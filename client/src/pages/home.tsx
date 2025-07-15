@@ -626,9 +626,13 @@ export default function Home() {
                       <Button
                         variant="outline"
                         size="sm"
-                        onClick={() => {
-                          setShowProfile(true);
+                        onClick={(e) => {
+                          e.stopPropagation();
                           setShowHeaderSidebar(false);
+                          // Give a small delay to ensure sidebar is closed before opening profile
+                          setTimeout(() => {
+                            setShowProfile(true);
+                          }, 100);
                         }}
                         className="bg-slate-700 border-slate-600 text-white hover:bg-slate-600 text-xs"
                       >
@@ -741,7 +745,7 @@ export default function Home() {
                   <p className="text-sm text-gray-300 mb-3">
                     {user?.displayName || user?.username || 'Player'}
                   </p>
-                  <ProfileManager user={user} />
+                  <ProfileManager user={user} open={false} />
                 </div>
               </CardContent>
             </Card>
@@ -913,12 +917,11 @@ export default function Home() {
         user={user}
       />
 
-      {showProfile && (
-        <ProfileManager 
-          user={user}
-          onClose={() => setShowProfile(false)}
-        />
-      )}
+      <ProfileManager 
+        user={user}
+        open={showProfile}
+        onClose={() => setShowProfile(false)}
+      />
 
     </div>
   );

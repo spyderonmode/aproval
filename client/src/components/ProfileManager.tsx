@@ -12,10 +12,11 @@ import { User, Upload, X } from "lucide-react";
 
 interface ProfileManagerProps {
   user: any;
+  open?: boolean;
   onClose?: () => void;
 }
 
-export function ProfileManager({ user, onClose }: ProfileManagerProps) {
+export function ProfileManager({ user, open = false, onClose }: ProfileManagerProps) {
   const [displayName, setDisplayName] = useState(user?.displayName || user?.username || '');
   const [profilePicture, setProfilePicture] = useState(user?.profilePicture || '');
   const [isUploading, setIsUploading] = useState(false);
@@ -119,13 +120,7 @@ export function ProfileManager({ user, onClose }: ProfileManagerProps) {
   };
 
   return (
-    <Dialog>
-      <DialogTrigger asChild>
-        <Button variant="outline" size="sm">
-          <User className="w-4 h-4 mr-2" />
-          Edit Profile
-        </Button>
-      </DialogTrigger>
+    <Dialog open={open} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle>Edit Profile</DialogTitle>

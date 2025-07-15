@@ -60,6 +60,8 @@ export const verifyEmail = async (token: string) => {
 
 export const logout = async () => {
   await fetch('/api/auth/logout', { method: 'POST' });
+  // Force page refresh after logout
+  window.location.href = '/';
 };
 
 export const getCurrentUser = async () => {
