@@ -21,6 +21,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
   const roomConnections = new Map<string, Set<string>>();
   const matchmakingQueue: string[] = []; // Queue of user IDs waiting for matches
 
+  // Error logging endpoint
+  app.post('/api/error-log', (req, res) => {
+    const { error, stack, info } = req.body;
+    console.error('🚨 FRONTEND ERROR CAUGHT:', error);
+    console.error('🚨 ERROR STACK:', stack);
+    console.error('🚨 ERROR INFO:', info);
+    res.json({ success: true });
+  });
+
   // User stats route
   app.get('/api/users/:id/stats', requireAuth, async (req: any, res) => {
     try {
