@@ -403,7 +403,7 @@ export function setupAuth(app: Express) {
   });
 
   // Update user profile endpoint
-  app.put('/api/auth/profile', (req, res) => {
+  app.put('/api/auth/profile', async (req, res) => {
     if (!req.session.user) {
       return res.status(401).json({ error: 'Not authenticated' });
     }
@@ -411,21 +411,51 @@ export function setupAuth(app: Express) {
     const { displayName, profilePicture } = req.body;
     const userId = req.session.user.userId;
     
-    const updates: Partial<User> = {};
-    if (displayName !== undefined) updates.displayName = displayName;
-    if (profilePicture !== undefined) updates.profilePicture = profilePicture;
-    
-    const updatedUser = updateUser(userId, updates);
-    if (!updatedUser) {
-      return res.status(404).json({ error: 'User not found' });
+    try {
+      const updates: Partial<User> = {};
+      if (displayName !== undefined) updates.displayName = displayName;
+      if (profilePicture !== undefined) updates.profilePicture = profilePicture;
+      
+      // Update user in JSON file
+      const updatedUser = updateUser(userId, updates);
+      if (!updatedUser) {
+        return res.status(404).json({ error: 'User not found' });
+      }
+      
+      // Also update user in database to keep session valid
+      try {
+        await storage.upsertUser({
+          id: updatedUser.id,
+          email: updatedUser.email || null,
+          firstName: updatedUser.displayName || updatedUser.username || 'Anonymous',
+          lastName: null,
+          profileImageUrl: updatedUser.profilePicture || null,
+        });
+        console.log('User profile synced to database:', updatedUser.id);
+      } catch (error) {
+        console.error('Error syncing updated user to database:', error);
+        // Continue even if database sync fails to avoid breaking the session
+      }
+      
+      // Keep session alive - update session data if needed
+      req.session.user = {
+        ...req.session.user,
+        displayName: updatedUser.displayName,
+        profilePicture: updatedUser.profilePicture
+      };
+      
+      res.json({
+        userId: updatedUser.id,
+        username: updatedUser.username,
+        displayName: updatedUser.displayName,
+        profilePicture: updatedUser.profilePicture,
+        email: updatedUser.email,
+        isEmailVerified: updatedUser.isEmailVerified
+      });
+    } catch (error) {
+      console.error('Error updating user profile:', error);
+      res.status(500).json({ error: 'Failed to update profile' });
     }
-    
-    res.json({
-      userId: updatedUser.id,
-      username: updatedUser.username,
-      displayName: updatedUser.displayName,
-      profilePicture: updatedUser.profilePicture
-    });
   });
 
   // Send email verification

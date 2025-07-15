@@ -10,6 +10,8 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+- **Profile Update Session Fix** (July 15, 2025): Fixed issue where users were getting logged out after updating their profile (display name/profile picture). Updated profile endpoint to sync changes to both JSON file and database, and properly maintain session data to keep users logged in after profile updates
+- **Complete Matchmaking System** (July 15, 2025): Implemented full matchmaking system with Quick Match button, real-time search modal with timer and progress bar, automatic player pairing when 2 players search, WebSocket-based match notifications, and automatic room creation for matched players
 - **Email/Username Login & Production URLs** (July 15, 2025): Updated login system to support both username and email authentication, modified email verification and password reset URLs to use production domain (tic-tac-master-zanv1.replit.app) instead of localhost
 - **Forgot Password System** (July 15, 2025): Added complete forgot password functionality with password reset endpoints, email templates for password reset, forgot password modal in auth page, dedicated reset password page, secure token-based reset system with 1-hour expiry, and SMTP email integration for password reset emails
 - **Mandatory Email Verification** (July 15, 2025): Implemented mandatory email verification system requiring users to verify their email before accessing the application, added email verification endpoints and resend functionality, created email verification modal and dedicated verification page, updated authentication flow to block unverified users, and integrated SMTP email service for verification emails

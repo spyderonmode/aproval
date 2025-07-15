@@ -29,7 +29,14 @@ export function ProfileManager({ user, onClose }: ProfileManagerProps) {
       return response.json();
     },
     onSuccess: (updatedUser) => {
+      // Update the user data in the cache
       queryClient.setQueryData(['/api/auth/user'], updatedUser);
+      
+      // Also invalidate and refetch to ensure fresh data
+      queryClient.invalidateQueries({
+        queryKey: ['/api/auth/user']
+      });
+      
       toast({
         title: "Profile updated",
         description: "Your profile has been updated successfully",
@@ -44,7 +51,7 @@ export function ProfileManager({ user, onClose }: ProfileManagerProps) {
           variant: "destructive",
         });
         setTimeout(() => {
-          window.location.href = "/api/auth/login";
+          window.location.href = "/api/login";
         }, 500);
         return;
       }
