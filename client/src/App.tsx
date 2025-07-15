@@ -8,6 +8,62 @@ import Landing from "@/pages/landing";
 import Home from "@/pages/home";
 import Auth from "@/pages/auth";
 import NotFound from "@/pages/not-found";
+import { Component } from "react";
+
+// Error boundary to catch white screen crashes
+class GameErrorBoundary extends Component<{ children: React.ReactNode }, { hasError: boolean }> {
+  constructor(props: { children: React.ReactNode }) {
+    super(props);
+    this.state = { hasError: false };
+  }
+
+  static getDerivedStateFromError() {
+    return { hasError: true };
+  }
+
+  componentDidCatch(error: Error, errorInfo: any) {
+    console.error('🚨 Game crashed with error:', error, errorInfo);
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div style={{ 
+          position: 'fixed', 
+          top: 0, 
+          left: 0, 
+          right: 0, 
+          bottom: 0, 
+          backgroundColor: 'black', 
+          color: 'white', 
+          display: 'flex', 
+          alignItems: 'center', 
+          justifyContent: 'center', 
+          flexDirection: 'column' 
+        }}>
+          <h1>Game Error</h1>
+          <p>Something went wrong. Please refresh the page.</p>
+          <button 
+            onClick={() => window.location.reload()}
+            style={{ 
+              padding: '10px 20px', 
+              backgroundColor: '#3b82f6', 
+              color: 'white', 
+              border: 'none', 
+              borderRadius: '4px', 
+              cursor: 'pointer', 
+              marginTop: '20px' 
+            }}
+          >
+            Reload Page
+          </button>
+        </div>
+      );
+    }
+
+    return this.props.children;
+  }
+}
 
 function Router() {
   const { isAuthenticated, isLoading } = useAuth();
@@ -23,19 +79,21 @@ function Router() {
   }
 
   return (
-    <Switch>
-      {!isAuthenticated ? (
-        <>
-          <Route path="/" component={Auth} />
-          <Route path="/auth" component={Auth} />
-        </>
-      ) : (
-        <>
-          <Route path="/" component={Home} />
-        </>
-      )}
-      <Route component={NotFound} />
-    </Switch>
+    <GameErrorBoundary>
+      <Switch>
+        {!isAuthenticated ? (
+          <>
+            <Route path="/" component={Auth} />
+            <Route path="/auth" component={Auth} />
+          </>
+        ) : (
+          <>
+            <Route path="/" component={Home} />
+          </>
+        )}
+        <Route component={NotFound} />
+      </Switch>
+    </GameErrorBoundary>
   );
 }
 

@@ -282,38 +282,15 @@ export default function Home() {
   const handleGameOver = (result: any) => {
     console.log('🎮 handleGameOver called with result:', result);
     
-    // Ensure we have a valid result object
-    if (!result) {
-      console.error('🎮 handleGameOver: No result provided');
-      return;
-    }
-    
-    // Ensure game stays available to prevent white screen
-    if (result.game) {
-      console.log('🎮 Preserving game state for game over modal:', result.game);
-      setCurrentGame(result.game);
-    }
-    // Preserve game state even if not in result
-    if (!result.game && currentGame) {
-      console.log('🎮 Using current game state for game over modal:', currentGame);
-      result.game = currentGame;
-    }
-    
-    // Force result to have required properties
-    const safeResult = {
-      winner: result.winner || null,
-      winnerName: result.winnerName || (result.winner === 'X' ? 'Player X' : result.winner === 'O' ? 'AI' : null),
-      condition: result.condition || 'unknown',
-      board: result.board || currentGame?.board || {},
-      game: result.game || currentGame,
-      playerXInfo: result.playerXInfo || { displayName: 'Player X' },
-      playerOInfo: result.playerOInfo || { displayName: 'AI' },
-      winnerInfo: result.winnerInfo || null,
-      winningPositions: result.winningPositions || []
+    // Ultra-simple approach - just store the winner and condition
+    const simpleResult = {
+      winner: result?.winner || null,
+      winnerName: result?.winnerName || (result?.winner === 'X' ? 'Player X' : result?.winner === 'O' ? 'AI' : null),
+      condition: result?.condition || 'unknown'
     };
     
-    console.log('🎮 Setting safe game result:', safeResult);
-    setGameResult(safeResult);
+    console.log('🎮 Setting simple game result:', simpleResult);
+    setGameResult(simpleResult);
     setShowGameOver(true);
   };
 
