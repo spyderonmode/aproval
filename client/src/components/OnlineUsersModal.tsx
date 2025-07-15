@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -24,6 +24,14 @@ export function OnlineUsersModal({ open, onClose, currentRoom }: OnlineUsersModa
     refetchInterval: 5000, // Refresh every 5 seconds
     enabled: open,
   });
+
+  // Debug logging
+  React.useEffect(() => {
+    if (open) {
+      console.log('🔍 OnlineUsersModal - currentRoom:', currentRoom);
+      console.log('🔍 OnlineUsersModal - onlineUsers:', onlineUsers);
+    }
+  }, [open, currentRoom, onlineUsers]);
 
   const inviteMutation = useMutation({
     mutationFn: async ({ targetUserId, roomId }: { targetUserId: string; roomId: string }) => {
@@ -85,6 +93,14 @@ export function OnlineUsersModal({ open, onClose, currentRoom }: OnlineUsersModa
         </DialogHeader>
         
         <div className="space-y-4">
+          {!currentRoom && (
+            <div className="bg-blue-50 dark:bg-blue-950 border border-blue-200 dark:border-blue-800 rounded-lg p-3">
+              <p className="text-sm text-blue-800 dark:text-blue-200">
+                Create or join a room to invite other players to play with you.
+              </p>
+            </div>
+          )}
+          
           {isLoading ? (
             <div className="flex items-center justify-center py-8">
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
@@ -124,17 +140,16 @@ export function OnlineUsersModal({ open, onClose, currentRoom }: OnlineUsersModa
                             <Badge variant="secondary">In Room</Badge>
                           )}
                           
-                          {currentRoom && (
-                            <Button
-                              size="sm"
-                              variant="outline"
-                              onClick={() => handleInvite(user.userId)}
-                              disabled={inviteMutation.isPending || user.inRoom}
-                            >
-                              <UserPlus className="h-4 w-4 mr-1" />
-                              {user.inRoom ? "In Room" : "Invite"}
-                            </Button>
-                          )}
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => handleInvite(user.userId)}
+                            disabled={inviteMutation.isPending || user.inRoom || !currentRoom}
+                            title={!currentRoom ? "You must be in a room to send invitations" : user.inRoom ? "User is already in a room" : "Invite to your room"}
+                          >
+                            <UserPlus className="h-4 w-4 mr-1" />
+                            {user.inRoom ? "In Room" : "Invite"}
+                          </Button>
                         </div>
                       </div>
                     </Card>
