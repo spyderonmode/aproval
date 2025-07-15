@@ -53,11 +53,11 @@ export default function Auth() {
         await refreshUser();
         toast({
           title: "Registration successful",
-          description: "Welcome to TicTac 3x5!",
+          description: "Please verify your email to continue.",
         });
         
-        // Force immediate redirect to dashboard
-        window.location.href = "/";
+        // Show email verification modal instead of redirecting
+        setShowEmailVerification(true);
       }
     } catch (error) {
       toast({

@@ -63,9 +63,14 @@ export const logout = async () => {
 };
 
 export const getCurrentUser = async () => {
-  const response = await fetch('/api/auth/user');
-  if (!response.ok) {
+  try {
+    const response = await fetch('/api/auth/user');
+    if (!response.ok) {
+      return null;
+    }
+    return response.json();
+  } catch (error) {
+    console.error('Error getting current user:', error);
     return null;
   }
-  return response.json();
 };

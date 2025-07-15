@@ -62,18 +62,14 @@ export function EmailVerificationModal({ email, onClose }: EmailVerificationModa
                 <Button
                   onClick={handleSendVerification}
                   disabled={isLoading}
-                  className="flex-1 bg-blue-600 hover:bg-blue-700"
+                  className="w-full bg-blue-600 hover:bg-blue-700"
                 >
                   {isLoading ? "Sending..." : "Send Verification"}
                 </Button>
-                <Button
-                  onClick={onClose}
-                  variant="outline"
-                  className="flex-1 bg-slate-700 border-slate-600 text-white hover:bg-slate-600"
-                >
-                  Skip for now
-                </Button>
               </div>
+              <p className="text-sm text-slate-400 text-center mt-2">
+                Email verification is required to access the dashboard
+              </p>
             </>
           ) : (
             <>

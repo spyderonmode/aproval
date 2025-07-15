@@ -287,7 +287,9 @@ export function setupAuth(app: Express) {
       userId: user.id,
       username: user.username,
       displayName: user.displayName,
-      profilePicture: user.profilePicture
+      profilePicture: user.profilePicture,
+      email: user.email,
+      isEmailVerified: user.isEmailVerified
     });
   });
 
@@ -407,6 +409,13 @@ export function requireAuth(req: any, res: any, next: any) {
   if (!req.session?.user) {
     return res.status(401).json({ error: 'Not authenticated' });
   }
+  
+  // Check if user's email is verified
+  const user = getUserById(req.session.user.userId);
+  if (user && user.email && !user.isEmailVerified) {
+    return res.status(403).json({ error: 'Email verification required' });
+  }
+  
   req.user = req.session.user;
   next();
 }

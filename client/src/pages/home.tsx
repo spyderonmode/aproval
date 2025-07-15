@@ -12,6 +12,7 @@ import { RoomManager } from "@/components/RoomManager";
 import { PlayerList } from "@/components/PlayerList";
 import { CreateRoomModal } from "@/components/CreateRoomModal";
 import { GameOverModal } from "@/components/GameOverModal";
+import { EmailVerificationModal } from "@/components/EmailVerificationModal";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -32,12 +33,20 @@ export default function Home() {
   const [showGameOver, setShowGameOver] = useState(false);
   const [gameResult, setGameResult] = useState<any>(null);
   const [isCreatingGame, setIsCreatingGame] = useState(false);
+  const [showEmailVerification, setShowEmailVerification] = useState(false);
   // Remove matchmaking state variables
 
   const { data: userStats } = useQuery({
     queryKey: ["/api/users", user?.id, "stats"],
     enabled: !!user,
   });
+
+  // Check if email verification is required
+  useEffect(() => {
+    if (user && user.email && !user.isEmailVerified) {
+      setShowEmailVerification(true);
+    }
+  }, [user]);
 
   useEffect(() => {
     if (lastMessage) {
@@ -132,7 +141,7 @@ export default function Home() {
             console.log('🎮 Winner info from server:', lastMessage.winnerInfo);
             console.log('🎮 Player X Info:', lastMessage.playerXInfo || currentGame.playerXInfo);
             console.log('🎮 Player O Info:', lastMessage.playerOInfo || currentGame.playerOInfo);
-            
+
             // Create comprehensive result object with all player info
             const gameResult = {
               winner: lastMessage.winner,
@@ -146,7 +155,7 @@ export default function Home() {
                 gameMode: currentGame.gameMode || 'online'
               }
             };
-            
+
             console.log('🎮 Setting complete game result:', gameResult);
             setGameResult(gameResult);
             setShowGameOver(true);
@@ -193,13 +202,13 @@ export default function Home() {
 
   const resetToMainMenu = () => {
     console.log('🏠 resetToMainMenu called');
-    
+
     // Leave room if currently in one - this will trigger room end notification
     if (currentRoom) {
       console.log('🏠 Leaving room from main menu:', currentRoom.id);
       console.log('🏠 User info:', user);
       console.log('🏠 WebSocket connected:', isConnected);
-      
+
       // Send explicit leave message to notify other players FIRST
       const leaveMessage = {
         type: 'leave_room',
@@ -207,10 +216,10 @@ export default function Home() {
         userId: user?.userId || user?.id,
         playerName: user?.displayName || user?.firstName || user?.username || 'Player'
       };
-      
+
       console.log('🏠 Sending leave message:', leaveMessage);
       sendMessage(leaveMessage);
-      
+
       // Small delay to ensure message is sent before cleanup
       setTimeout(() => {
         console.log('🏠 Cleaning up after leave message sent');
@@ -279,7 +288,7 @@ export default function Home() {
       initializeLocalGame();
     }
   }, [selectedMode, currentGame, user]);
-  
+
   // Fix white screen issue by ensuring game exists for all modes
   useEffect(() => {
     console.log('🎮 Effect check - currentGame:', !!currentGame, 'currentRoom:', !!currentRoom, 'selectedMode:', selectedMode);
@@ -344,14 +353,14 @@ export default function Home() {
 
   const handleGameOver = (result: any) => {
     console.log('🎮 handleGameOver called with result:', result);
-    
+
     // Ultra-simple approach - just store the winner and condition
     const simpleResult = {
       winner: result?.winner || null,
       winnerName: result?.winnerName || (result?.winner === 'X' ? 'Player X' : result?.winner === 'O' ? 'AI' : null),
       condition: result?.condition || 'unknown'
     };
-    
+
     console.log('🎮 Setting simple game result:', simpleResult);
     setGameResult(simpleResult);
     setShowGameOver(true);
@@ -362,11 +371,11 @@ export default function Home() {
       console.log('🎮 Already creating game, ignoring request');
       return;
     }
-    
+
     setIsCreatingGame(true);
     setShowGameOver(false);
     setGameResult(null);
-    
+
     if (selectedMode === 'online' && currentRoom) {
       // For online mode, create a new game in the same room
       try {
@@ -377,15 +386,15 @@ export default function Home() {
             'Content-Type': 'application/json',
           },
         });
-        
+
         if (response.ok) {
           const newGame = await response.json();
           console.log('🎮 New game created for play again:', newGame);
           setCurrentGame(newGame);
-          
+
           // No need to broadcast manually, server will handle it
           console.log('🎮 Game created successfully, server will broadcast to all participants');
-          
+
           // Sound effects removed as requested
         } else {
           console.error('Failed to create new game:', response.status);
@@ -419,11 +428,11 @@ export default function Home() {
           username: 'Player O'
         }
       };
-      
+
       setCurrentGame(newGame);
       // Sound effects removed as requested
     }
-    
+
     // Reset creating state after a short delay
     setTimeout(() => {
       setIsCreatingGame(false);
@@ -441,7 +450,7 @@ export default function Home() {
             </div>
             <h1 className="text-lg md:text-xl font-bold">Player Dashboard</h1>
           </div>
-          
+
           {/* User Profile */}
           <div className="flex items-center space-x-2 md:space-x-4">
             <div className="flex items-center space-x-2 md:space-x-3">
@@ -682,6 +691,13 @@ export default function Home() {
         isCreatingGame={isCreatingGame}
         onMainMenu={resetToMainMenu}
       />
+
+      {showEmailVerification && user?.email && (
+        <EmailVerificationModal 
+          email={user.email}
+          onClose={() => setShowEmailVerification(false)}
+        />
+      )}
     </div>
   );
 }
