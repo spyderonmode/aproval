@@ -36,10 +36,17 @@ export class EmailService {
         html: params.html,
       };
 
+      console.log('📧 Sending email:', {
+        to: params.to,
+        subject: params.subject,
+        from: this.fromEmail
+      });
+
       await this.transporter.sendMail(mailOptions);
+      console.log('✅ Email sent successfully to:', params.to);
       return true;
     } catch (error) {
-      console.error('SMTP email error:', error);
+      console.error('❌ SMTP email error:', error);
       return false;
     }
   }
@@ -114,8 +121,23 @@ export function createEmailService(): EmailService | null {
 
   if (!smtpHost || !smtpPort || !smtpUser || !smtpPass || !fromEmail) {
     console.log('SMTP configuration not complete - email verification disabled');
+    console.log('Missing:', {
+      smtpHost: !!smtpHost,
+      smtpPort: !!smtpPort,
+      smtpUser: !!smtpUser,
+      smtpPass: !!smtpPass,
+      fromEmail: !!fromEmail
+    });
     return null;
   }
+
+  console.log('✅ SMTP configuration complete - email service enabled');
+  console.log('SMTP settings:', {
+    host: smtpHost,
+    port: smtpPort,
+    user: smtpUser,
+    from: fromEmail
+  });
 
   const config: EmailConfig = {
     host: smtpHost,
