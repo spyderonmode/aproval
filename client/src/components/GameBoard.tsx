@@ -196,21 +196,38 @@ export function GameBoard({ game, onGameOver, gameMode, user }: GameBoardProps) 
     if (game) {
       console.log('🎮 Game prop changed:', game);
       console.log('🎮 Game ID:', game.id);
-      console.log('📋 Setting board to:', game.board || {});
+      console.log('📋 Game board from prop:', game.board || {});
       console.log('👤 Player X Info:', game.playerXInfo);
       console.log('👤 Player O Info:', game.playerOInfo);
-      // Force board state update - always update regardless of previous state
-      const newBoard = game.board || {};
-      console.log('📋 Board update - setting to:', newBoard);
-      setBoard(newBoard);
+      
+      // Only update board if it's a new game or if we have moves from server
+      const gameBoard = game.board || {};
+      const isNewGame = Object.keys(gameBoard).length === 0;
+      
+      // For local games, don't overwrite board with empty state
+      if (game.id.startsWith('local-game')) {
+        // Only reset board if it's truly a new game
+        if (isNewGame && Object.keys(board).length > 0) {
+          console.log('📋 Resetting local game board');
+          setBoard({});
+          setWinningLine(null);
+          setLastMove(null);
+        }
+      } else {
+        // For online games, always sync with server state
+        console.log('📋 Syncing online game board to:', gameBoard);
+        setBoard(gameBoard);
+      }
+      
       setCurrentPlayer(game.currentPlayer || 'X');
+      
       // Clear winning line and last move for new games
-      if (game.board && Object.keys(game.board).length === 0) {
+      if (isNewGame) {
         setWinningLine(null);
         setLastMove(null);
       }
     }
-  }, [game, game?.board, game?.currentPlayer]);
+  }, [game?.id, game?.timestamp]); // Only depend on game ID and timestamp, not board
 
   // Remove WebSocket handling from GameBoard - it's now handled in Home component
   // This prevents double handling and state conflicts
@@ -220,6 +237,8 @@ export function GameBoard({ game, onGameOver, gameMode, user }: GameBoardProps) 
     console.log('🔄 Board state changed:', board);
     console.log('🔄 Board keys:', Object.keys(board));
     console.log('🔄 Board values:', Object.values(board));
+    console.log('🔄 Game ID:', game?.id);
+    console.log('🔄 Game mode:', gameMode);
   }, [board]);
 
   const makeMoveMutation = useMutation({
@@ -253,8 +272,8 @@ export function GameBoard({ game, onGameOver, gameMode, user }: GameBoardProps) 
         // No need to update local state here
         console.log('✅ Move successful, WebSocket will handle board update');
       }
-      // Force a re-render to ensure the board shows the latest state
-      setBoard(prevBoard => ({ ...prevBoard }));
+      // For online games, don't force board update since WebSocket handles it
+      // For local games, board is already updated in handleLocalMove
     },
     onError: (error) => {
       console.log('❌ Move mutation error:', error);
@@ -280,10 +299,17 @@ export function GameBoard({ game, onGameOver, gameMode, user }: GameBoardProps) 
   const handleLocalMove = (position: number) => {
     if (!game) return;
     
+    console.log('🎮 HandleLocalMove called:');
+    console.log('  - Position:', position);
+    console.log('  - Current player:', currentPlayer);
+    console.log('  - Current board:', board);
+    
     // Sound effects removed as requested
     const newBoard = { ...board };
     newBoard[position.toString()] = currentPlayer;
     setLastMove(position);
+    
+    console.log('  - New board after move:', newBoard);
     
     // Check for win condition with winning line detection
     const checkWin = (board: Record<string, string>, player: string) => {
