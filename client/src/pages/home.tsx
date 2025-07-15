@@ -206,15 +206,14 @@ export default function Home() {
         playerXId: user?.userId || user?.id,
         playerOId: selectedMode === 'ai' ? 'ai' : 'player2',
         playerXInfo: {
-          displayName: user?.displayName || user?.firstName || user?.username || 'Player X',
-          firstName: user?.firstName || user?.displayName || user?.username || 'Player X',
-          username: user?.username || 'Player X',
-          profilePicture: user?.profilePicture || user?.profileImageUrl
+          displayName: 'Player X',
+          firstName: 'Player X',
+          username: 'Player X'
         },
         playerOInfo: selectedMode === 'ai' ? {
-          displayName: `AI (${aiDifficulty})`,
-          firstName: `AI (${aiDifficulty})`,
-          username: `AI (${aiDifficulty})`
+          displayName: 'AI',
+          firstName: 'AI',
+          username: 'AI'
         } : {
           displayName: 'Player O',
           firstName: 'Player O',
@@ -229,6 +228,7 @@ export default function Home() {
   // Auto-initialize game when switching to AI or pass-play mode
   useEffect(() => {
     if (!currentGame && (selectedMode === 'ai' || selectedMode === 'pass-play')) {
+      console.log('🎮 Auto-initializing game for mode:', selectedMode);
       initializeLocalGame();
     }
   }, [selectedMode, currentGame, user]);
@@ -250,22 +250,34 @@ export default function Home() {
     }
   }, [user]);
 
-  // Update AI difficulty when changed
+  // Update AI difficulty when changed - reset the game
   useEffect(() => {
     if (currentGame && selectedMode === 'ai') {
-      console.log('🎮 AI difficulty changed, updating game');
-      const updatedGame = {
-        ...currentGame,
+      console.log('🎮 AI difficulty changed, resetting game');
+      // Reset the game completely when difficulty changes
+      const newGame = {
+        id: `local-game-${Date.now()}`,
+        board: {},
+        currentPlayer: 'X',
+        status: 'active',
+        gameMode: selectedMode,
         aiDifficulty,
+        playerXId: user?.userId || user?.id,
+        playerOId: 'ai',
+        playerXInfo: {
+          displayName: 'Player X',
+          firstName: 'Player X',
+          username: 'Player X'
+        },
         playerOInfo: {
-          displayName: `AI (${aiDifficulty})`,
-          firstName: `AI (${aiDifficulty})`,
-          username: `AI (${aiDifficulty})`
+          displayName: 'AI',
+          firstName: 'AI',
+          username: 'AI'
         }
       };
-      setCurrentGame(updatedGame);
+      setCurrentGame(newGame);
     }
-  }, [aiDifficulty, selectedMode]);
+  }, [aiDifficulty, selectedMode, user]);
 
   const handleGameOver = (result: any) => {
     // Sound effects removed as requested
@@ -327,13 +339,24 @@ export default function Home() {
         board: {},
         currentPlayer: 'X',
         status: 'active',
-        playerX: user?.id || 'local-x',
-        playerO: selectedMode === 'ai' ? 'ai' : 'local-o',
-        playerXInfo: user,
-        playerOInfo: selectedMode === 'ai' ? { username: 'AI', displayName: 'AI Player' } : null,
         gameMode: selectedMode,
         aiDifficulty,
-        createdAt: new Date().toISOString()
+        playerXId: user?.userId || user?.id,
+        playerOId: selectedMode === 'ai' ? 'ai' : 'player2',
+        playerXInfo: {
+          displayName: 'Player X',
+          firstName: 'Player X',
+          username: 'Player X'
+        },
+        playerOInfo: selectedMode === 'ai' ? {
+          displayName: 'AI',
+          firstName: 'AI',
+          username: 'AI'
+        } : {
+          displayName: 'Player O',
+          firstName: 'Player O',
+          username: 'Player O'
+        }
       };
       
       setCurrentGame(newGame);
