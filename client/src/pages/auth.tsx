@@ -39,8 +39,8 @@ export default function Auth() {
             title: "Login successful",
             description: "Welcome back!",
           });
-          // Force immediate redirect to dashboard
-          window.location.href = "/";
+          // Refresh authentication state and navigate
+          window.location.reload();
         } else {
           const errorData = await response.json();
           
