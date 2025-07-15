@@ -20,7 +20,7 @@ import { ThemeSelector } from "@/components/ThemeSelector";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { GamepadIcon, LogOut, User, Zap, Loader2, Users } from "lucide-react";
+import { GamepadIcon, LogOut, User, Zap, Loader2, Users, Settings } from "lucide-react";
 import { logout } from "@/lib/firebase";
 
 export default function Home() {
@@ -529,18 +529,6 @@ export default function Home() {
                 {isConnected ? 'Online' : 'Offline'}
               </span>
             </div>
-            <ThemeSelector />
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setShowOnlineUsers(true)}
-              className="bg-slate-700 border-slate-600 text-white hover:bg-slate-600 px-2 md:px-4 py-1 md:py-2"
-            >
-              <Users className="w-3 h-3 md:w-4 md:h-4 mr-1 md:mr-2" />
-              <span className="hidden sm:inline">Players</span>
-              <span className="sm:hidden">({onlineUserCount})</span>
-              <span className="hidden sm:inline">({onlineUserCount})</span>
-            </Button>
             <Button 
               variant="outline" 
               size="sm"
@@ -641,6 +629,39 @@ export default function Home() {
                     {user?.displayName || user?.username || 'Player'}
                   </p>
                   <ProfileManager user={user} />
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Settings */}
+            <Card className="bg-slate-800 border-slate-700">
+              <CardHeader>
+                <CardTitle className="text-lg flex items-center space-x-2">
+                  <Settings className="w-5 h-5" />
+                  <span>Settings</span>
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  {/* Theme Selector */}
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-gray-300">Theme</span>
+                    <ThemeSelector />
+                  </div>
+                  
+                  {/* Online Players */}
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-gray-300">Online Players</span>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setShowOnlineUsers(true)}
+                      className="bg-slate-700 border-slate-600 text-white hover:bg-slate-600"
+                    >
+                      <Users className="w-4 h-4 mr-2" />
+                      {onlineUserCount} Players
+                    </Button>
+                  </div>
                 </div>
               </CardContent>
             </Card>
