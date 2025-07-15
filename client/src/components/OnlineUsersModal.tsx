@@ -69,10 +69,10 @@ export function OnlineUsersModal({ open, onClose, currentRoom, user }: OnlineUse
     });
   };
 
-  // Handle incoming chat messages
+  // Handle incoming chat messages via a prop or global event system
   useEffect(() => {
-    const handleMessage = (event: any) => {
-      const data = JSON.parse(event.data);
+    const handleChatMessage = (event: CustomEvent) => {
+      const data = event.detail;
       
       if (data.type === 'chat_message_received') {
         const incomingMessage = {
@@ -83,24 +83,27 @@ export function OnlineUsersModal({ open, onClose, currentRoom, user }: OnlineUse
           senderName: data.message.senderName
         };
         
-        setChatMessages(prev => [...prev, incomingMessage]);
-        
-        // Show toast notification if not currently chatting with this user
-        if (!selectedUser || selectedUser.userId !== data.message.senderId) {
-          toast({
-            title: "New message",
-            description: `${data.message.senderName}: ${data.message.message}`,
-          });
+        // Only add to chat if we're chatting with this user
+        if (selectedUser && selectedUser.userId === data.message.senderId) {
+          setChatMessages(prev => [...prev, incomingMessage]);
         }
       }
     };
 
-    // Add WebSocket listener if available
-    if (window.WebSocket && open) {
-      // This would need to be connected to the existing WebSocket in the home component
-      // For now, we'll handle it through the parent component
+    // Listen for chat messages via custom events
+    window.addEventListener('chat_message_received', handleChatMessage as EventListener);
+    
+    return () => {
+      window.removeEventListener('chat_message_received', handleChatMessage as EventListener);
+    };
+  }, [selectedUser]);
+
+  // Reset chat messages when changing users
+  useEffect(() => {
+    if (selectedUser) {
+      setChatMessages([]);
     }
-  }, [selectedUser, open, toast]);
+  }, [selectedUser]);
 
   const formatLastSeen = (lastSeen: string) => {
     const diff = Date.now() - new Date(lastSeen).getTime();

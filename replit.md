@@ -10,6 +10,7 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+- **Real-time Chat System** (July 15, 2025): Replaced invitation system with comprehensive chat functionality - players can now message each other in real-time through the Online Players modal, with proper message display, WebSocket integration, and custom event handling for seamless communication
 - **Header Display Fix** (July 15, 2025): Fixed duplicate player name display in the header by removing redundant user name element, ensuring clean single display of player information
 - **Profile Update Session Fix** (July 15, 2025): Fixed issue where users were getting logged out after updating their profile (display name/profile picture). Updated profile endpoint to sync changes to both JSON file and database, and properly maintain session data to keep users logged in after profile updates
 - **Complete Matchmaking System** (July 15, 2025): Implemented full matchmaking system with Quick Match button, real-time search modal with timer and progress bar, automatic player pairing when 2 players search, WebSocket-based match notifications, and automatic room creation for matched players

@@ -62,7 +62,12 @@ export default function Home() {
           setOnlineUserCount(lastMessage.count);
           break;
         case 'chat_message_received':
-          // Handle chat messages - show notification
+          // Dispatch custom event for chat components to handle
+          window.dispatchEvent(new CustomEvent('chat_message_received', {
+            detail: lastMessage
+          }));
+          
+          // Show toast notification
           toast({
             title: "New message",
             description: `${lastMessage.message.senderName}: ${lastMessage.message.message}`,
