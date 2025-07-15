@@ -314,38 +314,16 @@ export function GameBoard({ game, onGameOver, gameMode, user }: GameBoardProps) 
       // Add delay before showing game over for AI and pass-play
       setTimeout(() => {
         if (onGameOver) {
-          const playerXInfo = user ? {
-            displayName: user.displayName,
-            firstName: user.firstName,
-            username: user.username,
-            profilePicture: user.profilePicture,
-            profileImageUrl: user.profileImageUrl
-          } : null;
-          
-          const playerOInfo = gameMode === 'ai' ? {
-            displayName: 'AI',
-            firstName: 'AI',
-            username: 'AI',
-            profilePicture: null,
-            profileImageUrl: null
-          } : {
-            displayName: 'Player O',
-            firstName: 'Player O',
-            username: 'Player O',
-            profilePicture: null,
-            profileImageUrl: null
-          };
-          
           onGameOver({
             winner: currentPlayer,
-            winnerName: winnerInfo,
+            winnerName: currentPlayer === 'X' ? 'Player X' : (gameMode === 'ai' ? 'AI' : 'Player O'),
             condition: 'diagonal',
             board: newBoard,
             winningPositions,
             game: game, // Pass game object to prevent white screen
-            playerXInfo: playerXInfo,
-            playerOInfo: playerOInfo,
-            winnerInfo: currentPlayer === 'X' ? playerXInfo : playerOInfo
+            playerXInfo: { displayName: 'Player X' },
+            playerOInfo: { displayName: gameMode === 'ai' ? 'AI' : 'Player O' },
+            winnerInfo: null // Keep simple for local modes
           });
         }
       }, gameMode === 'ai' || gameMode === 'pass-play' ? 2500 : 0);
@@ -354,36 +332,14 @@ export function GameBoard({ game, onGameOver, gameMode, user }: GameBoardProps) 
     
     if (checkDraw(newBoard)) {
       if (onGameOver) {
-        const playerXInfo = user ? {
-          displayName: user.displayName,
-          firstName: user.firstName,
-          username: user.username,
-          profilePicture: user.profilePicture,
-          profileImageUrl: user.profileImageUrl
-        } : null;
-        
-        const playerOInfo = gameMode === 'ai' ? {
-          displayName: 'AI',
-          firstName: 'AI',
-          username: 'AI',
-          profilePicture: null,
-          profileImageUrl: null
-        } : {
-          displayName: 'Player O',
-          firstName: 'Player O',
-          username: 'Player O',
-          profilePicture: null,
-          profileImageUrl: null
-        };
-        
         onGameOver({
           winner: null,
           winnerName: null,
           condition: 'draw',
           board: newBoard,
           game: game, // Pass game object to prevent white screen
-          playerXInfo: playerXInfo,
-          playerOInfo: playerOInfo,
+          playerXInfo: { displayName: 'Player X' },
+          playerOInfo: { displayName: gameMode === 'ai' ? 'AI' : 'Player O' },
           winnerInfo: null
         });
       }
@@ -482,22 +438,6 @@ export function GameBoard({ game, onGameOver, gameMode, user }: GameBoardProps) 
       // Add delay before showing game over for AI mode
       setTimeout(() => {
         if (onGameOver) {
-          const playerXInfo = user ? {
-            displayName: user.displayName,
-            firstName: user.firstName,
-            username: user.username,
-            profilePicture: user.profilePicture,
-            profileImageUrl: user.profileImageUrl
-          } : null;
-          
-          const playerOInfo = {
-            displayName: 'AI',
-            firstName: 'AI',
-            username: 'AI',
-            profilePicture: null,
-            profileImageUrl: null
-          };
-          
           onGameOver({
             winner: 'O',
             winnerName: 'AI',
@@ -505,9 +445,9 @@ export function GameBoard({ game, onGameOver, gameMode, user }: GameBoardProps) 
             board: newBoard,
             winningPositions,
             game: game, // Pass game object to prevent white screen
-            playerXInfo: playerXInfo,
-            playerOInfo: playerOInfo,
-            winnerInfo: playerOInfo
+            playerXInfo: { displayName: 'Player X' },
+            playerOInfo: { displayName: 'AI' },
+            winnerInfo: null // Keep simple for local modes
           });
         }
       }, 2500);
@@ -516,30 +456,14 @@ export function GameBoard({ game, onGameOver, gameMode, user }: GameBoardProps) 
     
     if (checkDraw(newBoard)) {
       if (onGameOver) {
-        const playerXInfo = user ? {
-          displayName: user.displayName,
-          firstName: user.firstName,
-          username: user.username,
-          profilePicture: user.profilePicture,
-          profileImageUrl: user.profileImageUrl
-        } : null;
-        
-        const playerOInfo = {
-          displayName: 'AI',
-          firstName: 'AI',
-          username: 'AI',
-          profilePicture: null,
-          profileImageUrl: null
-        };
-        
         onGameOver({
           winner: null,
           winnerName: null,
           condition: 'draw',
           board: newBoard,
           game: game, // Pass game object to prevent white screen
-          playerXInfo: playerXInfo,
-          playerOInfo: playerOInfo,
+          playerXInfo: { displayName: 'Player X' },
+          playerOInfo: { displayName: 'AI' },
           winnerInfo: null
         });
       }
@@ -699,7 +623,7 @@ export function GameBoard({ game, onGameOver, gameMode, user }: GameBoardProps) 
             <div className="flex items-center space-x-2">
               <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
               <div className="flex items-center space-x-2">
-                {game?.playerXInfo?.profileImageUrl || game?.playerXInfo?.profilePicture ? (
+                {gameMode === 'online' && (game?.playerXInfo?.profileImageUrl || game?.playerXInfo?.profilePicture) ? (
                   <img 
                     src={game.playerXInfo.profileImageUrl || game.playerXInfo.profilePicture} 
                     alt="Player X" 
@@ -711,14 +635,16 @@ export function GameBoard({ game, onGameOver, gameMode, user }: GameBoardProps) 
                   </div>
                 )}
                 <span className="text-sm text-gray-300">
-                  {game?.playerXInfo?.firstName || game?.playerXInfo?.displayName || game?.playerXInfo?.username || 'Player X'}
+                  {gameMode === 'online' 
+                    ? (game?.playerXInfo?.firstName || game?.playerXInfo?.displayName || game?.playerXInfo?.username || 'Player X')
+                    : 'Player X'}
                 </span>
               </div>
             </div>
             <div className="flex items-center space-x-2">
               <div className="w-3 h-3 bg-red-500 rounded-full"></div>
               <div className="flex items-center space-x-2">
-                {game?.playerOInfo?.profileImageUrl || game?.playerOInfo?.profilePicture ? (
+                {gameMode === 'online' && (game?.playerOInfo?.profileImageUrl || game?.playerOInfo?.profilePicture) ? (
                   <img 
                     src={game.playerOInfo.profileImageUrl || game.playerOInfo.profilePicture} 
                     alt="Player O" 
@@ -730,7 +656,9 @@ export function GameBoard({ game, onGameOver, gameMode, user }: GameBoardProps) 
                   </div>
                 )}
                 <span className="text-sm text-gray-300">
-                  {game?.playerOInfo?.firstName || game?.playerOInfo?.displayName || game?.playerOInfo?.username || (gameMode === 'ai' ? 'AI' : 'Player O')}
+                  {gameMode === 'online' 
+                    ? (game?.playerOInfo?.firstName || game?.playerOInfo?.displayName || game?.playerOInfo?.username || 'Player O')
+                    : (gameMode === 'ai' ? 'AI' : 'Player O')}
                 </span>
               </div>
             </div>
@@ -746,9 +674,13 @@ export function GameBoard({ game, onGameOver, gameMode, user }: GameBoardProps) 
               currentPlayer === 'X' ? 'bg-blue-500' : 'bg-red-500'
             }`}></div>
             <span className="text-lg font-medium">
-              {currentPlayer === 'X' 
-                ? (game?.playerXInfo?.firstName || game?.playerXInfo?.displayName || game?.playerXInfo?.username || 'Player X')
-                : (game?.playerOInfo?.firstName || game?.playerOInfo?.displayName || game?.playerOInfo?.username || (gameMode === 'ai' ? 'AI' : 'Player O'))
+              {gameMode === 'online' 
+                ? (currentPlayer === 'X' 
+                    ? (game?.playerXInfo?.firstName || game?.playerXInfo?.displayName || game?.playerXInfo?.username || 'Player X')
+                    : (game?.playerOInfo?.firstName || game?.playerOInfo?.displayName || game?.playerOInfo?.username || 'Player O'))
+                : (currentPlayer === 'X' 
+                    ? 'Player X'
+                    : (gameMode === 'ai' ? 'AI' : 'Player O'))
               }'s Turn
             </span>
           </div>

@@ -109,7 +109,7 @@ export function GameOverModal({ open, onClose, result, onPlayAgain, isCreatingGa
               </div>
               
               <p style={{ fontSize: '20px', color: 'white', marginBottom: '16px' }}>
-                {winnerInfo?.displayName || winnerInfo?.firstName || winnerInfo?.username || `Player ${winnerSymbol}`} Wins!
+                {result.winnerName || `Player ${winnerSymbol}`} Wins!
               </p>
               
               {result.condition && result.condition !== 'draw' && (
