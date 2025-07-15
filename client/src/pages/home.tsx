@@ -46,7 +46,7 @@ export default function Home() {
   const headerSidebarRef = useRef<HTMLDivElement>(null);
 
   const { data: userStats } = useQuery({
-    queryKey: ["/api/users", user?.id, "online-stats"],
+    queryKey: ["/api/users/online-stats"],
     enabled: !!user,
   });
 
