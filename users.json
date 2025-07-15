@@ -74,7 +74,9 @@
     "isEmailVerified": false,
     "emailVerificationToken": "91335539-30a2-4fc0-8304-e066db7a5bc9",
     "emailVerificationExpiry": "2025-07-15T14:41:38.147Z",
-    "createdAt": "2025-07-14T14:41:27.170Z"
+    "createdAt": "2025-07-14T14:41:27.170Z",
+    "passwordResetToken": "8c79e39e-dbad-4c92-95d0-6eaaa92a0a0f",
+    "passwordResetExpiry": "2025-07-15T20:03:52.575Z"
   },
   {
     "id": "c556b97e-61ed-446e-920c-e552a70e231a",
@@ -111,5 +113,17 @@
     "emailVerificationToken": "4735d124-8870-4755-b8ee-28f203a3dc66",
     "emailVerificationExpiry": "2025-07-16T09:24:03.783Z",
     "createdAt": "2025-07-15T09:24:03.783Z"
+  },
+  {
+    "id": "6ca4f62e-e0dc-49d5-96ec-41b47ea0cb47",
+    "username": "ethan",
+    "password": "e995346a13f21511feb37080ea6dd1919242513db1defafe419f42a614d9bc63",
+    "email": "deadlyydude0@gmail.com",
+    "displayName": "ethan",
+    "profilePicture": null,
+    "isEmailVerified": false,
+    "emailVerificationToken": "32c7898e-5c9b-4e71-988d-919c3889a9b5",
+    "emailVerificationExpiry": "2025-07-16T19:09:05.330Z",
+    "createdAt": "2025-07-15T19:06:26.647Z"
   }
 ]
