@@ -10,6 +10,8 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+- **Critical Move Disappearing Bug Fix** (July 15, 2025): Fixed major bug where moves disappeared after 1 second in all game modes - root cause was GameBoard component being remounted due to timestamp-based key prop, causing React to lose all internal state. Fixed by removing timestamp from component key and optimizing board state persistence for both local and online games
+- **Online Game Synchronization Fix** (July 15, 2025): Enhanced WebSocket board synchronization for online multiplayer games by adding proper useEffect dependencies for board state, currentPlayer, and timestamp changes, ensuring real-time move updates appear immediately for both players
 - **Database Migration to Personal Neon Account** (July 15, 2025): Successfully migrated from Replit-managed Neon database to user's own Neon account for full database ownership and portability - migrated 3 users, 10 rooms, 10 games, 17 participants, and 50 moves with zero data loss, ensuring complete database control and deployment flexibility
 - **Header Menu System** (July 15, 2025): Replaced logout button with hamburger menu dropdown in header containing theme selector, online players, profile settings, and logout - improved mobile experience with organized dropdown menu accessible from header while maintaining clean navigation
 - **Header Mobile Optimization** (July 15, 2025): Moved theme selector and online players button from crowded header to organized Settings card in sidebar - improved mobile responsiveness and cleaner navigation with dedicated settings section containing theme customization and player count display

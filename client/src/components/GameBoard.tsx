@@ -198,7 +198,6 @@ export function GameBoard({ game, onGameOver, gameMode, user }: GameBoardProps) 
       console.log('🎮 Game ID:', game.id);
       console.log('📋 Game board from prop:', game.board || {});
       
-      // Only initialize board state for new games
       const gameBoard = game.board || {};
       const isNewGame = Object.keys(gameBoard).length === 0;
       
@@ -210,16 +209,20 @@ export function GameBoard({ game, onGameOver, gameMode, user }: GameBoardProps) 
           setWinningLine(null);
           setLastMove(null);
         }
+        // Always sync currentPlayer for local games
+        setCurrentPlayer(game.currentPlayer || 'X');
         // Don't overwrite board state for local games with existing moves
       } else {
         // For online games, always sync with server state
         console.log('📋 Syncing online game board to:', gameBoard);
         setBoard(gameBoard);
+        setCurrentPlayer(game.currentPlayer || 'X');
+        if (game.lastMove) {
+          setLastMove(game.lastMove);
+        }
       }
-      
-      setCurrentPlayer(game.currentPlayer || 'X');
     }
-  }, [game?.id]); // Only depend on game ID for new games
+  }, [game?.id, game?.board, game?.currentPlayer, game?.timestamp]); // Include board and timestamp for online games
 
   // Remove WebSocket handling from GameBoard - it's now handled in Home component
   // This prevents double handling and state conflicts
