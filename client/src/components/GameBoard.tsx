@@ -165,6 +165,7 @@ export function GameBoard({ game, onGameOver, gameMode, user }: GameBoardProps) 
   const [showChat, setShowChat] = useState(false);
   const [chatMessage, setChatMessage] = useState("");
   const [chatHistory, setChatHistory] = useState<any[]>([]);
+  const [messageStatus, setMessageStatus] = useState<'idle' | 'sending' | 'sent' | 'error'>('idle');
   const [opponent, setOpponent] = useState<any>(null);
   
   // Update winning line when game has winning positions
@@ -198,17 +199,13 @@ export function GameBoard({ game, onGameOver, gameMode, user }: GameBoardProps) 
       return await apiRequest('POST', '/api/chat/send', { targetUserId, message });
     },
     onSuccess: () => {
-      // Add sent message to chat history
-      const newMessage = {
-        fromMe: true,
-        message: chatMessage,
-        timestamp: new Date().toLocaleTimeString(),
-        userId: user?.userId || user?.id
-      };
-      setChatHistory(prev => [...prev, newMessage]);
-      setChatMessage("");
+      setMessageStatus('sent');
+      setTimeout(() => setMessageStatus('idle'), 2000);
     },
     onError: (error: any) => {
+      setMessageStatus('error');
+      setTimeout(() => setMessageStatus('idle'), 3000);
+      
       if (isUnauthorizedError(error)) {
         toast({
           title: "Unauthorized",
@@ -232,9 +229,23 @@ export function GameBoard({ game, onGameOver, gameMode, user }: GameBoardProps) 
   const handleSendMessage = () => {
     if (!chatMessage.trim() || !opponent) return;
     
+    setMessageStatus('sending');
+    
+    // Add message to chat history immediately for instant feedback
+    const newMessage = {
+      fromMe: true,
+      message: chatMessage.trim(),
+      timestamp: new Date().toLocaleTimeString(),
+      userId: user?.id,
+      senderName: 'You'
+    };
+    
+    setChatHistory(prev => [...prev, newMessage]);
+    setChatMessage('');
+    
     sendChatMutation.mutate({
       targetUserId: opponent.id || opponent.userId,
-      message: chatMessage.trim()
+      message: newMessage.message
     });
   };
 
@@ -854,80 +865,79 @@ export function GameBoard({ game, onGameOver, gameMode, user }: GameBoardProps) 
             <Button
               variant="outline"
               onClick={() => setShowChat(!showChat)}
-              className="flex items-center gap-2"
+              className="flex items-center gap-2 relative"
             >
               <MessageCircle className="h-4 w-4" />
               {showChat ? 'Hide Chat' : 'Show Chat'}
+              {messageStatus === 'sending' && (
+                <div className="absolute -top-1 -right-1 w-2 h-2 bg-yellow-500 rounded-full animate-pulse"></div>
+              )}
+              {messageStatus === 'sent' && (
+                <div className="absolute -top-1 -right-1 w-2 h-2 bg-green-500 rounded-full"></div>
+              )}
+              {messageStatus === 'error' && (
+                <div className="absolute -top-1 -right-1 w-2 h-2 bg-red-500 rounded-full"></div>
+              )}
             </Button>
           )}
         </div>
       </CardContent>
 
-      {/* Chat Panel for Online Games */}
+      {/* Compact Chat Panel for Online Games */}
       {gameMode === 'online' && opponent && showChat && (
-        <div className="border-t border-slate-700 bg-slate-900">
-          <div className="p-4">
-            <div className="flex items-center justify-between mb-4">
-              <div className="flex items-center gap-2">
-                <MessageCircle className="h-5 w-5 text-blue-400" />
-                <h3 className="text-lg font-semibold text-white">
-                  Chat with {opponent.firstName || opponent.displayName || opponent.username}
-                </h3>
-              </div>
-              <Button
-                size="sm"
-                variant="ghost"
-                onClick={() => setShowChat(false)}
-              >
-                <X className="h-4 w-4" />
-              </Button>
-            </div>
-            
-            <div className="space-y-3">
-              {/* Chat Messages */}
-              <ScrollArea className="h-64 w-full border border-slate-600 rounded-lg p-3 bg-slate-800">
-                <div className="space-y-2">
-                  {chatHistory.length > 0 ? (
-                    chatHistory.map((msg, index) => (
-                      <div key={index} className={`p-2 rounded-lg ${msg.fromMe ? 'bg-blue-900 ml-4' : 'bg-slate-700 mr-4'}`}>
-                        <div className="text-sm font-medium text-white">
-                          {msg.fromMe ? 'You' : (opponent.firstName || opponent.displayName || opponent.username)}
-                        </div>
-                        <div className="text-sm text-gray-300">{msg.message}</div>
-                        <div className="text-xs text-gray-400 mt-1">{msg.timestamp}</div>
-                      </div>
-                    ))
-                  ) : (
-                    <div className="text-center py-8 text-gray-400">
-                      No messages yet. Start the conversation!
-                    </div>
-                  )}
+        <div className="border-t border-slate-700 bg-slate-900 p-3">
+          <div className="flex items-center gap-2 mb-2">
+            <MessageCircle className="h-4 w-4 text-blue-400" />
+            <span className="text-sm font-medium text-white">
+              Chat with {opponent.firstName || opponent.displayName || opponent.username}
+            </span>
+          </div>
+          
+          {/* Compact Chat Messages */}
+          <div className="h-24 overflow-y-auto border border-slate-600 rounded p-2 bg-slate-800 mb-2">
+            {chatHistory.length > 0 ? (
+              chatHistory.map((msg, index) => (
+                <div key={index} className={`text-xs mb-1 ${msg.fromMe ? 'text-blue-300' : 'text-gray-300'}`}>
+                  <span className="font-medium">{msg.fromMe ? 'You' : (opponent.firstName || opponent.displayName || opponent.username)}: </span>
+                  {msg.message}
                 </div>
-              </ScrollArea>
+              ))
+            ) : (
+              <div className="text-xs text-gray-400">No messages yet</div>
+            )}
+          </div>
 
-              {/* Message Input */}
-              <div className="flex gap-2">
-                <Input
-                  value={chatMessage}
-                  onChange={(e) => setChatMessage(e.target.value)}
-                  placeholder="Type a message..."
-                  className="flex-1 bg-slate-800 border-slate-600 text-white placeholder-gray-400"
-                  onKeyPress={(e) => {
-                    if (e.key === 'Enter') {
-                      handleSendMessage();
-                    }
-                  }}
-                />
-                <Button
-                  size="sm"
-                  onClick={handleSendMessage}
-                  disabled={!chatMessage.trim() || sendChatMutation.isPending}
-                  className="bg-blue-600 hover:bg-blue-700 text-white"
-                >
-                  <Send className="h-4 w-4" />
-                </Button>
-              </div>
-            </div>
+          {/* Compact Message Input */}
+          <div className="flex gap-2">
+            <Input
+              value={chatMessage}
+              onChange={(e) => setChatMessage(e.target.value)}
+              placeholder="Type message..."
+              className="flex-1 h-8 text-sm bg-slate-800 border-slate-600 text-white placeholder-gray-400"
+              onKeyPress={(e) => {
+                if (e.key === 'Enter') {
+                  handleSendMessage();
+                }
+              }}
+              disabled={sendChatMutation.isPending}
+            />
+            <Button
+              size="sm"
+              onClick={handleSendMessage}
+              disabled={!chatMessage.trim() || sendChatMutation.isPending}
+              className={`h-8 px-2 text-white ${
+                messageStatus === 'sending' ? 'bg-yellow-600' :
+                messageStatus === 'sent' ? 'bg-green-600' :
+                messageStatus === 'error' ? 'bg-red-600' :
+                'bg-blue-600 hover:bg-blue-700'
+              }`}
+            >
+              {messageStatus === 'sending' ? (
+                <div className="h-3 w-3 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+              ) : (
+                <Send className="h-3 w-3" />
+              )}
+            </Button>
           </div>
         </div>
       )}
