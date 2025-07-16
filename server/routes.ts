@@ -75,6 +75,77 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Achievement routes
+  app.get('/api/achievements', requireAuth, async (req: any, res) => {
+    try {
+      const userId = req.session.user.userId;
+      const achievements = await storage.getUserAchievements(userId);
+      res.json(achievements);
+    } catch (error) {
+      console.error("Error fetching achievements:", error);
+      res.status(500).json({ message: "Failed to fetch achievements" });
+    }
+  });
+
+  app.get('/api/users/:id/achievements', requireAuth, async (req: any, res) => {
+    try {
+      const userId = req.params.id;
+      const achievements = await storage.getUserAchievements(userId);
+      res.json(achievements);
+    } catch (error) {
+      console.error("Error fetching user achievements:", error);
+      res.status(500).json({ message: "Failed to fetch user achievements" });
+    }
+  });
+
+  // Theme routes
+  app.get('/api/themes', requireAuth, async (req: any, res) => {
+    try {
+      const userId = req.session.user.userId;
+      const themes = await storage.getUserThemes(userId);
+      
+      // Add default themes that are always available
+      const defaultThemes = [
+        { id: 'default', name: 'Default', unlocked: true },
+        { id: 'neon', name: 'Neon', unlocked: true },
+        { id: 'autumn', name: 'Autumn', unlocked: true },
+        { id: 'minimalist', name: 'Minimalist', unlocked: true },
+        { id: 'nature', name: 'Nature', unlocked: true },
+        { id: 'space', name: 'Space', unlocked: true },
+      ];
+      
+      // Add special themes based on unlocked themes
+      const specialThemes = [
+        { id: 'halloween', name: 'Halloween', unlocked: await storage.isThemeUnlocked(userId, 'halloween') },
+        { id: 'christmas', name: 'Christmas', unlocked: await storage.isThemeUnlocked(userId, 'christmas') },
+        { id: 'summer', name: 'Summer', unlocked: await storage.isThemeUnlocked(userId, 'summer') },
+      ];
+      
+      res.json({
+        defaultThemes,
+        specialThemes,
+        unlockedThemes: themes
+      });
+    } catch (error) {
+      console.error("Error fetching themes:", error);
+      res.status(500).json({ message: "Failed to fetch themes" });
+    }
+  });
+
+  app.post('/api/themes/:name/unlock', requireAuth, async (req: any, res) => {
+    try {
+      const userId = req.session.user.userId;
+      const { name } = req.params;
+      
+      // Check if theme can be unlocked (for admin testing)
+      const theme = await storage.unlockTheme(userId, name);
+      res.json({ message: "Theme unlocked successfully", theme });
+    } catch (error) {
+      console.error("Error unlocking theme:", error);
+      res.status(500).json({ message: "Failed to unlock theme" });
+    }
+  });
+
   // Player rankings route
   app.get('/api/rankings', requireAuth, async (req: any, res) => {
     try {

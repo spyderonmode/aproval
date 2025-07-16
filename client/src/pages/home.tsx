@@ -16,11 +16,12 @@ import { EmailVerificationModal } from "@/components/EmailVerificationModal";
 import { MatchmakingModal } from "@/components/MatchmakingModal";
 import { OnlineUsersModal } from "@/components/OnlineUsersModal";
 import { ThemeSelector } from "@/components/ThemeSelector";
+import { AchievementModal } from "@/components/AchievementModal";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { GamepadIcon, LogOut, User, Zap, Loader2, Users, Settings, Menu, X, Palette } from "lucide-react";
+import { GamepadIcon, LogOut, User, Zap, Loader2, Users, Settings, Menu, X, Palette, Trophy } from "lucide-react";
 import { logout } from "@/lib/firebase";
 
 export default function Home() {
@@ -43,6 +44,7 @@ export default function Home() {
   const [onlineUserCount, setOnlineUserCount] = useState(0);
   const [showProfile, setShowProfile] = useState(false);
   const [showHeaderSidebar, setShowHeaderSidebar] = useState(false);
+  const [showAchievements, setShowAchievements] = useState(false);
   const headerSidebarRef = useRef<HTMLDivElement>(null);
 
   const { data: userStats } = useQuery({
@@ -657,6 +659,26 @@ export default function Home() {
                       </Button>
                     </div>
                     
+                    {/* Achievements */}
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center space-x-2">
+                        <Trophy className="w-4 h-4 text-gray-400" />
+                        <span className="text-sm text-gray-300">Achievements</span>
+                      </div>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => {
+                          setShowAchievements(true);
+                          setShowHeaderSidebar(false);
+                        }}
+                        className="bg-slate-700 border-slate-600 text-white hover:bg-slate-600 text-xs"
+                      >
+                        <Trophy className="h-3 w-3 mr-1" />
+                        View
+                      </Button>
+                    </div>
+                    
                     {/* Profile Settings */}
                     <div className="flex items-center justify-between">
                       <div className="flex items-center space-x-2">
@@ -964,6 +986,11 @@ export default function Home() {
       />
 
       <ThemeSelector />
+
+      <AchievementModal 
+        open={showAchievements}
+        onClose={() => setShowAchievements(false)}
+      />
 
     </div>
   );

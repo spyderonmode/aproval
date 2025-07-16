@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 
-export type GameTheme = 'default' | 'neon' | 'autumn' | 'minimalist' | 'nature' | 'space';
+export type GameTheme = 'default' | 'neon' | 'autumn' | 'minimalist' | 'nature' | 'space' | 'halloween' | 'christmas' | 'summer';
 
 interface ThemeContextType {
   currentTheme: GameTheme;
@@ -98,6 +98,45 @@ const themes = {
     textColor: 'text-purple-100',
     borderColor: 'border-purple-600',
     winningCellStyle: 'bg-gradient-to-br from-blue-400 to-purple-500 shadow-lg shadow-blue-400/50'
+  },
+  halloween: {
+    name: 'Halloween',
+    description: 'Spooky orange and black theme',
+    boardStyle: 'bg-gradient-to-br from-orange-800 to-black border-orange-500 shadow-lg shadow-orange-500/30',
+    cellStyle: 'bg-gradient-to-br from-orange-700 to-orange-900 border-orange-600 text-orange-100 hover:from-orange-600 hover:to-orange-800 transition-all duration-300',
+    cellHoverStyle: 'hover:from-orange-600 hover:to-orange-800 transition-all duration-300',
+    playerXColor: 'text-orange-400 drop-shadow-[0_0_8px_rgba(251,146,60,0.8)]',
+    playerOColor: 'text-purple-400 drop-shadow-[0_0_8px_rgba(196,181,253,0.8)]',
+    backgroundColor: 'bg-gradient-to-br from-orange-900 to-black',
+    textColor: 'text-orange-100',
+    borderColor: 'border-orange-500',
+    winningCellStyle: 'bg-gradient-to-br from-orange-400 to-purple-500 shadow-lg shadow-orange-400/50 border-orange-300'
+  },
+  christmas: {
+    name: 'Christmas',
+    description: 'Festive red and green theme',
+    boardStyle: 'bg-gradient-to-br from-red-800 to-green-800 border-red-400 shadow-lg shadow-red-400/30',
+    cellStyle: 'bg-gradient-to-br from-red-700 to-green-700 border-red-500 text-red-100 hover:from-red-600 hover:to-green-600 transition-all duration-300',
+    cellHoverStyle: 'hover:from-red-600 hover:to-green-600 transition-all duration-300',
+    playerXColor: 'text-red-400 drop-shadow-[0_0_8px_rgba(248,113,113,0.8)]',
+    playerOColor: 'text-green-400 drop-shadow-[0_0_8px_rgba(74,222,128,0.8)]',
+    backgroundColor: 'bg-gradient-to-br from-red-900 to-green-900',
+    textColor: 'text-red-100',
+    borderColor: 'border-red-400',
+    winningCellStyle: 'bg-gradient-to-br from-red-400 to-green-400 shadow-lg shadow-red-400/50 border-red-300'
+  },
+  summer: {
+    name: 'Summer',
+    description: 'Bright and sunny theme',
+    boardStyle: 'bg-gradient-to-br from-yellow-300 to-blue-300 border-yellow-400 shadow-lg shadow-yellow-400/30',
+    cellStyle: 'bg-gradient-to-br from-yellow-200 to-blue-200 border-yellow-300 text-yellow-900 hover:from-yellow-100 hover:to-blue-100 transition-all duration-300',
+    cellHoverStyle: 'hover:from-yellow-100 hover:to-blue-100 transition-all duration-300',
+    playerXColor: 'text-yellow-700 drop-shadow-[0_0_8px_rgba(234,179,8,0.6)]',
+    playerOColor: 'text-blue-700 drop-shadow-[0_0_8px_rgba(59,130,246,0.6)]',
+    backgroundColor: 'bg-gradient-to-br from-yellow-100 to-blue-100',
+    textColor: 'text-yellow-900',
+    borderColor: 'border-yellow-400',
+    winningCellStyle: 'bg-gradient-to-br from-yellow-400 to-blue-400 shadow-lg shadow-yellow-400/50 border-yellow-300'
   }
 };
 

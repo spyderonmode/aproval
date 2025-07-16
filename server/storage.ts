@@ -5,6 +5,8 @@ import {
   moves,
   roomParticipants,
   blockedUsers,
+  achievements,
+  userThemes,
   type User,
   type UpsertUser,
   type Room,
@@ -12,11 +14,15 @@ import {
   type Move,
   type RoomParticipant,
   type BlockedUser,
+  type Achievement,
+  type UserTheme,
   type InsertRoom,
   type InsertGame,
   type InsertMove,
   type InsertRoomParticipant,
   type InsertBlockedUser,
+  type InsertAchievement,
+  type InsertUserTheme,
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, and, desc, count, or, ne, isNull, isNotNull, sql } from "drizzle-orm";
@@ -62,6 +68,17 @@ export interface IStorage {
   
   // Player Rankings
   getPlayerRankings(sortBy: string): Promise<any[]>;
+  
+  // Achievement operations
+  createAchievement(achievement: InsertAchievement): Promise<Achievement>;
+  getUserAchievements(userId: string): Promise<Achievement[]>;
+  hasAchievement(userId: string, achievementType: string): Promise<boolean>;
+  checkAndGrantAchievements(userId: string, gameResult: 'win' | 'loss' | 'draw', gameData?: any): Promise<Achievement[]>;
+  
+  // Theme operations
+  unlockTheme(userId: string, themeName: string): Promise<UserTheme>;
+  getUserThemes(userId: string): Promise<UserTheme[]>;
+  isThemeUnlocked(userId: string, themeName: string): Promise<boolean>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -144,6 +161,28 @@ export class DatabaseStorage implements IStorage {
     if (status === "finished") updateData.finishedAt = new Date();
     
     await db.update(games).set(updateData).where(eq(games.id, gameId));
+
+    // Check for achievements when game is finished
+    if (status === 'finished') {
+      const [game] = await db.select().from(games).where(eq(games.id, gameId));
+      if (game && game.playerXId && game.playerOId) {
+        const gameData = { winCondition, gameId };
+        
+        // Check achievements for both players
+        if (winnerId) {
+          // Winner achievements
+          await this.checkAndGrantAchievements(winnerId, 'win', gameData);
+          
+          // Loser achievements
+          const loserId = winnerId === game.playerXId ? game.playerOId : game.playerXId;
+          await this.checkAndGrantAchievements(loserId, 'loss', gameData);
+        } else {
+          // Draw achievements for both players
+          await this.checkAndGrantAchievements(game.playerXId, 'draw', gameData);
+          await this.checkAndGrantAchievements(game.playerOId, 'draw', gameData);
+        }
+      }
+    }
   }
 
   async updateCurrentPlayer(gameId: string, currentPlayer: string): Promise<void> {
@@ -393,6 +432,235 @@ export class DatabaseStorage implements IStorage {
       console.error('Error fetching player rankings:', error);
       throw error;
     }
+  }
+
+  // Achievement operations
+  async createAchievement(achievementData: InsertAchievement): Promise<Achievement> {
+    const [achievement] = await db
+      .insert(achievements)
+      .values(achievementData)
+      .onConflictDoNothing()
+      .returning();
+    return achievement;
+  }
+
+  async getUserAchievements(userId: string): Promise<Achievement[]> {
+    return await db
+      .select()
+      .from(achievements)
+      .where(eq(achievements.userId, userId))
+      .orderBy(desc(achievements.unlockedAt));
+  }
+
+  async hasAchievement(userId: string, achievementType: string): Promise<boolean> {
+    const [achievement] = await db
+      .select()
+      .from(achievements)
+      .where(and(
+        eq(achievements.userId, userId),
+        eq(achievements.achievementType, achievementType)
+      ));
+    return !!achievement;
+  }
+
+  async checkAndGrantAchievements(userId: string, gameResult: 'win' | 'loss' | 'draw', gameData?: any): Promise<Achievement[]> {
+    const newAchievements: Achievement[] = [];
+    
+    // Get user stats
+    const userStats = await this.getUserStats(userId);
+    
+    // Define achievement conditions
+    const achievementConditions = [
+      {
+        type: 'first_win',
+        name: 'First Victory',
+        description: 'Win your first game',
+        icon: '🏆',
+        condition: gameResult === 'win' && userStats.wins === 1,
+      },
+      {
+        type: 'win_streak_5',
+        name: 'Win Streak Master',
+        description: 'Win 5 games in a row',
+        icon: '🔥',
+        condition: gameResult === 'win' && await this.checkWinStreak(userId, 5),
+      },
+      {
+        type: 'win_streak_10',
+        name: 'Unstoppable',
+        description: 'Win 10 games in a row',
+        icon: '⚡',
+        condition: gameResult === 'win' && await this.checkWinStreak(userId, 10),
+      },
+      {
+        type: 'master_of_diagonals',
+        name: 'Master of Diagonals',
+        description: 'Win 3 games with diagonal victories',
+        icon: '🎯',
+        condition: gameResult === 'win' && gameData?.winCondition === 'diagonal' && await this.checkDiagonalWins(userId, 3),
+      },
+      {
+        type: 'speed_demon',
+        name: 'Speed Demon',
+        description: 'Win 20 games total',
+        icon: '⚡',
+        condition: gameResult === 'win' && userStats.wins >= 20,
+      },
+      {
+        type: 'veteran_player',
+        name: 'Veteran Player',
+        description: 'Play 100 games total',
+        icon: '🎖️',
+        condition: (userStats.wins + userStats.losses + userStats.draws) >= 100,
+      },
+      {
+        type: 'comeback_king',
+        name: 'Comeback King',
+        description: 'Win after losing 5 games in a row',
+        icon: '👑',
+        condition: gameResult === 'win' && await this.checkComebackCondition(userId),
+      },
+    ];
+
+    // Check each achievement condition
+    for (const achievement of achievementConditions) {
+      if (achievement.condition && !await this.hasAchievement(userId, achievement.type)) {
+        try {
+          const newAchievement = await this.createAchievement({
+            userId,
+            achievementType: achievement.type,
+            achievementName: achievement.name,
+            description: achievement.description,
+            icon: achievement.icon,
+            metadata: gameData || {},
+          });
+          if (newAchievement) {
+            newAchievements.push(newAchievement);
+            
+            // Unlock special themes for certain achievements
+            if (achievement.type === 'win_streak_10') {
+              await this.unlockTheme(userId, 'halloween');
+            } else if (achievement.type === 'speed_demon') {
+              await this.unlockTheme(userId, 'christmas');
+            } else if (achievement.type === 'veteran_player') {
+              await this.unlockTheme(userId, 'summer');
+            }
+          }
+        } catch (error) {
+          console.error('Error creating achievement:', error);
+        }
+      }
+    }
+
+    return newAchievements;
+  }
+
+  private async checkWinStreak(userId: string, requiredStreak: number): Promise<boolean> {
+    const recentGames = await db
+      .select()
+      .from(games)
+      .where(or(
+        eq(games.playerXId, userId),
+        eq(games.playerOId, userId)
+      ))
+      .orderBy(desc(games.finishedAt))
+      .limit(requiredStreak);
+
+    if (recentGames.length < requiredStreak) return false;
+
+    let streak = 0;
+    for (const game of recentGames) {
+      if (game.winnerId === userId) {
+        streak++;
+      } else {
+        break;
+      }
+    }
+
+    return streak >= requiredStreak;
+  }
+
+  private async checkDiagonalWins(userId: string, requiredWins: number): Promise<boolean> {
+    const diagonalWins = await db
+      .select()
+      .from(games)
+      .where(and(
+        eq(games.winnerId, userId),
+        eq(games.winCondition, 'diagonal')
+      ));
+
+    return diagonalWins.length >= requiredWins;
+  }
+
+  private async checkComebackCondition(userId: string): Promise<boolean> {
+    const recentGames = await db
+      .select()
+      .from(games)
+      .where(or(
+        eq(games.playerXId, userId),
+        eq(games.playerOId, userId)
+      ))
+      .orderBy(desc(games.finishedAt))
+      .limit(6);
+
+    if (recentGames.length < 6) return false;
+
+    // Check if latest game is a win
+    const latestGame = recentGames[0];
+    if (latestGame.winnerId !== userId) return false;
+
+    // Check if previous 5 games were losses
+    for (let i = 1; i < 6; i++) {
+      const game = recentGames[i];
+      if (game.winnerId === userId || game.winnerId === null) {
+        return false;
+      }
+    }
+
+    return true;
+  }
+
+  // Theme operations
+  async unlockTheme(userId: string, themeName: string): Promise<UserTheme> {
+    const [theme] = await db
+      .insert(userThemes)
+      .values({
+        userId,
+        themeName,
+        isUnlocked: true,
+      })
+      .onConflictDoUpdate({
+        target: [userThemes.userId, userThemes.themeName],
+        set: {
+          isUnlocked: true,
+          unlockedAt: new Date(),
+        },
+      })
+      .returning();
+    return theme;
+  }
+
+  async getUserThemes(userId: string): Promise<UserTheme[]> {
+    return await db
+      .select()
+      .from(userThemes)
+      .where(and(
+        eq(userThemes.userId, userId),
+        eq(userThemes.isUnlocked, true)
+      ))
+      .orderBy(desc(userThemes.unlockedAt));
+  }
+
+  async isThemeUnlocked(userId: string, themeName: string): Promise<boolean> {
+    const [theme] = await db
+      .select()
+      .from(userThemes)
+      .where(and(
+        eq(userThemes.userId, userId),
+        eq(userThemes.themeName, themeName),
+        eq(userThemes.isUnlocked, true)
+      ));
+    return !!theme;
   }
 }
 

@@ -93,6 +93,31 @@ export const blockedUsers = pgTable("blocked_users", {
   index("unique_block").on(table.blockerId, table.blockedId),
 ]);
 
+export const achievements = pgTable("achievements", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  userId: varchar("user_id").references(() => users.id).notNull(),
+  achievementType: varchar("achievement_type").notNull(), // first_win, win_streak_5, win_streak_10, master_of_diagonals, speed_demon, etc.
+  achievementName: varchar("achievement_name").notNull(),
+  description: varchar("description").notNull(),
+  icon: varchar("icon").notNull(), // emoji or icon name
+  unlockedAt: timestamp("unlocked_at").defaultNow(),
+  metadata: jsonb("metadata").default('{}'), // additional data like streak count, game time, etc.
+}, (table) => [
+  // Prevent duplicate achievements
+  index("unique_achievement").on(table.userId, table.achievementType),
+]);
+
+export const userThemes = pgTable("user_themes", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  userId: varchar("user_id").references(() => users.id).notNull(),
+  themeName: varchar("theme_name").notNull(), // halloween, christmas, summer, etc.
+  unlockedAt: timestamp("unlocked_at").defaultNow(),
+  isUnlocked: boolean("is_unlocked").default(true),
+}, (table) => [
+  // Prevent duplicate theme unlocks
+  index("unique_user_theme").on(table.userId, table.themeName),
+]);
+
 // Relations
 export const usersRelations = relations(users, ({ many }) => ({
   ownedRooms: many(rooms),
@@ -103,6 +128,8 @@ export const usersRelations = relations(users, ({ many }) => ({
   moves: many(moves),
   blockedUsers: many(blockedUsers, { relationName: "blocker" }),
   blockedByUsers: many(blockedUsers, { relationName: "blocked" }),
+  achievements: many(achievements),
+  unlockedThemes: many(userThemes),
 }));
 
 export const roomsRelations = relations(rooms, ({ one, many }) => ({
@@ -132,6 +159,14 @@ export const movesRelations = relations(moves, ({ one }) => ({
 export const blockedUsersRelations = relations(blockedUsers, ({ one }) => ({
   blocker: one(users, { fields: [blockedUsers.blockerId], references: [users.id], relationName: "blocker" }),
   blocked: one(users, { fields: [blockedUsers.blockedId], references: [users.id], relationName: "blocked" }),
+}));
+
+export const achievementsRelations = relations(achievements, ({ one }) => ({
+  user: one(users, { fields: [achievements.userId], references: [users.id] }),
+}));
+
+export const userThemesRelations = relations(userThemes, ({ one }) => ({
+  user: one(users, { fields: [userThemes.userId], references: [users.id] }),
 }));
 
 // Schemas
@@ -177,6 +212,21 @@ export const insertBlockedUserSchema = createInsertSchema(blockedUsers).pick({
   blockedId: true,
 });
 
+export const insertAchievementSchema = createInsertSchema(achievements).pick({
+  userId: true,
+  achievementType: true,
+  achievementName: true,
+  description: true,
+  icon: true,
+  metadata: true,
+});
+
+export const insertUserThemeSchema = createInsertSchema(userThemes).pick({
+  userId: true,
+  themeName: true,
+  isUnlocked: true,
+});
+
 // Types
 export type UpsertUser = typeof users.$inferInsert;
 export type User = typeof users.$inferSelect;
@@ -185,8 +235,12 @@ export type Game = typeof games.$inferSelect;
 export type Move = typeof moves.$inferSelect;
 export type RoomParticipant = typeof roomParticipants.$inferSelect;
 export type BlockedUser = typeof blockedUsers.$inferSelect;
+export type Achievement = typeof achievements.$inferSelect;
+export type UserTheme = typeof userThemes.$inferSelect;
 export type InsertRoom = z.infer<typeof insertRoomSchema>;
 export type InsertGame = z.infer<typeof insertGameSchema>;
 export type InsertMove = z.infer<typeof insertMoveSchema>;
 export type InsertRoomParticipant = z.infer<typeof insertRoomParticipantSchema>;
 export type InsertBlockedUser = z.infer<typeof insertBlockedUserSchema>;
+export type InsertAchievement = z.infer<typeof insertAchievementSchema>;
+export type InsertUserTheme = z.infer<typeof insertUserThemeSchema>;
