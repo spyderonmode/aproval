@@ -869,11 +869,26 @@ export function GameBoard({ game, onGameOver, gameMode, user }: GameBoardProps) 
                 )}
               </AnimatePresence>
               
-              <span className={`text-sm ${theme.textColor} max-w-24 truncate`}>
-                {gameMode === 'online' 
-                  ? (game?.playerXInfo?.firstName || game?.playerXInfo?.displayName || game?.playerXInfo?.username || 'Player X')
-                  : 'Player X'}
-              </span>
+              <div className="flex flex-col items-end">
+                <span className={`text-sm ${theme.textColor} max-w-24 truncate`}>
+                  {gameMode === 'online' 
+                    ? (game?.playerXInfo?.firstName || game?.playerXInfo?.displayName || game?.playerXInfo?.username || 'Player X')
+                    : 'Player X'}
+                </span>
+                {gameMode === 'online' && game?.playerXInfo?.achievements && game.playerXInfo.achievements.length > 0 && (
+                  <div className="flex items-center gap-1 mt-1">
+                    {game.playerXInfo.achievements.slice(0, 2).map((achievement: any) => (
+                      <span
+                        key={achievement.id}
+                        className="text-xs bg-gradient-to-r from-yellow-400 to-orange-500 text-white px-1 py-0.5 rounded-full"
+                        title={achievement.description}
+                      >
+                        {achievement.icon}
+                      </span>
+                    ))}
+                  </div>
+                )}
+              </div>
               {gameMode === 'online' && (game?.playerXInfo?.profileImageUrl || game?.playerXInfo?.profilePicture) ? (
                 <img 
                   src={game.playerXInfo.profileImageUrl || game.playerXInfo.profilePicture} 
@@ -928,11 +943,26 @@ export function GameBoard({ game, onGameOver, gameMode, user }: GameBoardProps) 
                 )}
               </AnimatePresence>
               
-              <span className={`text-sm ${theme.textColor} max-w-24 truncate`}>
-                {gameMode === 'online' 
-                  ? (game?.playerOInfo?.firstName || game?.playerOInfo?.displayName || game?.playerOInfo?.username || 'Player O')
-                  : (gameMode === 'ai' ? 'AI' : 'Player O')}
-              </span>
+              <div className="flex flex-col items-end">
+                <span className={`text-sm ${theme.textColor} max-w-24 truncate`}>
+                  {gameMode === 'online' 
+                    ? (game?.playerOInfo?.firstName || game?.playerOInfo?.displayName || game?.playerOInfo?.username || 'Player O')
+                    : (gameMode === 'ai' ? 'AI' : 'Player O')}
+                </span>
+                {gameMode === 'online' && game?.playerOInfo?.achievements && game.playerOInfo.achievements.length > 0 && (
+                  <div className="flex items-center gap-1 mt-1">
+                    {game.playerOInfo.achievements.slice(0, 2).map((achievement: any) => (
+                      <span
+                        key={achievement.id}
+                        className="text-xs bg-gradient-to-r from-yellow-400 to-orange-500 text-white px-1 py-0.5 rounded-full"
+                        title={achievement.description}
+                      >
+                        {achievement.icon}
+                      </span>
+                    ))}
+                  </div>
+                )}
+              </div>
               {gameMode === 'online' && (game?.playerOInfo?.profileImageUrl || game?.playerOInfo?.profilePicture) ? (
                 <img 
                   src={game.playerOInfo.profileImageUrl || game.playerOInfo.profilePicture} 

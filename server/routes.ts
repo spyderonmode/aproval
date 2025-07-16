@@ -165,10 +165,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const onlineUsersList = Array.from(onlineUsers.values())
         .filter(user => user.userId !== currentUserId);
       
-      // Get complete user information from database
+      // Get complete user information from database with achievements
       const usersWithProfiles = await Promise.all(
         onlineUsersList.map(async (user) => {
           const userInfo = await storage.getUser(user.userId);
+          const achievements = await storage.getUserAchievements(user.userId);
           return {
             userId: user.userId,
             username: userInfo?.username || user.username,
@@ -177,7 +178,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
             profilePicture: userInfo?.profilePicture,
             profileImageUrl: userInfo?.profileImageUrl,
             inRoom: !!user.roomId,
-            lastSeen: user.lastSeen
+            lastSeen: user.lastSeen,
+            achievements: achievements.slice(0, 3) // Show top 3 achievements
           };
         })
       );
@@ -538,14 +540,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const game = await storage.createGame(gameData);
       console.log('🎮 New game created:', game.id);
       
-      // Get player information
-      const playerXInfo = await storage.getUser(game.playerXId);
-      const playerOInfo = await storage.getUser(game.playerOId);
+      // Get player information with achievements
+      const [playerXInfo, playerOInfo] = await Promise.all([
+        storage.getUser(game.playerXId),
+        storage.getUser(game.playerOId)
+      ]);
+      
+      // Get achievements for both players
+      const [playerXAchievements, playerOAchievements] = await Promise.all([
+        playerXInfo ? storage.getUserAchievements(game.playerXId) : Promise.resolve([]),
+        playerOInfo ? storage.getUserAchievements(game.playerOId) : Promise.resolve([])
+      ]);
       
       const gameWithPlayers = {
         ...game,
-        playerXInfo,
-        playerOInfo,
+        playerXInfo: playerXInfo ? {
+          ...playerXInfo,
+          achievements: playerXAchievements.slice(0, 3)
+        } : playerXInfo,
+        playerOInfo: playerOInfo ? {
+          ...playerOInfo,
+          achievements: playerOAchievements.slice(0, 3)
+        } : playerOInfo,
       };
       
       // Broadcast to all room participants
@@ -608,14 +624,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
         const existingGame = await storage.getActiveGameByRoomId(gameData.roomId);
         if (existingGame) {
           console.log('🎮 Game already exists for room:', existingGame.id);
-          // Get player information for the existing game
-          const playerXInfo = await storage.getUser(existingGame.playerXId);
-          const playerOInfo = existingGame.playerOId && existingGame.playerOId !== 'AI' ? await storage.getUser(existingGame.playerOId) : null;
+          // Get player information for the existing game with achievements
+          const [playerXInfo, playerOInfo] = await Promise.all([
+            storage.getUser(existingGame.playerXId),
+            existingGame.playerOId && existingGame.playerOId !== 'AI' ? storage.getUser(existingGame.playerOId) : Promise.resolve(null)
+          ]);
+          
+          // Get achievements for both players
+          const [playerXAchievements, playerOAchievements] = await Promise.all([
+            playerXInfo ? storage.getUserAchievements(existingGame.playerXId) : Promise.resolve([]),
+            playerOInfo ? storage.getUserAchievements(existingGame.playerOId) : Promise.resolve([])
+          ]);
           
           const gameWithPlayers = {
             ...existingGame,
-            playerXInfo,
-            playerOInfo: playerOInfo || { 
+            playerXInfo: playerXInfo ? {
+              ...playerXInfo,
+              achievements: playerXAchievements.slice(0, 3)
+            } : playerXInfo,
+            playerOInfo: playerOInfo ? {
+              ...playerOInfo,
+              achievements: playerOAchievements.slice(0, 3)
+            } : { 
               id: 'AI', 
               firstName: 'AI', 
               lastName: 'Player',
@@ -631,8 +661,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
           const refreshedGame = await storage.getGameById(existingGame.id);
           const refreshedGameWithPlayers = {
             ...refreshedGame,
-            playerXInfo,
-            playerOInfo: playerOInfo || { 
+            playerXInfo: playerXInfo ? {
+              ...playerXInfo,
+              achievements: playerXAchievements.slice(0, 3)
+            } : playerXInfo,
+            playerOInfo: playerOInfo ? {
+              ...playerOInfo,
+              achievements: playerOAchievements.slice(0, 3)
+            } : { 
               id: 'AI', 
               firstName: 'AI', 
               lastName: 'Player',
@@ -694,14 +730,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       const game = await storage.createGame(gameCreateData);
       
-      // Get player information for the game
-      const playerXInfo = await storage.getUser(game.playerXId);
-      const playerOInfo = game.playerOId && game.playerOId !== 'AI' ? await storage.getUser(game.playerOId) : null;
+      // Get player information with achievements for the game
+      const [playerXInfo, playerOInfo] = await Promise.all([
+        storage.getUser(game.playerXId),
+        game.playerOId && game.playerOId !== 'AI' ? storage.getUser(game.playerOId) : Promise.resolve(null)
+      ]);
+      
+      // Get achievements for both players
+      const [playerXAchievements, playerOAchievements] = await Promise.all([
+        playerXInfo ? storage.getUserAchievements(game.playerXId) : Promise.resolve([]),
+        playerOInfo ? storage.getUserAchievements(game.playerOId) : Promise.resolve([])
+      ]);
       
       const gameWithPlayers = {
         ...game,
-        playerXInfo,
-        playerOInfo: playerOInfo || { 
+        playerXInfo: playerXInfo ? {
+          ...playerXInfo,
+          achievements: playerXAchievements.slice(0, 3)
+        } : playerXInfo,
+        playerOInfo: playerOInfo ? {
+          ...playerOInfo,
+          achievements: playerOAchievements.slice(0, 3)
+        } : { 
           id: 'AI', 
           firstName: 'AI', 
           lastName: 'Player',
@@ -748,14 +798,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "Game not found" });
       }
       
-      // Get player information for the game
-      const playerXInfo = await storage.getUser(game.playerXId);
-      const playerOInfo = game.playerOId !== 'AI' ? await storage.getUser(game.playerOId) : null;
+      // Get player information with achievements for the game
+      const [playerXInfo, playerOInfo] = await Promise.all([
+        storage.getUser(game.playerXId),
+        game.playerOId !== 'AI' ? storage.getUser(game.playerOId) : Promise.resolve(null)
+      ]);
+      
+      // Get achievements for both players
+      const [playerXAchievements, playerOAchievements] = await Promise.all([
+        playerXInfo ? storage.getUserAchievements(game.playerXId) : Promise.resolve([]),
+        playerOInfo ? storage.getUserAchievements(game.playerOId) : Promise.resolve([])
+      ]);
       
       const gameWithPlayers = {
         ...game,
-        playerXInfo,
-        playerOInfo: playerOInfo || { username: 'AI', displayName: 'AI' }
+        playerXInfo: playerXInfo ? {
+          ...playerXInfo,
+          achievements: playerXAchievements.slice(0, 3)
+        } : playerXInfo,
+        playerOInfo: playerOInfo ? {
+          ...playerOInfo,
+          achievements: playerOAchievements.slice(0, 3)
+        } : { username: 'AI', displayName: 'AI' }
       };
       
       res.json(gameWithPlayers);
@@ -1018,10 +1082,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
         if (game.roomId && roomConnections.has(game.roomId)) {
           const roomUsers = roomConnections.get(game.roomId)!;
           
-          // Get player information for the move broadcast (parallel fetch for speed)
+          // Get player information with achievements for the move broadcast (parallel fetch for speed)
           const [playerXInfo, playerOInfo] = await Promise.all([
             storage.getUser(game.playerXId),
             game.playerOId !== 'AI' ? storage.getUser(game.playerOId) : Promise.resolve(null)
+          ]);
+          
+          // Get achievements for both players
+          const [playerXAchievements, playerOAchievements] = await Promise.all([
+            playerXInfo ? storage.getUserAchievements(game.playerXId) : Promise.resolve([]),
+            playerOInfo ? storage.getUserAchievements(game.playerOId) : Promise.resolve([])
           ]);
           
           // Prepare the message once to avoid JSON.stringify overhead
@@ -1038,14 +1108,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
               firstName: playerXInfo.firstName,
               username: playerXInfo.username,
               profilePicture: playerXInfo.profilePicture,
-              profileImageUrl: playerXInfo.profileImageUrl
+              profileImageUrl: playerXInfo.profileImageUrl,
+              achievements: playerXAchievements.slice(0, 3)
             } : null,
             playerOInfo: playerOInfo ? {
               displayName: playerOInfo.displayName,
               firstName: playerOInfo.firstName,
               username: playerOInfo.username,
               profilePicture: playerOInfo.profilePicture,
-              profileImageUrl: playerOInfo.profileImageUrl
+              profileImageUrl: playerOInfo.profileImageUrl,
+              achievements: playerOAchievements.slice(0, 3)
             } : null
           });
           

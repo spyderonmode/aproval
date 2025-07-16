@@ -308,6 +308,20 @@ export function OnlineUsersModal({ open, onClose, currentRoom, user }: OnlineUse
                                     <Clock className="h-3 w-3" />
                                     {formatLastSeen(user.lastSeen)}
                                   </div>
+                                  {user.achievements && user.achievements.length > 0 && (
+                                    <div className="flex items-center gap-1 mt-1">
+                                      {user.achievements.map((achievement: any) => (
+                                        <span
+                                          key={achievement.id}
+                                          className="text-xs bg-gradient-to-r from-yellow-400 to-orange-500 text-white px-2 py-1 rounded-full flex items-center gap-1"
+                                          title={achievement.description}
+                                        >
+                                          {achievement.icon}
+                                          <span className="font-medium">{achievement.achievementName}</span>
+                                        </span>
+                                      ))}
+                                    </div>
+                                  )}
                                 </div>
                               </div>
                               

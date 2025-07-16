@@ -43,7 +43,6 @@
     "isEmailVerified": true,
     "createdAt": "2025-07-14T14:41:27.170Z"
   },
-  
   {
     "id": "8d44fe25-2c05-4f90-b141-f755dfc13feb",
     "username": "Yogesh",
@@ -67,5 +66,17 @@
     "emailVerificationToken": "32c7898e-5c9b-4e71-988d-919c3889a9b5",
     "emailVerificationExpiry": "2025-07-16T19:09:05.330Z",
     "createdAt": "2025-07-15T19:06:26.647Z"
+  },
+  {
+    "id": "208a27ca-bee0-481e-954e-b56d805a06ea",
+    "username": "testuser",
+    "password": "13d249f2cb4127b40cfa757866850278793f814ded3c587fe5889e889a7a9f6c",
+    "email": "test@example.com",
+    "displayName": "testuser",
+    "profilePicture": null,
+    "isEmailVerified": true,
+    "emailVerificationToken": "5ebc2a41-bff7-410e-9d71-0f683eb72c7e",
+    "emailVerificationExpiry": "2025-07-17T04:48:28.124Z",
+    "createdAt": "2025-07-16T04:48:28.124Z"
   }
 ]
