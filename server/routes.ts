@@ -351,23 +351,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
           role: 'player',
         });
         
-        // Notify both players via WebSocket
+        // Notify both players via WebSocket with the same message type
         const notifyPlayer = async (playerId: string) => {
           // Find connection by userId
           for (const [connId, connection] of connections.entries()) {
             if (connection.userId === playerId && connection.ws.readyState === WebSocket.OPEN) {
-              // Get user information for both players
-              const player1 = await storage.getUser(player1Id);
-              const player2 = await storage.getUser(player2Id);
-              
               connection.ws.send(JSON.stringify({
                 type: 'match_found',
                 room: room,
-                opponent: playerId === player1Id ? player2Id : player1Id,
-                players: {
-                  player1: player1,
-                  player2: player2
-                }
+                message: 'Match found! Joining room...'
               }));
               break;
             }
@@ -381,18 +373,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
         
         // Return matched status to the player who just joined
         res.json({ status: 'matched', room: room });
-        
-        // Send matched response to the first player who was waiting
-        for (const [connId, connection] of connections.entries()) {
-          if (connection.userId === player1Id && connection.ws.readyState === WebSocket.OPEN) {
-            connection.ws.send(JSON.stringify({
-              type: 'matchmaking_response',
-              status: 'matched',
-              room: room
-            }));
-            break;
-          }
-        }
       } else {
         res.json({ status: 'waiting', message: 'Waiting for another player...' });
       }

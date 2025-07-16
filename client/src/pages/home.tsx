@@ -273,6 +273,13 @@ export default function Home() {
             handleRoomJoin(lastMessage.room);
           }
           break;
+        
+        case 'match_found':
+          console.log('🎮 Match found:', lastMessage);
+          setIsMatchmaking(false);
+          setShowMatchmaking(false);
+          handleRoomJoin(lastMessage.room);
+          break;
       }
     }
   }, [lastMessage, currentGame, currentRoom, user]);
