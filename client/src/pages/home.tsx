@@ -149,16 +149,31 @@ export default function Home() {
           if (currentGame && lastMessage.gameId === currentGame.id) {
             console.log('🎮 Home received move WebSocket message:', lastMessage);
             console.log('🎮 Updating game board from:', currentGame.board, 'to:', lastMessage.board);
+            console.log('🎮 Current player changing from:', currentGame.currentPlayer, 'to:', lastMessage.currentPlayer);
+            
             // Update the current game state immediately for everyone (players and spectators)
-            setCurrentGame(prevGame => ({
-              ...prevGame,
-              board: lastMessage.board,
-              currentPlayer: lastMessage.currentPlayer,
-              lastMove: lastMessage.position,
-              playerXInfo: lastMessage.playerXInfo || prevGame.playerXInfo,
-              playerOInfo: lastMessage.playerOInfo || prevGame.playerOInfo,
-              timestamp: Date.now() // Force re-render
-            }));
+            setCurrentGame(prevGame => {
+              const updatedGame = {
+                ...prevGame,
+                board: lastMessage.board,
+                currentPlayer: lastMessage.currentPlayer,
+                lastMove: lastMessage.position,
+                playerXInfo: lastMessage.playerXInfo || prevGame.playerXInfo,
+                playerOInfo: lastMessage.playerOInfo || prevGame.playerOInfo,
+                timestamp: Date.now() // Force re-render
+              };
+              console.log('🎮 Updated game state after move:', updatedGame);
+              return updatedGame;
+            });
+            
+            // Force a second update to ensure React re-renders with the new state
+            setTimeout(() => {
+              setCurrentGame(prevGame => ({
+                ...prevGame,
+                syncTimestamp: Date.now()
+              }));
+            }, 10);
+            
             // Sound effects removed as requested
           } else if (currentRoom && (lastMessage.roomId === currentRoom.id || lastMessage.gameId)) {
             // If we're in the room but don't have currentGame set, set it from the move message

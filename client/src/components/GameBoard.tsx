@@ -309,7 +309,7 @@ export function GameBoard({ game, onGameOver, gameMode, user }: GameBoardProps) 
         }
       }
     }
-  }, [game?.id, game?.board, game?.currentPlayer, game?.timestamp]); // Include board and timestamp for online games
+  }, [game?.id, game?.board, game?.currentPlayer, game?.timestamp, game?.syncTimestamp]); // Include syncTimestamp for better WebSocket sync
 
   // Remove WebSocket handling from GameBoard - it's now handled in Home component
   // This prevents double handling and state conflicts
@@ -877,7 +877,8 @@ export function GameBoard({ game, onGameOver, gameMode, user }: GameBoardProps) 
                 </span>
                 {gameMode === 'online' && game?.playerXInfo?.achievements && game.playerXInfo.achievements.length > 0 && (
                   <div className="flex items-center gap-1 mt-1">
-                    {game.playerXInfo.achievements.slice(0, 2).map((achievement: any) => (
+                    {/* Show only the most recent achievement (latest badge replaces old one) */}
+                    {game.playerXInfo.achievements.slice(-1).map((achievement: any) => (
                       <span
                         key={achievement.id}
                         className="text-xs bg-gradient-to-r from-yellow-400 to-orange-500 text-white px-1 py-0.5 rounded-full"
@@ -951,7 +952,8 @@ export function GameBoard({ game, onGameOver, gameMode, user }: GameBoardProps) 
                 </span>
                 {gameMode === 'online' && game?.playerOInfo?.achievements && game.playerOInfo.achievements.length > 0 && (
                   <div className="flex items-center gap-1 mt-1">
-                    {game.playerOInfo.achievements.slice(0, 2).map((achievement: any) => (
+                    {/* Show only the most recent achievement (latest badge replaces old one) */}
+                    {game.playerOInfo.achievements.slice(-1).map((achievement: any) => (
                       <span
                         key={achievement.id}
                         className="text-xs bg-gradient-to-r from-yellow-400 to-orange-500 text-white px-1 py-0.5 rounded-full"
