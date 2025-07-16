@@ -881,7 +881,7 @@ export function GameBoard({ game, onGameOver, gameMode, user }: GameBoardProps) 
                     {game.playerXInfo.achievements.slice(-1).map((achievement: any) => (
                       <span
                         key={achievement.id}
-                        className="text-xs bg-gradient-to-r from-yellow-400 to-orange-500 text-white px-1 py-0.5 rounded-full"
+                        className="text-xs text-gray-700 dark:text-gray-300 px-1 py-0.5"
                         title={achievement.description}
                       >
                         {achievement.icon}
@@ -956,7 +956,7 @@ export function GameBoard({ game, onGameOver, gameMode, user }: GameBoardProps) 
                     {game.playerOInfo.achievements.slice(-1).map((achievement: any) => (
                       <span
                         key={achievement.id}
-                        className="text-xs bg-gradient-to-r from-yellow-400 to-orange-500 text-white px-1 py-0.5 rounded-full"
+                        className="text-xs text-gray-700 dark:text-gray-300 px-1 py-0.5"
                         title={achievement.description}
                       >
                         {achievement.icon}
