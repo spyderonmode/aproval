@@ -286,14 +286,11 @@ export default function Home() {
             setIsMatchmaking(false);
             setShowMatchmaking(false);
             handleRoomJoin(lastMessage.room);
+            toast({
+              title: "Match Found!",
+              description: "You've been matched with an opponent. Game starting...",
+            });
           }
-          break;
-        
-        case 'match_found':
-          console.log('🎮 Match found:', lastMessage);
-          setIsMatchmaking(false);
-          setShowMatchmaking(false);
-          handleRoomJoin(lastMessage.room);
           break;
         case 'player_reaction':
           // Handle player reaction - this will be broadcast to all players and spectators

@@ -373,6 +373,71 @@ export async function registerRoutes(app: Express): Promise<Server> {
         
         console.log(`🎯 Match notifications sent to both players`);
         
+        // Auto-start the game after a brief delay to ensure both players are connected
+        setTimeout(async () => {
+          try {
+            console.log(`🎯 Auto-starting game for matched players in room ${room.id}`);
+            
+            // Create the game automatically
+            const game = await storage.createGame({
+              roomId: room.id,
+              playerXId: player1Id,
+              playerOId: player2Id,
+              gameMode: 'online',
+              currentPlayer: 'X',
+              board: {},
+              status: 'active',
+            });
+            
+            // Get player information with achievements
+            const [playerXInfo, playerOInfo] = await Promise.all([
+              storage.getUser(player1Id),
+              storage.getUser(player2Id)
+            ]);
+            
+            // Get achievements for both players
+            const [playerXAchievements, playerOAchievements] = await Promise.all([
+              storage.getUserAchievements(player1Id),
+              storage.getUserAchievements(player2Id)
+            ]);
+            
+            const gameWithPlayers = {
+              ...game,
+              playerXInfo: playerXInfo ? {
+                ...playerXInfo,
+                achievements: playerXAchievements.slice(0, 3)
+              } : null,
+              playerOInfo: playerOInfo ? {
+                ...playerOInfo,
+                achievements: playerOAchievements.slice(0, 3)
+              } : null,
+              gameMode: 'online'
+            };
+            
+            // Update room status to active
+            await storage.updateRoomStatus(room.id, 'active');
+            
+            // Broadcast game start to all room participants
+            const roomUsers = roomConnections.get(room.id);
+            if (roomUsers) {
+              roomUsers.forEach(connectionId => {
+                const connection = connections.get(connectionId);
+                if (connection && connection.ws.readyState === WebSocket.OPEN) {
+                  connection.ws.send(JSON.stringify({
+                    type: 'game_started',
+                    game: gameWithPlayers,
+                    roomId: room.id,
+                  }));
+                }
+              });
+            }
+            
+            console.log(`🎯 Auto-started game ${game.id} for matchmaking room ${room.id}`);
+          } catch (error) {
+            console.error('Error auto-starting matchmaking game:', error);
+          }
+        }, 2000); // 2 second delay to ensure both players are connected
+        
         // Return matched status to the player who just joined
         res.json({ status: 'matched', room: room });
       } else {
