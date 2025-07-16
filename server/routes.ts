@@ -1421,6 +1421,36 @@ export async function registerRoutes(app: Express): Promise<Server> {
               conn.roomId = undefined;
             }
             break;
+            
+          case 'player_reaction':
+            // Handle player reaction and broadcast to all users in the room
+            const { roomId, gameId, userId, playerSymbol, reactionType, emoji, playerInfo } = data;
+            
+            console.log(`🎭 Player reaction from ${userId} in room ${roomId}: ${emoji}`);
+            
+            // Broadcast reaction to all users in the room
+            const roomUsers = roomConnections.get(roomId);
+            if (roomUsers) {
+              const reactionMessage = JSON.stringify({
+                type: 'player_reaction',
+                roomId,
+                gameId,
+                userId,
+                playerSymbol,
+                reactionType,
+                emoji,
+                playerInfo,
+                timestamp: Date.now()
+              });
+              
+              roomUsers.forEach(connId => {
+                const conn = connections.get(connId);
+                if (conn && conn.ws.readyState === WebSocket.OPEN) {
+                  conn.ws.send(reactionMessage);
+                }
+              });
+            }
+            break;
         }
       } catch (error) {
         console.error('WebSocket message error:', error);

@@ -200,7 +200,7 @@ export function GameBoard({ game, onGameOver, gameMode, user }: GameBoardProps) 
   const { toast } = useToast();
   const { currentTheme, themes } = useTheme();
   // Sound effects removed as requested
-  const { lastMessage } = useWebSocket();
+  const { lastMessage, sendMessage } = useWebSocket();
   const queryClient = useQueryClient();
 
   // Determine opponent for online games
@@ -254,7 +254,23 @@ export function GameBoard({ game, onGameOver, gameMode, user }: GameBoardProps) 
       // Find the reaction by emoji
       const reactionType = Object.entries(REACTION_EMOJIS).find(([_, reaction]) => reaction.emoji === emoji)?.[0];
       if (reactionType) {
+        // Show reaction locally first
         setPlayerReaction(playerSymbol, reactionType as keyof typeof REACTION_EMOJIS);
+        
+        // Broadcast reaction to all players and spectators in the room
+        const reactionMessage = {
+          type: 'player_reaction',
+          roomId: game.roomId,
+          gameId: game.id,
+          userId: userId,
+          playerSymbol: playerSymbol,
+          reactionType: reactionType,
+          emoji: emoji,
+          playerInfo: isPlayerX ? game.playerXInfo : game.playerOInfo
+        };
+        
+        // Send via WebSocket
+        sendMessage(reactionMessage);
       }
     } else {
       // For local games, current player uses reaction
@@ -313,6 +329,22 @@ export function GameBoard({ game, onGameOver, gameMode, user }: GameBoardProps) 
 
   // Remove WebSocket handling from GameBoard - it's now handled in Home component
   // This prevents double handling and state conflicts
+
+  // Handle incoming WebSocket messages for reactions
+  useEffect(() => {
+    if (lastMessage?.type === 'player_reaction') {
+      console.log('🎭 Received player reaction:', lastMessage);
+      if (lastMessage.gameId === game?.id || lastMessage.roomId === game?.roomId) {
+        const reactionType = lastMessage.reactionType;
+        const playerSymbol = lastMessage.playerSymbol;
+        
+        // Show the reaction for the specified player
+        if (reactionType && REACTION_EMOJIS[reactionType]) {
+          setPlayerReaction(playerSymbol, reactionType);
+        }
+      }
+    }
+  }, [lastMessage]);
 
   // Debug effect to track board state changes
   useEffect(() => {

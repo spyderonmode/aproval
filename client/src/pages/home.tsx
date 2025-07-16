@@ -295,6 +295,14 @@ export default function Home() {
           setShowMatchmaking(false);
           handleRoomJoin(lastMessage.room);
           break;
+        case 'player_reaction':
+          // Handle player reaction - this will be broadcast to all players and spectators
+          if (currentGame && (lastMessage.gameId === currentGame.id || lastMessage.roomId === currentRoom?.id)) {
+            console.log('🎮 Player reaction received:', lastMessage);
+            // The reaction will be displayed by the GameBoard component
+            // We don't need to handle it here as it's handled by the GameBoard component directly
+          }
+          break;
       }
     }
   }, [lastMessage, currentGame, currentRoom, user]);
