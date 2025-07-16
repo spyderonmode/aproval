@@ -857,6 +857,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
           await storage.updateUserStats(opponentId, 'loss');
         }
         
+        // Check and grant achievements for the winner
+        console.log(`🏆 Checking achievements for winner: ${userId}`);
+        const newAchievements = await storage.checkAndGrantAchievements(userId, 'win', {
+          winCondition: winResult.condition,
+          isOnlineGame: game.roomId ? true : false
+        });
+        console.log(`🏆 Granted ${newAchievements.length} new achievements:`, newAchievements.map(a => a.achievementName));
+        
+        // Check and grant achievements for the loser if it's not AI
+        if (opponentId && opponentId !== 'AI') {
+          await storage.checkAndGrantAchievements(opponentId, 'loss', {
+            winCondition: winResult.condition,
+            isOnlineGame: game.roomId ? true : false
+          });
+        }
+        
         // Update room status
         if (game.roomId) {
           await storage.updateRoomStatus(game.roomId, 'finished');
@@ -933,6 +949,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
         await storage.updateGameStatus(gameId, 'finished', undefined, 'draw');
         if (game.playerXId && game.playerXId !== 'AI') await storage.updateUserStats(game.playerXId, 'draw');
         if (game.playerOId && game.playerOId !== 'AI') await storage.updateUserStats(game.playerOId, 'draw');
+        
+        // Check and grant achievements for both players (they drew)
+        if (game.playerXId && game.playerXId !== 'AI') {
+          await storage.checkAndGrantAchievements(game.playerXId, 'draw', {
+            winCondition: 'draw',
+            isOnlineGame: game.roomId ? true : false
+          });
+        }
+        if (game.playerOId && game.playerOId !== 'AI') {
+          await storage.checkAndGrantAchievements(game.playerOId, 'draw', {
+            winCondition: 'draw',
+            isOnlineGame: game.roomId ? true : false
+          });
+        }
         
         // Update room status
         if (game.roomId) {
@@ -1034,6 +1064,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
                 await storage.updateGameStatus(gameId, 'finished', game.playerOId || undefined, aiWinResult.condition || undefined);
                 await storage.updateUserStats(userId, 'loss');
                 
+                // Check and grant achievements for the human player (they lost to AI)
+                await storage.checkAndGrantAchievements(userId, 'loss', {
+                  winCondition: aiWinResult.condition,
+                  isOnlineGame: false
+                });
+                
                 if (game.roomId) {
                   await storage.updateRoomStatus(game.roomId, 'finished');
                 }
@@ -1057,6 +1093,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
               } else if (checkDraw(aiBoard)) {
                 await storage.updateGameStatus(gameId, 'finished', undefined, 'draw');
                 await storage.updateUserStats(userId, 'draw');
+                
+                // Check and grant achievements for the human player (they drew with AI)
+                await storage.checkAndGrantAchievements(userId, 'draw', {
+                  winCondition: 'draw',
+                  isOnlineGame: false
+                });
                 
                 if (game.roomId) {
                   await storage.updateRoomStatus(game.roomId, 'finished');
