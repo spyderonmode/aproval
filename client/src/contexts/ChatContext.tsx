@@ -63,8 +63,14 @@ export function ChatProvider({ children, currentUser }: ChatProviderProps) {
           fromMe: data.message.senderId === (currentUser?.userId || currentUser?.id)
         };
         
-        // Add to chat history
-        addToHistory(data.message.senderId, message);
+        // Add to chat history for the conversation partner
+        // If it's from me, add to history with the target user
+        // If it's from them, add to history with the sender
+        const conversationPartnerId = message.fromMe 
+          ? data.message.targetUserId || data.message.senderId // Use target if available, fallback to sender
+          : data.message.senderId;
+        
+        addToHistory(conversationPartnerId, message);
         
         // Only show popup for messages from other users (not from current user)
         if (!message.fromMe) {
