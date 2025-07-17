@@ -17,6 +17,7 @@ import { MatchmakingModal } from "@/components/MatchmakingModal";
 import { OnlineUsersModal } from "@/components/OnlineUsersModal";
 import { ThemeSelector } from "@/components/ThemeSelector";
 import { AchievementModal } from "@/components/AchievementModal";
+import { Friends } from "@/components/Friends";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -688,6 +689,11 @@ export default function Home() {
                         <Palette className="h-3 w-3 mr-1" />
                         Change
                       </Button>
+                    </div>
+                    
+                    {/* Friends */}
+                    <div className="w-full">
+                      <Friends />
                     </div>
                     
                     {/* Online Players */}

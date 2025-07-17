@@ -363,6 +363,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Search users by email
+  app.post('/api/users/search', requireAuth, async (req: any, res) => {
+    try {
+      const { email } = req.body;
+      
+      if (!email) {
+        return res.status(400).json({ error: 'Email is required' });
+      }
+      
+      // Search for user by email
+      const users = await storage.getUserByEmail(email);
+      
+      if (!users) {
+        return res.status(404).json({ error: 'User not found' });
+      }
+      
+      res.json({ user: users });
+    } catch (error) {
+      console.error("Error searching users:", error);
+      res.status(500).json({ message: "Failed to search users" });
+    }
+  });
+
   // Send chat message
   app.post('/api/chat/send', requireAuth, async (req: any, res) => {
     try {
