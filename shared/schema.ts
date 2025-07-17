@@ -118,6 +118,28 @@ export const userThemes = pgTable("user_themes", {
   index("unique_user_theme").on(table.userId, table.themeName),
 ]);
 
+export const friendRequests = pgTable("friend_requests", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  requesterId: varchar("requester_id").references(() => users.id).notNull(),
+  requestedId: varchar("requested_id").references(() => users.id).notNull(),
+  status: varchar("status").default("pending"), // pending, accepted, rejected
+  sentAt: timestamp("sent_at").defaultNow(),
+  respondedAt: timestamp("responded_at"),
+}, (table) => [
+  // Prevent duplicate friend requests
+  index("unique_friend_request").on(table.requesterId, table.requestedId),
+]);
+
+export const friendships = pgTable("friendships", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  user1Id: varchar("user1_id").references(() => users.id).notNull(),
+  user2Id: varchar("user2_id").references(() => users.id).notNull(),
+  becameFriendsAt: timestamp("became_friends_at").defaultNow(),
+}, (table) => [
+  // Prevent duplicate friendships
+  index("unique_friendship").on(table.user1Id, table.user2Id),
+]);
+
 // Relations
 export const usersRelations = relations(users, ({ many }) => ({
   ownedRooms: many(rooms),
@@ -130,6 +152,10 @@ export const usersRelations = relations(users, ({ many }) => ({
   blockedByUsers: many(blockedUsers, { relationName: "blocked" }),
   achievements: many(achievements),
   unlockedThemes: many(userThemes),
+  sentFriendRequests: many(friendRequests, { relationName: "requester" }),
+  receivedFriendRequests: many(friendRequests, { relationName: "requested" }),
+  friendshipsAsUser1: many(friendships, { relationName: "user1" }),
+  friendshipsAsUser2: many(friendships, { relationName: "user2" }),
 }));
 
 export const roomsRelations = relations(rooms, ({ one, many }) => ({
@@ -167,6 +193,16 @@ export const achievementsRelations = relations(achievements, ({ one }) => ({
 
 export const userThemesRelations = relations(userThemes, ({ one }) => ({
   user: one(users, { fields: [userThemes.userId], references: [users.id] }),
+}));
+
+export const friendRequestsRelations = relations(friendRequests, ({ one }) => ({
+  requester: one(users, { fields: [friendRequests.requesterId], references: [users.id], relationName: "requester" }),
+  requested: one(users, { fields: [friendRequests.requestedId], references: [users.id], relationName: "requested" }),
+}));
+
+export const friendshipsRelations = relations(friendships, ({ one }) => ({
+  user1: one(users, { fields: [friendships.user1Id], references: [users.id], relationName: "user1" }),
+  user2: one(users, { fields: [friendships.user2Id], references: [users.id], relationName: "user2" }),
 }));
 
 // Schemas
@@ -227,6 +263,16 @@ export const insertUserThemeSchema = createInsertSchema(userThemes).pick({
   isUnlocked: true,
 });
 
+export const insertFriendRequestSchema = createInsertSchema(friendRequests).pick({
+  requesterId: true,
+  requestedId: true,
+});
+
+export const insertFriendshipSchema = createInsertSchema(friendships).pick({
+  user1Id: true,
+  user2Id: true,
+});
+
 // Types
 export type UpsertUser = typeof users.$inferInsert;
 export type User = typeof users.$inferSelect;
@@ -237,6 +283,11 @@ export type RoomParticipant = typeof roomParticipants.$inferSelect;
 export type BlockedUser = typeof blockedUsers.$inferSelect;
 export type Achievement = typeof achievements.$inferSelect;
 export type UserTheme = typeof userThemes.$inferSelect;
+export type FriendRequest = typeof friendRequests.$inferSelect;
+export type Friendship = typeof friendships.$inferSelect;
+
+export type InsertFriendRequest = z.infer<typeof insertFriendRequestSchema>;
+export type InsertFriendship = z.infer<typeof insertFriendshipSchema>;
 export type InsertRoom = z.infer<typeof insertRoomSchema>;
 export type InsertGame = z.infer<typeof insertGameSchema>;
 export type InsertMove = z.infer<typeof insertMoveSchema>;

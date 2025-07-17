@@ -7,6 +7,8 @@ import {
   blockedUsers,
   achievements,
   userThemes,
+  friendRequests,
+  friendships,
   type User,
   type UpsertUser,
   type Room,
@@ -16,6 +18,8 @@ import {
   type BlockedUser,
   type Achievement,
   type UserTheme,
+  type FriendRequest,
+  type Friendship,
   type InsertRoom,
   type InsertGame,
   type InsertMove,
@@ -23,6 +27,8 @@ import {
   type InsertBlockedUser,
   type InsertAchievement,
   type InsertUserTheme,
+  type InsertFriendRequest,
+  type InsertFriendship,
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, and, desc, count, or, ne, isNull, isNotNull, sql } from "drizzle-orm";
@@ -79,6 +85,22 @@ export interface IStorage {
   unlockTheme(userId: string, themeName: string): Promise<UserTheme>;
   getUserThemes(userId: string): Promise<UserTheme[]>;
   isThemeUnlocked(userId: string, themeName: string): Promise<boolean>;
+  
+  // Friend operations
+  sendFriendRequest(requesterId: string, requestedId: string): Promise<FriendRequest>;
+  getFriendRequests(userId: string): Promise<(FriendRequest & { requester: User; requested: User })[]>;
+  respondToFriendRequest(requestId: string, response: 'accepted' | 'rejected'): Promise<void>;
+  getFriends(userId: string): Promise<User[]>;
+  removeFriend(userId: string, friendId: string): Promise<void>;
+  areFriends(userId: string, friendId: string): Promise<boolean>;
+  getHeadToHeadStats(userId: string, friendId: string): Promise<{
+    totalGames: number;
+    userWins: number;
+    friendWins: number;
+    draws: number;
+    userWinRate: number;
+    friendWinRate: number;
+  }>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -661,6 +683,228 @@ export class DatabaseStorage implements IStorage {
         eq(userThemes.isUnlocked, true)
       ));
     return !!theme;
+  }
+
+  // Friend operations
+  async sendFriendRequest(requesterId: string, requestedId: string): Promise<FriendRequest> {
+    // Check if they're already friends
+    const alreadyFriends = await this.areFriends(requesterId, requestedId);
+    if (alreadyFriends) {
+      throw new Error('Users are already friends');
+    }
+
+    // Check if friend request already exists
+    const existingRequest = await db
+      .select()
+      .from(friendRequests)
+      .where(and(
+        eq(friendRequests.requesterId, requesterId),
+        eq(friendRequests.requestedId, requestedId),
+        eq(friendRequests.status, 'pending')
+      ));
+
+    if (existingRequest.length > 0) {
+      throw new Error('Friend request already sent');
+    }
+
+    const [friendRequest] = await db
+      .insert(friendRequests)
+      .values({
+        requesterId,
+        requestedId,
+      })
+      .returning();
+    
+    return friendRequest;
+  }
+
+  async getFriendRequests(userId: string): Promise<(FriendRequest & { requester: User; requested: User })[]> {
+    return await db
+      .select({
+        id: friendRequests.id,
+        requesterId: friendRequests.requesterId,
+        requestedId: friendRequests.requestedId,
+        status: friendRequests.status,
+        sentAt: friendRequests.sentAt,
+        respondedAt: friendRequests.respondedAt,
+        requester: {
+          id: users.id,
+          email: users.email,
+          firstName: users.firstName,
+          lastName: users.lastName,
+          profileImageUrl: users.profileImageUrl,
+          wins: users.wins,
+          losses: users.losses,
+          draws: users.draws,
+          createdAt: users.createdAt,
+          updatedAt: users.updatedAt,
+        },
+        requested: {
+          id: users.id,
+          email: users.email,
+          firstName: users.firstName,
+          lastName: users.lastName,
+          profileImageUrl: users.profileImageUrl,
+          wins: users.wins,
+          losses: users.losses,
+          draws: users.draws,
+          createdAt: users.createdAt,
+          updatedAt: users.updatedAt,
+        },
+      })
+      .from(friendRequests)
+      .leftJoin(users, eq(friendRequests.requesterId, users.id))
+      .where(and(
+        eq(friendRequests.requestedId, userId),
+        eq(friendRequests.status, 'pending')
+      ))
+      .orderBy(desc(friendRequests.sentAt));
+  }
+
+  async respondToFriendRequest(requestId: string, response: 'accepted' | 'rejected'): Promise<void> {
+    const [request] = await db
+      .select()
+      .from(friendRequests)
+      .where(eq(friendRequests.id, requestId));
+
+    if (!request) {
+      throw new Error('Friend request not found');
+    }
+
+    if (request.status !== 'pending') {
+      throw new Error('Friend request already responded to');
+    }
+
+    // Update friend request status
+    await db
+      .update(friendRequests)
+      .set({
+        status: response,
+        respondedAt: new Date(),
+      })
+      .where(eq(friendRequests.id, requestId));
+
+    // If accepted, create friendship
+    if (response === 'accepted') {
+      const user1Id = request.requesterId < request.requestedId ? request.requesterId : request.requestedId;
+      const user2Id = request.requesterId < request.requestedId ? request.requestedId : request.requesterId;
+
+      await db
+        .insert(friendships)
+        .values({
+          user1Id,
+          user2Id,
+        })
+        .onConflictDoNothing();
+    }
+  }
+
+  async getFriends(userId: string): Promise<User[]> {
+    const friends = await db
+      .select({
+        id: users.id,
+        email: users.email,
+        firstName: users.firstName,
+        lastName: users.lastName,
+        profileImageUrl: users.profileImageUrl,
+        wins: users.wins,
+        losses: users.losses,
+        draws: users.draws,
+        createdAt: users.createdAt,
+        updatedAt: users.updatedAt,
+      })
+      .from(friendships)
+      .leftJoin(users, or(
+        and(eq(friendships.user1Id, userId), eq(friendships.user2Id, users.id)),
+        and(eq(friendships.user2Id, userId), eq(friendships.user1Id, users.id))
+      ))
+      .where(or(
+        eq(friendships.user1Id, userId),
+        eq(friendships.user2Id, userId)
+      ))
+      .orderBy(desc(friendships.becameFriendsAt));
+
+    return friends.map(friend => ({
+      id: friend.id!,
+      email: friend.email!,
+      firstName: friend.firstName!,
+      lastName: friend.lastName!,
+      profileImageUrl: friend.profileImageUrl!,
+      wins: friend.wins!,
+      losses: friend.losses!,
+      draws: friend.draws!,
+      createdAt: friend.createdAt!,
+      updatedAt: friend.updatedAt!,
+    }));
+  }
+
+  async removeFriend(userId: string, friendId: string): Promise<void> {
+    await db
+      .delete(friendships)
+      .where(or(
+        and(eq(friendships.user1Id, userId), eq(friendships.user2Id, friendId)),
+        and(eq(friendships.user1Id, friendId), eq(friendships.user2Id, userId))
+      ));
+  }
+
+  async areFriends(userId: string, friendId: string): Promise<boolean> {
+    const [friendship] = await db
+      .select()
+      .from(friendships)
+      .where(or(
+        and(eq(friendships.user1Id, userId), eq(friendships.user2Id, friendId)),
+        and(eq(friendships.user1Id, friendId), eq(friendships.user2Id, userId))
+      ));
+
+    return !!friendship;
+  }
+
+  async getHeadToHeadStats(userId: string, friendId: string): Promise<{
+    totalGames: number;
+    userWins: number;
+    friendWins: number;
+    draws: number;
+    userWinRate: number;
+    friendWinRate: number;
+  }> {
+    const headToHeadGames = await db
+      .select()
+      .from(games)
+      .where(and(
+        eq(games.gameMode, 'online'),
+        eq(games.status, 'finished'),
+        or(
+          and(eq(games.playerXId, userId), eq(games.playerOId, friendId)),
+          and(eq(games.playerXId, friendId), eq(games.playerOId, userId))
+        )
+      ));
+
+    const totalGames = headToHeadGames.length;
+    let userWins = 0;
+    let friendWins = 0;
+    let draws = 0;
+
+    headToHeadGames.forEach(game => {
+      if (game.winnerId === userId) {
+        userWins++;
+      } else if (game.winnerId === friendId) {
+        friendWins++;
+      } else {
+        draws++;
+      }
+    });
+
+    const userWinRate = totalGames > 0 ? Math.round((userWins / totalGames) * 100) : 0;
+    const friendWinRate = totalGames > 0 ? Math.round((friendWins / totalGames) * 100) : 0;
+
+    return {
+      totalGames,
+      userWins,
+      friendWins,
+      draws,
+      userWinRate,
+      friendWinRate,
+    };
   }
 }
 

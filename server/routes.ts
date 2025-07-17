@@ -259,6 +259,110 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Friend system routes
+  // Send friend request
+  app.post('/api/friends/request', requireAuth, async (req: any, res) => {
+    try {
+      const { requestedId } = req.body;
+      const requesterId = req.session.user.userId;
+      
+      if (!requestedId) {
+        return res.status(400).json({ error: 'Requested user ID is required' });
+      }
+      
+      if (requesterId === requestedId) {
+        return res.status(400).json({ error: 'Cannot send friend request to yourself' });
+      }
+      
+      const friendRequest = await storage.sendFriendRequest(requesterId, requestedId);
+      res.json(friendRequest);
+    } catch (error) {
+      console.error("Error sending friend request:", error);
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  // Get friend requests
+  app.get('/api/friends/requests', requireAuth, async (req: any, res) => {
+    try {
+      const userId = req.session.user.userId;
+      const friendRequests = await storage.getFriendRequests(userId);
+      res.json(friendRequests);
+    } catch (error) {
+      console.error("Error getting friend requests:", error);
+      res.status(500).json({ message: "Failed to get friend requests" });
+    }
+  });
+
+  // Respond to friend request
+  app.post('/api/friends/respond', requireAuth, async (req: any, res) => {
+    try {
+      const { requestId, response } = req.body;
+      
+      if (!requestId || !response) {
+        return res.status(400).json({ error: 'Request ID and response are required' });
+      }
+      
+      if (!['accepted', 'rejected'].includes(response)) {
+        return res.status(400).json({ error: 'Response must be "accepted" or "rejected"' });
+      }
+      
+      await storage.respondToFriendRequest(requestId, response);
+      res.json({ success: true, message: `Friend request ${response}` });
+    } catch (error) {
+      console.error("Error responding to friend request:", error);
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  // Get friends list
+  app.get('/api/friends', requireAuth, async (req: any, res) => {
+    try {
+      const userId = req.session.user.userId;
+      const friends = await storage.getFriends(userId);
+      res.json(friends);
+    } catch (error) {
+      console.error("Error getting friends:", error);
+      res.status(500).json({ message: "Failed to get friends" });
+    }
+  });
+
+  // Remove friend
+  app.delete('/api/friends/:friendId', requireAuth, async (req: any, res) => {
+    try {
+      const { friendId } = req.params;
+      const userId = req.session.user.userId;
+      
+      if (!friendId) {
+        return res.status(400).json({ error: 'Friend ID is required' });
+      }
+      
+      await storage.removeFriend(userId, friendId);
+      res.json({ success: true, message: 'Friend removed' });
+    } catch (error) {
+      console.error("Error removing friend:", error);
+      res.status(500).json({ message: "Failed to remove friend" });
+    }
+  });
+
+  // Get head-to-head stats
+  app.get('/api/friends/:friendId/stats', requireAuth, async (req: any, res) => {
+    try {
+      const { friendId } = req.params;
+      const userId = req.session.user.userId;
+      
+      if (!friendId) {
+        return res.status(400).json({ error: 'Friend ID is required' });
+      }
+      
+      const stats = await storage.getHeadToHeadStats(userId, friendId);
+      res.json(stats);
+    } catch (error) {
+      console.error("Error getting head-to-head stats:", error);
+      res.status(500).json({ message: "Failed to get head-to-head stats" });
+    }
+  });
+
   // Send chat message
   app.post('/api/chat/send', requireAuth, async (req: any, res) => {
     try {
