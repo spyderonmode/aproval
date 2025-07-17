@@ -73,18 +73,8 @@ export function ChatPopup({
       return await apiRequest('POST', '/api/chat/send', { targetUserId, message });
     },
     onSuccess: () => {
-      if (activeChatUser) {
-        // Add the sent message to shared chat history
-        const sentMessage = {
-          senderId: currentUser?.userId || currentUser?.id,
-          senderName: currentUser?.displayName || currentUser?.firstName || 'You',
-          message: newMessage,
-          timestamp: new Date().toLocaleTimeString(),
-          fromMe: true
-        };
-        
-        addToHistory(activeChatUser.userId, sentMessage);
-      }
+      // Message will be added to history via WebSocket response  
+      // No need to manually add sent messages here
       setNewMessage('');
     },
     onError: (error: any) => {

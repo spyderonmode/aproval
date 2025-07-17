@@ -54,19 +54,8 @@ export function OnlineUsersModal({ open, onClose, currentRoom, user }: OnlineUse
       return await apiRequest('POST', '/api/chat/send', { targetUserId, message });
     },
     onSuccess: () => {
-      if (selectedUser) {
-        // Add the sent message to shared chat history
-        const newMessage = {
-          senderId: user?.userId || user?.id,
-          senderName: user?.displayName || user?.username || 'You',
-          message: chatMessage,
-          timestamp: new Date().toLocaleTimeString(),
-          fromMe: true
-        };
-        
-        // Add to shared chat history for the target user
-        addToHistory(selectedUser.userId, newMessage);
-      }
+      // Message will be added to history via WebSocket response
+      // No need to manually add sent messages here
       setChatMessage("");
     },
     onError: (error: any) => {

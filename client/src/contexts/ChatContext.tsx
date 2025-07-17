@@ -60,14 +60,16 @@ export function ChatProvider({ children, currentUser }: ChatProviderProps) {
           senderName: data.message.senderName,
           message: data.message.message,
           timestamp: new Date(data.message.timestamp).toLocaleTimeString(),
-          fromMe: false
+          fromMe: data.message.senderId === (currentUser?.userId || currentUser?.id)
         };
         
         // Add to chat history
         addToHistory(data.message.senderId, message);
         
-        // Show popup with the new message
-        showChatPopup(sender, data.message.message);
+        // Only show popup for messages from other users (not from current user)
+        if (!message.fromMe) {
+          showChatPopup(sender, data.message.message);
+        }
       }
     };
 
