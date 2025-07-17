@@ -156,12 +156,8 @@ export function OnlineUsersModal({ open, onClose, currentRoom, user }: OnlineUse
         // Only handle if modal is open
         if (!open) return;
         
-        // Remove chat history for offline user
-        setChatHistory(prev => {
-          const newHistory = new Map(prev);
-          newHistory.delete(data.userId);
-          return newHistory;
-        });
+        // Note: Chat history is now managed by ChatContext globally
+        // No need to manually remove chat history here
         
         // Remove unread messages for offline user
         setUnreadMessages(prev => {

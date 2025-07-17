@@ -9,6 +9,7 @@ import { MessageCircle, Send, X, Minimize2, Maximize2, User } from 'lucide-react
 import { useToast } from '@/hooks/use-toast';
 import { apiRequest } from '@/lib/queryClient';
 import { useMutation } from '@tanstack/react-query';
+import { useChatContext } from '@/contexts/ChatContext';
 
 interface ChatMessage {
   id: string;
@@ -38,12 +39,15 @@ export function ChatPopup({
   initialSender, 
   initialMessage 
 }: ChatPopupProps) {
-  const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [newMessage, setNewMessage] = useState('');
   const [isMinimized, setIsMinimized] = useState(false);
   const [activeChatUser, setActiveChatUser] = useState(initialSender || null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
+  const { chatHistory, addToHistory } = useChatContext();
+
+  // Get current chat messages from shared context
+  const currentMessages = activeChatUser ? chatHistory.get(activeChatUser.userId) || [] : [];
 
   // Auto-scroll to bottom when new messages arrive
   const scrollToBottom = () => {
@@ -52,61 +56,17 @@ export function ChatPopup({
 
   useEffect(() => {
     scrollToBottom();
-  }, [messages]);
+  }, [currentMessages]);
 
-  // Add initial message if provided
+  // Set active chat user from initial sender
   useEffect(() => {
-    if (initialMessage && initialSender) {
-      const message: ChatMessage = {
-        id: Date.now().toString(),
-        senderId: initialSender.userId,
-        senderName: initialSender.displayName || initialSender.username,
-        message: initialMessage,
-        timestamp: new Date().toLocaleTimeString(),
-        fromMe: false
-      };
-      setMessages([message]);
+    if (initialSender) {
       setActiveChatUser(initialSender);
     }
-  }, [initialMessage, initialSender]);
+  }, [initialSender]);
 
-  // Handle incoming messages from WebSocket
-  useEffect(() => {
-    const handleChatMessage = (event: CustomEvent) => {
-      const data = event.detail;
-      
-      if (data.type === 'chat_message_received') {
-        const incomingMessage: ChatMessage = {
-          id: Date.now().toString(),
-          senderId: data.message.senderId,
-          senderName: data.message.senderName,
-          message: data.message.message,
-          timestamp: new Date(data.message.timestamp).toLocaleTimeString(),
-          fromMe: false
-        };
-        
-        // If no active chat user, set the sender as active
-        if (!activeChatUser) {
-          setActiveChatUser({
-            userId: data.message.senderId,
-            displayName: data.message.senderName,
-            username: data.message.senderName
-          });
-        }
-        
-        // Only add message if it's from the current chat user
-        if (activeChatUser?.userId === data.message.senderId) {
-          setMessages(prev => [...prev, incomingMessage]);
-        }
-      }
-    };
-
-    window.addEventListener('chat_message_received', handleChatMessage as EventListener);
-    
-    return () => {
-      window.removeEventListener('chat_message_received', handleChatMessage as EventListener);
-    };
-  }, [activeChatUser]);
+  // Note: Incoming messages are handled by ChatContext
+  // ChatPopup just displays messages from shared context
 
   const sendMessageMutation = useMutation({
     mutationFn: async ({ targetUserId, message }: { targetUserId: string; message: string }) => {
@@ -114,9 +74,8 @@ export function ChatPopup({
     },
     onSuccess: () => {
       if (activeChatUser) {
-        // Add the sent message to chat
-        const sentMessage: ChatMessage = {
-          id: Date.now().toString(),
+        // Add the sent message to shared chat history
+        const sentMessage = {
           senderId: currentUser?.userId || currentUser?.id,
           senderName: currentUser?.displayName || currentUser?.firstName || 'You',
           message: newMessage,
@@ -124,7 +83,7 @@ export function ChatPopup({
           fromMe: true
         };
         
-        setMessages(prev => [...prev, sentMessage]);
+        addToHistory(activeChatUser.userId, sentMessage);
       }
       setNewMessage('');
     },
@@ -155,7 +114,6 @@ export function ChatPopup({
   };
 
   const handleClose = () => {
-    setMessages([]);
     setActiveChatUser(null);
     onClose();
   };
@@ -213,14 +171,14 @@ export function ChatPopup({
                   <div className="h-64 flex flex-col">
                     <ScrollArea className="flex-1 p-3">
                       <div className="space-y-2">
-                        {messages.length === 0 ? (
+                        {currentMessages.length === 0 ? (
                           <div className="text-center text-gray-500 text-sm py-8">
                             No messages yet. Start a conversation!
                           </div>
                         ) : (
-                          messages.map((message) => (
+                          currentMessages.map((message, index) => (
                             <div
-                              key={message.id}
+                              key={index}
                               className={`flex ${message.fromMe ? 'justify-end' : 'justify-start'}`}
                             >
                               <div
