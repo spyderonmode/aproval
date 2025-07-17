@@ -1094,13 +1094,15 @@ export function GameBoard({ game, onGameOver, gameMode, user }: GameBoardProps) 
             <span>React</span>
           </Button>
           
-          <Button 
-            variant="destructive"
-            onClick={resetGame}
-            disabled={makeMoveMutation.isPending}
-          >
-            Reset Game
-          </Button>
+          {gameMode !== 'online' && (
+            <Button 
+              variant="destructive"
+              onClick={resetGame}
+              disabled={makeMoveMutation.isPending}
+            >
+              Reset Game
+            </Button>
+          )}
         </div>
         
         {/* Emoji Reaction Panel */}
