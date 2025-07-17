@@ -164,8 +164,8 @@ export function ChatPage() {
                     onClick={() => setSelectedUser(onlineUser)}
                   >
                     <div className="flex items-center space-x-3 w-full">
-                      <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center flex-shrink-0">
-                        <span className="text-xs font-bold">
+                      <div className="w-8 h-8 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full flex items-center justify-center flex-shrink-0">
+                        <span className="text-xs font-bold text-white">
                           {(onlineUser.displayName || onlineUser.username).charAt(0).toUpperCase()}
                         </span>
                       </div>
@@ -202,8 +202,8 @@ export function ChatPage() {
               {/* Chat Header */}
               <CardHeader className="pb-3 border-b border-slate-700">
                 <div className="flex items-center space-x-3">
-                  <div className="w-10 h-10 bg-primary rounded-full flex items-center justify-center">
-                    <span className="font-bold">
+                  <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full flex items-center justify-center">
+                    <span className="font-bold text-white">
                       {(selectedUser.displayName || selectedUser.username).charAt(0).toUpperCase()}
                     </span>
                   </div>

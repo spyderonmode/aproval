@@ -201,7 +201,7 @@ export function SettingsPage() {
               <span>Appearance</span>
             </CardTitle>
           </CardHeader>
-          <CardContent>
+          <CardContent className="space-y-4">
             <div>
               <Label className="text-base font-medium mb-3 block">Theme</Label>
               <ThemeSelector />

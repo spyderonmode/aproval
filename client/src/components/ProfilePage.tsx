@@ -90,8 +90,8 @@ export function ProfilePage() {
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="flex items-center space-x-4">
-                <div className="w-16 h-16 bg-primary rounded-full flex items-center justify-center">
-                  <span className="text-2xl font-bold">
+                <div className="w-16 h-16 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full flex items-center justify-center">
+                  <span className="text-2xl font-bold text-white">
                     {(displayName || user?.username || 'U').charAt(0).toUpperCase()}
                   </span>
                 </div>
