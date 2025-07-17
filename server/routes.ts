@@ -481,9 +481,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
             await storage.updateRoomStatus(room.id, 'active');
             
             // Broadcast game start to all room participants
-            const roomUsers = roomConnections.get(room.id);
-            if (roomUsers) {
-              roomUsers.forEach(connectionId => {
+            const roomConnections_broadcast = roomConnections.get(room.id);
+            if (roomConnections_broadcast) {
+              roomConnections_broadcast.forEach(connectionId => {
                 const connection = connections.get(connectionId);
                 if (connection && connection.ws.readyState === WebSocket.OPEN) {
                   connection.ws.send(JSON.stringify({
