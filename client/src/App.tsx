@@ -4,6 +4,7 @@ import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { ThemeProvider } from "@/contexts/ThemeContext";
+import { ChatProvider } from "@/contexts/ChatContext";
 import { useAuth } from "@/hooks/useAuth";
 import Landing from "@/pages/landing";
 import Home from "@/pages/home";
@@ -70,7 +71,7 @@ function Router() {
     return <Auth />;
   }
 
-  return (
+  const content = (
     <Switch>
       <Route path="/auth">
         {isAuthenticated && user?.isEmailVerified ? <Home /> : <Auth />}
@@ -84,6 +85,13 @@ function Router() {
       <Route component={NotFound} />
     </Switch>
   );
+
+  // Only wrap with ChatProvider if user is authenticated
+  return isAuthenticated && user?.isEmailVerified ? (
+    <ChatProvider currentUser={user}>
+      {content}
+    </ChatProvider>
+  ) : content;
 }
 
 function App() {
