@@ -1,6 +1,5 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { AchievementBadge } from "./AchievementBadge";
 import { useQuery } from "@tanstack/react-query";
 import { Loader2, Trophy, Target, Star, Crown, Zap, Medal } from "lucide-react";
@@ -65,9 +64,8 @@ export function AchievementModal({ open, onClose, userId }: AchievementModalProp
             <Loader2 className="w-8 h-8 animate-spin" />
           </div>
         ) : (
-          <div className="flex-1 min-h-0 overflow-hidden">
-            <ScrollArea className="h-full">
-              <div className="space-y-6 pb-6 pr-4">
+          <div className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden" style={{ WebkitOverflowScrolling: 'touch' }}>
+            <div className="space-y-6 pb-6 pr-4">
               {achievementCategories.map((category) => {
                 const categoryAchievements = getAchievementsByCategory(category.types);
                 const possibleAchievements = allPossibleAchievements.filter(a => category.types.includes(a.type));
@@ -137,14 +135,13 @@ export function AchievementModal({ open, onClose, userId }: AchievementModalProp
                 );
               })}
               
-                {achievements && achievements.length === 0 && (
-                  <div className="text-center py-8 text-gray-500">
-                    <Trophy className="w-16 h-16 mx-auto mb-4 opacity-50" />
-                    <p>No achievements yet. Start playing to earn your first badge!</p>
-                  </div>
-                )}
-              </div>
-            </ScrollArea>
+              {achievements && achievements.length === 0 && (
+                <div className="text-center py-8 text-gray-500">
+                  <Trophy className="w-16 h-16 mx-auto mb-4 opacity-50" />
+                  <p>No achievements yet. Start playing to earn your first badge!</p>
+                </div>
+              )}
+            </div>
           </div>
         )}
 
