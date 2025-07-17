@@ -247,24 +247,13 @@ export function GameBoard({ game, onGameOver, gameMode, user }: GameBoardProps) 
   };
 
   const handleReactionClick = (emoji: string) => {
-    console.log('🎭 Handling reaction click:', emoji);
-    
     if (gameMode === 'online' && user) {
       const userId = user.userId || user.id;
       const isPlayerX = game.playerXId === userId;
       const playerSymbol = isPlayerX ? 'X' : 'O';
-      
-      console.log('🎭 Online reaction - User ID:', userId);
-      console.log('🎭 Online reaction - Player symbol:', playerSymbol);
-      console.log('🎭 Online reaction - Game room ID:', game.roomId);
-      console.log('🎭 Online reaction - Game ID:', game.id);
-      
       // Find the reaction by emoji
       const reactionType = Object.entries(REACTION_EMOJIS).find(([_, reaction]) => reaction.emoji === emoji)?.[0];
-      
       if (reactionType) {
-        console.log('🎭 Found reaction type:', reactionType);
-        
         // Show reaction locally first
         setPlayerReaction(playerSymbol, reactionType as keyof typeof REACTION_EMOJIS);
         
@@ -280,16 +269,10 @@ export function GameBoard({ game, onGameOver, gameMode, user }: GameBoardProps) 
           playerInfo: isPlayerX ? game.playerXInfo : game.playerOInfo
         };
         
-        console.log('🎭 Sending reaction message:', reactionMessage);
-        
         // Send via WebSocket
         sendMessage(reactionMessage);
-      } else {
-        console.log('🎭 Reaction type not found for emoji:', emoji);
       }
     } else {
-      console.log('🎭 Local reaction - Current player:', currentPlayer);
-      
       // For local games, current player uses reaction
       const reactionType = Object.entries(REACTION_EMOJIS).find(([_, reaction]) => reaction.emoji === emoji)?.[0];
       if (reactionType) {
@@ -351,32 +334,17 @@ export function GameBoard({ game, onGameOver, gameMode, user }: GameBoardProps) 
   useEffect(() => {
     if (lastMessage?.type === 'player_reaction') {
       console.log('🎭 Received player reaction:', lastMessage);
-      console.log('🎭 Current game ID:', game?.id);
-      console.log('🎭 Current room ID:', game?.roomId);
-      console.log('🎭 Message game ID:', lastMessage.gameId);
-      console.log('🎭 Message room ID:', lastMessage.roomId);
-      
-      // Check if reaction is for current game or room
-      const isForCurrentGame = lastMessage.gameId === game?.id || lastMessage.roomId === game?.roomId;
-      
-      if (isForCurrentGame) {
+      if (lastMessage.gameId === game?.id || lastMessage.roomId === game?.roomId) {
         const reactionType = lastMessage.reactionType;
         const playerSymbol = lastMessage.playerSymbol;
         
-        console.log('🎭 Processing reaction:', reactionType, 'for player:', playerSymbol);
-        
         // Show the reaction for the specified player
         if (reactionType && REACTION_EMOJIS[reactionType]) {
-          console.log('🎭 Setting player reaction:', playerSymbol, reactionType);
           setPlayerReaction(playerSymbol, reactionType);
-        } else {
-          console.log('🎭 Invalid reaction type or emoji not found:', reactionType);
         }
-      } else {
-        console.log('🎭 Reaction not for current game/room, ignoring');
       }
     }
-  }, [lastMessage, game?.id, game?.roomId]);
+  }, [lastMessage]);
 
   // Debug effect to track board state changes
   useEffect(() => {
@@ -1094,15 +1062,13 @@ export function GameBoard({ game, onGameOver, gameMode, user }: GameBoardProps) 
             <span>React</span>
           </Button>
           
-          {gameMode !== 'online' && (
-            <Button 
-              variant="destructive"
-              onClick={resetGame}
-              disabled={makeMoveMutation.isPending}
-            >
-              Reset Game
-            </Button>
-          )}
+          <Button 
+            variant="destructive"
+            onClick={resetGame}
+            disabled={makeMoveMutation.isPending}
+          >
+            Reset Game
+          </Button>
         </div>
         
         {/* Emoji Reaction Panel */}
