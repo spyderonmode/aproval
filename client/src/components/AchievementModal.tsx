@@ -52,10 +52,10 @@ export function AchievementModal({ open, onClose, userId }: AchievementModalProp
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="max-w-4xl max-h-[80vh]">
+      <DialogContent className="max-w-4xl max-h-[80vh] w-[95vw] sm:w-full mx-auto">
         <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
-            <Trophy className="w-6 h-6" />
+          <DialogTitle className="flex items-center gap-2 text-lg sm:text-xl">
+            <Trophy className="w-5 h-5 sm:w-6 sm:h-6" />
             {userId ? 'Player Achievements' : 'Your Achievements'}
           </DialogTitle>
         </DialogHeader>
@@ -109,11 +109,11 @@ export function AchievementModal({ open, onClose, userId }: AchievementModalProp
                               </div>
                               
                               {/* Tooltip for locked achievements */}
-                              <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-3 px-4 py-3 bg-red-900 text-white text-sm rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-20 whitespace-nowrap shadow-2xl border border-red-700 max-w-xs">
-                                <div className="font-bold text-red-300 mb-1">🔒 {possible.name}</div>
-                                <div className="text-gray-200 text-xs whitespace-normal">{possible.description}</div>
+                              <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-3 px-3 py-2 bg-red-900 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-50 shadow-2xl border border-red-700 w-44 max-w-[90vw]">
+                                <div className="font-bold text-red-300 mb-1 text-center text-xs">🔒 {possible.name}</div>
+                                <div className="text-gray-200 text-xs text-center leading-tight">{possible.description}</div>
                                 {/* Arrow pointing down */}
-                                <div className="absolute top-full left-1/2 transform -translate-x-1/2 border-6 border-transparent border-t-red-900"></div>
+                                <div className="absolute top-full left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-3 border-r-3 border-t-3 border-transparent border-t-red-900"></div>
                               </div>
                             </div>
                           );
