@@ -52,8 +52,8 @@ export function AchievementModal({ open, onClose, userId }: AchievementModalProp
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="max-w-4xl max-h-[85vh] w-[95vw] sm:w-full mx-auto flex flex-col">
-        <DialogHeader className="flex-shrink-0">
+      <DialogContent className="max-w-4xl max-h-[90vh] w-[95vw] sm:w-full mx-auto flex flex-col overflow-hidden">
+        <DialogHeader className="flex-shrink-0 pb-4">
           <DialogTitle className="flex items-center gap-2 text-lg sm:text-xl">
             <Trophy className="w-5 h-5 sm:w-6 sm:h-6" />
             {userId ? 'Player Achievements' : 'Your Achievements'}
@@ -65,8 +65,9 @@ export function AchievementModal({ open, onClose, userId }: AchievementModalProp
             <Loader2 className="w-8 h-8 animate-spin" />
           </div>
         ) : (
-          <ScrollArea className="flex-1 min-h-0">
-            <div className="space-y-6 pb-4">
+          <div className="flex-1 min-h-0 overflow-hidden">
+            <ScrollArea className="h-full">
+              <div className="space-y-6 pb-6 pr-4">
               {achievementCategories.map((category) => {
                 const categoryAchievements = getAchievementsByCategory(category.types);
                 const possibleAchievements = allPossibleAchievements.filter(a => category.types.includes(a.type));
@@ -136,14 +137,15 @@ export function AchievementModal({ open, onClose, userId }: AchievementModalProp
                 );
               })}
               
-              {achievements && achievements.length === 0 && (
-                <div className="text-center py-8 text-gray-500">
-                  <Trophy className="w-16 h-16 mx-auto mb-4 opacity-50" />
-                  <p>No achievements yet. Start playing to earn your first badge!</p>
-                </div>
-              )}
-            </div>
-          </ScrollArea>
+                {achievements && achievements.length === 0 && (
+                  <div className="text-center py-8 text-gray-500">
+                    <Trophy className="w-16 h-16 mx-auto mb-4 opacity-50" />
+                    <p>No achievements yet. Start playing to earn your first badge!</p>
+                  </div>
+                )}
+              </div>
+            </ScrollArea>
+          </div>
         )}
 
         <div className="flex justify-end pt-4 border-t border-gray-200 dark:border-gray-700 flex-shrink-0">
