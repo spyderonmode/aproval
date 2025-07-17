@@ -326,14 +326,26 @@ export function GameBoard({ game, onGameOver, gameMode, user }: GameBoardProps) 
   useEffect(() => {
     if (lastMessage?.type === 'player_chat') {
       console.log('💬 Received player chat:', lastMessage);
+      console.log('💬 Current game ID:', game?.id);
+      console.log('💬 Current room ID:', game?.roomId);
+      console.log('💬 Message game ID:', lastMessage.gameId);
+      console.log('💬 Message room ID:', lastMessage.roomId);
+      console.log('💬 Message text:', lastMessage.messageText);
+      console.log('💬 Player symbol:', lastMessage.playerSymbol);
+      
       if (lastMessage.gameId === game?.id || lastMessage.roomId === game?.roomId) {
         const messageText = lastMessage.messageText;
         const playerSymbol = lastMessage.playerSymbol;
         
+        console.log('💬 Message matches current game/room, displaying message');
+        
         // Show the message for the specified player
         if (messageText) {
           setPlayerMessage(playerSymbol, messageText);
+          console.log('💬 Set player message:', playerSymbol, messageText);
         }
+      } else {
+        console.log('💬 Message does not match current game/room, ignoring');
       }
     }
   }, [lastMessage]);
