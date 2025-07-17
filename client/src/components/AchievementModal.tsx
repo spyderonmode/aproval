@@ -81,39 +81,51 @@ export function AchievementModal({ open, onClose, userId }: AchievementModalProp
                       </span>
                     </div>
                     
-                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+                    <div className="space-y-3">
                       {possibleAchievements.map((possible) => {
                         const earned = categoryAchievements.find((a: any) => a.achievementType === possible.type);
                         
                         if (earned) {
                           return (
-                            <AchievementBadge
+                            <div
                               key={earned.id}
-                              achievement={earned}
-                              size="md"
-                            />
+                              className="flex items-center gap-4 p-3 rounded-lg bg-gradient-to-r from-amber-50 to-orange-100 dark:from-amber-900/20 dark:to-orange-900/20 border border-amber-200 dark:border-amber-700/50"
+                            >
+                              <div className="flex-shrink-0">
+                                <div className="w-12 h-12 bg-gradient-to-br from-amber-400 to-orange-500 rounded-full flex items-center justify-center text-white text-xl font-bold shadow-lg">
+                                  {earned.icon}
+                                </div>
+                              </div>
+                              <div className="flex-1 min-w-0">
+                                <div className="font-semibold text-amber-800 dark:text-amber-200 text-sm">
+                                  {earned.achievementName}
+                                </div>
+                                <div className="text-xs text-amber-700 dark:text-amber-300 mt-1 leading-tight">
+                                  {earned.description}
+                                </div>
+                              </div>
+                            </div>
                           );
                         } else {
-                          // Show locked achievement with tooltip
+                          // Show locked achievement
                           return (
                             <div
                               key={possible.type}
-                              className="w-20 h-20 rounded-lg border-2 border-dashed border-gray-300 dark:border-gray-600 flex flex-col items-center justify-center opacity-50 cursor-help group relative"
-                              title={`🔒 ${possible.name}: ${possible.description}`}
+                              className="flex items-center gap-4 p-3 rounded-lg bg-gray-50 dark:bg-gray-800/50 border border-dashed border-gray-300 dark:border-gray-600 opacity-60"
                             >
-                              <div className="text-xl mb-1 grayscale">
-                                {possible.icon}
+                              <div className="flex-shrink-0">
+                                <div className="w-12 h-12 bg-gray-300 dark:bg-gray-700 rounded-full flex items-center justify-center text-gray-500 dark:text-gray-400 text-xl grayscale">
+                                  {possible.icon}
+                                </div>
                               </div>
-                              <div className="text-xs text-center leading-tight text-gray-500">
-                                {possible.name}
-                              </div>
-                              
-                              {/* Tooltip for locked achievements */}
-                              <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-3 px-3 py-2 bg-red-900 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-50 shadow-2xl border border-red-700 w-44 max-w-[90vw] pointer-events-none">
-                                <div className="font-bold text-red-300 mb-1 text-center text-xs">🔒 {possible.name}</div>
-                                <div className="text-gray-200 text-xs text-center leading-tight">{possible.description}</div>
-                                {/* Arrow pointing down */}
-                                <div className="absolute top-full left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-3 border-r-3 border-t-3 border-transparent border-t-red-900"></div>
+                              <div className="flex-1 min-w-0">
+                                <div className="font-semibold text-gray-600 dark:text-gray-400 text-sm flex items-center gap-2">
+                                  <span>🔒</span>
+                                  {possible.name}
+                                </div>
+                                <div className="text-xs text-gray-500 dark:text-gray-500 mt-1 leading-tight">
+                                  {possible.description}
+                                </div>
                               </div>
                             </div>
                           );
