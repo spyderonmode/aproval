@@ -10,6 +10,7 @@ import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { User, MessageCircle, Clock, Users, Send, UserX, UserCheck, Eye } from "lucide-react";
 import { UserProfileModal } from "./UserProfileModal";
+import { useChatContext } from "@/contexts/ChatContext";
 
 interface OnlineUsersModalProps {
   open: boolean;
@@ -21,9 +22,9 @@ interface OnlineUsersModalProps {
 export function OnlineUsersModal({ open, onClose, currentRoom, user }: OnlineUsersModalProps) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const { chatHistory, addToHistory } = useChatContext();
   const [selectedUser, setSelectedUser] = useState<any>(null);
   const [chatMessage, setChatMessage] = useState("");
-  const [chatHistory, setChatHistory] = useState<Map<string, any[]>>(new Map());
   const [unreadMessages, setUnreadMessages] = useState<Map<string, number>>(new Map());
   const [blockedUsers, setBlockedUsers] = useState<Set<string>>(new Set());
   const [profileUser, setProfileUser] = useState<any>(null);
@@ -54,20 +55,17 @@ export function OnlineUsersModal({ open, onClose, currentRoom, user }: OnlineUse
     },
     onSuccess: () => {
       if (selectedUser) {
-        // Add the sent message to chat history for this user
+        // Add the sent message to shared chat history
         const newMessage = {
-          fromMe: true,
+          senderId: user?.userId || user?.id,
+          senderName: user?.displayName || user?.username || 'You',
           message: chatMessage,
           timestamp: new Date().toLocaleTimeString(),
-          userId: user?.userId || user?.id
+          fromMe: true
         };
         
-        setChatHistory(prev => {
-          const newHistory = new Map(prev);
-          const userMessages = newHistory.get(selectedUser.userId) || [];
-          newHistory.set(selectedUser.userId, [...userMessages, newMessage]);
-          return newHistory;
-        });
+        // Add to shared chat history for the target user
+        addToHistory(selectedUser.userId, newMessage);
       }
       setChatMessage("");
     },

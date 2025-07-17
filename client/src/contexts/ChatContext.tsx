@@ -6,12 +6,15 @@ interface ChatMessage {
   senderName: string;
   message: string;
   timestamp: string;
+  fromMe: boolean;
 }
 
 interface ChatContextType {
   showChatPopup: (sender: { userId: string; displayName: string; username: string }, message: string) => void;
   closeChatPopup: () => void;
   isPopupOpen: boolean;
+  chatHistory: Map<string, ChatMessage[]>;
+  addToHistory: (userId: string, message: ChatMessage) => void;
 }
 
 const ChatContext = createContext<ChatContextType | undefined>(undefined);
@@ -37,6 +40,7 @@ export function ChatProvider({ children, currentUser }: ChatProviderProps) {
     username: string;
   } | null>(null);
   const [currentMessage, setCurrentMessage] = useState<string>('');
+  const [chatHistory, setChatHistory] = useState<Map<string, ChatMessage[]>>(new Map());
 
   // Listen for incoming chat messages
   useEffect(() => {
@@ -49,6 +53,18 @@ export function ChatProvider({ children, currentUser }: ChatProviderProps) {
           displayName: data.message.senderName,
           username: data.message.senderName
         };
+        
+        // Create message object
+        const message: ChatMessage = {
+          senderId: data.message.senderId,
+          senderName: data.message.senderName,
+          message: data.message.message,
+          timestamp: new Date(data.message.timestamp).toLocaleTimeString(),
+          fromMe: false
+        };
+        
+        // Add to chat history
+        addToHistory(data.message.senderId, message);
         
         // Show popup with the new message
         showChatPopup(sender, data.message.message);
@@ -63,6 +79,15 @@ export function ChatProvider({ children, currentUser }: ChatProviderProps) {
     };
   }, []);
 
+  const addToHistory = (userId: string, message: ChatMessage) => {
+    setChatHistory(prev => {
+      const newHistory = new Map(prev);
+      const userMessages = newHistory.get(userId) || [];
+      newHistory.set(userId, [...userMessages, message]);
+      return newHistory;
+    });
+  };
+
   const showChatPopup = (sender: { userId: string; displayName: string; username: string }, message: string) => {
     setCurrentSender(sender);
     setCurrentMessage(message);
@@ -76,7 +101,7 @@ export function ChatProvider({ children, currentUser }: ChatProviderProps) {
   };
 
   return (
-    <ChatContext.Provider value={{ showChatPopup, closeChatPopup, isPopupOpen }}>
+    <ChatContext.Provider value={{ showChatPopup, closeChatPopup, isPopupOpen, chatHistory, addToHistory }}>
       {children}
       <ChatPopup
         isOpen={isPopupOpen}
