@@ -64,13 +64,23 @@ export function ChatProvider({ children, currentUser }: ChatProviderProps) {
         };
         
         // Add to chat history for the conversation partner
-        // If it's from me, add to history with the target user
-        // If it's from them, add to history with the sender
+        // For messages from me: add to history with the target user (who I'm talking to)
+        // For messages from others: add to history with the sender (who sent it to me)
         const conversationPartnerId = message.fromMe 
-          ? data.message.targetUserId || data.message.senderId // Use target if available, fallback to sender
-          : data.message.senderId;
+          ? data.message.targetUserId // Who I sent the message to
+          : data.message.senderId;    // Who sent the message to me
         
-        addToHistory(conversationPartnerId, message);
+        console.log('🗨️ Adding message to history:', {
+          messageFromMe: message.fromMe,
+          senderId: data.message.senderId,
+          targetUserId: data.message.targetUserId,
+          conversationPartnerId,
+          currentUserId: currentUser?.userId || currentUser?.id
+        });
+        
+        if (conversationPartnerId) {
+          addToHistory(conversationPartnerId, message);
+        }
         
         // Only show popup for messages from other users (not from current user)
         if (!message.fromMe) {
