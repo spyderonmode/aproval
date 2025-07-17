@@ -282,92 +282,95 @@ export function OnlineUsersModal({ open, onClose, currentRoom, user }: OnlineUse
                         const isBlocked = blockedUsers.has(user.userId);
                         return (
                           <Card key={user.userId} className={`p-3 cursor-pointer transition-colors ${isBlocked ? 'opacity-50 border-red-200 dark:border-red-800' : 'hover:bg-slate-50 dark:hover:bg-slate-800'}`}>
-                            <div className="flex items-center justify-between">
-                              <div className="flex items-center gap-3">
-                                {user.profilePicture || user.profileImageUrl ? (
-                                  <img
-                                    src={user.profilePicture || user.profileImageUrl}
-                                    alt="Profile"
-                                    className="h-10 w-10 rounded-full object-cover"
-                                  />
-                                ) : (
-                                  <div className="h-10 w-10 rounded-full bg-blue-600 flex items-center justify-center">
-                                    <User className="h-5 w-5 text-white" />
-                                  </div>
-                                )}
-                                <div>
-                                  <h3 className="font-medium flex items-center gap-2">
-                                    {user.displayName || user.firstName || user.username}
-                                    {isBlocked && (
-                                      <Badge variant="destructive" className="text-xs">
-                                        Blocked
-                                      </Badge>
-                                    )}
-                                  </h3>
-                                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                                    <Clock className="h-3 w-3" />
-                                    {formatLastSeen(user.lastSeen)}
-                                  </div>
-                                  {user.achievements && user.achievements.length > 0 && (
-                                    <div className="flex items-center gap-1 mt-1">
-                                      {user.achievements.map((achievement: any) => (
-                                        <span
-                                          key={achievement.id}
-                                          className="text-xs bg-gradient-to-r from-yellow-400 to-orange-500 text-white px-2 py-1 rounded-full flex items-center gap-1"
-                                          title={achievement.description}
-                                        >
-                                          {achievement.icon}
-                                          <span className="font-medium">{achievement.achievementName}</span>
-                                        </span>
-                                      ))}
+                            <div className="space-y-2">
+                              <div className="flex items-center justify-between">
+                                <div className="flex items-center gap-3">
+                                  {user.profilePicture || user.profileImageUrl ? (
+                                    <img
+                                      src={user.profilePicture || user.profileImageUrl}
+                                      alt="Profile"
+                                      className="h-10 w-10 rounded-full object-cover"
+                                    />
+                                  ) : (
+                                    <div className="h-10 w-10 rounded-full bg-blue-600 flex items-center justify-center">
+                                      <User className="h-5 w-5 text-white" />
                                     </div>
+                                  )}
+                                  <div>
+                                    <h3 className="font-medium flex items-center gap-2">
+                                      {user.displayName || user.firstName || user.username}
+                                      {isBlocked && (
+                                        <Badge variant="destructive" className="text-xs">
+                                          Blocked
+                                        </Badge>
+                                      )}
+                                    </h3>
+                                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                                      <Clock className="h-3 w-3" />
+                                      {formatLastSeen(user.lastSeen)}
+                                    </div>
+                                  </div>
+                                </div>
+                                
+                                <div className="flex items-center gap-2">
+                                  {user.inRoom && (
+                                    <Badge variant="secondary">In Room</Badge>
+                                  )}
+                                  
+                                  <Button
+                                    size="sm"
+                                    variant="outline"
+                                    onClick={() => handleViewProfile(user)}
+                                    className="text-blue-600 hover:text-blue-700"
+                                  >
+                                    <Eye className="h-4 w-4 mr-1" />
+                                    Profile
+                                  </Button>
+                                  
+                                  {isBlocked ? (
+                                    <Button
+                                      size="sm"
+                                      variant="outline"
+                                      onClick={() => handleUnblockUser(user.userId)}
+                                      disabled={unblockUserMutation.isPending}
+                                      className="text-green-600 hover:text-green-700"
+                                    >
+                                      <UserCheck className="h-4 w-4 mr-1" />
+                                      Unblock
+                                    </Button>
+                                  ) : (
+                                    <Button
+                                      size="sm"
+                                      variant="outline"
+                                      onClick={() => startChatWithUser(user)}
+                                      className="relative"
+                                    >
+                                      <MessageCircle className="h-4 w-4 mr-1" />
+                                      Chat
+                                      {unreadMessages.get(user.userId) && (
+                                        <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                                          {unreadMessages.get(user.userId)}
+                                        </span>
+                                      )}
+                                    </Button>
                                   )}
                                 </div>
                               </div>
                               
-                              <div className="flex items-center gap-2">
-                                {user.inRoom && (
-                                  <Badge variant="secondary">In Room</Badge>
-                                )}
-                                
-                                <Button
-                                  size="sm"
-                                  variant="outline"
-                                  onClick={() => handleViewProfile(user)}
-                                  className="text-blue-600 hover:text-blue-700"
-                                >
-                                  <Eye className="h-4 w-4 mr-1" />
-                                  Profile
-                                </Button>
-                                
-                                {isBlocked ? (
-                                  <Button
-                                    size="sm"
-                                    variant="outline"
-                                    onClick={() => handleUnblockUser(user.userId)}
-                                    disabled={unblockUserMutation.isPending}
-                                    className="text-green-600 hover:text-green-700"
-                                  >
-                                    <UserCheck className="h-4 w-4 mr-1" />
-                                    Unblock
-                                  </Button>
-                                ) : (
-                                  <Button
-                                    size="sm"
-                                    variant="outline"
-                                    onClick={() => startChatWithUser(user)}
-                                    className="relative"
-                                  >
-                                    <MessageCircle className="h-4 w-4 mr-1" />
-                                    Chat
-                                    {unreadMessages.get(user.userId) && (
-                                      <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
-                                        {unreadMessages.get(user.userId)}
-                                      </span>
-                                    )}
-                                  </Button>
-                                )}
-                              </div>
+                              {user.achievements && user.achievements.length > 0 && (
+                                <div className="flex items-center gap-1 pl-13">
+                                  {user.achievements.map((achievement: any) => (
+                                    <span
+                                      key={achievement.id}
+                                      className="text-xs bg-gradient-to-r from-yellow-400 to-orange-500 text-white px-2 py-1 rounded-full flex items-center gap-1"
+                                      title={achievement.description}
+                                    >
+                                      {achievement.icon}
+                                      <span className="font-medium">{achievement.achievementName}</span>
+                                    </span>
+                                  ))}
+                                </div>
+                              )}
                             </div>
                           </Card>
                         );
