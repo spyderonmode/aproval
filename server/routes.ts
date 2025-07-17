@@ -376,35 +376,40 @@ export async function registerRoutes(app: Express): Promise<Server> {
         
         // Notify both players via WebSocket and ensure they join the room
         const notifyAndJoinPlayer = async (playerId: string) => {
-          // Find all connections for this user (they might have multiple tabs)
-          for (const [connId, connection] of connections.entries()) {
-            if (connection.userId === playerId && connection.ws.readyState === WebSocket.OPEN) {
-              // Add to room connections immediately
-              if (!roomConnections.has(room.id)) {
-                roomConnections.set(room.id, new Set());
-              }
-              roomConnections.get(room.id)!.add(connId);
-              
-              // Update connection room info
-              connection.roomId = room.id;
-              
-              // Update user room state
-              userRoomStates.set(playerId, {
-                roomId: room.id,
-                isInGame: false,
-                role: 'player'
-              });
-              
-              // Send match found notification
-              connection.ws.send(JSON.stringify({
-                type: 'match_found',
-                room: room,
-                message: 'Match found! Joining room...'
-              }));
-              
-              console.log(`🎯 Player ${playerId} automatically joined room ${room.id} via connection ${connId}`);
-              break;
+          // Find the most recent connection for this user
+          const userConnections = Array.from(connections.entries())
+            .filter(([_, connection]) => connection.userId === playerId && connection.ws.readyState === WebSocket.OPEN)
+            .sort(([a], [b]) => b.localeCompare(a)); // Sort by connection ID descending (most recent first)
+          
+          if (userConnections.length > 0) {
+            const [connId, connection] = userConnections[0]; // Use the most recent connection
+            
+            // Add to room connections immediately
+            if (!roomConnections.has(room.id)) {
+              roomConnections.set(room.id, new Set());
             }
+            roomConnections.get(room.id)!.add(connId);
+            
+            // Update connection room info
+            connection.roomId = room.id;
+            
+            // Update user room state
+            userRoomStates.set(playerId, {
+              roomId: room.id,
+              isInGame: false,
+              role: 'player'
+            });
+            
+            // Send match found notification
+            connection.ws.send(JSON.stringify({
+              type: 'match_found',
+              room: room,
+              message: 'Match found! Joining room...'
+            }));
+            
+            console.log(`🎯 Player ${playerId} automatically joined room ${room.id} via connection ${connId}`);
+          } else {
+            console.log(`🎯 Warning: No active connection found for player ${playerId}`);
           }
         };
         
@@ -417,6 +422,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
         setTimeout(async () => {
           try {
             console.log(`🎯 Auto-starting game for matched players in room ${room.id}`);
+            
+            // Check if both players are still connected to the room before starting
+            const roomUsers = roomConnections.get(room.id);
+            if (!roomUsers || roomUsers.size < 2) {
+              console.log(`🎯 Warning: Not enough players in room ${room.id} for auto-start. Room has ${roomUsers?.size || 0} connections`);
+              return;
+            }
+            
+            // Verify both players are actually connected
+            const connectedPlayers = Array.from(roomUsers)
+              .map(connId => connections.get(connId))
+              .filter(conn => conn && conn.ws.readyState === WebSocket.OPEN)
+              .map(conn => conn!.userId);
+            
+            if (!connectedPlayers.includes(player1Id) || !connectedPlayers.includes(player2Id)) {
+              console.log(`🎯 Warning: One or both players disconnected from room ${room.id}. Connected players: ${connectedPlayers.join(', ')}`);
+              return;
+            }
             
             // Create the game automatically
             const game = await storage.createGame({
