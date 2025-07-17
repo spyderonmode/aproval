@@ -37,6 +37,7 @@ export const users = pgTable("users", {
   wins: integer("wins").default(0),
   losses: integer("losses").default(0),
   draws: integer("draws").default(0),
+  coins: integer("coins").default(100), // Starting coins for shop
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
@@ -142,6 +143,42 @@ export const friendships = pgTable("friendships", {
   index("unique_friendship").on(table.user1Id, table.user2Id),
 ]);
 
+// Shop system tables
+export const shopItems = pgTable("shop_items", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  name: varchar("name").notNull(),
+  description: text("description"),
+  category: varchar("category").notNull(), // theme, powerup, cosmetic, upgrade
+  price: integer("price").notNull(),
+  icon: varchar("icon"), // icon name or emoji
+  rarity: varchar("rarity").default("common"), // common, rare, epic, legendary
+  isAvailable: boolean("is_available").default(true),
+  metadata: jsonb("metadata").default('{}'), // item-specific data like theme colors, powerup effects, etc.
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const userPurchases = pgTable("user_purchases", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  userId: varchar("user_id").references(() => users.id).notNull(),
+  itemId: uuid("item_id").references(() => shopItems.id).notNull(),
+  purchasedAt: timestamp("purchased_at").defaultNow(),
+  isActive: boolean("is_active").default(true), // for equipped items
+}, (table) => [
+  // Prevent duplicate purchases
+  index("unique_purchase").on(table.userId, table.itemId),
+]);
+
+export const userInventory = pgTable("user_inventory", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  userId: varchar("user_id").references(() => users.id).notNull(),
+  itemId: uuid("item_id").references(() => shopItems.id).notNull(),
+  quantity: integer("quantity").default(1),
+  obtainedAt: timestamp("obtained_at").defaultNow(),
+}, (table) => [
+  // Prevent duplicate inventory entries
+  index("unique_inventory").on(table.userId, table.itemId),
+]);
+
 // Relations
 export const usersRelations = relations(users, ({ many }) => ({
   ownedRooms: many(rooms),
@@ -158,6 +195,8 @@ export const usersRelations = relations(users, ({ many }) => ({
   receivedFriendRequests: many(friendRequests, { relationName: "requested" }),
   friendshipsAsUser1: many(friendships, { relationName: "user1" }),
   friendshipsAsUser2: many(friendships, { relationName: "user2" }),
+  purchases: many(userPurchases),
+  inventory: many(userInventory),
 }));
 
 export const roomsRelations = relations(rooms, ({ one, many }) => ({
@@ -205,6 +244,21 @@ export const friendRequestsRelations = relations(friendRequests, ({ one }) => ({
 export const friendshipsRelations = relations(friendships, ({ one }) => ({
   user1: one(users, { fields: [friendships.user1Id], references: [users.id], relationName: "user1" }),
   user2: one(users, { fields: [friendships.user2Id], references: [users.id], relationName: "user2" }),
+}));
+
+export const shopItemsRelations = relations(shopItems, ({ many }) => ({
+  purchases: many(userPurchases),
+  inventoryItems: many(userInventory),
+}));
+
+export const userPurchasesRelations = relations(userPurchases, ({ one }) => ({
+  user: one(users, { fields: [userPurchases.userId], references: [users.id] }),
+  item: one(shopItems, { fields: [userPurchases.itemId], references: [shopItems.id] }),
+}));
+
+export const userInventoryRelations = relations(userInventory, ({ one }) => ({
+  user: one(users, { fields: [userInventory.userId], references: [users.id] }),
+  item: one(shopItems, { fields: [userInventory.itemId], references: [shopItems.id] }),
 }));
 
 // Schemas
@@ -269,6 +323,56 @@ export const insertFriendRequestSchema = createInsertSchema(friendRequests).pick
   requesterId: true,
   requestedId: true,
 });
+
+export const insertShopItemSchema = createInsertSchema(shopItems).pick({
+  name: true,
+  description: true,
+  category: true,
+  price: true,
+  icon: true,
+  rarity: true,
+  isAvailable: true,
+  metadata: true,
+});
+
+export const insertUserPurchaseSchema = createInsertSchema(userPurchases).pick({
+  userId: true,
+  itemId: true,
+  isActive: true,
+});
+
+export const insertUserInventorySchema = createInsertSchema(userInventory).pick({
+  userId: true,
+  itemId: true,
+  quantity: true,
+});
+
+// Types
+export type User = typeof users.$inferSelect;
+export type Room = typeof rooms.$inferSelect;
+export type Game = typeof games.$inferSelect;
+export type Move = typeof moves.$inferSelect;
+export type RoomParticipant = typeof roomParticipants.$inferSelect;
+export type BlockedUser = typeof blockedUsers.$inferSelect;
+export type Achievement = typeof achievements.$inferSelect;
+export type UserTheme = typeof userThemes.$inferSelect;
+export type FriendRequest = typeof friendRequests.$inferSelect;
+export type Friendship = typeof friendships.$inferSelect;
+export type ShopItem = typeof shopItems.$inferSelect;
+export type UserPurchase = typeof userPurchases.$inferSelect;
+export type UserInventory = typeof userInventory.$inferSelect;
+
+export type InsertRoom = z.infer<typeof insertRoomSchema>;
+export type InsertGame = z.infer<typeof insertGameSchema>;
+export type InsertMove = z.infer<typeof insertMoveSchema>;
+export type InsertRoomParticipant = z.infer<typeof insertRoomParticipantSchema>;
+export type InsertBlockedUser = z.infer<typeof insertBlockedUserSchema>;
+export type InsertAchievement = z.infer<typeof insertAchievementSchema>;
+export type InsertUserTheme = z.infer<typeof insertUserThemeSchema>;
+export type InsertFriendRequest = z.infer<typeof insertFriendRequestSchema>;
+export type InsertShopItem = z.infer<typeof insertShopItemSchema>;
+export type InsertUserPurchase = z.infer<typeof insertUserPurchaseSchema>;
+export type InsertUserInventory = z.infer<typeof insertUserInventorySchema>;
 
 export const insertFriendshipSchema = createInsertSchema(friendships).pick({
   user1Id: true,

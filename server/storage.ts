@@ -9,6 +9,9 @@ import {
   userThemes,
   friendRequests,
   friendships,
+  shopItems,
+  userPurchases,
+  userInventory,
   type User,
   type UpsertUser,
   type Room,
@@ -20,6 +23,9 @@ import {
   type UserTheme,
   type FriendRequest,
   type Friendship,
+  type ShopItem,
+  type UserPurchase,
+  type UserInventory,
   type InsertRoom,
   type InsertGame,
   type InsertMove,
@@ -29,6 +35,9 @@ import {
   type InsertUserTheme,
   type InsertFriendRequest,
   type InsertFriendship,
+  type InsertShopItem,
+  type InsertUserPurchase,
+  type InsertUserInventory,
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, and, desc, count, or, ne, isNull, isNotNull, sql, exists } from "drizzle-orm";
@@ -103,6 +112,27 @@ export interface IStorage {
     userWinRate: number;
     friendWinRate: number;
   }>;
+  
+  // Shop operations
+  getShopItems(category?: string): Promise<ShopItem[]>;
+  getShopItemById(id: string): Promise<ShopItem | undefined>;
+  createShopItem(item: InsertShopItem): Promise<ShopItem>;
+  updateShopItem(id: string, updates: Partial<InsertShopItem>): Promise<void>;
+  
+  // Purchase operations
+  purchaseItem(userId: string, itemId: string): Promise<UserPurchase>;
+  getUserPurchases(userId: string): Promise<(UserPurchase & { item: ShopItem })[]>;
+  hasPurchased(userId: string, itemId: string): Promise<boolean>;
+  
+  // Inventory operations
+  getUserInventory(userId: string): Promise<(UserInventory & { item: ShopItem })[]>;
+  addToInventory(userId: string, itemId: string, quantity?: number): Promise<UserInventory>;
+  removeFromInventory(userId: string, itemId: string, quantity?: number): Promise<void>;
+  
+  // Coin operations
+  getUserCoins(userId: string): Promise<number>;
+  addCoins(userId: string, amount: number): Promise<void>;
+  deductCoins(userId: string, amount: number): Promise<boolean>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -279,9 +309,18 @@ export class DatabaseStorage implements IStorage {
     if (!user) return;
 
     const updates: any = {};
-    if (result === 'win') updates.wins = (user.wins || 0) + 1;
-    if (result === 'loss') updates.losses = (user.losses || 0) + 1;
-    if (result === 'draw') updates.draws = (user.draws || 0) + 1;
+    if (result === 'win') {
+      updates.wins = (user.wins || 0) + 1;
+      updates.coins = (user.coins || 0) + 10; // Award 10 coins for a win
+    }
+    if (result === 'loss') {
+      updates.losses = (user.losses || 0) + 1;
+      updates.coins = (user.coins || 0) + 2; // Award 2 coins for participation
+    }
+    if (result === 'draw') {
+      updates.draws = (user.draws || 0) + 1;
+      updates.coins = (user.coins || 0) + 5; // Award 5 coins for a draw
+    }
 
     await db.update(users).set(updates).where(eq(users.id, userId));
   }
@@ -987,6 +1026,228 @@ export class DatabaseStorage implements IStorage {
       userWinRate,
       friendWinRate,
     };
+  }
+
+  // Shop operations
+  async getShopItems(category?: string): Promise<ShopItem[]> {
+    const query = db.select().from(shopItems).where(eq(shopItems.isAvailable, true));
+    
+    if (category) {
+      return await query.where(eq(shopItems.category, category)).orderBy(shopItems.price);
+    }
+    
+    return await query.orderBy(shopItems.category, shopItems.price);
+  }
+
+  async getShopItemById(id: string): Promise<ShopItem | undefined> {
+    const [item] = await db.select().from(shopItems).where(eq(shopItems.id, id));
+    return item;
+  }
+
+  async createShopItem(item: InsertShopItem): Promise<ShopItem> {
+    const [newItem] = await db.insert(shopItems).values(item).returning();
+    return newItem;
+  }
+
+  async updateShopItem(id: string, updates: Partial<InsertShopItem>): Promise<void> {
+    await db.update(shopItems).set(updates).where(eq(shopItems.id, id));
+  }
+
+  // Purchase operations
+  async purchaseItem(userId: string, itemId: string): Promise<UserPurchase> {
+    const [item] = await db.select().from(shopItems).where(eq(shopItems.id, itemId));
+    if (!item) {
+      throw new Error('Item not found');
+    }
+
+    const [user] = await db.select().from(users).where(eq(users.id, userId));
+    if (!user) {
+      throw new Error('User not found');
+    }
+
+    if ((user.coins || 0) < item.price) {
+      throw new Error('Insufficient coins');
+    }
+
+    // Check if already purchased
+    const existingPurchase = await this.hasPurchased(userId, itemId);
+    if (existingPurchase) {
+      throw new Error('Item already purchased');
+    }
+
+    // Deduct coins
+    await db.update(users).set({ coins: (user.coins || 0) - item.price }).where(eq(users.id, userId));
+
+    // Create purchase record
+    const [purchase] = await db.insert(userPurchases).values({
+      userId,
+      itemId,
+    }).returning();
+
+    // Add to inventory
+    await this.addToInventory(userId, itemId, 1);
+
+    return purchase;
+  }
+
+  async getUserPurchases(userId: string): Promise<(UserPurchase & { item: ShopItem })[]> {
+    return await db
+      .select({
+        id: userPurchases.id,
+        userId: userPurchases.userId,
+        itemId: userPurchases.itemId,
+        purchasedAt: userPurchases.purchasedAt,
+        isActive: userPurchases.isActive,
+        item: {
+          id: shopItems.id,
+          name: shopItems.name,
+          description: shopItems.description,
+          category: shopItems.category,
+          price: shopItems.price,
+          icon: shopItems.icon,
+          rarity: shopItems.rarity,
+          isAvailable: shopItems.isAvailable,
+          metadata: shopItems.metadata,
+          createdAt: shopItems.createdAt,
+        },
+      })
+      .from(userPurchases)
+      .leftJoin(shopItems, eq(userPurchases.itemId, shopItems.id))
+      .where(eq(userPurchases.userId, userId))
+      .orderBy(desc(userPurchases.purchasedAt));
+  }
+
+  async hasPurchased(userId: string, itemId: string): Promise<boolean> {
+    const [purchase] = await db
+      .select()
+      .from(userPurchases)
+      .where(and(
+        eq(userPurchases.userId, userId),
+        eq(userPurchases.itemId, itemId)
+      ));
+    return !!purchase;
+  }
+
+  // Inventory operations
+  async getUserInventory(userId: string): Promise<(UserInventory & { item: ShopItem })[]> {
+    return await db
+      .select({
+        id: userInventory.id,
+        userId: userInventory.userId,
+        itemId: userInventory.itemId,
+        quantity: userInventory.quantity,
+        obtainedAt: userInventory.obtainedAt,
+        item: {
+          id: shopItems.id,
+          name: shopItems.name,
+          description: shopItems.description,
+          category: shopItems.category,
+          price: shopItems.price,
+          icon: shopItems.icon,
+          rarity: shopItems.rarity,
+          isAvailable: shopItems.isAvailable,
+          metadata: shopItems.metadata,
+          createdAt: shopItems.createdAt,
+        },
+      })
+      .from(userInventory)
+      .leftJoin(shopItems, eq(userInventory.itemId, shopItems.id))
+      .where(eq(userInventory.userId, userId))
+      .orderBy(desc(userInventory.obtainedAt));
+  }
+
+  async addToInventory(userId: string, itemId: string, quantity: number = 1): Promise<UserInventory> {
+    const [existingItem] = await db
+      .select()
+      .from(userInventory)
+      .where(and(
+        eq(userInventory.userId, userId),
+        eq(userInventory.itemId, itemId)
+      ));
+
+    if (existingItem) {
+      // Update existing quantity
+      const [updated] = await db
+        .update(userInventory)
+        .set({ quantity: existingItem.quantity + quantity })
+        .where(and(
+          eq(userInventory.userId, userId),
+          eq(userInventory.itemId, itemId)
+        ))
+        .returning();
+      return updated;
+    } else {
+      // Create new inventory item
+      const [newItem] = await db
+        .insert(userInventory)
+        .values({
+          userId,
+          itemId,
+          quantity,
+        })
+        .returning();
+      return newItem;
+    }
+  }
+
+  async removeFromInventory(userId: string, itemId: string, quantity: number = 1): Promise<void> {
+    const [existingItem] = await db
+      .select()
+      .from(userInventory)
+      .where(and(
+        eq(userInventory.userId, userId),
+        eq(userInventory.itemId, itemId)
+      ));
+
+    if (!existingItem) {
+      throw new Error('Item not found in inventory');
+    }
+
+    if (existingItem.quantity <= quantity) {
+      // Remove item entirely
+      await db
+        .delete(userInventory)
+        .where(and(
+          eq(userInventory.userId, userId),
+          eq(userInventory.itemId, itemId)
+        ));
+    } else {
+      // Decrease quantity
+      await db
+        .update(userInventory)
+        .set({ quantity: existingItem.quantity - quantity })
+        .where(and(
+          eq(userInventory.userId, userId),
+          eq(userInventory.itemId, itemId)
+        ));
+    }
+  }
+
+  // Coin operations
+  async getUserCoins(userId: string): Promise<number> {
+    const [user] = await db.select({ coins: users.coins }).from(users).where(eq(users.id, userId));
+    return user?.coins || 0;
+  }
+
+  async addCoins(userId: string, amount: number): Promise<void> {
+    await db
+      .update(users)
+      .set({ coins: sql`${users.coins} + ${amount}` })
+      .where(eq(users.id, userId));
+  }
+
+  async deductCoins(userId: string, amount: number): Promise<boolean> {
+    const [user] = await db.select({ coins: users.coins }).from(users).where(eq(users.id, userId));
+    if (!user || (user.coins || 0) < amount) {
+      return false;
+    }
+
+    await db
+      .update(users)
+      .set({ coins: (user.coins || 0) - amount })
+      .where(eq(users.id, userId));
+    
+    return true;
   }
 }
 
