@@ -386,6 +386,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Recalculate user stats
+  app.post('/api/users/recalculate-stats', requireAuth, async (req: any, res) => {
+    try {
+      const { userId } = req.body;
+      
+      if (userId) {
+        // Recalculate for specific user
+        await storage.recalculateUserStats(userId);
+        res.json({ success: true, message: 'User stats recalculated successfully' });
+      } else {
+        // Recalculate for all users
+        await storage.recalculateAllUserStats();
+        res.json({ success: true, message: 'All user stats recalculated successfully' });
+      }
+    } catch (error) {
+      console.error("Error recalculating user stats:", error);
+      res.status(500).json({ error: `Failed to recalculate user stats: ${error.message}` });
+    }
+  });
+
   // Send chat message
   app.post('/api/chat/send', requireAuth, async (req: any, res) => {
     try {

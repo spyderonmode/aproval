@@ -31,7 +31,7 @@ import {
   type InsertFriendship,
 } from "@shared/schema";
 import { db } from "./db";
-import { eq, and, desc, count, or, ne, isNull, isNotNull, sql } from "drizzle-orm";
+import { eq, and, desc, count, or, ne, isNull, isNotNull, sql, exists } from "drizzle-orm";
 
 export interface IStorage {
   // User operations - mandatory for Replit Auth
@@ -283,6 +283,67 @@ export class DatabaseStorage implements IStorage {
     if (result === 'draw') updates.draws = (user.draws || 0) + 1;
 
     await db.update(users).set(updates).where(eq(users.id, userId));
+  }
+
+  async recalculateUserStats(userId: string): Promise<void> {
+    // Get all finished games for this user
+    const userGames = await db
+      .select()
+      .from(games)
+      .where(and(
+        eq(games.status, 'finished'),
+        or(
+          eq(games.playerXId, userId),
+          eq(games.playerOId, userId)
+        )
+      ));
+
+    let wins = 0;
+    let losses = 0;
+    let draws = 0;
+
+    userGames.forEach(game => {
+      if (game.winnerId === userId) {
+        wins++;
+      } else if (game.winnerId === null) {
+        draws++;
+      } else {
+        losses++;
+      }
+    });
+
+    // Update user stats in database
+    await db.update(users).set({
+      wins: wins,
+      losses: losses,
+      draws: draws
+    }).where(eq(users.id, userId));
+  }
+
+  async recalculateAllUserStats(): Promise<void> {
+    // Get all users who have played games
+    const allUsers = await db
+      .select({ id: users.id })
+      .from(users)
+      .where(
+        exists(
+          db.select().from(games).where(
+            or(
+              eq(games.playerXId, users.id),
+              eq(games.playerOId, users.id)
+            )
+          )
+        )
+      );
+
+    console.log(`🔄 Recalculating stats for ${allUsers.length} users...`);
+
+    for (const user of allUsers) {
+      await this.recalculateUserStats(user.id);
+      console.log(`✅ Updated stats for user: ${user.id}`);
+    }
+
+    console.log('🎉 User stats recalculation completed!');
   }
 
   async getUserStats(userId: string): Promise<{ wins: number; losses: number; draws: number }> {

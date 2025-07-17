@@ -202,6 +202,15 @@ export function setupAuth(app: Express) {
   // Sync all existing users to database on startup
   syncAllUsersToDatabase();
   
+  // Recalculate all user stats to ensure they're up to date
+  setTimeout(async () => {
+    try {
+      await storage.recalculateAllUserStats();
+    } catch (error) {
+      console.error('Failed to recalculate user stats:', error);
+    }
+  }, 5000); // Wait 5 seconds to ensure database sync is complete
+  
   // Session middleware
   app.use(session({
     secret: process.env.SESSION_SECRET || 'your-secret-key-change-in-production',
