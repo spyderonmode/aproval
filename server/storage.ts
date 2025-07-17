@@ -124,6 +124,7 @@ export class DatabaseStorage implements IStorage {
         sql`LOWER(${users.firstName}) LIKE LOWER(${searchTerm})`,
         sql`LOWER(${users.lastName}) LIKE LOWER(${searchTerm})`,
         sql`LOWER(${users.displayName}) LIKE LOWER(${searchTerm})`,
+        sql`LOWER(${users.username}) LIKE LOWER(${searchTerm})`,
         sql`LOWER(${users.firstName} || ' ' || ${users.lastName}) LIKE LOWER(${searchTerm})`
       )
     ).limit(10);

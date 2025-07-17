@@ -32,6 +32,7 @@ export const users = pgTable("users", {
   firstName: varchar("first_name"),
   lastName: varchar("last_name"),
   displayName: varchar("display_name"),
+  username: varchar("username").unique(),
   profileImageUrl: varchar("profile_image_url"),
   wins: integer("wins").default(0),
   losses: integer("losses").default(0),
