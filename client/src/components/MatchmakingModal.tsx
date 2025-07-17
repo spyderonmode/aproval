@@ -7,8 +7,6 @@ import { Card, CardContent } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { isUnauthorizedError } from "@/lib/authUtils";
 import { Loader2, Users, X, Zap } from "lucide-react";
-import { TicTacToeLoader } from "@/components/TicTacToeLoader";
-import { ProgressBar } from "@/components/ProgressBar";
 
 interface MatchmakingModalProps {
   open: boolean;
@@ -171,7 +169,7 @@ export function MatchmakingModal({ open, onClose, onMatchFound, user }: Matchmak
             <div className="text-center space-y-4">
               <div className="p-6 bg-gradient-to-r from-yellow-50 to-orange-50 dark:from-yellow-900/20 dark:to-orange-900/20 rounded-lg">
                 <div className="flex items-center justify-center mb-4">
-                  <TicTacToeLoader size="md" speed="fast" />
+                  <Loader2 className="h-8 w-8 text-yellow-500 animate-spin" />
                 </div>
                 <h3 className="font-semibold text-lg mb-2">Searching for Opponent</h3>
                 <p className="text-sm text-gray-600 dark:text-gray-300">
@@ -199,11 +197,12 @@ export function MatchmakingModal({ open, onClose, onMatchFound, user }: Matchmak
                       </div>
                     </div>
                     
-                    <ProgressBar
-                      progress={Math.min((searchTime / 30) * 100, 100)}
-                      variant="gradient"
-                      size="sm"
-                    />
+                    <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                      <div 
+                        className="bg-gradient-to-r from-blue-500 to-purple-500 h-2 rounded-full transition-all duration-1000"
+                        style={{ width: `${Math.min((searchTime / 30) * 100, 100)}%` }}
+                      ></div>
+                    </div>
                     
                     <div className="text-xs text-gray-500 text-center">
                       {searchTime < 10 ? "Finding the perfect opponent..." : 
