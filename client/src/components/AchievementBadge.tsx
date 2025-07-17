@@ -37,7 +37,7 @@ export function AchievementBadge({ achievement, size = 'md' }: AchievementBadgeP
         </div>
         
         {/* Tooltip on hover */}
-        <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-3 px-3 py-2 bg-gray-900 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-50 shadow-2xl border border-gray-700 w-44 max-w-[90vw]">
+        <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-3 px-3 py-2 bg-gray-900 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-50 shadow-2xl border border-gray-700 w-44 max-w-[90vw] pointer-events-none">
           <div className="font-bold text-amber-300 mb-1 text-center text-xs">{achievement.achievementName}</div>
           <div className="text-gray-200 text-xs text-center leading-tight">{achievement.description}</div>
           {/* Arrow pointing down */}

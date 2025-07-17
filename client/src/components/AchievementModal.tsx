@@ -52,8 +52,8 @@ export function AchievementModal({ open, onClose, userId }: AchievementModalProp
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="max-w-4xl max-h-[80vh] w-[95vw] sm:w-full mx-auto">
-        <DialogHeader>
+      <DialogContent className="max-w-4xl max-h-[85vh] w-[95vw] sm:w-full mx-auto flex flex-col">
+        <DialogHeader className="flex-shrink-0">
           <DialogTitle className="flex items-center gap-2 text-lg sm:text-xl">
             <Trophy className="w-5 h-5 sm:w-6 sm:h-6" />
             {userId ? 'Player Achievements' : 'Your Achievements'}
@@ -61,12 +61,12 @@ export function AchievementModal({ open, onClose, userId }: AchievementModalProp
         </DialogHeader>
 
         {isLoading ? (
-          <div className="flex items-center justify-center py-8">
+          <div className="flex items-center justify-center py-8 flex-1">
             <Loader2 className="w-8 h-8 animate-spin" />
           </div>
         ) : (
-          <ScrollArea className="max-h-[60vh]">
-            <div className="space-y-6">
+          <ScrollArea className="flex-1 min-h-0">
+            <div className="space-y-6 pb-4">
               {achievementCategories.map((category) => {
                 const categoryAchievements = getAchievementsByCategory(category.types);
                 const possibleAchievements = allPossibleAchievements.filter(a => category.types.includes(a.type));
@@ -109,7 +109,7 @@ export function AchievementModal({ open, onClose, userId }: AchievementModalProp
                               </div>
                               
                               {/* Tooltip for locked achievements */}
-                              <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-3 px-3 py-2 bg-red-900 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-50 shadow-2xl border border-red-700 w-44 max-w-[90vw]">
+                              <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-3 px-3 py-2 bg-red-900 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-50 shadow-2xl border border-red-700 w-44 max-w-[90vw] pointer-events-none">
                                 <div className="font-bold text-red-300 mb-1 text-center text-xs">🔒 {possible.name}</div>
                                 <div className="text-gray-200 text-xs text-center leading-tight">{possible.description}</div>
                                 {/* Arrow pointing down */}
@@ -134,8 +134,8 @@ export function AchievementModal({ open, onClose, userId }: AchievementModalProp
           </ScrollArea>
         )}
 
-        <div className="flex justify-end">
-          <Button onClick={onClose}>Close</Button>
+        <div className="flex justify-end pt-4 border-t border-gray-200 dark:border-gray-700 flex-shrink-0">
+          <Button onClick={onClose} variant="default">Close</Button>
         </div>
       </DialogContent>
     </Dialog>
