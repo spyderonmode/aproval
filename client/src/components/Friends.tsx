@@ -8,17 +8,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Users, UserPlus, UserCheck, UserX, Trophy, TrendingUp, Calendar, Loader2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { apiRequest } from '@/lib/queryClient';
-
-interface User {
-  id: string;
-  email: string;
-  firstName: string;
-  lastName: string;
-  profileImageUrl: string | null;
-  wins: number;
-  losses: number;
-  draws: number;
-}
+import { User } from '@shared/schema';
 
 interface FriendRequest {
   id: string;
@@ -226,17 +216,17 @@ export function Friends() {
                       {friend.profileImageUrl ? (
                         <img
                           src={friend.profileImageUrl}
-                          alt={`${friend.firstName} ${friend.lastName}`}
+                          alt={friend.displayName || `${friend.firstName} ${friend.lastName || ''}`.trim()}
                           className="w-10 h-10 rounded-full"
                         />
                       ) : (
                         <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-medium">
-                          {friend.firstName[0]}{friend.lastName[0]}
+                          {friend.firstName?.[0] || '?'}{friend.lastName?.[0] || ''}
                         </div>
                       )}
                       <div>
                         <div className="font-medium">
-                          {friend.firstName} {friend.lastName}
+                          {friend.displayName || `${friend.firstName} ${friend.lastName || ''}`.trim()}
                         </div>
                         <div className="text-sm text-muted-foreground">
                           {friend.wins}W-{friend.losses}L-{friend.draws}D
@@ -277,17 +267,17 @@ export function Friends() {
                       {request.requester.profileImageUrl ? (
                         <img
                           src={request.requester.profileImageUrl}
-                          alt={`${request.requester.firstName} ${request.requester.lastName}`}
+                          alt={request.requester.displayName || `${request.requester.firstName} ${request.requester.lastName || ''}`.trim()}
                           className="w-10 h-10 rounded-full"
                         />
                       ) : (
                         <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-medium">
-                          {request.requester.firstName[0]}{request.requester.lastName[0]}
+                          {request.requester.firstName?.[0] || '?'}{request.requester.lastName?.[0] || ''}
                         </div>
                       )}
                       <div>
                         <div className="font-medium">
-                          {request.requester.firstName} {request.requester.lastName}
+                          {request.requester.displayName || `${request.requester.firstName} ${request.requester.lastName || ''}`.trim()}
                         </div>
                         <div className="text-sm text-muted-foreground">
                           Sent on {formatDate(request.sentAt)}
@@ -356,17 +346,17 @@ export function Friends() {
                       {user.profileImageUrl ? (
                         <img
                           src={user.profileImageUrl}
-                          alt={`${user.firstName} ${user.lastName}`}
+                          alt={user.displayName || `${user.firstName} ${user.lastName || ''}`.trim()}
                           className="w-10 h-10 rounded-full"
                         />
                       ) : (
                         <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-medium">
-                          {user.firstName[0]}{user.lastName[0]}
+                          {user.firstName?.[0] || '?'}{user.lastName?.[0] || ''}
                         </div>
                       )}
                       <div>
                         <div className="font-medium">
-                          {user.firstName} {user.lastName}
+                          {user.displayName || `${user.firstName} ${user.lastName || ''}`.trim()}
                         </div>
                         <div className="text-sm text-muted-foreground">
                           {user.wins}W-{user.losses}L-{user.draws}D
@@ -394,7 +384,7 @@ export function Friends() {
             <DialogContent className="sm:max-w-[500px]">
               <DialogHeader>
                 <DialogTitle>
-                  Head-to-Head with {selectedFriend.firstName} {selectedFriend.lastName}
+                  Head-to-Head with {selectedFriend.displayName || `${selectedFriend.firstName} ${selectedFriend.lastName || ''}`.trim()}
                 </DialogTitle>
               </DialogHeader>
               
