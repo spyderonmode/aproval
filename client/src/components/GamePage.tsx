@@ -35,6 +35,23 @@ export function GamePage({ onPageChange }: GamePageProps) {
   const [showMatchmaking, setShowMatchmaking] = useState(false);
   const [isMatchmaking, setIsMatchmaking] = useState(false);
 
+  // Handle quick match event from HomePage
+  useEffect(() => {
+    const handleQuickMatch = () => {
+      setIsMatchmaking(true);
+      setShowMatchmaking(true);
+      // Start matchmaking
+      sendMessage({
+        type: 'find_match',
+        userId: user?.userId || user?.id,
+        playerName: user?.displayName || user?.firstName || user?.username || 'Player'
+      });
+    };
+
+    window.addEventListener('quickMatch', handleQuickMatch);
+    return () => window.removeEventListener('quickMatch', handleQuickMatch);
+  }, [user, sendMessage]);
+
   // Handle WebSocket messages
   useEffect(() => {
     if (lastMessage) {

@@ -157,7 +157,19 @@ export function HomePage({ onPageChange, onlineUserCount }: HomePageProps) {
             Start Playing Now
           </Button>
           
-          <div className="grid grid-cols-2 gap-2">
+          <div className="grid grid-cols-3 gap-2">
+            <Button
+              variant="outline"
+              onClick={() => {
+                // Quick Match functionality
+                window.dispatchEvent(new CustomEvent('quickMatch'));
+                onPageChange('game');
+              }}
+              className="h-10"
+            >
+              <Zap className="w-4 h-4 mr-2" />
+              Quick Match
+            </Button>
             <Button
               variant="outline"
               onClick={() => onPageChange('chat')}

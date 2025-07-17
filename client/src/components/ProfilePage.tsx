@@ -22,13 +22,27 @@ export function ProfilePage() {
 
   const handleSaveProfile = async () => {
     try {
-      // Here you would typically make an API call to update the profile
-      // For now, we'll just show a success message
-      toast({
-        title: "Profile Updated",
-        description: "Your profile has been successfully updated.",
+      const response = await fetch('/api/auth/profile', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          displayName: displayName,
+        }),
       });
-      setIsEditing(false);
+
+      if (response.ok) {
+        toast({
+          title: "Profile Updated",
+          description: "Your profile has been successfully updated.",
+        });
+        setIsEditing(false);
+        // Refresh the page to show updated info
+        window.location.reload();
+      } else {
+        throw new Error('Failed to update profile');
+      }
     } catch (error) {
       toast({
         title: "Error",
