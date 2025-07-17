@@ -12,7 +12,9 @@ import Auth from "@/pages/auth";
 import VerifyEmail from "@/pages/verify-email";
 import ResetPassword from "@/pages/reset-password";
 import NotFound from "@/pages/not-found";
+import LoadingDemo from "@/pages/loading-demo";
 import { Component } from "react";
+import { LoadingScreen } from "@/components/LoadingScreen";
 
 // Error boundary to catch white screen crashes
 class ErrorBoundary extends Component<
@@ -60,9 +62,11 @@ function Router() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center">
-        <div className="text-white">Loading...</div>
-      </div>
+      <LoadingScreen
+        variant="tictactoe"
+        message="Loading application..."
+        fullscreen={true}
+      />
     );
   }
 
@@ -78,6 +82,7 @@ function Router() {
       </Route>
       <Route path="/verify-email" component={VerifyEmail} />
       <Route path="/reset-password" component={ResetPassword} />
+      <Route path="/loading-demo" component={LoadingDemo} />
       <Route path="/not-found" component={NotFound} />
       <Route path="/">
         {isAuthenticated && user?.isEmailVerified ? <Home /> : <Auth />}

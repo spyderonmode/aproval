@@ -9,6 +9,7 @@ import { Users, UserPlus, UserCheck, UserX, Trophy, TrendingUp, Calendar, Loader
 import { useToast } from '@/hooks/use-toast';
 import { apiRequest } from '@/lib/queryClient';
 import { User } from '@shared/schema';
+import { LoadingSpinner } from '@/components/LoadingSpinner';
 
 interface FriendRequest {
   id: string;
@@ -199,7 +200,10 @@ export function Friends() {
           
           <TabsContent value="friends" className="space-y-4">
             {friendsLoading ? (
-              <div className="text-center py-8">Loading friends...</div>
+              <div className="text-center py-8">
+                <LoadingSpinner variant="dots" />
+                <p className="mt-2 text-sm text-muted-foreground">Loading friends...</p>
+              </div>
             ) : friends.length === 0 ? (
               <div className="text-center py-8 text-muted-foreground">
                 No friends yet. Add some friends to get started!
@@ -251,7 +255,10 @@ export function Friends() {
           
           <TabsContent value="requests" className="space-y-4">
             {requestsLoading ? (
-              <div className="text-center py-8">Loading requests...</div>
+              <div className="text-center py-8">
+                <LoadingSpinner variant="dots" />
+                <p className="mt-2 text-sm text-muted-foreground">Loading requests...</p>
+              </div>
             ) : friendRequests.length === 0 ? (
               <div className="text-center py-8 text-muted-foreground">
                 No pending friend requests
@@ -328,7 +335,7 @@ export function Friends() {
                   onClick={findUsersByName}
                   disabled={!searchName.trim() || isSearching}
                 >
-                  {isSearching ? <Loader2 className="h-4 w-4 animate-spin" /> : <UserPlus className="h-4 w-4" />}
+                  {isSearching ? <LoadingSpinner size="sm" /> : <UserPlus className="h-4 w-4" />}
                 </Button>
               </div>
             </div>

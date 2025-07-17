@@ -758,6 +758,25 @@ export default function Home() {
                       </Button>
                     </div>
                     
+                    {/* Loading Demo */}
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center space-x-2">
+                        <Loader2 className="w-4 h-4 text-gray-400" />
+                        <span className="text-sm text-gray-300">Loading Demo</span>
+                      </div>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => {
+                          setShowHeaderSidebar(false);
+                          window.location.href = '/loading-demo';
+                        }}
+                        className="bg-slate-700 border-slate-600 text-white hover:bg-slate-600 text-xs"
+                      >
+                        View
+                      </Button>
+                    </div>
+                    
                     {/* Logout */}
                     <div className="border-t border-slate-700 pt-2">
                       <Button

@@ -8,6 +8,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
 import { EmailVerificationModal } from "@/components/EmailVerificationModal";
 import { ForgotPasswordModal } from "@/components/ForgotPasswordModal";
+import { LoadingSpinner } from "@/components/LoadingSpinner";
 import { GamepadIcon, Mail } from "lucide-react";
 
 export default function Auth() {
@@ -182,7 +183,12 @@ export default function Auth() {
                 className="w-full bg-primary hover:bg-primary/90"
                 disabled={isLoading}
               >
-                {isLoading ? "Please wait..." : (isLogin ? "Sign In" : "Sign Up")}
+                {isLoading ? (
+                  <div className="flex items-center space-x-2">
+                    <LoadingSpinner size="sm" variant="dots" />
+                    <span>Please wait...</span>
+                  </div>
+                ) : (isLogin ? "Sign In" : "Sign Up")}
               </Button>
             </form>
             

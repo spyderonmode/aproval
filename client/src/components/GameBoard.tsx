@@ -11,6 +11,8 @@ import { motion, AnimatePresence } from "framer-motion"; // Added back for winni
 import { useTheme } from "@/contexts/ThemeContext";
 import { User, MessageCircle } from "lucide-react";
 import { QuickChatPanel } from '@/components/QuickChatPanel';
+import { GameBoardLoader } from '@/components/GameBoardLoader';
+import { LoadingSpinner } from '@/components/LoadingSpinner';
 
 const VALID_POSITIONS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15];
 
@@ -183,6 +185,7 @@ export function GameBoard({ game, onGameOver, gameMode, user, lastMessage, sendM
   const [currentPlayer, setCurrentPlayer] = useState<'X' | 'O'>('X');
   const [winningLine, setWinningLine] = useState<number[] | null>(null);
   const [lastMove, setLastMove] = useState<number | null>(null);
+  const [isGameInitializing, setIsGameInitializing] = useState(true);
   
   const [opponent, setOpponent] = useState<any>(null);
   
@@ -299,6 +302,16 @@ export function GameBoard({ game, onGameOver, gameMode, user, lastMessage, sendM
       
       const gameBoard = game.board || {};
       const isNewGame = Object.keys(gameBoard).length === 0;
+      
+      // Show loading for a brief moment on new games
+      if (isNewGame) {
+        setIsGameInitializing(true);
+        setTimeout(() => {
+          setIsGameInitializing(false);
+        }, 1500);
+      } else {
+        setIsGameInitializing(false);
+      }
       
       // For local games, only set board if it's truly empty (new game)
       if (game.id.startsWith('local-game')) {
@@ -862,6 +875,15 @@ export function GameBoard({ game, onGameOver, gameMode, user, lastMessage, sendM
   };
 
   const theme = themes[currentTheme];
+  
+  // Show loading screen during game initialization
+  if (isGameInitializing) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <GameBoardLoader message="Initializing game..." />
+      </div>
+    );
+  }
   
   return (
     <Card className={`${theme.boardStyle}`}>
