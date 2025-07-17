@@ -363,23 +363,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Search users by email
+  // Search users by name
   app.post('/api/users/search', requireAuth, async (req: any, res) => {
     try {
-      const { email } = req.body;
+      const { name } = req.body;
       
-      if (!email) {
-        return res.status(400).json({ error: 'Email is required' });
+      if (!name) {
+        return res.status(400).json({ error: 'Name is required' });
       }
       
-      // Search for user by email
-      const users = await storage.getUserByEmail(email);
+      // Search for user by name
+      const users = await storage.getUsersByName(name);
       
-      if (!users) {
-        return res.status(404).json({ error: 'User not found' });
+      if (!users || users.length === 0) {
+        return res.status(404).json({ error: 'No users found' });
       }
       
-      res.json({ user: users });
+      res.json({ users });
     } catch (error) {
       console.error("Error searching users:", error);
       res.status(500).json({ message: "Failed to search users" });

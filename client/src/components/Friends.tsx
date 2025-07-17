@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Users, UserPlus, UserCheck, UserX, Trophy, TrendingUp, Calendar } from 'lucide-react';
+import { Users, UserPlus, UserCheck, UserX, Trophy, TrendingUp, Calendar, Loader2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { apiRequest } from '@/lib/queryClient';
 
@@ -42,7 +42,7 @@ interface HeadToHeadStats {
 
 export function Friends() {
   const [isOpen, setIsOpen] = useState(false);
-  const [searchEmail, setSearchEmail] = useState('');
+  const [searchName, setSearchName] = useState('');
   const [selectedFriend, setSelectedFriend] = useState<User | null>(null);
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -78,7 +78,8 @@ export function Friends() {
         title: "Success",
         description: "Friend request sent successfully",
       });
-      setSearchEmail('');
+      setSearchName('');
+      setSearchResults([]);
       queryClient.invalidateQueries({ queryKey: ['/api/friends/requests'] });
     },
     onError: (error: any) => {
@@ -139,25 +140,33 @@ export function Friends() {
     },
   });
 
-  // Find user by email for friend requests
-  const findUserByEmail = async () => {
-    if (!searchEmail.trim()) return;
+  // State for search results
+  const [searchResults, setSearchResults] = useState<User[]>([]);
+  const [isSearching, setIsSearching] = useState(false);
 
+  // Find users by name for friend requests
+  const findUsersByName = async () => {
+    if (!searchName.trim()) return;
+
+    setIsSearching(true);
     try {
       const response = await apiRequest('/api/users/search', {
         method: 'POST',
-        body: { email: searchEmail.trim() },
+        body: { name: searchName.trim() },
       });
       
-      if (response.user) {
-        sendFriendRequest.mutate(response.user.id);
+      if (response.users) {
+        setSearchResults(response.users);
       }
     } catch (error: any) {
       toast({
         title: "Error",
-        description: error.message || "User not found",
+        description: error.message || "No users found",
         variant: "destructive",
       });
+      setSearchResults([]);
+    } finally {
+      setIsSearching(false);
     }
   };
 
@@ -310,30 +319,73 @@ export function Friends() {
           
           <TabsContent value="add" className="space-y-4">
             <div className="space-y-2">
-              <label htmlFor="email" className="text-sm font-medium">
-                Find friend by email
+              <label htmlFor="name" className="text-sm font-medium">
+                Find friend by name
               </label>
               <div className="flex gap-2">
                 <Input
-                  id="email"
-                  type="email"
-                  placeholder="Enter email address"
-                  value={searchEmail}
-                  onChange={(e) => setSearchEmail(e.target.value)}
+                  id="name"
+                  type="text"
+                  placeholder="Enter name to search"
+                  value={searchName}
+                  onChange={(e) => setSearchName(e.target.value)}
                   onKeyDown={(e) => {
                     if (e.key === 'Enter') {
-                      findUserByEmail();
+                      findUsersByName();
                     }
                   }}
                 />
                 <Button
-                  onClick={findUserByEmail}
-                  disabled={!searchEmail.trim() || sendFriendRequest.isPending}
+                  onClick={findUsersByName}
+                  disabled={!searchName.trim() || isSearching}
                 >
-                  <UserPlus className="h-4 w-4" />
+                  {isSearching ? <Loader2 className="h-4 w-4 animate-spin" /> : <UserPlus className="h-4 w-4" />}
                 </Button>
               </div>
             </div>
+            
+            {/* Search Results */}
+            {searchResults.length > 0 && (
+              <div className="space-y-2">
+                <div className="text-sm font-medium">Search Results:</div>
+                {searchResults.map((user) => (
+                  <div
+                    key={user.id}
+                    className="flex items-center justify-between p-3 border rounded-lg hover:bg-accent"
+                  >
+                    <div className="flex items-center gap-3">
+                      {user.profileImageUrl ? (
+                        <img
+                          src={user.profileImageUrl}
+                          alt={`${user.firstName} ${user.lastName}`}
+                          className="w-10 h-10 rounded-full"
+                        />
+                      ) : (
+                        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-medium">
+                          {user.firstName[0]}{user.lastName[0]}
+                        </div>
+                      )}
+                      <div>
+                        <div className="font-medium">
+                          {user.firstName} {user.lastName}
+                        </div>
+                        <div className="text-sm text-muted-foreground">
+                          {user.wins}W-{user.losses}L-{user.draws}D
+                        </div>
+                      </div>
+                    </div>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => sendFriendRequest.mutate(user.id)}
+                      disabled={sendFriendRequest.isPending}
+                    >
+                      <UserPlus className="h-4 w-4" />
+                    </Button>
+                  </div>
+                ))}
+              </div>
+            )}
           </TabsContent>
         </Tabs>
         

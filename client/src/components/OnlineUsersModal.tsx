@@ -8,7 +8,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
-import { User, MessageCircle, Clock, Users, Send, UserX, UserCheck, Eye } from "lucide-react";
+import { User, MessageCircle, Clock, Users, Send, UserX, UserCheck, Eye, UserPlus } from "lucide-react";
 import { UserProfileModal } from "./UserProfileModal";
 
 interface OnlineUsersModalProps {
@@ -50,7 +50,10 @@ export function OnlineUsersModal({ open, onClose, currentRoom, user }: OnlineUse
 
   const sendMessageMutation = useMutation({
     mutationFn: async ({ targetUserId, message }: { targetUserId: string; message: string }) => {
-      return await apiRequest('POST', '/api/chat/send', { targetUserId, message });
+      return await apiRequest('/api/chat/send', {
+        method: 'POST',
+        body: { targetUserId, message },
+      });
     },
     onSuccess: () => {
       if (selectedUser) {
@@ -83,7 +86,10 @@ export function OnlineUsersModal({ open, onClose, currentRoom, user }: OnlineUse
 
   const blockUserMutation = useMutation({
     mutationFn: async (userId: string) => {
-      return await apiRequest('POST', '/api/users/block', { userId });
+      return await apiRequest('/api/users/block', {
+        method: 'POST',
+        body: { userId },
+      });
     },
     onSuccess: (_, userId) => {
       setBlockedUsers(prev => new Set(prev).add(userId));
@@ -104,7 +110,10 @@ export function OnlineUsersModal({ open, onClose, currentRoom, user }: OnlineUse
 
   const unblockUserMutation = useMutation({
     mutationFn: async (userId: string) => {
-      return await apiRequest('POST', '/api/users/unblock', { userId });
+      return await apiRequest('/api/users/unblock', {
+        method: 'POST',
+        body: { userId },
+      });
     },
     onSuccess: (_, userId) => {
       setBlockedUsers(prev => {
@@ -127,6 +136,29 @@ export function OnlineUsersModal({ open, onClose, currentRoom, user }: OnlineUse
     },
   });
 
+  const sendFriendRequestMutation = useMutation({
+    mutationFn: async (requestedId: string) => {
+      return await apiRequest('/api/friends/request', {
+        method: 'POST',
+        body: { requestedId },
+      });
+    },
+    onSuccess: () => {
+      toast({
+        title: "Success",
+        description: "Friend request sent successfully",
+      });
+      queryClient.invalidateQueries({ queryKey: ['/api/friends/requests'] });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to send friend request",
+        variant: "destructive",
+      });
+    },
+  });
+
   const handleSendMessage = () => {
     if (!chatMessage.trim() || !selectedUser) return;
     
@@ -142,6 +174,10 @@ export function OnlineUsersModal({ open, onClose, currentRoom, user }: OnlineUse
 
   const handleUnblockUser = (userId: string) => {
     unblockUserMutation.mutate(userId);
+  };
+
+  const handleSendFriendRequest = (userId: string) => {
+    sendFriendRequestMutation.mutate(userId);
   };
 
   const handleViewProfile = (user: any) => {
@@ -328,6 +364,17 @@ export function OnlineUsersModal({ open, onClose, currentRoom, user }: OnlineUse
                                     Profile
                                   </Button>
                                   
+                                  <Button
+                                    size="sm"
+                                    variant="outline"
+                                    onClick={() => handleSendFriendRequest(user.userId)}
+                                    disabled={sendFriendRequestMutation.isPending}
+                                    className="text-blue-600 hover:text-blue-700"
+                                  >
+                                    <UserPlus className="h-4 w-4 mr-1" />
+                                    Add Friend
+                                  </Button>
+                                  
                                   {isBlocked ? (
                                     <Button
                                       size="sm"
@@ -415,6 +462,17 @@ export function OnlineUsersModal({ open, onClose, currentRoom, user }: OnlineUse
                 </div>
                 
                 <div className="flex items-center gap-2">
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => handleSendFriendRequest(selectedUser.userId)}
+                    disabled={sendFriendRequestMutation.isPending}
+                    className="text-blue-600 hover:text-blue-700"
+                  >
+                    <UserPlus className="h-4 w-4 mr-1" />
+                    Add Friend
+                  </Button>
+                  
                   {blockedUsers.has(selectedUser.userId) ? (
                     <Button
                       size="sm"
