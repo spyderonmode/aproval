@@ -143,15 +143,24 @@ export function Friends() {
     setIsSearching(true);
     try {
       const response = await apiRequest('POST', '/api/users/search', { name: searchName.trim() });
+      
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || errorData.message || `HTTP ${response.status}`);
+      }
+      
       const data = await response.json();
       
       if (data.users) {
         setSearchResults(data.users);
+      } else {
+        setSearchResults([]);
       }
     } catch (error: any) {
+      console.error("Friend search error:", error);
       toast({
-        title: "Error",
-        description: error.message || "No users found",
+        title: "Search Error",
+        description: error.message || "Failed to search for users",
         variant: "destructive",
       });
       setSearchResults([]);

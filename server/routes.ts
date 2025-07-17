@@ -382,7 +382,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json({ users });
     } catch (error) {
       console.error("Error searching users:", error);
-      res.status(500).json({ message: "Failed to search users" });
+      res.status(500).json({ error: `Failed to search users: ${error.message}` });
     }
   });
 

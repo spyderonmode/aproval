@@ -91,6 +91,7 @@ async function createUser(username: string, password: string, email?: string): P
       id: newUser.id,
       email: email || null,
       firstName: newUser.displayName || newUser.username,
+      displayName: newUser.displayName || newUser.username,
       lastName: null,
       profileImageUrl: newUser.profilePicture || null,
     });
@@ -182,6 +183,7 @@ async function syncAllUsersToDatabase() {
         email: user.email || null,
         firstName: user.displayName || user.username || 'Anonymous',
         lastName: null,
+        displayName: user.displayName || user.username || 'Anonymous',
         profileImageUrl: user.profilePicture || null,
       });
       console.log(`✅ Synced user: ${user.username} (${user.id})`);
