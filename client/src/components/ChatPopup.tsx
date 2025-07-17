@@ -70,15 +70,15 @@ export function ChatPopup({
     }
   }, [initialMessage, initialSender]);
 
-  // Handle additional incoming messages from WebSocket (for the same chat user)
+  // Handle additional incoming messages from WebSocket (only for continuation of existing chat)
   useEffect(() => {
     const handleChatMessage = (event: CustomEvent) => {
       const data = event.detail;
       
-      if (data.type === 'chat_message_received' && activeChatUser) {
+      if (data.type === 'chat_message_received' && activeChatUser && isOpen) {
         // Only add message if it's from the current active chat user
-        // and we're not showing the initial popup message
-        if (activeChatUser.userId === data.message.senderId && isOpen) {
+        // and it's not the initial message (which comes through props)
+        if (activeChatUser.userId === data.message.senderId) {
           const incomingMessage: ChatMessage = {
             id: Date.now().toString(),
             senderId: data.message.senderId,
@@ -88,19 +88,10 @@ export function ChatPopup({
             fromMe: false
           };
           
-          // Check if this message is already in the list to prevent duplicates
-          setMessages(prev => {
-            const messageExists = prev.some(msg => 
-              msg.senderId === incomingMessage.senderId && 
-              msg.message === incomingMessage.message &&
-              Math.abs(new Date(msg.timestamp).getTime() - new Date(incomingMessage.timestamp).getTime()) < 1000
-            );
-            
-            if (!messageExists) {
-              return [...prev, incomingMessage];
-            }
-            return prev;
-          });
+          // Only add if it's not the initial message that triggered the popup
+          if (data.message.message !== initialMessage) {
+            setMessages(prev => [...prev, incomingMessage]);
+          }
         }
       }
     };
@@ -113,7 +104,7 @@ export function ChatPopup({
         window.removeEventListener('chat_message_received', handleChatMessage as EventListener);
       };
     }
-  }, [activeChatUser, isOpen]);
+  }, [activeChatUser, isOpen, initialMessage]);
 
   const sendMessageMutation = useMutation({
     mutationFn: async ({ targetUserId, message }: { targetUserId: string; message: string }) => {
