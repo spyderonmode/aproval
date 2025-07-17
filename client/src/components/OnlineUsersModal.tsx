@@ -10,7 +10,6 @@ import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { User, MessageCircle, Clock, Users, Send, UserX, UserCheck, Eye } from "lucide-react";
 import { UserProfileModal } from "./UserProfileModal";
-import { useChatContext } from "@/contexts/ChatContext";
 
 interface OnlineUsersModalProps {
   open: boolean;
@@ -22,9 +21,9 @@ interface OnlineUsersModalProps {
 export function OnlineUsersModal({ open, onClose, currentRoom, user }: OnlineUsersModalProps) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  const { chatHistory, addToHistory } = useChatContext();
   const [selectedUser, setSelectedUser] = useState<any>(null);
   const [chatMessage, setChatMessage] = useState("");
+  const [chatHistory, setChatHistory] = useState<Map<string, any[]>>(new Map());
   const [unreadMessages, setUnreadMessages] = useState<Map<string, number>>(new Map());
   const [blockedUsers, setBlockedUsers] = useState<Set<string>>(new Set());
   const [profileUser, setProfileUser] = useState<any>(null);
@@ -54,8 +53,22 @@ export function OnlineUsersModal({ open, onClose, currentRoom, user }: OnlineUse
       return await apiRequest('POST', '/api/chat/send', { targetUserId, message });
     },
     onSuccess: () => {
-      // Message will be added to history via WebSocket response
-      // No need to manually add sent messages here
+      if (selectedUser) {
+        // Add the sent message to chat history for this user
+        const newMessage = {
+          fromMe: true,
+          message: chatMessage,
+          timestamp: new Date().toLocaleTimeString(),
+          userId: user?.userId || user?.id
+        };
+        
+        setChatHistory(prev => {
+          const newHistory = new Map(prev);
+          const userMessages = newHistory.get(selectedUser.userId) || [];
+          newHistory.set(selectedUser.userId, [...userMessages, newMessage]);
+          return newHistory;
+        });
+      }
       setChatMessage("");
     },
     onError: (error: any) => {
@@ -136,8 +149,41 @@ export function OnlineUsersModal({ open, onClose, currentRoom, user }: OnlineUse
     setShowProfileModal(true);
   };
 
-  // Handle user offline events only (messages are handled by ChatPopup)
+  // Handle incoming chat messages and user offline events
   useEffect(() => {
+    const handleChatMessage = (event: CustomEvent) => {
+      const data = event.detail;
+      
+      if (data.type === 'chat_message_received') {
+        // Only handle messages if OnlineUsersModal is open and we're actively chatting
+        if (!open || !selectedUser) return;
+        
+        // Only handle messages from the currently selected user
+        if (selectedUser.userId !== data.message.senderId) return;
+        
+        // Check if sender is blocked
+        if (blockedUsers.has(data.message.senderId)) {
+          return; // Ignore messages from blocked users
+        }
+        
+        const incomingMessage = {
+          fromMe: false,
+          message: data.message.message,
+          timestamp: new Date(data.message.timestamp).toLocaleTimeString(),
+          userId: data.message.senderId,
+          senderName: data.message.senderName
+        };
+        
+        // Add to chat history for this sender
+        setChatHistory(prev => {
+          const newHistory = new Map(prev);
+          const userMessages = newHistory.get(data.message.senderId) || [];
+          newHistory.set(data.message.senderId, [...userMessages, incomingMessage]);
+          return newHistory;
+        });
+      }
+    };
+
     const handleUserOffline = (event: CustomEvent) => {
       const data = event.detail;
       
@@ -145,8 +191,12 @@ export function OnlineUsersModal({ open, onClose, currentRoom, user }: OnlineUse
         // Only handle if modal is open
         if (!open) return;
         
-        // Note: Chat history is now managed by ChatContext globally
-        // No need to manually remove chat history here
+        // Remove chat history for offline user
+        setChatHistory(prev => {
+          const newHistory = new Map(prev);
+          newHistory.delete(data.userId);
+          return newHistory;
+        });
         
         // Remove unread messages for offline user
         setUnreadMessages(prev => {
@@ -162,15 +212,17 @@ export function OnlineUsersModal({ open, onClose, currentRoom, user }: OnlineUse
       }
     };
 
-    // Only listen for user offline events when modal is open
+    // Only listen for events when modal is open
     if (open) {
+      window.addEventListener('chat_message_received', handleChatMessage as EventListener);
       window.addEventListener('user_offline', handleUserOffline as EventListener);
       
       return () => {
+        window.removeEventListener('chat_message_received', handleChatMessage as EventListener);
         window.removeEventListener('user_offline', handleUserOffline as EventListener);
       };
     }
-  }, [open, selectedUser]);
+  }, [open, selectedUser, blockedUsers]);
 
   // Get current chat messages for selected user
   const currentChatMessages = selectedUser ? chatHistory.get(selectedUser.userId) || [] : [];

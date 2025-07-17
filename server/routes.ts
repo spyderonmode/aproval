@@ -301,32 +301,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ error: 'Target user connection not found' });
       }
 
-      // Create message object with target user ID
-      const messageData = {
-        type: 'chat_message_received',
-        message: {
-          senderId,
-          senderName: senderInfo.displayName || senderInfo.username,
-          message,
-          timestamp: new Date().toISOString(),
-          targetUserId
-        }
-      };
-
       // Send to all active connections for the target user
       let messageSent = false;
       for (const targetConnection of targetConnections) {
         if (targetConnection.ws && targetConnection.ws.readyState === WebSocket.OPEN) {
-          targetConnection.ws.send(JSON.stringify(messageData));
+          targetConnection.ws.send(JSON.stringify({
+            type: 'chat_message_received',
+            message: {
+              senderId,
+              senderName: senderInfo.displayName || senderInfo.username,
+              message,
+              timestamp: new Date().toISOString()
+            }
+          }));
           messageSent = true;
-        }
-      }
-
-      // Also send to sender so they can see their own message in chat history
-      const senderConnections = Array.from(connections.values()).filter(conn => conn.userId === senderId);
-      for (const senderConnection of senderConnections) {
-        if (senderConnection.ws && senderConnection.ws.readyState === WebSocket.OPEN) {
-          senderConnection.ws.send(JSON.stringify(messageData));
         }
       }
 

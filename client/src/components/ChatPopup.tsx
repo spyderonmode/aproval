@@ -9,7 +9,6 @@ import { MessageCircle, Send, X, Minimize2, Maximize2, User } from 'lucide-react
 import { useToast } from '@/hooks/use-toast';
 import { apiRequest } from '@/lib/queryClient';
 import { useMutation } from '@tanstack/react-query';
-import { useChatContext } from '@/contexts/ChatContext';
 
 interface ChatMessage {
   id: string;
@@ -39,25 +38,124 @@ export function ChatPopup({
   initialSender, 
   initialMessage 
 }: ChatPopupProps) {
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
+  const [newMessage, setNewMessage] = useState('');
   const [isMinimized, setIsMinimized] = useState(false);
   const [activeChatUser, setActiveChatUser] = useState(initialSender || null);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const { toast } = useToast();
 
-  // ChatPopup is now just a notification - doesn't show chat history
-  // Chat history is only shown in OnlineUsersModal
+  // Auto-scroll to bottom when new messages arrive
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  };
 
-  // No need for auto-scroll since we're not showing chat history
-  // ChatPopup is now just a notification popup
-
-  // Set active chat user from initial sender
   useEffect(() => {
-    if (initialSender) {
+    scrollToBottom();
+  }, [messages]);
+
+  // Add initial message if provided
+  useEffect(() => {
+    if (initialMessage && initialSender) {
+      const message: ChatMessage = {
+        id: Date.now().toString(),
+        senderId: initialSender.userId,
+        senderName: initialSender.displayName || initialSender.username,
+        message: initialMessage,
+        timestamp: new Date().toLocaleTimeString(),
+        fromMe: false
+      };
+      setMessages([message]);
       setActiveChatUser(initialSender);
     }
-  }, [initialSender]);
+  }, [initialMessage, initialSender]);
 
-  // ChatPopup is now just a notification popup - no chat functionality
+  // Handle incoming messages from WebSocket
+  useEffect(() => {
+    const handleChatMessage = (event: CustomEvent) => {
+      const data = event.detail;
+      
+      if (data.type === 'chat_message_received') {
+        const incomingMessage: ChatMessage = {
+          id: Date.now().toString(),
+          senderId: data.message.senderId,
+          senderName: data.message.senderName,
+          message: data.message.message,
+          timestamp: new Date(data.message.timestamp).toLocaleTimeString(),
+          fromMe: false
+        };
+        
+        // If no active chat user, set the sender as active
+        if (!activeChatUser) {
+          setActiveChatUser({
+            userId: data.message.senderId,
+            displayName: data.message.senderName,
+            username: data.message.senderName
+          });
+        }
+        
+        // Only add message if it's from the current chat user
+        if (activeChatUser?.userId === data.message.senderId) {
+          setMessages(prev => [...prev, incomingMessage]);
+        }
+      }
+    };
+
+    window.addEventListener('chat_message_received', handleChatMessage as EventListener);
+    
+    return () => {
+      window.removeEventListener('chat_message_received', handleChatMessage as EventListener);
+    };
+  }, [activeChatUser]);
+
+  const sendMessageMutation = useMutation({
+    mutationFn: async ({ targetUserId, message }: { targetUserId: string; message: string }) => {
+      return await apiRequest('POST', '/api/chat/send', { targetUserId, message });
+    },
+    onSuccess: () => {
+      if (activeChatUser) {
+        // Add the sent message to chat
+        const sentMessage: ChatMessage = {
+          id: Date.now().toString(),
+          senderId: currentUser?.userId || currentUser?.id,
+          senderName: currentUser?.displayName || currentUser?.firstName || 'You',
+          message: newMessage,
+          timestamp: new Date().toLocaleTimeString(),
+          fromMe: true
+        };
+        
+        setMessages(prev => [...prev, sentMessage]);
+      }
+      setNewMessage('');
+    },
+    onError: (error: any) => {
+      console.error('Chat message error:', error);
+      toast({
+        title: "Error",
+        description: error.message || "Failed to send message",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const handleSendMessage = () => {
+    if (!newMessage.trim() || !activeChatUser) return;
+    
+    sendMessageMutation.mutate({ 
+      targetUserId: activeChatUser.userId, 
+      message: newMessage.trim() 
+    });
+  };
+
+  const handleKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      handleSendMessage();
+    }
+  };
 
   const handleClose = () => {
+    setMessages([]);
     setActiveChatUser(null);
     onClose();
   };
@@ -111,27 +209,62 @@ export function ChatPopup({
               </CardHeader>
               
               {!isMinimized && (
-                <CardContent className="p-4">
-                  <div className="text-center">
-                    <div className="flex items-center justify-center w-12 h-12 rounded-full bg-blue-100 dark:bg-blue-900 mx-auto mb-3">
-                      <MessageCircle className="h-6 w-6 text-blue-600 dark:text-blue-400" />
+                <CardContent className="p-0">
+                  <div className="h-64 flex flex-col">
+                    <ScrollArea className="flex-1 p-3">
+                      <div className="space-y-2">
+                        {messages.length === 0 ? (
+                          <div className="text-center text-gray-500 text-sm py-8">
+                            No messages yet. Start a conversation!
+                          </div>
+                        ) : (
+                          messages.map((message) => (
+                            <div
+                              key={message.id}
+                              className={`flex ${message.fromMe ? 'justify-end' : 'justify-start'}`}
+                            >
+                              <div
+                                className={`max-w-xs px-3 py-2 rounded-lg text-sm ${
+                                  message.fromMe
+                                    ? 'bg-blue-500 text-white'
+                                    : 'bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-gray-100'
+                                }`}
+                              >
+                                <div className="font-medium text-xs opacity-70 mb-1">
+                                  {message.fromMe ? 'You' : message.senderName}
+                                </div>
+                                <div>{message.message}</div>
+                                <div className="text-xs opacity-70 mt-1">
+                                  {message.timestamp}
+                                </div>
+                              </div>
+                            </div>
+                          ))
+                        )}
+                        <div ref={messagesEndRef} />
+                      </div>
+                    </ScrollArea>
+                    
+                    <div className="p-3 border-t bg-gray-50 dark:bg-gray-800">
+                      <div className="flex gap-2">
+                        <Input
+                          placeholder="Type a message..."
+                          value={newMessage}
+                          onChange={(e) => setNewMessage(e.target.value)}
+                          onKeyPress={handleKeyPress}
+                          className="flex-1 text-sm"
+                          disabled={!activeChatUser || sendMessageMutation.isPending}
+                        />
+                        <Button
+                          onClick={handleSendMessage}
+                          disabled={!newMessage.trim() || !activeChatUser || sendMessageMutation.isPending}
+                          size="sm"
+                          className="px-3"
+                        >
+                          <Send className="h-4 w-4" />
+                        </Button>
+                      </div>
                     </div>
-                    <div className="text-sm font-medium text-gray-900 dark:text-gray-100 mb-1">
-                      New message from {activeChatUser?.displayName || activeChatUser?.username}
-                    </div>
-                    <div className="text-sm text-gray-600 dark:text-gray-400 mb-4">
-                      {initialMessage}
-                    </div>
-                    <div className="text-xs text-gray-500 dark:text-gray-400 mb-4">
-                      Open chat to view full conversation
-                    </div>
-                    <Button
-                      onClick={handleClose}
-                      size="sm"
-                      className="w-full"
-                    >
-                      Dismiss
-                    </Button>
                   </div>
                 </CardContent>
               )}

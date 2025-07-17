@@ -6,15 +6,12 @@ interface ChatMessage {
   senderName: string;
   message: string;
   timestamp: string;
-  fromMe: boolean;
 }
 
 interface ChatContextType {
   showChatPopup: (sender: { userId: string; displayName: string; username: string }, message: string) => void;
   closeChatPopup: () => void;
   isPopupOpen: boolean;
-  chatHistory: Map<string, ChatMessage[]>;
-  addToHistory: (userId: string, message: ChatMessage) => void;
 }
 
 const ChatContext = createContext<ChatContextType | undefined>(undefined);
@@ -40,7 +37,6 @@ export function ChatProvider({ children, currentUser }: ChatProviderProps) {
     username: string;
   } | null>(null);
   const [currentMessage, setCurrentMessage] = useState<string>('');
-  const [chatHistory, setChatHistory] = useState<Map<string, ChatMessage[]>>(new Map());
 
   // Listen for incoming chat messages
   useEffect(() => {
@@ -54,32 +50,8 @@ export function ChatProvider({ children, currentUser }: ChatProviderProps) {
           username: data.message.senderName
         };
         
-        // Create message object
-        const message: ChatMessage = {
-          senderId: data.message.senderId,
-          senderName: data.message.senderName,
-          message: data.message.message,
-          timestamp: new Date(data.message.timestamp).toLocaleTimeString(),
-          fromMe: data.message.senderId === (currentUser?.userId || currentUser?.id)
-        };
-        
-        // Add to chat history for the conversation partner
-        // For messages from me: add to history with the target user (who I'm talking to)
-        // For messages from others: add to history with the sender (who sent it to me)
-        const conversationPartnerId = message.fromMe 
-          ? data.message.targetUserId // Who I sent the message to
-          : data.message.senderId;    // Who sent the message to me
-        
-
-        
-        if (conversationPartnerId) {
-          addToHistory(conversationPartnerId, message);
-        }
-        
-        // Only show popup for messages from other users (not from current user)
-        if (!message.fromMe) {
-          showChatPopup(sender, data.message.message);
-        }
+        // Show popup with the new message
+        showChatPopup(sender, data.message.message);
       }
     };
 
@@ -90,15 +62,6 @@ export function ChatProvider({ children, currentUser }: ChatProviderProps) {
       window.removeEventListener('chat_message_received', handleChatMessage as EventListener);
     };
   }, []);
-
-  const addToHistory = (userId: string, message: ChatMessage) => {
-    setChatHistory(prev => {
-      const newHistory = new Map(prev);
-      const userMessages = newHistory.get(userId) || [];
-      newHistory.set(userId, [...userMessages, message]);
-      return newHistory;
-    });
-  };
 
   const showChatPopup = (sender: { userId: string; displayName: string; username: string }, message: string) => {
     setCurrentSender(sender);
@@ -113,7 +76,7 @@ export function ChatProvider({ children, currentUser }: ChatProviderProps) {
   };
 
   return (
-    <ChatContext.Provider value={{ showChatPopup, closeChatPopup, isPopupOpen, chatHistory, addToHistory }}>
+    <ChatContext.Provider value={{ showChatPopup, closeChatPopup, isPopupOpen }}>
       {children}
       <ChatPopup
         isOpen={isPopupOpen}
