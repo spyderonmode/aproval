@@ -278,7 +278,8 @@ export default function Home() {
           }
           setIsMatchmaking(false);
           setShowMatchmaking(false);
-          handleRoomJoin(lastMessage.room);
+          // Server automatically joins players to room, just set room state
+          setCurrentRoom(lastMessage.room);
           toast({
             title: "Match Found!",
             description: "You've been matched with an opponent. Game starting...",

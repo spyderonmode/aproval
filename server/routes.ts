@@ -374,27 +374,46 @@ export async function registerRoutes(app: Express): Promise<Server> {
           role: 'player',
         });
         
-        // Notify both players via WebSocket with the same message type
-        const notifyPlayer = async (playerId: string) => {
-          // Find connection by userId
+        // Notify both players via WebSocket and ensure they join the room
+        const notifyAndJoinPlayer = async (playerId: string) => {
+          // Find all connections for this user (they might have multiple tabs)
           for (const [connId, connection] of connections.entries()) {
             if (connection.userId === playerId && connection.ws.readyState === WebSocket.OPEN) {
+              // Add to room connections immediately
+              if (!roomConnections.has(room.id)) {
+                roomConnections.set(room.id, new Set());
+              }
+              roomConnections.get(room.id)!.add(connId);
+              
+              // Update connection room info
+              connection.roomId = room.id;
+              
+              // Update user room state
+              userRoomStates.set(playerId, {
+                roomId: room.id,
+                isInGame: false,
+                role: 'player'
+              });
+              
+              // Send match found notification
               connection.ws.send(JSON.stringify({
                 type: 'match_found',
                 room: room,
                 message: 'Match found! Joining room...'
               }));
+              
+              console.log(`🎯 Player ${playerId} automatically joined room ${room.id} via connection ${connId}`);
               break;
             }
           }
         };
         
-        await notifyPlayer(player1Id);
-        await notifyPlayer(player2Id);
+        await notifyAndJoinPlayer(player1Id);
+        await notifyAndJoinPlayer(player2Id);
         
-        console.log(`🎯 Match notifications sent to both players`);
+        console.log(`🎯 Match notifications sent and both players joined room ${room.id}`);
         
-        // Auto-start the game after a brief delay to ensure both players are connected
+        // Auto-start the game after a longer delay to ensure both players are fully connected
         setTimeout(async () => {
           try {
             console.log(`🎯 Auto-starting game for matched players in room ${room.id}`);

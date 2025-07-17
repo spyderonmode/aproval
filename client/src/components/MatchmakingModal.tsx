@@ -39,7 +39,7 @@ export function MatchmakingModal({ open, onClose, onMatchFound, user }: Matchmak
     onSuccess: (data) => {
       if (data.status === 'matched') {
         setIsSearching(false);
-        onMatchFound(data.room);
+        // Server automatically handles room joining, just close modal
         onClose();
         toast({
           title: "Match Found!",
