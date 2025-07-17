@@ -309,6 +309,14 @@ export default function Home() {
             // We don't need to handle it here as it's handled by the GameBoard component directly
           }
           break;
+        case 'player_chat':
+          // Handle player chat - this will be broadcast to all players and spectators
+          if (currentGame && (lastMessage.gameId === currentGame.id || lastMessage.roomId === currentRoom?.id)) {
+            console.log('🎮 Player chat received:', lastMessage);
+            // The chat will be displayed by the GameBoard component
+            // We don't need to handle it here as it's handled by the GameBoard component directly
+          }
+          break;
       }
     }
   }, [lastMessage, currentGame, currentRoom, user]);

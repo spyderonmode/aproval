@@ -9,32 +9,31 @@ import { useWebSocket } from "@/hooks/useWebSocket";
 import { isUnauthorizedError } from "@/lib/authUtils";
 import { motion, AnimatePresence } from "framer-motion"; // Added back for winning line animation
 import { useTheme } from "@/contexts/ThemeContext";
-import { User, Smile } from "lucide-react";
-import { EmojiReactionPanel } from '@/components/EmojiReactionPanel';
+import { User, MessageCircle } from "lucide-react";
+import { QuickChatPanel } from '@/components/QuickChatPanel';
 
 const VALID_POSITIONS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15];
 
-// Player emoji reactions system
-interface PlayerReaction {
-  emoji: string;
-  label: string;
+// Player quick chat system
+interface PlayerMessage {
+  text: string;
   duration: number;
 }
 
-const REACTION_EMOJIS = {
-  laugh: { emoji: '😂', label: 'Laugh', duration: 4000 },
-  love: { emoji: '❤️', label: 'Love', duration: 3500 },
-  wow: { emoji: '😮', label: 'Wow', duration: 3000 },
-  angry: { emoji: '😠', label: 'Angry', duration: 3500 },
-  sad: { emoji: '😢', label: 'Sad', duration: 3000 },
-  cool: { emoji: '😎', label: 'Cool', duration: 3500 },
-  fire: { emoji: '🔥', label: 'Fire', duration: 4000 },
-  thumbsUp: { emoji: '👍', label: 'Thumbs Up', duration: 3000 },
-  thumbsDown: { emoji: '👎', label: 'Thumbs Down', duration: 3000 },
-  thinking: { emoji: '🤔', label: 'Thinking', duration: 3500 },
-  party: { emoji: '🎉', label: 'Party', duration: 4000 },
-  target: { emoji: '🎯', label: 'Target', duration: 3000 }
-};
+const QUICK_CHAT_MESSAGES = [
+  { text: 'Good luck!', duration: 4000 },
+  { text: 'Well played!', duration: 3500 },
+  { text: 'Nice move!', duration: 3000 },
+  { text: 'Great strategy!', duration: 3500 },
+  { text: 'Play faster!', duration: 3000 },
+  { text: 'Take your time', duration: 3500 },
+  { text: 'Good game!', duration: 4000 },
+  { text: 'Thanks for the game!', duration: 3000 },
+  { text: 'One more?', duration: 3000 },
+  { text: 'Impressive!', duration: 3500 },
+  { text: 'Thinking...', duration: 4000 },
+  { text: 'Ready to play!', duration: 3000 }
+];
 
 // Function to get winning positions for highlighting
 const getWinningPositions = (board: Record<string, string>, player: string): number[] => {
@@ -185,11 +184,11 @@ export function GameBoard({ game, onGameOver, gameMode, user }: GameBoardProps) 
   
   const [opponent, setOpponent] = useState<any>(null);
   
-  // Player reaction state
-  const [playerXReaction, setPlayerXReaction] = useState<PlayerReaction | null>(null);
-  const [playerOReaction, setPlayerOReaction] = useState<PlayerReaction | null>(null);
-  const [reactionTimeouts, setReactionTimeouts] = useState<{ X?: NodeJS.Timeout; O?: NodeJS.Timeout }>({});
-  const [showReactionPanel, setShowReactionPanel] = useState(false);
+  // Player chat message state
+  const [playerXMessage, setPlayerXMessage] = useState<PlayerMessage | null>(null);
+  const [playerOMessage, setPlayerOMessage] = useState<PlayerMessage | null>(null);
+  const [messageTimeouts, setMessageTimeouts] = useState<{ X?: NodeJS.Timeout; O?: NodeJS.Timeout }>({});
+  const [showChatPanel, setShowChatPanel] = useState(false);
   
   // Update winning line when game has winning positions
   useEffect(() => {
@@ -217,79 +216,72 @@ export function GameBoard({ game, onGameOver, gameMode, user }: GameBoardProps) 
     }
   }, [game, user, gameMode]);
 
-  // Player reaction functions
-  const setPlayerReaction = (player: 'X' | 'O', reactionType: keyof typeof REACTION_EMOJIS) => {
-    const reaction = REACTION_EMOJIS[reactionType];
+  // Player message functions
+  const setPlayerMessage = (player: 'X' | 'O', messageText: string) => {
+    const message = QUICK_CHAT_MESSAGES.find(msg => msg.text === messageText) || { text: messageText, duration: 3000 };
     
     // Clear existing timeout
-    if (reactionTimeouts[player]) {
-      clearTimeout(reactionTimeouts[player]);
+    if (messageTimeouts[player]) {
+      clearTimeout(messageTimeouts[player]);
     }
     
-    // Set new reaction
+    // Set new message
     if (player === 'X') {
-      setPlayerXReaction(reaction);
+      setPlayerXMessage(message);
     } else {
-      setPlayerOReaction(reaction);
+      setPlayerOMessage(message);
     }
     
-    // Clear reaction after duration
+    // Clear message after duration
     const timeout = setTimeout(() => {
       if (player === 'X') {
-        setPlayerXReaction(null);
+        setPlayerXMessage(null);
       } else {
-        setPlayerOReaction(null);
+        setPlayerOMessage(null);
       }
-      setReactionTimeouts(prev => ({ ...prev, [player]: undefined }));
-    }, reaction.duration);
+      setMessageTimeouts(prev => ({ ...prev, [player]: undefined }));
+    }, message.duration);
     
-    setReactionTimeouts(prev => ({ ...prev, [player]: timeout }));
+    setMessageTimeouts(prev => ({ ...prev, [player]: timeout }));
   };
 
-  const handleReactionClick = (emoji: string) => {
+  const handleMessageClick = (messageText: string) => {
     if (gameMode === 'online' && user) {
       const userId = user.userId || user.id;
       const isPlayerX = game.playerXId === userId;
       const playerSymbol = isPlayerX ? 'X' : 'O';
-      // Find the reaction by emoji
-      const reactionType = Object.entries(REACTION_EMOJIS).find(([_, reaction]) => reaction.emoji === emoji)?.[0];
-      if (reactionType) {
-        // Show reaction locally first
-        setPlayerReaction(playerSymbol, reactionType as keyof typeof REACTION_EMOJIS);
-        
-        // Broadcast reaction to all players and spectators in the room
-        const reactionMessage = {
-          type: 'player_reaction',
-          roomId: game.roomId,
-          gameId: game.id,
-          userId: userId,
-          playerSymbol: playerSymbol,
-          reactionType: reactionType,
-          emoji: emoji,
-          playerInfo: isPlayerX ? game.playerXInfo : game.playerOInfo
-        };
-        
-        // Send via WebSocket
-        sendMessage(reactionMessage);
-      }
+      
+      // Show message locally first
+      setPlayerMessage(playerSymbol, messageText);
+      
+      // Broadcast message to all players and spectators in the room
+      const chatMessage = {
+        type: 'player_chat',
+        roomId: game.roomId,
+        gameId: game.id,
+        userId: userId,
+        playerSymbol: playerSymbol,
+        messageText: messageText,
+        playerInfo: isPlayerX ? game.playerXInfo : game.playerOInfo
+      };
+      
+      // Send via WebSocket
+      sendMessage(chatMessage);
     } else {
-      // For local games, current player uses reaction
-      const reactionType = Object.entries(REACTION_EMOJIS).find(([_, reaction]) => reaction.emoji === emoji)?.[0];
-      if (reactionType) {
-        setPlayerReaction(currentPlayer, reactionType as keyof typeof REACTION_EMOJIS);
-      }
+      // For local games, current player uses message
+      setPlayerMessage(currentPlayer, messageText);
     }
-    setShowReactionPanel(false);
+    setShowChatPanel(false);
   };
 
   // Cleanup timeouts on unmount
   useEffect(() => {
     return () => {
-      Object.values(reactionTimeouts).forEach(timeout => {
+      Object.values(messageTimeouts).forEach(timeout => {
         if (timeout) clearTimeout(timeout);
       });
     };
-  }, [reactionTimeouts]);
+  }, [messageTimeouts]);
 
 
 
@@ -330,17 +322,17 @@ export function GameBoard({ game, onGameOver, gameMode, user }: GameBoardProps) 
   // Remove WebSocket handling from GameBoard - it's now handled in Home component
   // This prevents double handling and state conflicts
 
-  // Handle incoming WebSocket messages for reactions
+  // Handle incoming WebSocket messages for chat
   useEffect(() => {
-    if (lastMessage?.type === 'player_reaction') {
-      console.log('🎭 Received player reaction:', lastMessage);
+    if (lastMessage?.type === 'player_chat') {
+      console.log('💬 Received player chat:', lastMessage);
       if (lastMessage.gameId === game?.id || lastMessage.roomId === game?.roomId) {
-        const reactionType = lastMessage.reactionType;
+        const messageText = lastMessage.messageText;
         const playerSymbol = lastMessage.playerSymbol;
         
-        // Show the reaction for the specified player
-        if (reactionType && REACTION_EMOJIS[reactionType]) {
-          setPlayerReaction(playerSymbol, reactionType);
+        // Show the message for the specified player
+        if (messageText) {
+          setPlayerMessage(playerSymbol, messageText);
         }
       }
     }
@@ -863,31 +855,28 @@ export function GameBoard({ game, onGameOver, gameMode, user }: GameBoardProps) 
           <div className="flex flex-col space-y-3 text-right">
             {/* Player X - Top */}
             <div className="flex items-center justify-end space-x-2">
-              {/* Reaction Indicator for Player X */}
+              {/* Chat Message for Player X */}
               <AnimatePresence>
-                {playerXReaction && (
+                {playerXMessage && (
                   <motion.div
                     initial={{ opacity: 0, scale: 0.5, y: 20 }}
                     animate={{ 
                       opacity: 1, 
-                      scale: [1, 1.2, 1], 
-                      y: 0,
-                      rotate: [0, -10, 10, 0]
+                      scale: [1, 1.05, 1], 
+                      y: 0
                     }}
                     exit={{ opacity: 0, scale: 0.5, y: -20 }}
                     transition={{ 
-                      duration: 0.5,
-                      scale: { duration: 0.6, ease: "easeInOut" },
-                      rotate: { duration: 0.8, ease: "easeInOut" }
+                      duration: 0.4,
+                      scale: { duration: 0.6, ease: "easeInOut" }
                     }}
-                    className="relative"
-                    title={playerXReaction.label}
+                    className="relative max-w-32"
+                    title={playerXMessage.text}
                   >
-                    <motion.span 
-                      className="text-lg"
+                    <motion.div 
+                      className="text-xs bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 px-2 py-1 rounded-md shadow-sm"
                       animate={{ 
-                        scale: [1, 1.1, 1],
-                        filter: ["brightness(1)", "brightness(1.2)", "brightness(1)"]
+                        scale: [1, 1.02, 1]
                       }}
                       transition={{ 
                         duration: 2,
@@ -895,8 +884,8 @@ export function GameBoard({ game, onGameOver, gameMode, user }: GameBoardProps) 
                         ease: "easeInOut"
                       }}
                     >
-                      {playerXReaction.emoji}
-                    </motion.span>
+                      {playerXMessage.text}
+                    </motion.div>
                   </motion.div>
                 )}
               </AnimatePresence>
@@ -938,31 +927,28 @@ export function GameBoard({ game, onGameOver, gameMode, user }: GameBoardProps) 
             
             {/* Player O - Bottom */}
             <div className="flex items-center justify-end space-x-2">
-              {/* Reaction Indicator for Player O */}
+              {/* Chat Message for Player O */}
               <AnimatePresence>
-                {playerOReaction && (
+                {playerOMessage && (
                   <motion.div
                     initial={{ opacity: 0, scale: 0.5, y: 20 }}
                     animate={{ 
                       opacity: 1, 
-                      scale: [1, 1.2, 1], 
-                      y: 0,
-                      rotate: [0, -10, 10, 0]
+                      scale: [1, 1.05, 1], 
+                      y: 0
                     }}
                     exit={{ opacity: 0, scale: 0.5, y: -20 }}
                     transition={{ 
-                      duration: 0.5,
-                      scale: { duration: 0.6, ease: "easeInOut" },
-                      rotate: { duration: 0.8, ease: "easeInOut" }
+                      duration: 0.4,
+                      scale: { duration: 0.6, ease: "easeInOut" }
                     }}
-                    className="relative"
-                    title={playerOReaction.label}
+                    className="relative max-w-32"
+                    title={playerOMessage.text}
                   >
-                    <motion.span 
-                      className="text-lg"
+                    <motion.div 
+                      className="text-xs bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200 px-2 py-1 rounded-md shadow-sm"
                       animate={{ 
-                        scale: [1, 1.1, 1],
-                        filter: ["brightness(1)", "brightness(1.2)", "brightness(1)"]
+                        scale: [1, 1.02, 1]
                       }}
                       transition={{ 
                         duration: 2,
@@ -970,8 +956,8 @@ export function GameBoard({ game, onGameOver, gameMode, user }: GameBoardProps) 
                         ease: "easeInOut"
                       }}
                     >
-                      {playerOReaction.emoji}
-                    </motion.span>
+                      {playerOMessage.text}
+                    </motion.div>
                   </motion.div>
                 )}
               </AnimatePresence>
@@ -1055,11 +1041,11 @@ export function GameBoard({ game, onGameOver, gameMode, user }: GameBoardProps) 
         <div className="mt-8 flex justify-center space-x-4">
           <Button 
             variant="outline"
-            onClick={() => setShowReactionPanel(!showReactionPanel)}
+            onClick={() => setShowChatPanel(!showChatPanel)}
             className="flex items-center space-x-2"
           >
-            <Smile className="w-4 h-4" />
-            <span>React</span>
+            <MessageCircle className="w-4 h-4" />
+            <span>Chat</span>
           </Button>
           
           <Button 
@@ -1071,12 +1057,12 @@ export function GameBoard({ game, onGameOver, gameMode, user }: GameBoardProps) 
           </Button>
         </div>
         
-        {/* Emoji Reaction Panel */}
+        {/* Quick Chat Panel */}
         <div className="relative">
-          <EmojiReactionPanel
-            isOpen={showReactionPanel}
-            onReactionClick={handleReactionClick}
-            onClose={() => setShowReactionPanel(false)}
+          <QuickChatPanel
+            isOpen={showChatPanel}
+            onMessageClick={handleMessageClick}
+            onClose={() => setShowChatPanel(false)}
           />
         </div>
       </CardContent>

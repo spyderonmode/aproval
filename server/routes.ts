@@ -1563,6 +1563,42 @@ export async function registerRoutes(app: Express): Promise<Server> {
               console.log(`🎭 No room users found for room ${roomId} or room is empty`);
             }
             break;
+            
+          case 'player_chat':
+            // Handle player chat message and broadcast to all users in the room
+            const { roomId: chatRoomId, gameId: chatGameId, userId: chatUserId, playerSymbol: chatPlayerSymbol, messageText, playerInfo: chatPlayerInfo } = data;
+            
+            console.log(`💬 Player chat from ${chatUserId} in room ${chatRoomId}: ${messageText} (${chatPlayerSymbol})`);
+            
+            // Broadcast chat message to all users in the room
+            const chatRoomUsers = roomConnections.get(chatRoomId);
+            if (chatRoomUsers && chatRoomUsers.size > 0) {
+              const chatMessage = JSON.stringify({
+                type: 'player_chat',
+                roomId: chatRoomId,
+                gameId: chatGameId,
+                userId: chatUserId,
+                playerSymbol: chatPlayerSymbol,
+                messageText,
+                playerInfo: chatPlayerInfo,
+                timestamp: Date.now()
+              });
+              
+              console.log(`💬 Broadcasting chat to ${chatRoomUsers.size} users in room ${chatRoomId}`);
+              let broadcastCount = 0;
+              chatRoomUsers.forEach(connId => {
+                const conn = connections.get(connId);
+                if (conn && conn.ws.readyState === WebSocket.OPEN) {
+                  conn.ws.send(chatMessage);
+                  broadcastCount++;
+                  console.log(`💬 Sent chat to user: ${conn.userId}`);
+                }
+              });
+              console.log(`💬 Successfully broadcast chat to ${broadcastCount} users`);
+            } else {
+              console.log(`💬 No room users found for room ${chatRoomId} or room is empty`);
+            }
+            break;
         }
       } catch (error) {
         console.error('WebSocket message error:', error);
