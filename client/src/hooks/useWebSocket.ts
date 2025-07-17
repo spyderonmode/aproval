@@ -11,6 +11,7 @@ export function useWebSocket() {
   const ws = useRef<WebSocket | null>(null);
   const [isConnected, setIsConnected] = useState(false);
   const [lastMessage, setLastMessage] = useState<WebSocketMessage | null>(null);
+  const joinedRooms = useRef<Set<string>>(new Set());
 
   useEffect(() => {
     if (!user) return;
@@ -23,6 +24,8 @@ export function useWebSocket() {
     ws.current.onopen = () => {
       console.log('🔌 WebSocket connected');
       setIsConnected(true);
+      // Clear joined rooms on reconnect to prevent duplicates
+      joinedRooms.current.clear();
       // Authenticate with WebSocket
       const authMessage = {
         type: 'auth',
@@ -76,11 +79,18 @@ export function useWebSocket() {
   };
 
   const joinRoom = (roomId: string) => {
+    if (joinedRooms.current.has(roomId)) {
+      console.log(`🏠 Already joined room ${roomId}, skipping duplicate join`);
+      return;
+    }
     console.log(`🏠 Joining room: ${roomId}`);
+    joinedRooms.current.add(roomId);
     sendMessage({ type: 'join_room', roomId });
   };
 
   const leaveRoom = (roomId: string) => {
+    console.log(`🏠 Leaving room: ${roomId}`);
+    joinedRooms.current.delete(roomId);
     sendMessage({ type: 'leave_room', roomId });
   };
 

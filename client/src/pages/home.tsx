@@ -272,6 +272,10 @@ export default function Home() {
           break;
         case 'match_found':
           console.log('🎮 Match found:', lastMessage);
+          if (!isMatchmaking) {
+            console.log('🎮 Ignoring duplicate match_found - not in matchmaking');
+            break;
+          }
           setIsMatchmaking(false);
           setShowMatchmaking(false);
           handleRoomJoin(lastMessage.room);
@@ -283,6 +287,10 @@ export default function Home() {
         case 'matchmaking_response':
           console.log('🎮 Matchmaking response:', lastMessage);
           if (lastMessage.status === 'matched') {
+            if (!isMatchmaking) {
+              console.log('🎮 Ignoring duplicate matchmaking_response - not in matchmaking');
+              break;
+            }
             setIsMatchmaking(false);
             setShowMatchmaking(false);
             handleRoomJoin(lastMessage.room);
@@ -305,6 +313,15 @@ export default function Home() {
   }, [lastMessage, currentGame, currentRoom, user]);
 
   const handleRoomJoin = (room: any) => {
+    console.log('🏠 handleRoomJoin called with room:', room.id);
+    console.log('🏠 Current room before join:', currentRoom?.id);
+    
+    // Prevent duplicate room joins
+    if (currentRoom && currentRoom.id === room.id) {
+      console.log('🏠 Already in this room, skipping duplicate join');
+      return;
+    }
+    
     setCurrentRoom(room);
     joinRoom(room.id);
   };
