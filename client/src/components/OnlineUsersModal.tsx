@@ -155,6 +155,12 @@ export function OnlineUsersModal({ open, onClose, currentRoom, user }: OnlineUse
       const data = event.detail;
       
       if (data.type === 'chat_message_received') {
+        // Only handle messages if OnlineUsersModal is open and we're actively chatting
+        if (!open || !selectedUser) return;
+        
+        // Only handle messages from the currently selected user
+        if (selectedUser.userId !== data.message.senderId) return;
+        
         // Check if sender is blocked
         if (blockedUsers.has(data.message.senderId)) {
           return; // Ignore messages from blocked users
@@ -175,16 +181,6 @@ export function OnlineUsersModal({ open, onClose, currentRoom, user }: OnlineUse
           newHistory.set(data.message.senderId, [...userMessages, incomingMessage]);
           return newHistory;
         });
-        
-        // Add to unread messages count if not currently chatting with this user
-        if (!selectedUser || selectedUser.userId !== data.message.senderId) {
-          setUnreadMessages(prev => {
-            const newUnread = new Map(prev);
-            const currentCount = newUnread.get(data.message.senderId) || 0;
-            newUnread.set(data.message.senderId, currentCount + 1);
-            return newUnread;
-          });
-        }
       }
     };
 
@@ -192,6 +188,9 @@ export function OnlineUsersModal({ open, onClose, currentRoom, user }: OnlineUse
       const data = event.detail;
       
       if (data.type === 'user_offline') {
+        // Only handle if modal is open
+        if (!open) return;
+        
         // Remove chat history for offline user
         setChatHistory(prev => {
           const newHistory = new Map(prev);
@@ -213,15 +212,17 @@ export function OnlineUsersModal({ open, onClose, currentRoom, user }: OnlineUse
       }
     };
 
-    // Listen for chat messages and user offline events
-    window.addEventListener('chat_message_received', handleChatMessage as EventListener);
-    window.addEventListener('user_offline', handleUserOffline as EventListener);
-    
-    return () => {
-      window.removeEventListener('chat_message_received', handleChatMessage as EventListener);
-      window.removeEventListener('user_offline', handleUserOffline as EventListener);
-    };
-  }, [selectedUser]);
+    // Only listen for events when modal is open
+    if (open) {
+      window.addEventListener('chat_message_received', handleChatMessage as EventListener);
+      window.addEventListener('user_offline', handleUserOffline as EventListener);
+      
+      return () => {
+        window.removeEventListener('chat_message_received', handleChatMessage as EventListener);
+        window.removeEventListener('user_offline', handleUserOffline as EventListener);
+      };
+    }
+  }, [open, selectedUser, blockedUsers]);
 
   // Get current chat messages for selected user
   const currentChatMessages = selectedUser ? chatHistory.get(selectedUser.userId) || [] : [];
