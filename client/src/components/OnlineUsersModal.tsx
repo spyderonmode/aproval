@@ -149,41 +149,8 @@ export function OnlineUsersModal({ open, onClose, currentRoom, user }: OnlineUse
     setShowProfileModal(true);
   };
 
-  // Handle incoming chat messages and user offline events
+  // Handle user offline events only (messages are handled by ChatPopup)
   useEffect(() => {
-    const handleChatMessage = (event: CustomEvent) => {
-      const data = event.detail;
-      
-      if (data.type === 'chat_message_received') {
-        // Only handle messages if OnlineUsersModal is open and we're actively chatting
-        if (!open || !selectedUser) return;
-        
-        // Only handle messages from the currently selected user
-        if (selectedUser.userId !== data.message.senderId) return;
-        
-        // Check if sender is blocked
-        if (blockedUsers.has(data.message.senderId)) {
-          return; // Ignore messages from blocked users
-        }
-        
-        const incomingMessage = {
-          fromMe: false,
-          message: data.message.message,
-          timestamp: new Date(data.message.timestamp).toLocaleTimeString(),
-          userId: data.message.senderId,
-          senderName: data.message.senderName
-        };
-        
-        // Add to chat history for this sender
-        setChatHistory(prev => {
-          const newHistory = new Map(prev);
-          const userMessages = newHistory.get(data.message.senderId) || [];
-          newHistory.set(data.message.senderId, [...userMessages, incomingMessage]);
-          return newHistory;
-        });
-      }
-    };
-
     const handleUserOffline = (event: CustomEvent) => {
       const data = event.detail;
       
@@ -212,17 +179,15 @@ export function OnlineUsersModal({ open, onClose, currentRoom, user }: OnlineUse
       }
     };
 
-    // Only listen for events when modal is open
+    // Only listen for user offline events when modal is open
     if (open) {
-      window.addEventListener('chat_message_received', handleChatMessage as EventListener);
       window.addEventListener('user_offline', handleUserOffline as EventListener);
       
       return () => {
-        window.removeEventListener('chat_message_received', handleChatMessage as EventListener);
         window.removeEventListener('user_offline', handleUserOffline as EventListener);
       };
     }
-  }, [open, selectedUser, blockedUsers]);
+  }, [open, selectedUser]);
 
   // Get current chat messages for selected user
   const currentChatMessages = selectedUser ? chatHistory.get(selectedUser.userId) || [] : [];
