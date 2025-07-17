@@ -70,43 +70,50 @@ export function ChatPopup({
     }
   }, [initialMessage, initialSender]);
 
-  // Handle incoming messages from WebSocket
+  // Handle additional incoming messages from WebSocket (for the same chat user)
   useEffect(() => {
     const handleChatMessage = (event: CustomEvent) => {
       const data = event.detail;
       
-      if (data.type === 'chat_message_received') {
-        const incomingMessage: ChatMessage = {
-          id: Date.now().toString(),
-          senderId: data.message.senderId,
-          senderName: data.message.senderName,
-          message: data.message.message,
-          timestamp: new Date(data.message.timestamp).toLocaleTimeString(),
-          fromMe: false
-        };
-        
-        // If no active chat user, set the sender as active
-        if (!activeChatUser) {
-          setActiveChatUser({
-            userId: data.message.senderId,
-            displayName: data.message.senderName,
-            username: data.message.senderName
+      if (data.type === 'chat_message_received' && activeChatUser) {
+        // Only add message if it's from the current active chat user
+        // and we're not showing the initial popup message
+        if (activeChatUser.userId === data.message.senderId && isOpen) {
+          const incomingMessage: ChatMessage = {
+            id: Date.now().toString(),
+            senderId: data.message.senderId,
+            senderName: data.message.senderName,
+            message: data.message.message,
+            timestamp: new Date(data.message.timestamp).toLocaleTimeString(),
+            fromMe: false
+          };
+          
+          // Check if this message is already in the list to prevent duplicates
+          setMessages(prev => {
+            const messageExists = prev.some(msg => 
+              msg.senderId === incomingMessage.senderId && 
+              msg.message === incomingMessage.message &&
+              Math.abs(new Date(msg.timestamp).getTime() - new Date(incomingMessage.timestamp).getTime()) < 1000
+            );
+            
+            if (!messageExists) {
+              return [...prev, incomingMessage];
+            }
+            return prev;
           });
-        }
-        
-        // Only add message if it's from the current chat user
-        if (activeChatUser?.userId === data.message.senderId) {
-          setMessages(prev => [...prev, incomingMessage]);
         }
       }
     };
 
-    window.addEventListener('chat_message_received', handleChatMessage as EventListener);
-    
-    return () => {
-      window.removeEventListener('chat_message_received', handleChatMessage as EventListener);
-    };
-  }, [activeChatUser]);
+    // Only listen if popup is open and we have an active chat user
+    if (isOpen && activeChatUser) {
+      window.addEventListener('chat_message_received', handleChatMessage as EventListener);
+      
+      return () => {
+        window.removeEventListener('chat_message_received', handleChatMessage as EventListener);
+      };
+    }
+  }, [activeChatUser, isOpen]);
 
   const sendMessageMutation = useMutation({
     mutationFn: async ({ targetUserId, message }: { targetUserId: string; message: string }) => {
