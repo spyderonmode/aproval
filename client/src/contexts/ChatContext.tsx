@@ -41,11 +41,9 @@ export function ChatProvider({ children, currentUser }: ChatProviderProps) {
   // Listen for incoming chat messages
   useEffect(() => {
     const handleChatMessage = (event: CustomEvent) => {
-      console.log('🔔 ChatProvider received chat event:', event.detail);
       const data = event.detail;
       
       if (data.type === 'chat_message_received') {
-        console.log('🔔 Processing chat message for popup:', data.message);
         const sender = {
           userId: data.message.senderId,
           displayName: data.message.senderName,
