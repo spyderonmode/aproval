@@ -792,6 +792,8 @@ export default function Home() {
                   onGameOver={handleGameOver}
                   gameMode={selectedMode}
                   user={user}
+                  lastMessage={lastMessage}
+                  sendMessage={sendMessage}
                 />
               </div>
             ) : (

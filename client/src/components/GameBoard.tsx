@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 // useAudio hook removed as sound effects are removed
-import { useWebSocket } from "@/hooks/useWebSocket";
+// Removed useWebSocket import - messages now come from parent component
 import { isUnauthorizedError } from "@/lib/authUtils";
 import { motion, AnimatePresence } from "framer-motion"; // Added back for winning line animation
 import { useTheme } from "@/contexts/ThemeContext";
@@ -174,9 +174,11 @@ interface GameBoardProps {
   onGameOver: (result: any) => void;
   gameMode: 'ai' | 'pass-play' | 'online';
   user: any;
+  lastMessage?: any;
+  sendMessage?: (message: any) => void;
 }
 
-export function GameBoard({ game, onGameOver, gameMode, user }: GameBoardProps) {
+export function GameBoard({ game, onGameOver, gameMode, user, lastMessage, sendMessage }: GameBoardProps) {
   const [board, setBoard] = useState<Record<string, string>>({});
   const [currentPlayer, setCurrentPlayer] = useState<'X' | 'O'>('X');
   const [winningLine, setWinningLine] = useState<number[] | null>(null);
@@ -199,7 +201,7 @@ export function GameBoard({ game, onGameOver, gameMode, user }: GameBoardProps) 
   const { toast } = useToast();
   const { currentTheme, themes } = useTheme();
   // Sound effects removed as requested
-  const { lastMessage, sendMessage } = useWebSocket();
+  // WebSocket now handled by parent component
   const queryClient = useQueryClient();
 
   // Determine opponent for online games
@@ -266,7 +268,9 @@ export function GameBoard({ game, onGameOver, gameMode, user }: GameBoardProps) 
       };
       
       // Send via WebSocket
-      sendMessage(chatMessage);
+      if (sendMessage) {
+        sendMessage(chatMessage);
+      }
     } else {
       // For local games, current player uses message
       setPlayerMessage(currentPlayer, messageText);
@@ -348,7 +352,7 @@ export function GameBoard({ game, onGameOver, gameMode, user }: GameBoardProps) 
         console.log('💬 Message does not match current game/room, ignoring');
       }
     }
-  }, [lastMessage]);
+  }, [lastMessage, game?.id, game?.roomId]);
 
   // Debug effect to track board state changes
   useEffect(() => {
