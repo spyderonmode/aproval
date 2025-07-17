@@ -41,13 +41,13 @@ export function AchievementModal({ open, onClose, userId }: AchievementModalProp
   };
 
   const allPossibleAchievements = [
-    { type: 'first_win', name: 'First Victory', description: 'Win your first game', icon: '🏆' },
-    { type: 'win_streak_5', name: 'Win Streak Master', description: 'Win 5 games in a row', icon: '🔥' },
-    { type: 'win_streak_10', name: 'Unstoppable', description: 'Win 10 games in a row', icon: '⚡' },
-    { type: 'master_of_diagonals', name: 'Master of Diagonals', description: 'Win 3 games with diagonal victories', icon: '🎯' },
-    { type: 'speed_demon', name: 'Speed Demon', description: 'Win 20 games total', icon: '⚡' },
-    { type: 'veteran_player', name: 'Veteran Player', description: 'Play 100 games total', icon: '🎖️' },
-    { type: 'comeback_king', name: 'Comeback King', description: 'Win after losing 5 games in a row', icon: '👑' },
+    { type: 'first_win', name: 'First Victory', description: 'Win your very first game against any opponent to earn this achievement', icon: '🏆' },
+    { type: 'win_streak_5', name: 'Win Streak Master', description: 'Win 5 consecutive games without losing to unlock the Halloween theme', icon: '🔥' },
+    { type: 'win_streak_10', name: 'Unstoppable', description: 'Win 10 consecutive games without losing - the ultimate challenge!', icon: '⚡' },
+    { type: 'master_of_diagonals', name: 'Master of Diagonals', description: 'Win 3 games by getting three in a row diagonally (corner to corner)', icon: '🎯' },
+    { type: 'speed_demon', name: 'Speed Demon', description: 'Win 20 total games to unlock the Christmas theme - keep playing!', icon: '⚡' },
+    { type: 'veteran_player', name: 'Veteran Player', description: 'Play 100 total games (wins + losses + draws) to unlock the Summer theme', icon: '🎖️' },
+    { type: 'comeback_king', name: 'Comeback King', description: 'Win a game after losing 5 games in a row - prove your resilience!', icon: '👑' },
   ];
 
   return (
@@ -94,17 +94,26 @@ export function AchievementModal({ open, onClose, userId }: AchievementModalProp
                             />
                           );
                         } else {
-                          // Show locked achievement
+                          // Show locked achievement with tooltip
                           return (
                             <div
                               key={possible.type}
-                              className="w-20 h-20 rounded-lg border-2 border-dashed border-gray-300 dark:border-gray-600 flex flex-col items-center justify-center opacity-50 cursor-not-allowed"
+                              className="w-20 h-20 rounded-lg border-2 border-dashed border-gray-300 dark:border-gray-600 flex flex-col items-center justify-center opacity-50 cursor-help group relative"
+                              title={`🔒 ${possible.name}: ${possible.description}`}
                             >
                               <div className="text-xl mb-1 grayscale">
                                 {possible.icon}
                               </div>
                               <div className="text-xs text-center leading-tight text-gray-500">
                                 {possible.name}
+                              </div>
+                              
+                              {/* Tooltip for locked achievements */}
+                              <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-3 px-4 py-3 bg-red-900 text-white text-sm rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-20 whitespace-nowrap shadow-2xl border border-red-700 max-w-xs">
+                                <div className="font-bold text-red-300 mb-1">🔒 {possible.name}</div>
+                                <div className="text-gray-200 text-xs whitespace-normal">{possible.description}</div>
+                                {/* Arrow pointing down */}
+                                <div className="absolute top-full left-1/2 transform -translate-x-1/2 border-6 border-transparent border-t-red-900"></div>
                               </div>
                             </div>
                           );
