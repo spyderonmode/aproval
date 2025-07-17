@@ -68,10 +68,7 @@ export function Friends() {
   // Send friend request mutation
   const sendFriendRequest = useMutation({
     mutationFn: async (requestedId: string) => {
-      return await apiRequest('/api/friends/request', {
-        method: 'POST',
-        body: { requestedId },
-      });
+      return await apiRequest('POST', '/api/friends/request', { requestedId });
     },
     onSuccess: () => {
       toast({
@@ -94,10 +91,7 @@ export function Friends() {
   // Respond to friend request mutation
   const respondToFriendRequest = useMutation({
     mutationFn: async ({ requestId, response }: { requestId: string; response: 'accepted' | 'rejected' }) => {
-      return await apiRequest('/api/friends/respond', {
-        method: 'POST',
-        body: { requestId, response },
-      });
+      return await apiRequest('POST', '/api/friends/respond', { requestId, response });
     },
     onSuccess: () => {
       toast({
@@ -119,9 +113,7 @@ export function Friends() {
   // Remove friend mutation
   const removeFriend = useMutation({
     mutationFn: async (friendId: string) => {
-      return await apiRequest(`/api/friends/${friendId}`, {
-        method: 'DELETE',
-      });
+      return await apiRequest('DELETE', `/api/friends/${friendId}`);
     },
     onSuccess: () => {
       toast({
@@ -150,13 +142,11 @@ export function Friends() {
 
     setIsSearching(true);
     try {
-      const response = await apiRequest('/api/users/search', {
-        method: 'POST',
-        body: { name: searchName.trim() },
-      });
+      const response = await apiRequest('POST', '/api/users/search', { name: searchName.trim() });
+      const data = await response.json();
       
-      if (response.users) {
-        setSearchResults(response.users);
+      if (data.users) {
+        setSearchResults(data.users);
       }
     } catch (error: any) {
       toast({

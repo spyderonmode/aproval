@@ -50,10 +50,7 @@ export function OnlineUsersModal({ open, onClose, currentRoom, user }: OnlineUse
 
   const sendMessageMutation = useMutation({
     mutationFn: async ({ targetUserId, message }: { targetUserId: string; message: string }) => {
-      return await apiRequest('/api/chat/send', {
-        method: 'POST',
-        body: { targetUserId, message },
-      });
+      return await apiRequest('POST', '/api/chat/send', { targetUserId, message });
     },
     onSuccess: () => {
       if (selectedUser) {
