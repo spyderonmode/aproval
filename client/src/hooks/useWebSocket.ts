@@ -50,10 +50,12 @@ export function useWebSocket() {
         
         // Dispatch custom events for different message types
         if (message.type === 'chat_message_received') {
+          console.log('🔔 Dispatching chat event:', message);
           const chatEvent = new CustomEvent('chat_message_received', {
             detail: message
           });
           window.dispatchEvent(chatEvent);
+          console.log('🔔 Chat event dispatched');
         }
         
         setLastMessage(message);
