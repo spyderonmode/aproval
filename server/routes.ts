@@ -102,7 +102,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get('/api/themes', requireAuth, async (req: any, res) => {
     try {
       const userId = req.session.user.userId;
-      const themes = await storage.getUserThemes(userId);
+      console.log('📊 Fetching themes for user:', userId);
       
       // Add default themes that are always available
       const defaultThemes = [
@@ -114,13 +114,34 @@ export async function registerRoutes(app: Express): Promise<Server> {
         { id: 'space', name: 'Space', unlocked: true },
       ];
       
-      // Add special themes based on unlocked themes
-      const specialThemes = [
-        { id: 'halloween', name: 'Halloween', unlocked: await storage.isThemeUnlocked(userId, 'halloween') },
-        { id: 'christmas', name: 'Christmas', unlocked: await storage.isThemeUnlocked(userId, 'christmas') },
-        { id: 'summer', name: 'Summer', unlocked: await storage.isThemeUnlocked(userId, 'summer') },
-      ];
+      // Check special themes with error handling
+      let specialThemes = [];
+      try {
+        specialThemes = [
+          { id: 'halloween', name: 'Halloween', unlocked: await storage.isThemeUnlocked(userId, 'halloween') },
+          { id: 'christmas', name: 'Christmas', unlocked: await storage.isThemeUnlocked(userId, 'christmas') },
+          { id: 'summer', name: 'Summer', unlocked: await storage.isThemeUnlocked(userId, 'summer') },
+        ];
+      } catch (themeError) {
+        console.error('Error checking theme unlock status:', themeError);
+        // Return default locked themes if error occurs
+        specialThemes = [
+          { id: 'halloween', name: 'Halloween', unlocked: false },
+          { id: 'christmas', name: 'Christmas', unlocked: false },
+          { id: 'summer', name: 'Summer', unlocked: false },
+        ];
+      }
       
+      // Get user themes with error handling
+      let themes = [];
+      try {
+        themes = await storage.getUserThemes(userId);
+      } catch (userThemeError) {
+        console.error('Error fetching user themes:', userThemeError);
+        themes = [];
+      }
+      
+      console.log('📊 Themes fetched successfully for user:', userId);
       res.json({
         defaultThemes,
         specialThemes,
@@ -1491,11 +1512,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
             // Handle player reaction and broadcast to all users in the room
             const { roomId, gameId, userId, playerSymbol, reactionType, emoji, playerInfo } = data;
             
-            console.log(`🎭 Player reaction from ${userId} in room ${roomId}: ${emoji}`);
+            console.log(`🎭 Player reaction from ${userId} in room ${roomId}: ${emoji} (${playerSymbol})`);
             
             // Broadcast reaction to all users in the room
             const roomUsers = roomConnections.get(roomId);
-            if (roomUsers) {
+            if (roomUsers && roomUsers.size > 0) {
               const reactionMessage = JSON.stringify({
                 type: 'player_reaction',
                 roomId,
@@ -1508,12 +1529,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
                 timestamp: Date.now()
               });
               
+              console.log(`🎭 Broadcasting reaction to ${roomUsers.size} users in room ${roomId}`);
+              let broadcastCount = 0;
               roomUsers.forEach(connId => {
                 const conn = connections.get(connId);
                 if (conn && conn.ws.readyState === WebSocket.OPEN) {
                   conn.ws.send(reactionMessage);
+                  broadcastCount++;
+                  console.log(`🎭 Sent reaction to user: ${conn.userId}`);
                 }
               });
+              console.log(`🎭 Successfully broadcast reaction to ${broadcastCount} users`);
+            } else {
+              console.log(`🎭 No room users found for room ${roomId} or room is empty`);
             }
             break;
         }
