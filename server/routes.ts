@@ -785,12 +785,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
           playerOId: playerO.userId,
         };
       } else {
-        // Pass-play or AI mode: current user starts as X, O will be filled in during play
+        // Pass-play mode: current user starts as X, O will be filled in during play
         gameCreateData = {
           ...gameData,
-          roomId: null, // Local games don't need a room
           playerXId: userId,
-          playerOId: gameData.gameMode === 'ai' ? 'AI' : undefined,
+          playerOId: gameData.playerOId || undefined,
         };
       }
       

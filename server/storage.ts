@@ -132,35 +132,8 @@ export class DatabaseStorage implements IStorage {
 
   // Game operations
   async createGame(gameData: InsertGame): Promise<Game> {
-    try {
-      // Handle room_id properly - allow null for local games
-      const gameDataWithNullHandling = {
-        ...gameData,
-        roomId: gameData.roomId || null,
-      };
-      const [game] = await db.insert(games).values(gameDataWithNullHandling).returning();
-      return game;
-    } catch (error: any) {
-      // If we get a not-null constraint error, try to fix the schema
-      if (error.code === '23502' && error.column === 'room_id') {
-        console.log('🔧 Attempting to fix room_id constraint...');
-        try {
-          await db.execute(sql`ALTER TABLE games ALTER COLUMN room_id DROP NOT NULL`);
-          console.log('✅ Successfully made room_id nullable');
-          // Retry the insert
-          const gameDataWithNullHandling = {
-            ...gameData,
-            roomId: gameData.roomId || null,
-          };
-          const [game] = await db.insert(games).values(gameDataWithNullHandling).returning();
-          return game;
-        } catch (alterError) {
-          console.log('❌ Failed to alter table:', alterError);
-          throw error;
-        }
-      }
-      throw error;
-    }
+    const [game] = await db.insert(games).values(gameData).returning();
+    return game;
   }
 
   async getGameById(id: string): Promise<Game | undefined> {
