@@ -1,4 +1,3 @@
-import crypto from 'crypto';
 import {
   users,
   rooms,
@@ -32,24 +31,6 @@ export interface IStorage {
   // User operations - mandatory for Replit Auth
   getUser(id: string): Promise<User | undefined>;
   upsertUser(user: UpsertUser): Promise<User>;
-  
-  // Authentication operations
-  getUserByUsername(username: string): Promise<User | undefined>;
-  getUserByEmail(email: string): Promise<User | undefined>;
-  createUser(userData: {
-    username: string;
-    password: string;
-    email?: string;
-    displayName?: string;
-    profilePicture?: string;
-    isEmailVerified?: boolean;
-    emailVerificationToken?: string;
-    emailVerificationExpiry?: Date;
-  }): Promise<User>;
-  updateUser(id: string, updates: Partial<User>): Promise<User>;
-  verifyEmail(token: string): Promise<User | undefined>;
-  setPasswordResetToken(email: string, token: string, expiry: Date): Promise<boolean>;
-  resetPassword(token: string, newPassword: string): Promise<boolean>;
   
   // Room operations
   createRoom(room: InsertRoom & { ownerId: string }): Promise<Room>;
@@ -120,110 +101,6 @@ export class DatabaseStorage implements IStorage {
       })
       .returning();
     return user;
-  }
-
-  // Authentication operations
-  async getUserByUsername(username: string): Promise<User | undefined> {
-    const [user] = await db.select().from(users).where(eq(users.username, username));
-    return user;
-  }
-
-  async getUserByEmail(email: string): Promise<User | undefined> {
-    const [user] = await db.select().from(users).where(eq(users.email, email));
-    return user;
-  }
-
-  async createUser(userData: {
-    username: string;
-    password: string;
-    email?: string;
-    displayName?: string;
-    profilePicture?: string;
-    isEmailVerified?: boolean;
-    emailVerificationToken?: string;
-    emailVerificationExpiry?: Date;
-  }): Promise<User> {
-    const [user] = await db
-      .insert(users)
-      .values({
-        id: crypto.randomUUID(),
-        username: userData.username,
-        password: userData.password,
-        email: userData.email,
-        displayName: userData.displayName,
-        profilePicture: userData.profilePicture,
-        isEmailVerified: userData.isEmailVerified || false,
-        emailVerificationToken: userData.emailVerificationToken,
-        emailVerificationExpiry: userData.emailVerificationExpiry,
-        wins: 0,
-        losses: 0,
-        draws: 0,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      })
-      .returning();
-    return user;
-  }
-
-  async updateUser(id: string, updates: Partial<User>): Promise<User> {
-    const [user] = await db
-      .update(users)
-      .set({
-        ...updates,
-        updatedAt: new Date(),
-      })
-      .where(eq(users.id, id))
-      .returning();
-    return user;
-  }
-
-  async verifyEmail(token: string): Promise<User | undefined> {
-    const [user] = await db.select().from(users).where(eq(users.emailVerificationToken, token));
-    if (!user || !user.emailVerificationExpiry || user.emailVerificationExpiry < new Date()) {
-      return undefined;
-    }
-    
-    const [updatedUser] = await db
-      .update(users)
-      .set({
-        isEmailVerified: true,
-        emailVerificationToken: null,
-        emailVerificationExpiry: null,
-        updatedAt: new Date(),
-      })
-      .where(eq(users.id, user.id))
-      .returning();
-    return updatedUser;
-  }
-
-  async setPasswordResetToken(email: string, token: string, expiry: Date): Promise<boolean> {
-    const result = await db
-      .update(users)
-      .set({
-        passwordResetToken: token,
-        passwordResetExpiry: expiry,
-        updatedAt: new Date(),
-      })
-      .where(eq(users.email, email));
-    return (result.rowCount || 0) > 0;
-  }
-
-  async resetPassword(token: string, newPassword: string): Promise<boolean> {
-    const [user] = await db.select().from(users).where(eq(users.passwordResetToken, token));
-    if (!user || !user.passwordResetExpiry || user.passwordResetExpiry < new Date()) {
-      return false;
-    }
-    
-    const result = await db
-      .update(users)
-      .set({
-        password: newPassword,
-        passwordResetToken: null,
-        passwordResetExpiry: null,
-        updatedAt: new Date(),
-      })
-      .where(eq(users.id, user.id));
-    return (result.rowCount || 0) > 0;
   }
 
   // Room operations
@@ -445,8 +322,8 @@ export class DatabaseStorage implements IStorage {
       // Calculate rankings with additional metrics
       const rankings = await Promise.all(
         usersWithStats.map(async (user, index) => {
-          const totalGames = (user.wins || 0) + (user.losses || 0) + (user.draws || 0);
-          const winRate = totalGames > 0 ? ((user.wins || 0) / totalGames) * 100 : 0;
+          const totalGames = user.wins + user.losses + user.draws;
+          const winRate = totalGames > 0 ? (user.wins / totalGames) * 100 : 0;
           
           // Get recent games for streak calculation
           const recentGames = await db.select({
@@ -525,7 +402,7 @@ export class DatabaseStorage implements IStorage {
       switch (sortBy) {
         case 'wins':
           sortedRankings = rankings.sort((a, b) => {
-            if ((b.wins || 0) !== (a.wins || 0)) return (b.wins || 0) - (a.wins || 0);
+            if (b.wins !== a.wins) return b.wins - a.wins;
             return b.winRate - a.winRate; // Secondary sort by win rate
           });
           break;
@@ -540,7 +417,7 @@ export class DatabaseStorage implements IStorage {
           sortedRankings = rankings.sort((a, b) => {
             if (b.winRate !== a.winRate) return b.winRate - a.winRate;
             if (b.totalGames !== a.totalGames) return b.totalGames - a.totalGames; // Secondary sort by total games
-            return (b.wins || 0) - (a.wins || 0); // Tertiary sort by wins
+            return b.wins - a.wins; // Tertiary sort by wins
           });
           break;
       }
