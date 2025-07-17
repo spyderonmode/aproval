@@ -70,41 +70,8 @@ export function ChatPopup({
     }
   }, [initialMessage, initialSender]);
 
-  // Handle additional incoming messages from WebSocket (only for continuation of existing chat)
-  useEffect(() => {
-    const handleChatMessage = (event: CustomEvent) => {
-      const data = event.detail;
-      
-      if (data.type === 'chat_message_received' && activeChatUser && isOpen) {
-        // Only add message if it's from the current active chat user
-        // and it's not the initial message (which comes through props)
-        if (activeChatUser.userId === data.message.senderId) {
-          const incomingMessage: ChatMessage = {
-            id: Date.now().toString(),
-            senderId: data.message.senderId,
-            senderName: data.message.senderName,
-            message: data.message.message,
-            timestamp: new Date(data.message.timestamp).toLocaleTimeString(),
-            fromMe: false
-          };
-          
-          // Only add if it's not the initial message that triggered the popup
-          if (data.message.message !== initialMessage) {
-            setMessages(prev => [...prev, incomingMessage]);
-          }
-        }
-      }
-    };
-
-    // Only listen if popup is open and we have an active chat user
-    if (isOpen && activeChatUser) {
-      window.addEventListener('chat_message_received', handleChatMessage as EventListener);
-      
-      return () => {
-        window.removeEventListener('chat_message_received', handleChatMessage as EventListener);
-      };
-    }
-  }, [activeChatUser, isOpen, initialMessage]);
+  // No WebSocket listener needed - ChatPopup only handles the initial message through props
+  // New messages from the same user will trigger a new popup instance
 
   const sendMessageMutation = useMutation({
     mutationFn: async ({ targetUserId, message }: { targetUserId: string; message: string }) => {

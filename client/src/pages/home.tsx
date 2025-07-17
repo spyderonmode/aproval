@@ -96,10 +96,7 @@ export default function Home() {
           setOnlineUserCount(lastMessage.count);
           break;
         case 'chat_message_received':
-          // Dispatch custom event for chat components to handle
-          window.dispatchEvent(new CustomEvent('chat_message_received', {
-            detail: lastMessage
-          }));
+          // Event is already dispatched by useWebSocket hook, no need to dispatch again
           break;
         case 'user_offline':
           // Dispatch custom event for chat history cleanup
