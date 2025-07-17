@@ -70,13 +70,7 @@ export function ChatProvider({ children, currentUser }: ChatProviderProps) {
           ? data.message.targetUserId // Who I sent the message to
           : data.message.senderId;    // Who sent the message to me
         
-        console.log('🗨️ Adding message to history:', {
-          messageFromMe: message.fromMe,
-          senderId: data.message.senderId,
-          targetUserId: data.message.targetUserId,
-          conversationPartnerId,
-          currentUserId: currentUser?.userId || currentUser?.id
-        });
+
         
         if (conversationPartnerId) {
           addToHistory(conversationPartnerId, message);

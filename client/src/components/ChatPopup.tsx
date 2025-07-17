@@ -39,24 +39,14 @@ export function ChatPopup({
   initialSender, 
   initialMessage 
 }: ChatPopupProps) {
-  const [newMessage, setNewMessage] = useState('');
   const [isMinimized, setIsMinimized] = useState(false);
   const [activeChatUser, setActiveChatUser] = useState(initialSender || null);
-  const messagesEndRef = useRef<HTMLDivElement>(null);
-  const { toast } = useToast();
-  const { chatHistory, addToHistory } = useChatContext();
 
-  // Get current chat messages from shared context
-  const currentMessages = activeChatUser ? chatHistory.get(activeChatUser.userId) || [] : [];
+  // ChatPopup is now just a notification - doesn't show chat history
+  // Chat history is only shown in OnlineUsersModal
 
-  // Auto-scroll to bottom when new messages arrive
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  };
-
-  useEffect(() => {
-    scrollToBottom();
-  }, [currentMessages]);
+  // No need for auto-scroll since we're not showing chat history
+  // ChatPopup is now just a notification popup
 
   // Set active chat user from initial sender
   useEffect(() => {
@@ -65,43 +55,7 @@ export function ChatPopup({
     }
   }, [initialSender]);
 
-  // Note: Incoming messages are handled by ChatContext
-  // ChatPopup just displays messages from shared context
-
-  const sendMessageMutation = useMutation({
-    mutationFn: async ({ targetUserId, message }: { targetUserId: string; message: string }) => {
-      return await apiRequest('POST', '/api/chat/send', { targetUserId, message });
-    },
-    onSuccess: () => {
-      // Message will be added to history via WebSocket response  
-      // No need to manually add sent messages here
-      setNewMessage('');
-    },
-    onError: (error: any) => {
-      console.error('Chat message error:', error);
-      toast({
-        title: "Error",
-        description: error.message || "Failed to send message",
-        variant: "destructive",
-      });
-    },
-  });
-
-  const handleSendMessage = () => {
-    if (!newMessage.trim() || !activeChatUser) return;
-    
-    sendMessageMutation.mutate({ 
-      targetUserId: activeChatUser.userId, 
-      message: newMessage.trim() 
-    });
-  };
-
-  const handleKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault();
-      handleSendMessage();
-    }
-  };
+  // ChatPopup is now just a notification popup - no chat functionality
 
   const handleClose = () => {
     setActiveChatUser(null);
@@ -157,62 +111,27 @@ export function ChatPopup({
               </CardHeader>
               
               {!isMinimized && (
-                <CardContent className="p-0">
-                  <div className="h-64 flex flex-col">
-                    <ScrollArea className="flex-1 p-3">
-                      <div className="space-y-2">
-                        {currentMessages.length === 0 ? (
-                          <div className="text-center text-gray-500 text-sm py-8">
-                            No messages yet. Start a conversation!
-                          </div>
-                        ) : (
-                          currentMessages.map((message, index) => (
-                            <div
-                              key={index}
-                              className={`flex ${message.fromMe ? 'justify-end' : 'justify-start'}`}
-                            >
-                              <div
-                                className={`max-w-xs px-3 py-2 rounded-lg text-sm ${
-                                  message.fromMe
-                                    ? 'bg-blue-500 text-white'
-                                    : 'bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-gray-100'
-                                }`}
-                              >
-                                <div className="font-medium text-xs opacity-70 mb-1">
-                                  {message.fromMe ? 'You' : message.senderName}
-                                </div>
-                                <div>{message.message}</div>
-                                <div className="text-xs opacity-70 mt-1">
-                                  {message.timestamp}
-                                </div>
-                              </div>
-                            </div>
-                          ))
-                        )}
-                        <div ref={messagesEndRef} />
-                      </div>
-                    </ScrollArea>
-                    
-                    <div className="p-3 border-t bg-gray-50 dark:bg-gray-800">
-                      <div className="flex gap-2">
-                        <Input
-                          placeholder="Type a message..."
-                          value={newMessage}
-                          onChange={(e) => setNewMessage(e.target.value)}
-                          onKeyPress={handleKeyPress}
-                          className="flex-1 text-sm"
-                          disabled={!activeChatUser || sendMessageMutation.isPending}
-                        />
-                        <Button
-                          onClick={handleSendMessage}
-                          disabled={!newMessage.trim() || !activeChatUser || sendMessageMutation.isPending}
-                          size="sm"
-                          className="px-3"
-                        >
-                          <Send className="h-4 w-4" />
-                        </Button>
-                      </div>
+                <CardContent className="p-4">
+                  <div className="text-center">
+                    <div className="flex items-center justify-center w-12 h-12 rounded-full bg-blue-100 dark:bg-blue-900 mx-auto mb-3">
+                      <MessageCircle className="h-6 w-6 text-blue-600 dark:text-blue-400" />
                     </div>
+                    <div className="text-sm font-medium text-gray-900 dark:text-gray-100 mb-1">
+                      New message from {activeChatUser?.displayName || activeChatUser?.username}
+                    </div>
+                    <div className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+                      {initialMessage}
+                    </div>
+                    <div className="text-xs text-gray-500 dark:text-gray-400 mb-4">
+                      Open chat to view full conversation
+                    </div>
+                    <Button
+                      onClick={handleClose}
+                      size="sm"
+                      className="w-full"
+                    >
+                      Dismiss
+                    </Button>
                   </div>
                 </CardContent>
               )}
