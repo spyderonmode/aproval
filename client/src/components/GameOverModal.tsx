@@ -1,6 +1,6 @@
 import React from "react";
 import { Home, RefreshCw } from "lucide-react";
-import { ConfettiExplosion } from "./ConfettiExplosion";
+import { SimpleConfetti } from "./SimpleConfetti";
 import { useAudio } from "../hooks/useAudio";
 
 interface GameOverModalProps {
@@ -28,15 +28,19 @@ export function GameOverModal({ open, onClose, result, onPlayAgain, isCreatingGa
   const isDraw = result.condition === 'draw';
   const winner = result.winner;
   
-  // Play celebration sound and show confetti for wins (not draws)
+  // Play celebration sound for wins (not draws)
   React.useEffect(() => {
     if (open && !isDraw && winner) {
-      // Play celebration sound with error handling
-      try {
-        playSound('celebrate');
-      } catch (error) {
-        console.warn('Celebration sound failed:', error);
-      }
+      // Delay the sound slightly to ensure modal is fully rendered
+      const timer = setTimeout(() => {
+        try {
+          playSound('celebrate');
+        } catch (error) {
+          console.warn('Celebration sound failed:', error);
+        }
+      }, 100);
+      
+      return () => clearTimeout(timer);
     }
   }, [open, isDraw, winner, playSound]);
   
@@ -67,14 +71,8 @@ export function GameOverModal({ open, onClose, result, onPlayAgain, isCreatingGa
 
   return (
     <>
-      {/* Confetti explosion for wins */}
-      {typeof window !== 'undefined' && (
-        <ConfettiExplosion 
-          active={open && !isDraw && winner !== null} 
-          duration={4000}
-          particleCount={150}
-        />
-      )}
+      {/* Simple confetti for wins */}
+      <SimpleConfetti active={open && !isDraw && winner !== null} />
       
       <div 
         style={{
