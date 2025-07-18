@@ -7,6 +7,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { isUnauthorizedError } from "@/lib/authUtils";
 import { Loader2, Users, X, Zap } from "lucide-react";
+import { useTranslation } from "@/contexts/LanguageContext";
 
 interface MatchmakingModalProps {
   open: boolean;
@@ -16,6 +17,7 @@ interface MatchmakingModalProps {
 }
 
 export function MatchmakingModal({ open, onClose, onMatchFound, user }: MatchmakingModalProps) {
+  const { t } = useTranslation();
   const [isSearching, setIsSearching] = useState(false);
   const [searchTime, setSearchTime] = useState(0);
   const [queuePosition, setQueuePosition] = useState(0);
@@ -42,23 +44,23 @@ export function MatchmakingModal({ open, onClose, onMatchFound, user }: Matchmak
         // Server automatically handles room joining, just close modal
         onClose();
         toast({
-          title: "Match Found!",
-          description: "You've been matched with an opponent. Game starting...",
+          title: t('matchFound'),
+          description: t('matchedWithOpponent'),
         });
       } else if (data.status === 'waiting') {
         setIsSearching(true);
         setQueuePosition(1);
         toast({
-          title: "Searching for Opponent",
-          description: "Looking for another player to match with...",
+          title: t('searchingForOpponent'),
+          description: t('lookingForPlayer'),
         });
       }
     },
     onError: (error) => {
       if (isUnauthorizedError(error)) {
         toast({
-          title: "Unauthorized",
-          description: "You are logged out. Logging in again...",
+          title: t('unauthorized'),
+          description: t('loggedOutLoggingIn'),
           variant: "destructive",
         });
         setTimeout(() => {
@@ -67,7 +69,7 @@ export function MatchmakingModal({ open, onClose, onMatchFound, user }: Matchmak
         return;
       }
       toast({
-        title: "Error",
+        title: t('error'),
         description: error.message,
         variant: "destructive",
       });
@@ -85,13 +87,13 @@ export function MatchmakingModal({ open, onClose, onMatchFound, user }: Matchmak
       setSearchTime(0);
       setQueuePosition(0);
       toast({
-        title: "Left Queue",
-        description: "You've left the matchmaking queue.",
+        title: t('leftQueue'),
+        description: t('leftMatchmakingQueue'),
       });
     },
     onError: (error) => {
       toast({
-        title: "Error",
+        title: t('error'),
         description: error.message,
         variant: "destructive",
       });
@@ -127,7 +129,7 @@ export function MatchmakingModal({ open, onClose, onMatchFound, user }: Matchmak
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Zap className="h-5 w-5 text-yellow-500" />
-            Quick Match
+            {t('quickMatch')}
           </DialogTitle>
         </DialogHeader>
         
@@ -136,9 +138,9 @@ export function MatchmakingModal({ open, onClose, onMatchFound, user }: Matchmak
             <div className="text-center space-y-4">
               <div className="p-6 bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 rounded-lg">
                 <Users className="h-12 w-12 mx-auto text-blue-500 mb-3" />
-                <h3 className="font-semibold text-lg mb-2">Ready to Play?</h3>
+                <h3 className="font-semibold text-lg mb-2">{t('readyToPlay')}</h3>
                 <p className="text-sm text-gray-600 dark:text-gray-300">
-                  We'll find another player for you to compete against in real-time!
+                  {t('findAnotherPlayerCompete')}
                 </p>
               </div>
               
@@ -147,10 +149,10 @@ export function MatchmakingModal({ open, onClose, onMatchFound, user }: Matchmak
                   <div className="text-center space-y-2">
                     <div className="flex items-center justify-center gap-2 text-sm">
                       <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                      <span>Online players looking for matches</span>
+                      <span>{t('onlinePlayersLookingForMatches')}</span>
                     </div>
                     <div className="text-xs text-gray-500">
-                      Average match time: 10-30 seconds
+                      {t('averageMatchTime')}
                     </div>
                   </div>
                 </CardContent>
@@ -162,7 +164,7 @@ export function MatchmakingModal({ open, onClose, onMatchFound, user }: Matchmak
                 size="lg"
               >
                 <Zap className="h-4 w-4 mr-2" />
-                Find Match
+                {t('findMatch')}
               </Button>
             </div>
           ) : (
@@ -171,9 +173,9 @@ export function MatchmakingModal({ open, onClose, onMatchFound, user }: Matchmak
                 <div className="flex items-center justify-center mb-4">
                   <Loader2 className="h-8 w-8 text-yellow-500 animate-spin" />
                 </div>
-                <h3 className="font-semibold text-lg mb-2">Searching for Opponent</h3>
+                <h3 className="font-semibold text-lg mb-2">{t('searchingForOpponent')}</h3>
                 <p className="text-sm text-gray-600 dark:text-gray-300">
-                  Looking for another player to match with...
+                  {t('lookingForPlayer')}
                 </p>
               </div>
               
@@ -181,18 +183,18 @@ export function MatchmakingModal({ open, onClose, onMatchFound, user }: Matchmak
                 <CardContent className="p-4">
                   <div className="space-y-3">
                     <div className="flex justify-between items-center">
-                      <span className="text-sm font-medium">Search Time:</span>
+                      <span className="text-sm font-medium">{t('searchTime')}</span>
                       <span className="text-sm text-blue-600 dark:text-blue-400 font-mono">
                         {formatTime(searchTime)}
                       </span>
                     </div>
                     
                     <div className="flex justify-between items-center">
-                      <span className="text-sm font-medium">Status:</span>
+                      <span className="text-sm font-medium">{t('status')}</span>
                       <div className="flex items-center gap-1">
                         <div className="w-2 h-2 bg-yellow-500 rounded-full animate-pulse"></div>
                         <span className="text-sm text-yellow-600 dark:text-yellow-400">
-                          Searching...
+                          {t('searching')}
                         </span>
                       </div>
                     </div>
@@ -205,9 +207,9 @@ export function MatchmakingModal({ open, onClose, onMatchFound, user }: Matchmak
                     </div>
                     
                     <div className="text-xs text-gray-500 text-center">
-                      {searchTime < 10 ? "Finding the perfect opponent..." : 
-                       searchTime < 20 ? "Expanding search..." : 
-                       "Almost there..."}
+                      {searchTime < 10 ? t('findingPerfectOpponent') : 
+                       searchTime < 20 ? t('expandingSearch') : 
+                       t('almostThere')}
                     </div>
                   </div>
                 </CardContent>
@@ -220,7 +222,7 @@ export function MatchmakingModal({ open, onClose, onMatchFound, user }: Matchmak
                 disabled={leaveMatchmakingMutation.isPending}
               >
                 <X className="h-4 w-4 mr-2" />
-                Cancel Search
+                {t('cancel')}
               </Button>
             </div>
           )}

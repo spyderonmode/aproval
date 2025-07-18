@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { AchievementBadge } from "./AchievementBadge";
 import { useQuery } from "@tanstack/react-query";
 import { Loader2, Trophy, Target, Star, Crown, Zap, Medal } from "lucide-react";
+import { useTranslation } from "@/contexts/LanguageContext";
 
 interface AchievementModalProps {
   open: boolean;
@@ -11,6 +12,7 @@ interface AchievementModalProps {
 }
 
 export function AchievementModal({ open, onClose, userId }: AchievementModalProps) {
+  const { t } = useTranslation();
   const { data: achievements, isLoading } = useQuery({
     queryKey: userId ? ['/api/users', userId, 'achievements'] : ['/api/achievements'],
     enabled: open,
@@ -18,17 +20,17 @@ export function AchievementModal({ open, onClose, userId }: AchievementModalProp
 
   const achievementCategories = [
     {
-      title: "Victory Achievements",
+      title: t('victoryAchievements'),
       icon: <Trophy className="w-5 h-5" />,
       types: ['first_win', 'win_streak_5', 'win_streak_10', 'speed_demon', 'legend', 'champion']
     },
     {
-      title: "Skill Achievements", 
+      title: t('skillAchievements'), 
       icon: <Target className="w-5 h-5" />,
       types: ['master_of_diagonals', 'comeback_king']
     },
     {
-      title: "Experience Achievements",
+      title: t('experienceAchievements'),
       icon: <Star className="w-5 h-5" />,
       types: ['veteran_player']
     }
@@ -40,15 +42,15 @@ export function AchievementModal({ open, onClose, userId }: AchievementModalProp
   };
 
   const allPossibleAchievements = [
-    { type: 'first_win', name: 'First Victory', description: 'Win your very first game against any opponent to earn this achievement', icon: '🏆' },
-    { type: 'win_streak_5', name: 'Win Streak Master', description: 'Win 5 consecutive games without losing to unlock the Halloween theme', icon: '🔥' },
-    { type: 'win_streak_10', name: 'Unstoppable', description: 'Win 10 consecutive games without losing - the ultimate challenge!', icon: '⚡' },
-    { type: 'master_of_diagonals', name: 'Master of Diagonals', description: 'Win 3 games by getting three in a row diagonally (corner to corner)', icon: '🎯' },
-    { type: 'speed_demon', name: 'Speed Demon', description: 'Win 20 total games to unlock the Christmas theme - keep playing!', icon: '⚡' },
-    { type: 'veteran_player', name: 'Veteran Player', description: 'Play 100 total games (wins + losses + draws) to unlock the Summer theme', icon: '🎖️' },
-    { type: 'comeback_king', name: 'Comeback King', description: 'Win a game after losing 5 games in a row - prove your resilience!', icon: '👑' },
-    { type: 'legend', name: 'Legend', description: 'Achieve 50 total wins to become a true legend with animated fire border!', icon: '🌟' },
-    { type: 'champion', name: 'Champion', description: 'Achieve 100 total wins to become an ultimate champion with cosmic border!', icon: '👑' },
+    { type: 'first_win', name: t('firstVictoryTitle'), description: t('winYourVeryFirstGame'), icon: '🏆' },
+    { type: 'win_streak_5', name: t('winStreakMaster'), description: t('winFiveConsecutiveGames'), icon: '🔥' },
+    { type: 'win_streak_10', name: t('unstoppable'), description: t('winTenConsecutiveGames'), icon: '⚡' },
+    { type: 'master_of_diagonals', name: t('masterOfDiagonals'), description: t('winThreeGamesDiagonally'), icon: '🎯' },
+    { type: 'speed_demon', name: t('speedDemon'), description: t('winTwentyTotalGames'), icon: '⚡' },
+    { type: 'veteran_player', name: t('veteranPlayer'), description: t('playOneHundredTotalGames'), icon: '🎖️' },
+    { type: 'comeback_king', name: t('comebackKing'), description: t('winAfterLosingFive'), icon: '👑' },
+    { type: 'legend', name: t('legend'), description: t('achieveFiftyTotalWins'), icon: '🌟' },
+    { type: 'champion', name: t('champion'), description: t('achieveOneHundredTotalWins'), icon: '👑' },
   ];
 
   return (
@@ -57,7 +59,7 @@ export function AchievementModal({ open, onClose, userId }: AchievementModalProp
         <DialogHeader className="flex-shrink-0 pb-4">
           <DialogTitle className="flex items-center gap-2 text-lg sm:text-xl">
             <Trophy className="w-5 h-5 sm:w-6 sm:h-6" />
-            {userId ? 'Player Achievements' : 'Your Achievements'}
+            {userId ? t('playerAchievements') : t('yourAchievements')}
           </DialogTitle>
         </DialogHeader>
 

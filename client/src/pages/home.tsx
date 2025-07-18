@@ -902,7 +902,7 @@ export default function Home() {
             {selectedMode === 'online' && (
               <Card className="bg-slate-800 border-slate-700">
                 <CardHeader>
-                  <CardTitle className="text-lg">Online Multiplayer</CardTitle>
+                  <CardTitle className="text-lg">{t('onlineMode')}</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-4">
@@ -910,9 +910,9 @@ export default function Home() {
                       <>
                         <div className="p-4 bg-gradient-to-r from-blue-900/20 to-purple-900/20 rounded-lg border border-blue-500/20">
                           <div className="text-center space-y-3">
-                            <div className="text-sm font-semibold text-blue-300">Quick Match</div>
+                            <div className="text-sm font-semibold text-blue-300">{t('quickMatch')}</div>
                             <p className="text-xs text-gray-400">
-                              Get matched with another player instantly
+                              {t('getMatchedWithAnotherPlayer')}
                             </p>
                             <Button 
                               onClick={handleMatchmakingStart}
@@ -922,12 +922,12 @@ export default function Home() {
                               {isMatchmaking ? (
                                 <>
                                   <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                                  Searching...
+                                  {t('thinking')}
                                 </>
                               ) : (
                                 <>
                                   <Zap className="w-4 h-4 mr-2" />
-                                  Find Match
+                                  {t('findMatch')}
                                 </>
                               )}
                             </Button>
@@ -935,12 +935,12 @@ export default function Home() {
                         </div>
                         
                         <div className="text-center text-sm text-gray-500">
-                          <span>or</span>
+                          <span>{t('or')}</span>
                         </div>
                         
                         <div className="text-center">
                           <p className="text-sm text-gray-300 mb-2">
-                            Create or join a room to play with friends
+                            {t('createOrJoinRoom')}
                           </p>
                         </div>
                       </>

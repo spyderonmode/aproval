@@ -10,6 +10,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
 import { isUnauthorizedError } from "@/lib/authUtils";
 import { showUserFriendlyError } from "@/lib/errorUtils";
+import { useTranslation } from "@/contexts/LanguageContext";
 
 interface CreateRoomModalProps {
   open: boolean;
@@ -18,6 +19,7 @@ interface CreateRoomModalProps {
 }
 
 export function CreateRoomModal({ open, onClose, onRoomCreated }: CreateRoomModalProps) {
+  const { t } = useTranslation();
   const [roomName, setRoomName] = useState("");
   const [maxPlayers, setMaxPlayers] = useState("2");
   const [isPrivate, setIsPrivate] = useState(false);
@@ -33,15 +35,15 @@ export function CreateRoomModal({ open, onClose, onRoomCreated }: CreateRoomModa
       onClose();
       resetForm();
       toast({
-        title: "Room Created",
-        description: `Room ${room.code} created successfully`,
+        title: t('roomCreated'),
+        description: t('roomCodeCreated').replace('%s', room.code),
       });
     },
     onError: (error) => {
       if (isUnauthorizedError(error)) {
         toast({
-          title: "Unauthorized",
-          description: "You are logged out. Logging in again...",
+          title: t('unauthorized'),
+          description: t('loggedOutLoggingIn'),
           variant: "destructive",
         });
         setTimeout(() => {
@@ -63,8 +65,8 @@ export function CreateRoomModal({ open, onClose, onRoomCreated }: CreateRoomModa
     e.preventDefault();
     if (!roomName.trim()) {
       toast({
-        title: "Error",
-        description: "Room name is required",
+        title: t('error'),
+        description: t('roomNameRequired'),
         variant: "destructive",
       });
       return;
@@ -88,17 +90,17 @@ export function CreateRoomModal({ open, onClose, onRoomCreated }: CreateRoomModa
     <Dialog open={open} onOpenChange={handleClose}>
       <DialogContent className="bg-slate-800 border-slate-700 text-white">
         <DialogHeader>
-          <DialogTitle className="text-xl">Create New Room</DialogTitle>
+          <DialogTitle className="text-xl">{t('createNewRoom')}</DialogTitle>
         </DialogHeader>
         
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <Label htmlFor="roomName" className="text-sm font-medium text-gray-300">
-              Room Name
+              {t('roomName')}
             </Label>
             <Input
               id="roomName"
-              placeholder="Enter room name"
+              placeholder={t('enterRoomName')}
               value={roomName}
               onChange={(e) => setRoomName(e.target.value)}
               className="bg-slate-700 border-slate-600 text-white mt-1"
@@ -108,7 +110,7 @@ export function CreateRoomModal({ open, onClose, onRoomCreated }: CreateRoomModa
           
           <div>
             <Label htmlFor="maxPlayers" className="text-sm font-medium text-gray-300">
-              Max Players
+              {t('maxPlayers')}
             </Label>
             <Select 
               value={maxPlayers} 
@@ -119,8 +121,8 @@ export function CreateRoomModal({ open, onClose, onRoomCreated }: CreateRoomModa
                 <SelectValue />
               </SelectTrigger>
               <SelectContent className="bg-slate-700 border-slate-600">
-                <SelectItem value="2">2 Players</SelectItem>
-                <SelectItem value="52">2 Players + 50 Spectators</SelectItem>
+                <SelectItem value="2">{t('twoPlayers')}</SelectItem>
+                <SelectItem value="52">{t('twoPlayersSpectators')}</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -134,7 +136,7 @@ export function CreateRoomModal({ open, onClose, onRoomCreated }: CreateRoomModa
               disabled={createRoomMutation.isPending}
             />
             <Label htmlFor="private" className="text-sm text-gray-300">
-              Private Room
+              {t('private')}
             </Label>
           </div>
           
@@ -146,14 +148,14 @@ export function CreateRoomModal({ open, onClose, onRoomCreated }: CreateRoomModa
               disabled={createRoomMutation.isPending}
               className="border-slate-600 text-gray-300 hover:bg-slate-700"
             >
-              Cancel
+              {t('cancel')}
             </Button>
             <Button
               type="submit"
               disabled={createRoomMutation.isPending}
               className="bg-primary hover:bg-primary/90"
             >
-              {createRoomMutation.isPending ? "Creating..." : "Create Room"}
+              {createRoomMutation.isPending ? t('creating') : t('createRoom')}
             </Button>
           </div>
         </form>

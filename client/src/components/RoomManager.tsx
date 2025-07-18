@@ -9,6 +9,7 @@ import { useToast } from "@/hooks/use-toast";
 import { isUnauthorizedError } from "@/lib/authUtils";
 import { Plus, LogOut, Play, UserPlus } from "lucide-react";
 import { InviteFriendsModal } from "./InviteFriendsModal";
+import { useTranslation } from "@/contexts/LanguageContext";
 
 interface RoomManagerProps {
   currentRoom: any;
@@ -29,6 +30,7 @@ export function RoomManager({
   gameMode,
   user 
 }: RoomManagerProps) {
+  const { t } = useTranslation();
   const [joinCode, setJoinCode] = useState("");
   const [showInviteModal, setShowInviteModal] = useState(false);
   const { toast } = useToast();
@@ -54,15 +56,15 @@ export function RoomManager({
       onRoomJoin(data.room);
       setJoinCode("");
       toast({
-        title: "Success",
-        description: "Joined room successfully",
+        title: t('success'),
+        description: t('joinedRoomSuccessfully'),
       });
     },
     onError: (error) => {
       if (isUnauthorizedError(error)) {
         toast({
-          title: "Unauthorized",
-          description: "You are logged out. Logging in again...",
+          title: t('unauthorized'),
+          description: t('loggedOutLoggingIn'),
           variant: "destructive",
         });
         setTimeout(() => {
@@ -71,7 +73,7 @@ export function RoomManager({
         return;
       }
       toast({
-        title: "Error",
+        title: t('error'),
         description: error.message,
         variant: "destructive",
       });
@@ -89,15 +91,15 @@ export function RoomManager({
       console.log('🎮 Game started successfully:', game);
       onGameStart(game);
       toast({
-        title: "Game Started",
-        description: "Let the battle begin!",
+        title: t('gameStarted'),
+        description: t('letTheBattleBegin'),
       });
     },
     onError: (error) => {
       if (isUnauthorizedError(error)) {
         toast({
-          title: "Unauthorized",
-          description: "You are logged out. Logging in again...",
+          title: t('unauthorized'),
+          description: t('loggedOutLoggingIn'),
           variant: "destructive",
         });
         setTimeout(() => {
@@ -106,7 +108,7 @@ export function RoomManager({
         return;
       }
       toast({
-        title: "Error",
+        title: t('error'),
         description: error.message,
         variant: "destructive",
       });

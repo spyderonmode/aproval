@@ -610,14 +610,6 @@ export const translations = {
     es: 'Tus Logros',
     id: 'Pencapaian Anda'
   },
-  victoryAchievements: {
-    en: 'Victory Achievements',
-    ar: 'إنجازات النصر',
-    bn: 'বিজয়ের অর্জন',
-    hi: 'विजय की उपलब्धियां',
-    es: 'Logros de Victoria',
-    id: 'Pencapaian Kemenangan'
-  },
   firstVictory: {
     en: 'First Victory',
     ar: 'أول انتصار',
@@ -630,7 +622,7 @@ export const translations = {
     en: 'Win your first game',
     ar: 'اربح لعبتك الأولى',
     bn: 'আপনার প্রথম গেম জিতুন',
-    hi: 'अपना पहला गेम जीतें',
+    hi: 'अपना पहला गेम জীতें',
     es: 'Gana tu primer juego',
     id: 'Menangkan permainan pertama Anda'
   },
@@ -776,6 +768,588 @@ export const translations = {
     hi: 'AI',
     es: 'IA',
     id: 'AI'
+  },
+  
+  // Achievement Categories and Details
+  victoryAchievements: {
+    en: 'Victory Achievements',
+    ar: 'إنجازات النصر',
+    bn: 'বিজয়ের অর্জন',
+    hi: 'विजय की उपलब्धियां',
+    es: 'Logros de Victoria',
+    id: 'Pencapaian Kemenangan'
+  },
+  skillAchievements: {
+    en: 'Skill Achievements',
+    ar: 'إنجازات المهارة',
+    bn: 'দক্ষতার অর্জন',
+    hi: 'कौशल की उपलब्धियां',
+    es: 'Logros de Habilidad',
+    id: 'Pencapaian Keterampilan'
+  },
+  experienceAchievements: {
+    en: 'Experience Achievements',
+    ar: 'إنجازات الخبرة',
+    bn: 'অভিজ্ঞতার অর্জন',
+    hi: 'अनुभव की उपलब्धियां',
+    es: 'Logros de Experiencia',
+    id: 'Pencapaian Pengalaman'
+  },
+  playerAchievements: {
+    en: 'Player Achievements',
+    ar: 'إنجازات اللاعب',
+    bn: 'খেলোয়াড়ের অর্জন',
+    hi: 'खिलाड़ी की उपलब्धियां',
+    es: 'Logros del Jugador',
+    id: 'Pencapaian Pemain'
+  },
+  
+  // Achievement Names
+  firstVictoryTitle: {
+    en: 'First Victory',
+    ar: 'أول انتصار',
+    bn: 'প্রথম বিজয়',
+    hi: 'पहली विजय',
+    es: 'Primera Victoria',
+    id: 'Kemenangan Pertama'
+  },
+  winStreakMaster: {
+    en: 'Win Streak Master',
+    ar: 'سيد سلسلة الانتصارات',
+    bn: 'জয়ের ধারা মাস্টার',
+    hi: 'जीत की लकीर के मास्टर',
+    es: 'Maestro de Racha Ganadora',
+    id: 'Master Kemenangan Beruntun'
+  },
+  unstoppable: {
+    en: 'Unstoppable',
+    ar: 'لا يُقهر',
+    bn: 'অপ্রতিরোধ্য',
+    hi: 'अजेय',
+    es: 'Imparable',
+    id: 'Tak Terhentikan'
+  },
+  masterOfDiagonals: {
+    en: 'Master of Diagonals',
+    ar: 'سيد الأقطار',
+    bn: 'কর্ণের মাস্টার',
+    hi: 'विकर्ण के मास्टर',
+    es: 'Maestro de Diagonales',
+    id: 'Master Diagonal'
+  },
+  speedDemon: {
+    en: 'Speed Demon',
+    ar: 'شيطان السرعة',
+    bn: 'গতির দানব',
+    hi: 'गति के दानव',
+    es: 'Demonio de la Velocidad',
+    id: 'Iblis Kecepatan'
+  },
+  veteranPlayer: {
+    en: 'Veteran Player',
+    ar: 'لاعب محنك',
+    bn: 'অভিজ্ঞ খেলোয়াড়',
+    hi: 'अनुभवी खिलाड़ी',
+    es: 'Jugador Veterano',
+    id: 'Pemain Veteran'
+  },
+  comebackKing: {
+    en: 'Comeback King',
+    ar: 'ملك العودة',
+    bn: 'প্রত্যাবর্তনের রাজা',
+    hi: 'वापसी के राजा',
+    es: 'Rey del Regreso',
+    id: 'Raja Comeback'
+  },
+  legend: {
+    en: 'Legend',
+    ar: 'أسطورة',
+    bn: 'কিংবদন্তি',
+    hi: 'दंतकथा',
+    es: 'Leyenda',
+    id: 'Legenda'
+  },
+  champion: {
+    en: 'Champion',
+    ar: 'بطل',
+    bn: 'চ্যাম্পিয়ন',
+    hi: 'चैंपियन',
+    es: 'Campeón',
+    id: 'Juara'
+  },
+  
+  // Achievement Descriptions
+  winYourVeryFirstGame: {
+    en: 'Win your very first game against any opponent to earn this achievement',
+    ar: 'اربح لعبتك الأولى ضد أي خصم لكسب هذا الإنجاز',
+    bn: 'এই অর্জন অর্জনের জন্য যেকোনো প্রতিপক্ষের বিরুদ্ধে আপনার প্রথম গেম জিতুন',
+    hi: 'इस उपलब्धि को अर्जित करने के लिए किसी भी प्रतिद्वंद्वी के खिलाफ अपना पहला गेम जीतें',
+    es: 'Gana tu primer juego contra cualquier oponente para obtener este logro',
+    id: 'Menangkan permainan pertama Anda melawan lawan mana pun untuk mendapatkan pencapaian ini'
+  },
+  winFiveConsecutiveGames: {
+    en: 'Win 5 consecutive games without losing to unlock the Halloween theme',
+    ar: 'اربح 5 ألعاب متتالية دون خسارة لفتح موضوع الهالوين',
+    bn: 'হ্যালোইন থিম আনলক করতে হার না মেনে পরপর 5টি গেম জিতুন',
+    hi: 'हैलोवीन थीम अनलॉक करने के लिए बिना हारे 5 लगातार गेम जीतें',
+    es: 'Gana 5 juegos consecutivos sin perder para desbloquear el tema de Halloween',
+    id: 'Menangkan 5 permainan berturut-turut tanpa kalah untuk membuka tema Halloween'
+  },
+  winTenConsecutiveGames: {
+    en: 'Win 10 consecutive games without losing - the ultimate challenge!',
+    ar: 'اربح 10 ألعاب متتالية دون خسارة - التحدي الأقصى!',
+    bn: 'হার না মেনে পরপর 10টি গেম জিতুন - চূড়ান্ত চ্যালেঞ্জ!',
+    hi: 'बिना हारे 10 लगातार गेम जीतें - परम चुनौती!',
+    es: 'Gana 10 juegos consecutivos sin perder - ¡el desafío definitivo!',
+    id: 'Menangkan 10 permainan berturut-turut tanpa kalah - tantangan tertinggi!'
+  },
+  winThreeGamesDiagonally: {
+    en: 'Win 3 games by getting three in a row diagonally (corner to corner)',
+    ar: 'اربح 3 ألعاب بالحصول على ثلاثة في صف قطرياً (من زاوية إلى زاوية)',
+    bn: 'কর্ণভাবে (কোণ থেকে কোণে) তিনটি পরপর পেয়ে 3টি গেম জিতুন',
+    hi: 'विकर्ण रूप से (कोने से कोने तक) तीन को एक पंक्ति में प्राप्त करके 3 गेम जीतें',
+    es: 'Gana 3 juegos obteniendo tres en fila diagonalmente (esquina a esquina)',
+    id: 'Menangkan 3 permainan dengan mendapatkan tiga berturut-turut secara diagonal (sudut ke sudut)'
+  },
+  winTwentyTotalGames: {
+    en: 'Win 20 total games to unlock the Christmas theme - keep playing!',
+    ar: 'اربح 20 لعبة إجمالية لفتح موضوع الكريسماس - استمر في اللعب!',
+    bn: 'ক্রিসমাস থিম আনলক করতে মোট 20টি গেম জিতুন - খেলা চালিয়ে যান!',
+    hi: 'क्रिसमस थीम अनलॉक करने के लिए कुल 20 गेम जीतें - खेलते रहें!',
+    es: 'Gana 20 juegos en total para desbloquear el tema navideño - ¡sigue jugando!',
+    id: 'Menangkan 20 permainan total untuk membuka tema Natal - terus bermain!'
+  },
+  playOneHundredTotalGames: {
+    en: 'Play 100 total games (wins + losses + draws) to unlock the Summer theme',
+    ar: 'العب 100 لعبة إجمالية (انتصارات + هزائم + تعادل) لفتح موضوع الصيف',
+    bn: 'গ্রীষ্মকালীন থিম আনলক করতে মোট 100টি গেম খেলুন (জয় + হার + ড্র)',
+    hi: 'गर्मियों का थीम अनलॉक करने के लिए कुल 100 गेम खेलें (जीत + हार + ड्रॉ)',
+    es: 'Juega 100 juegos en total (victorias + derrotas + empates) para desbloquear el tema de verano',
+    id: 'Mainkan 100 permainan total (menang + kalah + seri) untuk membuka tema musim panas'
+  },
+  winAfterLosingFive: {
+    en: 'Win a game after losing 5 games in a row - prove your resilience!',
+    ar: 'اربح لعبة بعد خسارة 5 ألعاب متتالية - أثبت مرونتك!',
+    bn: 'পরপর 5টি গেম হারার পর একটি গেম জিতুন - আপনার স্থিতিস্থাপকতা প্রমাণ করুন!',
+    hi: 'लगातार 5 गेम हारने के बाद एक गेम जीतें - अपनी लचक साबित करें!',
+    es: 'Gana un juego después de perder 5 juegos seguidos - ¡demuestra tu resistencia!',
+    id: 'Menangkan permainan setelah kalah 5 permainan berturut-turut - buktikan ketahananmu!'
+  },
+  achieveFiftyTotalWins: {
+    en: 'Achieve 50 total wins to become a true legend with animated fire border!',
+    ar: 'حقق 50 انتصاراً إجمالياً لتصبح أسطورة حقيقية مع حدود النار المتحركة!',
+    bn: 'অ্যানিমেটেড ফায়ার বর্ডার সহ সত্যিকারের কিংবদন্তি হতে মোট 50টি জয় অর্জন করুন!',
+    hi: 'एनिमेटेड फायर बॉर्डर के साथ एक सच्चे किंवदंती बनने के लिए कुल 50 जीत हासिल करें!',
+    es: '¡Logra 50 victorias totales para convertirte en una verdadera leyenda con borde de fuego animado!',
+    id: 'Capai 50 kemenangan total untuk menjadi legenda sejati dengan border api beranimasi!'
+  },
+  achieveOneHundredTotalWins: {
+    en: 'Achieve 100 total wins to become an ultimate champion with cosmic border!',
+    ar: 'حقق 100 انتصار إجمالي لتصبح بطلاً نهائياً مع حدود كونية!',
+    bn: 'কসমিক বর্ডার সহ চূড়ান্ত চ্যাম্পিয়ন হতে মোট 100টি জয় অর্জন করুন!',
+    hi: 'कॉस्मिक बॉर्डर के साथ एक परम चैंपियन बनने के लিए कुল 100 जीत हासिল करें!',
+    es: '¡Logra 100 victorias totales para convertirte en un campeón definitivo con borde cósmico!',
+    id: 'Capai 100 kemenangan total untuk menjadi juara tertinggi dengan border kosmik!'
+  },
+  
+  // Room Management
+  quickMatch: {
+    en: 'Quick Match',
+    ar: 'مباراة سريعة',
+    bn: 'দ্রুত ম্যাচ',
+    hi: 'त्वरित मैच',
+    es: 'Partida Rápida',
+    id: 'Pertandingan Cepat'
+  },
+  getMatchedWithAnotherPlayer: {
+    en: 'Get matched with another player instantly',
+    ar: 'احصل على مباراة مع لاعب آخر فوراً',
+    bn: 'তাৎক্ষণিকভাবে অন্য খেলোয়াড়ের সাথে ম্যাচ পান',
+    hi: 'तुरंत दूसरे खिलाड़ी के साथ मैच हो जाएं',
+    es: 'Obtén una partida con otro jugador al instante',
+    id: 'Dapatkan pertandingan dengan pemain lain secara instan'
+  },
+  findMatch: {
+    en: 'Find Match',
+    ar: 'البحث عن مباراة',
+    bn: 'ম্যাচ খুঁজুন',
+    hi: 'मैच खोजें',
+    es: 'Buscar Partida',
+    id: 'Cari Pertandingan'
+  },
+  or: {
+    en: 'or',
+    ar: 'أو',
+    bn: 'অথবা',
+    hi: 'या',
+    es: 'o',
+    id: 'atau'
+  },
+  createOrJoinRoom: {
+    en: 'Create or join a room to play with friends',
+    ar: 'أنشئ أو انضم إلى غرفة للعب مع الأصدقاء',
+    bn: 'বন্ধুদের সাথে খেলার জন্য একটি রুম তৈরি করুন বা যোগ দিন',
+    hi: 'दोस्तों के साथ खेलने के लिए एक रूम बनाएं या शामिल हों',
+    es: 'Crea o únete a una sala para jugar con amigos',
+    id: 'Buat atau bergabung dengan ruang untuk bermain dengan teman'
+  },
+  roomManagement: {
+    en: 'Room Management',
+    ar: 'إدارة الغرفة',
+    bn: 'রুম ব্যবস্থাপনা',
+    hi: 'रूम प्रबंधन',
+    es: 'Gestión de Sala',
+    id: 'Manajemen Ruang'
+  },
+  roomCode: {
+    en: 'Room code',
+    ar: 'رمز الغرفة',
+    bn: 'রুম কোড',
+    hi: 'रूम कोड',
+    es: 'Código de sala',
+    id: 'Kode ruang'
+  },
+  joinAsPlayer: {
+    en: 'Join as Player',
+    ar: 'انضم كلاعب',
+    bn: 'খেলোয়াড় হিসেবে যোগ দিন',
+    hi: 'खिलाड़ी के रूप में शामिल हों',
+    es: 'Unirse como Jugador',
+    id: 'Bergabung sebagai Pemain'
+  },
+  joinAsSpectator: {
+    en: 'Join as Spectator',
+    ar: 'انضم كمشاهد',
+    bn: 'দর্শক হিসেবে যোগ দিন',
+    hi: 'दर्शक के रूप में शामिल हों',
+    es: 'Unirse como Espectador',
+    id: 'Bergabung sebagai Penonton'
+  },
+  createNewRoom: {
+    en: 'Create New Room',
+    ar: 'إنشاء غرفة جديدة',
+    bn: 'নতুন রুম তৈরি করুন',
+    hi: 'नया रूम बनाएं',
+    es: 'Crear Nueva Sala',
+    id: 'Buat Ruang Baru'
+  },
+  
+  // Online Users
+  onlineUsers: {
+    en: 'Online Users',
+    ar: 'المستخدمون المتصلون',
+    bn: 'অনলাইন ব্যবহারকারী',
+    hi: 'ऑनलाइन उपयोगकर्ता',
+    es: 'Usuarios en Línea',
+    id: 'Pengguna Online'
+  },
+  
+  // Room and Matchmaking
+  roomName: {
+    en: 'Room Name',
+    ar: 'اسم الغرفة',
+    bn: 'রুমের নাম',
+    hi: 'रूम का नाम',
+    es: 'Nombre de la Sala',
+    id: 'Nama Ruang'
+  },
+  enterRoomName: {
+    en: 'Enter room name',
+    ar: 'أدخل اسم الغرفة',
+    bn: 'রুমের নাম লিখুন',
+    hi: 'रूम का नाम दर्ज करें',
+    es: 'Ingresa el nombre de la sala',
+    id: 'Masukkan nama ruang'
+  },
+  maxPlayers: {
+    en: 'Max Players',
+    ar: 'أقصى عدد لاعبين',
+    bn: 'সর্বোচ্চ খেলোয়াড়',
+    hi: 'अधिकतम खिलाड़ी',
+    es: 'Máximo de Jugadores',
+    id: 'Pemain Maksimal'
+  },
+  twoPlayers: {
+    en: '2 Players',
+    ar: '2 لاعبين',
+    bn: '2 জন খেলোয়াড়',
+    hi: '2 खिलाड़ी',
+    es: '2 Jugadores',
+    id: '2 Pemain'
+  },
+  twoPlayersSpectators: {
+    en: '2 Players + 50 Spectators',
+    ar: '2 لاعبين + 50 مشاهد',
+    bn: '2 জন খেলোয়াড় + 50 জন দর্শক',
+    hi: '2 खिलाड़ी + 50 दर्शक',
+    es: '2 Jugadores + 50 Espectadores',
+    id: '2 Pemain + 50 Penonton'
+  },
+  private: {
+    en: 'Private',
+    ar: 'خاص',
+    bn: 'ব্যক্তিগত',
+    hi: 'निजी',
+    es: 'Privado',
+    id: 'Pribadi'
+  },
+  makeRoomPrivate: {
+    en: 'Make room private (invite only)',
+    ar: 'جعل الغرفة خاصة (بدعوة فقط)',
+    bn: 'রুমটি ব্যক্তিগত করুন (শুধুমাত্র আমন্ত্রণের মাধ্যমে)',
+    hi: 'रूम को निजी बनाएं (केवल आमंत्रण)',
+    es: 'Hacer la sala privada (solo por invitación)',
+    id: 'Buat ruang privat (hanya undangan)'
+  },
+  createRoom: {
+    en: 'Create Room',
+    ar: 'إنشاء غرفة',
+    bn: 'রুম তৈরি করুন',
+    hi: 'रूम बनाएं',
+    es: 'Crear Sala',
+    id: 'Buat Ruang'
+  },
+  creating: {
+    en: 'Creating...',
+    ar: 'جاري الإنشاء...',
+    bn: 'তৈরি করা হচ্ছে...',
+    hi: 'बनाया जा रहा है...',
+    es: 'Creando...',
+    id: 'Membuat...'
+  },
+  roomCreated: {
+    en: 'Room Created',
+    ar: 'تم إنشاء الغرفة',
+    bn: 'রুম তৈরি হয়েছে',
+    hi: 'रूम बनाया गया',
+    es: 'Sala Creada',
+    id: 'Ruang Dibuat'
+  },
+  roomCodeCreated: {
+    en: 'Room %s created successfully',
+    ar: 'تم إنشاء الغرفة %s بنجاح',
+    bn: 'রুম %s সফলভাবে তৈরি হয়েছে',
+    hi: 'रूम %s सफलतापूर्वक बनाया गया',
+    es: 'Sala %s creada exitosamente',
+    id: 'Ruang %s berhasil dibuat'
+  },
+  error: {
+    en: 'Error',
+    ar: 'خطأ',
+    bn: 'ত্রুটি',
+    hi: 'त्रुटि',
+    es: 'Error',
+    id: 'Kesalahan'
+  },
+  roomNameRequired: {
+    en: 'Room name is required',
+    ar: 'اسم الغرفة مطلوب',
+    bn: 'রুমের নাম প্রয়োজন',
+    hi: 'रूम का नाम आवश्यक है',
+    es: 'Se requiere el nombre de la sala',
+    id: 'Nama ruang diperlukan'
+  },
+  unauthorized: {
+    en: 'Unauthorized',
+    ar: 'غير مصرح',
+    bn: 'অননুমোদিত',
+    hi: 'अनधिकृत',
+    es: 'No autorizado',
+    id: 'Tidak Diotorisasi'
+  },
+  loggedOutLoggingIn: {
+    en: 'You are logged out. Logging in again...',
+    ar: 'لقد تم تسجيل خروجك. جاري تسجيل الدخول مرة أخرى...',
+    bn: 'আপনি লগ আউট হয়েছেন। আবার লগ ইন করা হচ্ছে...',
+    hi: 'आप लॉग आउट हैं। फिर से लॉग इन कर रहे हैं...',
+    es: 'Has cerrado sesión. Iniciando sesión de nuevo...',
+    id: 'Anda telah logout. Masuk lagi...'
+  },
+  success: {
+    en: 'Success',
+    ar: 'نجح',
+    bn: 'সফল',
+    hi: 'सफलता',
+    es: 'Éxito',
+    id: 'Berhasil'
+  },
+  joinedRoomSuccessfully: {
+    en: 'Joined room successfully',
+    ar: 'انضممت إلى الغرفة بنجاح',
+    bn: 'সফলভাবে রুমে যোগ দিয়েছেন',
+    hi: 'सफलतापूर्वक रूम में शामिल हुए',
+    es: 'Se unió a la sala exitosamente',
+    id: 'Berhasil bergabung dengan ruang'
+  },
+  gameStarted: {
+    en: 'Game Started',
+    ar: 'بدأت اللعبة',
+    bn: 'গেম শুরু',
+    hi: 'गेम शुरू',
+    es: 'Juego Iniciado',
+    id: 'Permainan Dimulai'
+  },
+  letTheBattleBegin: {
+    en: 'Let the battle begin!',
+    ar: 'لتبدأ المعركة!',
+    bn: 'যুদ্ধ শুরু হোক!',
+    hi: 'युद्ध शुरू हो!',
+    es: '¡Que comience la batalla!',
+    id: 'Biarkan pertempuran dimulai!'
+  },
+  searching: {
+    en: 'Searching...',
+    ar: 'جاري البحث...',
+    bn: 'খোঁজা হচ্ছে...',
+    hi: 'खोज रहे हैं...',
+    es: 'Buscando...',
+    id: 'Mencari...'
+  },
+  matchFound: {
+    en: 'Match Found!',
+    ar: 'تم العثور على مباراة!',
+    bn: 'ম্যাচ পাওয়া গেছে!',
+    hi: 'मैच मिल गया!',
+    es: '¡Partida Encontrada!',
+    id: 'Pertandingan Ditemukan!'
+  },
+  matchedWithOpponent: {
+    en: "You've been matched with an opponent. Game starting...",
+    ar: 'تم ربطك مع خصم. بدء اللعبة...',
+    bn: 'আপনাকে একজন প্রতিপক্ষের সাথে ম্যাচ করা হয়েছে। গেম শুরু হচ্ছে...',
+    hi: 'आपका मैच एक प्रतिद्वंद्वी के साथ हो गया है। गेम शुरू हो रहा है...',
+    es: 'Has sido emparejado con un oponente. El juego está comenzando...',
+    id: 'Anda telah dicocokkan dengan lawan. Permainan dimulai...'
+  },
+  searchingForOpponent: {
+    en: 'Searching for Opponent',
+    ar: 'البحث عن خصم',
+    bn: 'প্রতিপক্ষ খোঁজা হচ্ছে',
+    hi: 'प्रतिद्वंद्वी की खोज',
+    es: 'Buscando Oponente',
+    id: 'Mencari Lawan'
+  },
+  lookingForPlayer: {
+    en: 'Looking for another player to match with...',
+    ar: 'البحث عن لاعب آخر للمطابقة معه...',
+    bn: 'ম্যাচ করার জন্য অন্য খেলোয়াড় খোঁজা হচ্ছে...',
+    hi: 'मैच करने के लिए दूसरा खिलाड़ी खोज रहे हैं...',
+    es: 'Buscando otro jugador para emparejar...',
+    id: 'Mencari pemain lain untuk dicocokkan...'
+  },
+  leftQueue: {
+    en: 'Left Queue',
+    ar: 'ترك الطابور',
+    bn: 'সারি ছেড়েছেন',
+    hi: 'कतार छोड़ दी',
+    es: 'Salió de la Cola',
+    id: 'Meninggalkan Antrian'
+  },
+  leftMatchmakingQueue: {
+    en: "You've left the matchmaking queue.",
+    ar: 'لقد تركت طابور المطابقة.',
+    bn: 'আপনি ম্যাচমেকিং সারি ছেড়ে দিয়েছেন।',
+    hi: 'आपने मैचमेकिंग कतार छोड़ दी है।',
+    es: 'Has salido de la cola de emparejamiento.',
+    id: 'Anda telah meninggalkan antrian matchmaking.'
+  },
+  
+  // Additional Room Management
+  roomCode: {
+    en: 'Room Code',
+    ar: 'رمز الغرفة',
+    bn: 'রুম কোড',
+    hi: 'रूम कोड',
+    es: 'Código de Sala',
+    id: 'Kode Ruang'
+  },
+  joinAsPlayer: {
+    en: 'Join as Player',
+    ar: 'انضم كلاعب',
+    bn: 'খেলোয়াড় হিসেবে যোগ দিন',
+    hi: 'खिलाड़ी के रूप में शामिल हों',
+    es: 'Unirse como Jugador',
+    id: 'Bergabung sebagai Pemain'
+  },
+  joinAsSpectator: {
+    en: 'Join as Spectator',
+    ar: 'انضم كمشاهد',
+    bn: 'দর্শক হিসেবে যোগ দিন',
+    hi: 'दर्शक के रूप में शामिल हों',
+    es: 'Unirse como Espectador',
+    id: 'Bergabung sebagai Penonton'
+  },
+  readyToPlay: {
+    en: 'Ready to Play?',
+    ar: 'مستعد للعب؟',
+    bn: 'খেলার জন্য প্রস্তুত?',
+    hi: 'खेलने के लिए तैयार?',
+    es: '¿Listo para Jugar?',
+    id: 'Siap Bermain?'
+  },
+  findAnotherPlayerCompete: {
+    en: "We'll find another player for you to compete against in real-time!",
+    ar: 'سنجد لك لاعباً آخر للتنافس معه في الوقت الفعلي!',
+    bn: 'আমরা আপনার জন্য রিয়েল-টাইমে প্রতিযোগিতা করার জন্য আরেকজন খেলোয়াড় খুঁজে দেব!',
+    hi: 'हम आपके लिए रीयल-टाइम में प्रतिस्पर्धा करने के लिए एक और खिलाड़ी ढूंढेंगे!',
+    es: '¡Te encontraremos otro jugador para competir en tiempo real!',
+    id: 'Kami akan menemukan pemain lain untuk Anda lawan secara real-time!'
+  },
+  onlinePlayersLookingForMatches: {
+    en: 'Online players looking for matches',
+    ar: 'اللاعبون المتصلون يبحثون عن مباريات',
+    bn: 'অনলাইন খেলোয়াড়রা ম্যাচ খুঁজছেন',
+    hi: 'ऑनलाइन खिलाड़ी मैच की तलाश में हैं',
+    es: 'Jugadores en línea buscando partidas',
+    id: 'Pemain online mencari pertandingan'
+  },
+  averageMatchTime: {
+    en: 'Average match time: 10-30 seconds',
+    ar: 'متوسط وقت المباراة: 10-30 ثانية',
+    bn: 'গড় ম্যাচ সময়: 10-30 সেকেন্ড',
+    hi: 'औसत मैच समय: 10-30 सेकंड',
+    es: 'Tiempo promedio de partida: 10-30 segundos',
+    id: 'Waktu rata-rata pertandingan: 10-30 detik'
+  },
+  searchTime: {
+    en: 'Search Time:',
+    ar: 'وقت البحث:',
+    bn: 'অনুসন্ধানের সময়:',
+    hi: 'खोज का समय:',
+    es: 'Tiempo de Búsqueda:',
+    id: 'Waktu Pencarian:'
+  },
+  status: {
+    en: 'Status:',
+    ar: 'الحالة:',
+    bn: 'স্থিতি:',
+    hi: 'स्थिति:',
+    es: 'Estado:',
+    id: 'Status:'
+  },
+  findingPerfectOpponent: {
+    en: 'Finding the perfect opponent...',
+    ar: 'العثور على الخصم المثالي...',
+    bn: 'নিখুঁত প্রতিপক্ষ খোঁজা হচ্ছে...',
+    hi: 'सही प्रतिद्वंद्वी खोजा जा रहा है...',
+    es: 'Encontrando el oponente perfecto...',
+    id: 'Mencari lawan yang sempurna...'
+  },
+  expandingSearch: {
+    en: 'Expanding search...',
+    ar: 'توسيع البحث...',
+    bn: 'অনুসন্ধান সম্প্রসারণ...',
+    hi: 'खोज का विस्तार कर रहे हैं...',
+    es: 'Expandiendo búsqueda...',
+    id: 'Memperluas pencarian...'
+  },
+  almostThere: {
+    en: 'Almost there...',
+    ar: 'تقريباً وصلنا...',
+    bn: 'প্রায় শেষ...',
+    hi: 'लगभग हो गया...',
+    es: 'Casi llegamos...',
+    id: 'Hampir sampai...'
   }
 } as const;
 
