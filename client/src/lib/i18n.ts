@@ -1921,6 +1921,24 @@ export const translations = {
     hi: 'छवि फाइल पढ़ने में असफल',
     es: 'Falló al leer el archivo de imagen',
     id: 'Gagal membaca file gambar'
+  },
+
+  // Game Board Controls
+  chat: {
+    en: 'Chat',
+    ar: 'دردشة',
+    bn: 'চ্যাট',
+    hi: 'चैट',
+    es: 'Chat',
+    id: 'Chat'
+  },
+  resetGame: {
+    en: 'Reset Game',
+    ar: 'إعادة تعيين اللعبة',
+    bn: 'গেম রিসেট',
+    hi: 'गेम रीसेट करें',
+    es: 'Reiniciar Juego',
+    id: 'Reset Permainan'
   }
 } as const;
 

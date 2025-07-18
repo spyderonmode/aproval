@@ -1215,7 +1215,7 @@ export function GameBoard({ game, onGameOver, gameMode, user, lastMessage, sendM
             className="flex items-center space-x-2"
           >
             <MessageCircle className="w-4 h-4" />
-            <span>Chat</span>
+            <span>{t('chat')}</span>
           </Button>
           
           {/* Only show Reset Game button for non-online modes */}
@@ -1225,7 +1225,7 @@ export function GameBoard({ game, onGameOver, gameMode, user, lastMessage, sendM
               onClick={resetGame}
               disabled={makeMoveMutation.isPending}
             >
-              Reset Game
+              {t('resetGame')}
             </Button>
           )}
         </div>
