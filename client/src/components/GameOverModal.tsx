@@ -1,5 +1,5 @@
-import React from "react";
-import { Home, RefreshCw, Volume2 } from "lucide-react";
+import React, { useEffect } from "react";
+import { Home, RefreshCw } from "lucide-react";
 import { useClickAudio } from '@/hooks/useClickAudio';
 
 interface GameOverModalProps {
@@ -26,6 +26,17 @@ export function GameOverModal({ open, onClose, result, onPlayAgain, isCreatingGa
   // Super simple logic - no complex conditionals
   const isDraw = result.condition === 'draw';
   const winner = result.winner;
+  
+  // Auto-play celebration sound when someone wins
+  useEffect(() => {
+    if (open && !isDraw && winner) {
+      // Initialize audio and play after a short delay
+      setTimeout(() => {
+        initAudio();
+        playSound();
+      }, 500);
+    }
+  }, [open, isDraw, winner, initAudio, playSound]);
   
   // Get proper player names and info - only for online games
   const isOnlineGame = result.game?.gameMode === 'online';
@@ -217,30 +228,6 @@ export function GameOverModal({ open, onClose, result, onPlayAgain, isCreatingGa
               <p style={{ fontSize: '14px', color: '#9ca3af' }}>
                 {result.condition === 'horizontal' ? 'Horizontal line' : 'Diagonal line'}
               </p>
-              
-              {/* Sound button for celebration */}
-              <button
-                onClick={() => {
-                  initAudio();
-                  playSound();
-                }}
-                style={{
-                  marginTop: '12px',
-                  padding: '8px 16px',
-                  borderRadius: '8px',
-                  backgroundColor: '#059669',
-                  color: 'white',
-                  border: 'none',
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '8px',
-                  fontSize: '14px'
-                }}
-              >
-                <Volume2 size={16} />
-                Play Celebration
-              </button>
             </div>
           )}
         </div>
