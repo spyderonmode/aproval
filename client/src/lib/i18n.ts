@@ -1277,40 +1277,7 @@ export const translations = {
     es: 'Has salido de la cola de emparejamiento.',
     id: 'Anda telah meninggalkan antrian matchmaking.'
   },
-  
-  // Additional Room Management
-  roomCode: {
-    en: 'Room Code',
-    ar: 'رمز الغرفة',
-    bn: 'রুম কোড',
-    hi: 'रूम कोड',
-    es: 'Código de Sala',
-    id: 'Kode Ruang'
-  },
-  joinAsPlayer: {
-    en: 'Join as Player',
-    ar: 'انضم كلاعب',
-    bn: 'খেলোয়াড় হিসেবে যোগ দিন',
-    hi: 'खिलाड़ी के रूप में शामिल हों',
-    es: 'Unirse como Jugador',
-    id: 'Bergabung sebagai Pemain'
-  },
-  joinAsSpectator: {
-    en: 'Join as Spectator',
-    ar: 'انضم كمشاهد',
-    bn: 'দর্শক হিসেবে যোগ দিন',
-    hi: 'दर्शक के रूप में शामिल हों',
-    es: 'Unirse como Espectador',
-    id: 'Bergabung sebagai Penonton'
-  },
-  readyToPlay: {
-    en: 'Ready to Play?',
-    ar: 'مستعد للعب؟',
-    bn: 'খেলার জন্য প্রস্তুত?',
-    hi: 'खेलने के लिए तैयार?',
-    es: '¿Listo para Jugar?',
-    id: 'Siap Bermain?'
-  },
+
   findAnotherPlayerCompete: {
     en: "We'll find another player for you to compete against in real-time!",
     ar: 'سنجد لك لاعباً آخر للتنافس معه في الوقت الفعلي!',
@@ -1458,6 +1425,340 @@ export const translations = {
     hi: 'कॉस्मिक बॉर्डर के साथ अंतिम चैंपियन बनने के लिए कुल 100 जीत हासिल करें!',
     es: '¡Consigue 100 victorias totales para convertirte en un campeón definitivo con borde cósmico!',
     id: 'Raih total 100 kemenangan untuk menjadi juara utama dengan border kosmik!'
+  },
+
+  // Missing Chat & Friends Translations
+  sendMessage: {
+    en: 'Send Message',
+    ar: 'إرسال رسالة',
+    bn: 'বার্তা পাঠান',
+    hi: 'संदेश भेजें',
+    es: 'Enviar Mensaje',
+    id: 'Kirim Pesan'
+  },
+  typeMessage: {
+    en: 'Type a message...',
+    ar: 'اكتب رسالة...',
+    bn: 'একটি বার্তা লিখুন...',
+    hi: 'एक संदेश टाइप करें...',
+    es: 'Escribe un mensaje...',
+    id: 'Ketik pesan...'
+  },
+  noFriends: {
+    en: 'No friends yet. Add some friends to get started!',
+    ar: 'لا توجد أصدقاء بعد. أضف بعض الأصدقاء للبدء!',
+    bn: 'এখনো কোনো বন্ধু নেই। শুরু করতে কিছু বন্ধু যোগ করুন!',
+    hi: 'अभी तक कोई मित्र नहीं। शुरू करने के लिए कुछ मित्र जोड़ें!',
+    es: '¡Aún no hay amigos. Agrega algunos amigos para comenzar!',
+    id: 'Belum ada teman. Tambahkan beberapa teman untuk memulai!'
+  },
+  searchFriends: {
+    en: 'Search by username...',
+    ar: 'البحث بواسطة اسم المستخدم...',
+    bn: 'ব্যবহারকারীর নাম দিয়ে অনুসন্ধান...',
+    hi: 'उपयोगकर्ता नाम से खोजें...',
+    es: 'Buscar por nombre de usuario...',
+    id: 'Cari berdasarkan nama pengguna...'
+  },
+  loadingFriends: {
+    en: 'Loading friends...',
+    ar: 'تحميل الأصدقاء...',
+    bn: 'বন্ধুদের লোড করা হচ্ছে...',
+    hi: 'मित्र लोड हो रहे हैं...',
+    es: 'Cargando amigos...',
+    id: 'Memuat teman...'
+  },
+  removeFriend: {
+    en: 'Remove Friend',
+    ar: 'إزالة صديق',
+    bn: 'বন্ধু সরান',
+    hi: 'मित्र हटाएं',
+    es: 'Eliminar Amigo',
+    id: 'Hapus Teman'
+  },
+  accept: {
+    en: 'Accept',
+    ar: 'قبول',
+    bn: 'গ্রহণ',
+    hi: 'स्वीकार',
+    es: 'Aceptar',
+    id: 'Terima'
+  },
+  reject: {
+    en: 'Reject',
+    ar: 'رفض',
+    bn: 'প্রত্যাখ্যান',
+    hi: 'अस्वीकार',
+    es: 'Rechazar',
+    id: 'Tolak'
+  },
+  newGame: {
+    en: 'New Game',
+    ar: 'لعبة جديدة',
+    bn: 'নতুন গেম',
+    hi: 'नया गेम',
+    es: 'Nuevo Juego',
+    id: 'Permainan Baru'
+  },
+  restartGame: {
+    en: 'Restart Game',
+    ar: 'إعادة تشغيل اللعبة',
+    bn: 'গেম পুনরায় শুরু',
+    hi: 'गेम पुनः आरंभ करें',
+    es: 'Reiniciar Juego',
+    id: 'Mulai Ulang Permainan'
+  },
+  locked: {
+    en: 'Locked',
+    ar: 'مقفل',
+    bn: 'লক করা',
+    hi: 'लॉक',
+    es: 'Bloqueado',
+    id: 'Terkunci'
+  },
+  unlocked: {
+    en: 'Unlocked',
+    ar: 'مفتوح',
+    bn: 'আনলক',
+    hi: 'अनलॉक',
+    es: 'Desbloqueado',
+    id: 'Terbuka'
+  },
+  emailAddress: {
+    en: 'Email Address',
+    ar: 'عنوان البريد الإلكتروني',
+    bn: 'ইমেইল ঠিকানা',
+    hi: 'ईमेल पता',
+    es: 'Dirección de Correo',
+    id: 'Alamat Email'
+  },
+  username: {
+    en: 'Username',
+    ar: 'اسم المستخدم',
+    bn: 'ব্যবহারকারীর নাম',
+    hi: 'उपयोगकर्ता नाम',
+    es: 'Nombre de Usuario',
+    id: 'Nama Pengguna'
+  },
+
+  // Additional Friends & Chat Translations
+  noPendingRequests: {
+    en: 'No pending friend requests',
+    ar: 'لا توجد طلبات صداقة معلقة',
+    bn: 'কোনো পেন্ডিং বন্ধুত্বের অনুরোধ নেই',
+    hi: 'कोई लंबित मित्र अनुरोध नहीं',
+    es: 'No hay solicitudes de amistad pendientes',
+    id: 'Tidak ada permintaan pertemanan yang tertunda'
+  },
+  sentOn: {
+    en: 'Sent on',
+    ar: 'أرسل في',
+    bn: 'পাঠানো হয়েছে',
+    hi: 'भेजा गया',
+    es: 'Enviado el',
+    id: 'Dikirim pada'
+  },
+  searchResults: {
+    en: 'Search Results',
+    ar: 'نتائج البحث',
+    bn: 'অনুসন্ধানের ফলাফল',
+    hi: 'खोज परिणाम',
+    es: 'Resultados de Búsqueda',
+    id: 'Hasil Pencarian'
+  },
+  headToHeadStats: {
+    en: 'Head-to-Head Stats',
+    ar: 'إحصائيات المواجهة المباشرة',
+    bn: 'মুখোমুখি পরিসংখ্যান',
+    hi: 'आमने-सामने के आंकड़े',
+    es: 'Estadísticas Cara a Cara',
+    id: 'Statistik Head-to-Head'
+  },
+  youWon: {
+    en: 'Your Wins',
+    ar: 'انتصاراتك',
+    bn: 'আপনার জয়',
+    hi: 'आपकी जीत',
+    es: 'Tus Victorias',
+    id: 'Kemenangan Anda'
+  },
+  theyWon: {
+    en: 'Their Wins',
+    ar: 'انتصاراتهم',
+    bn: 'তাদের জয়',
+    hi: 'उनकी जीत',
+    es: 'Sus Victorias',
+    id: 'Kemenangan Mereka'
+  },
+  totalGames: {
+    en: 'Total Games',
+    ar: 'إجمالي الألعاب',
+    bn: 'মোট গেম',
+    hi: 'कुल गेम',
+    es: 'Juegos Totales',
+    id: 'Total Permainan'
+  },
+  draws: {
+    en: 'Draws',
+    ar: 'التعادل',
+    bn: 'ড্র',
+    hi: 'ड्रॉ',
+    es: 'Empates',
+    id: 'Seri'
+  },
+  yourWinRate: {
+    en: 'Your Win Rate',
+    ar: 'معدل انتصارك',
+    bn: 'আপনার জয়ের হার',
+    hi: 'आपकी जीत दर',
+    es: 'Tu Tasa de Victorias',
+    id: 'Tingkat Kemenangan Anda'
+  },
+  loadingStats: {
+    en: 'Loading stats...',
+    ar: 'تحميل الإحصائيات...',
+    bn: 'পরিসংখ্যান লোড করা হচ্ছে...',
+    hi: 'आंकड़े लोड हो रहे हैं...',
+    es: 'Cargando estadísticas...',
+    id: 'Memuat statistik...'
+  },
+  back: {
+    en: 'Back',
+    ar: 'رجوع',
+    bn: 'পিছনে',
+    hi: 'वापस',
+    es: 'Volver',
+    id: 'Kembali'
+  },
+  chatWith: {
+    en: 'Chat with',
+    ar: 'دردشة مع',
+    bn: 'এর সাথে চ্যাট করুন',
+    hi: 'के साथ चैट करें',
+    es: 'Chatear con',
+    id: 'Chat dengan'
+  },
+  you: {
+    en: 'You',
+    ar: 'أنت',
+    bn: 'আপনি',
+    hi: 'आप',
+    es: 'Tú',
+    id: 'Anda'
+  },
+  noMessages: {
+    en: 'No messages yet. Start a conversation with your friend!',
+    ar: 'لا توجد رسائل بعد. ابدأ محادثة مع صديقك!',
+    bn: 'এখনো কোনো বার্তা নেই। আপনার বন্ধুর সাথে কথোপকথন শুরু করুন!',
+    hi: 'अभी तक कोई संदेश नहीं। अपने मित्र से बातचीत शुरू करें!',
+    es: '¡Aún no hay mensajes. Inicia una conversación con tu amigo!',
+    id: 'Belum ada pesan. Mulai percakapan dengan teman Anda!'
+  },
+  search: {
+    en: 'Search',
+    ar: 'بحث',
+    bn: 'অনুসন্ধান',
+    hi: 'खोजें',
+    es: 'Buscar',
+    id: 'Cari'
+  },
+  requests: {
+    en: 'Requests',
+    ar: 'الطلبات',
+    bn: 'অনুরোধ',
+    hi: 'अनुरोध',
+    es: 'Solicitudes',
+    id: 'Permintaan'
+  },
+  addFriend: {
+    en: 'Add Friend',
+    ar: 'إضافة صديق',
+    bn: 'বন্ধু যোগ করুন',
+    hi: 'मित्र जोड़ें',
+    es: 'Agregar Amigo',
+    id: 'Tambah Teman'
+  },
+  send: {
+    en: 'Send',
+    ar: 'إرسال',
+    bn: 'পাঠান',
+    hi: 'भेजें',
+    es: 'Enviar',
+    id: 'Kirim'
+  },
+
+  // GameBoard Messages
+  gameNotActive: {
+    en: 'Game not active',
+    ar: 'اللعبة غير نشطة',
+    bn: 'গেম সক্রিয় নয়',
+    hi: 'गेम सक्रिय नहीं',
+    es: 'Juego no activo',
+    id: 'Permainan tidak aktif'
+  },
+  startNewGameToPlay: {
+    en: 'Start a new game to play',
+    ar: 'ابدأ لعبة جديدة للعب',
+    bn: 'খেলার জন্য একটি নতুন গেম শুরু করুন',
+    hi: 'खेलने के लिए एक नया गेम शुरू करें',
+    es: 'Inicia un nuevo juego para jugar',
+    id: 'Mulai permainan baru untuk bermain'
+  },
+  invalidMove: {
+    en: 'Invalid move',
+    ar: 'حركة غير صالحة',
+    bn: 'অবৈধ চাল',
+    hi: 'अमान्य चाल',
+    es: 'Movimiento inválido',
+    id: 'Gerakan tidak valid'
+  },
+  positionOccupied: {
+    en: 'Position already occupied',
+    ar: 'الموقع محجوز بالفعل',
+    bn: 'অবস্থান ইতিমধ্যে দখল করা',
+    hi: 'स्थिति पहले से कब्जा में',
+    es: 'Posición ya ocupada',
+    id: 'Posisi sudah ditempati'
+  },
+  notAPlayer: {
+    en: 'Not a player',
+    ar: 'ليس لاعباً',
+    bn: 'একজন খেলোয়াড় নয়',
+    hi: 'एक खिलाड़ी नहीं',
+    es: 'No es un jugador',
+    id: 'Bukan pemain'
+  },
+  notPlayerInGame: {
+    en: 'You are not a player in this game',
+    ar: 'لست لاعباً في هذه اللعبة',
+    bn: 'আপনি এই গেমে একজন খেলোয়াড় নন',
+    hi: 'आप इस गेम में एक खिलाड़ी नहीं हैं',
+    es: 'No eres un jugador en este juego',
+    id: 'Anda bukan pemain dalam permainan ini'
+  },
+  notYourTurn: {
+    en: 'Not your turn',
+    ar: 'ليس دورك',
+    bn: 'আপনার পালা নয়',
+    hi: 'आपकी बारी नहीं',
+    es: 'No es tu turno',
+    id: 'Bukan giliran Anda'
+  },
+  waitingFor: {
+    en: 'Waiting for',
+    ar: 'في انتظار',
+    bn: 'অপেক্ষা করছে',
+    hi: 'प्रतीक्षा में',
+    es: 'Esperando a',
+    id: 'Menunggu'
+  },
+  toMakeMove: {
+    en: 'to make a move',
+    ar: 'للقيام بحركة',
+    bn: 'একটি চাল করতে',
+    hi: 'चाल बनाने के लिए',
+    es: 'para hacer un movimiento',
+    id: 'untuk bergerak'
   }
 } as const;
 

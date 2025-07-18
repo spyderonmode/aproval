@@ -11,6 +11,7 @@ import { useToast } from '@/hooks/use-toast';
 import { apiRequest } from '@/lib/queryClient';
 import { User } from '@shared/schema';
 import { showUserFriendlyError } from '@/lib/errorUtils';
+import { useTranslation } from '@/contexts/LanguageContext';
 
 interface FriendRequest {
   id: string;
@@ -33,6 +34,7 @@ interface HeadToHeadStats {
 }
 
 export function Friends() {
+  const { t } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
   const [searchName, setSearchName] = useState('');
   const [selectedFriend, setSelectedFriend] = useState<User | null>(null);
@@ -259,7 +261,7 @@ export function Friends() {
       <DialogTrigger asChild>
         <Button variant="ghost" size="sm" className="w-full justify-start">
           <Users className="h-4 w-4 mr-2" />
-          Friends
+          {t('friends')}
           {friendRequests.length > 0 && (
             <Badge variant="destructive" className="ml-auto">
               {friendRequests.length}
@@ -269,31 +271,31 @@ export function Friends() {
       </DialogTrigger>
       <DialogContent className="sm:max-w-[600px] max-h-[80vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Friends</DialogTitle>
+          <DialogTitle>{t('friends')}</DialogTitle>
         </DialogHeader>
         
         <Tabs defaultValue="friends" className="w-full">
           <TabsList className="grid w-full grid-cols-3">
             <TabsTrigger value="friends">
-              Friends ({friends.length})
+              {t('friends')} ({friends.length})
             </TabsTrigger>
             <TabsTrigger value="requests">
-              Requests 
+              {t('requests')}
               {friendRequests.length > 0 && (
                 <Badge variant="destructive" className="ml-1">
                   {friendRequests.length}
                 </Badge>
               )}
             </TabsTrigger>
-            <TabsTrigger value="add">Add Friend</TabsTrigger>
+            <TabsTrigger value="add">{t('addFriend')}</TabsTrigger>
           </TabsList>
           
           <TabsContent value="friends" className="space-y-4">
             {friendsLoading ? (
-              <div className="text-center py-8">Loading friends...</div>
+              <div className="text-center py-8">{t('loadingFriends')}</div>
             ) : friends.length === 0 ? (
               <div className="text-center py-8 text-muted-foreground">
-                No friends yet. Add some friends to get started!
+                {t('noFriends')}
               </div>
             ) : (
               <div className="space-y-2">
@@ -335,7 +337,7 @@ export function Friends() {
                         className="relative"
                       >
                         <MessageCircle className="h-4 w-4 mr-1" />
-                        Chat
+                        {t('chat')}
                         {unreadMessages.get(friend.id) && (
                           <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
                             {unreadMessages.get(friend.id)}
@@ -361,10 +363,10 @@ export function Friends() {
           
           <TabsContent value="requests" className="space-y-4">
             {requestsLoading ? (
-              <div className="text-center py-8">Loading requests...</div>
+              <div className="text-center py-8">{t('loadingFriends')}</div>
             ) : friendRequests.length === 0 ? (
               <div className="text-center py-8 text-muted-foreground">
-                No pending friend requests
+                {t('noPendingRequests')}
               </div>
             ) : (
               <div className="space-y-2">
@@ -390,7 +392,7 @@ export function Friends() {
                           {request.requester.displayName || `${request.requester.firstName} ${request.requester.lastName || ''}`.trim()}
                         </div>
                         <div className="text-sm text-muted-foreground">
-                          Sent on {formatDate(request.sentAt)}
+                          {t('sentOn')} {formatDate(request.sentAt)}
                         </div>
                       </div>
                     </div>
@@ -419,13 +421,13 @@ export function Friends() {
           <TabsContent value="add" className="space-y-4">
             <div className="space-y-2">
               <label htmlFor="name" className="text-sm font-medium">
-                Find friend by name
+                {t('searchFriends')}
               </label>
               <div className="flex gap-2">
                 <Input
                   id="name"
                   type="text"
-                  placeholder="Enter name to search"
+                  placeholder={t('searchFriends')}
                   value={searchName}
                   onChange={(e) => setSearchName(e.target.value)}
                   onKeyDown={(e) => {
@@ -446,7 +448,7 @@ export function Friends() {
             {/* Search Results */}
             {searchResults.length > 0 && (
               <div className="space-y-2">
-                <div className="text-sm font-medium">Search Results:</div>
+                <div className="text-sm font-medium">{t('searchResults')}:</div>
                 {searchResults.map((user) => (
                   <div
                     key={user.id}
@@ -494,7 +496,7 @@ export function Friends() {
             <DialogContent className="sm:max-w-[500px]">
               <DialogHeader>
                 <DialogTitle>
-                  Head-to-Head with {selectedFriend.displayName || `${selectedFriend.firstName} ${selectedFriend.lastName || ''}`.trim()}
+                  {t('headToHeadStats')} with {selectedFriend.displayName || `${selectedFriend.firstName} ${selectedFriend.lastName || ''}`.trim()}
                 </DialogTitle>
               </DialogHeader>
               
@@ -505,13 +507,13 @@ export function Friends() {
                       <div className="text-2xl font-bold text-blue-600">
                         {headToHeadStats.userWins}
                       </div>
-                      <div className="text-sm text-muted-foreground">Your Wins</div>
+                      <div className="text-sm text-muted-foreground">{t('youWon')}</div>
                     </div>
                     <div className="text-center p-4 border rounded-lg">
                       <div className="text-2xl font-bold text-red-600">
                         {headToHeadStats.friendWins}
                       </div>
-                      <div className="text-sm text-muted-foreground">Their Wins</div>
+                      <div className="text-sm text-muted-foreground">{t('theyWon')}</div>
                     </div>
                   </div>
                   
@@ -520,24 +522,24 @@ export function Friends() {
                       <div className="text-lg font-bold">
                         {headToHeadStats.totalGames}
                       </div>
-                      <div className="text-sm text-muted-foreground">Total Games</div>
+                      <div className="text-sm text-muted-foreground">{t('totalGames')}</div>
                     </div>
                     <div className="text-center p-3 border rounded-lg">
                       <div className="text-lg font-bold">
                         {headToHeadStats.draws}
                       </div>
-                      <div className="text-sm text-muted-foreground">Draws</div>
+                      <div className="text-sm text-muted-foreground">{t('draws')}</div>
                     </div>
                     <div className="text-center p-3 border rounded-lg">
                       <div className="text-lg font-bold">
                         {headToHeadStats.userWinRate}%
                       </div>
-                      <div className="text-sm text-muted-foreground">Your Win Rate</div>
+                      <div className="text-sm text-muted-foreground">{t('yourWinRate')}</div>
                     </div>
                   </div>
                 </div>
               ) : (
-                <div className="text-center py-8">Loading stats...</div>
+                <div className="text-center py-8">{t('loadingStats')}</div>
               )}
             </DialogContent>
           </Dialog>
@@ -554,7 +556,7 @@ export function Friends() {
                     variant="outline"
                     onClick={() => setSelectedChatFriend(null)}
                   >
-                    ← Back
+                    ← {t('back')}
                   </Button>
                   <div className="flex items-center gap-3">
                     {selectedChatFriend.profileImageUrl ? (
@@ -569,7 +571,7 @@ export function Friends() {
                       </div>
                     )}
                     <span className="font-medium">
-                      Chat with {selectedChatFriend.displayName || `${selectedChatFriend.firstName} ${selectedChatFriend.lastName || ''}`.trim()}
+                      {t('chatWith')} {selectedChatFriend.displayName || `${selectedChatFriend.firstName} ${selectedChatFriend.lastName || ''}`.trim()}
                     </span>
                   </div>
                 </DialogTitle>
@@ -581,14 +583,14 @@ export function Friends() {
                     {currentChatMessages.length > 0 ? (
                       currentChatMessages.map((msg, index) => (
                         <div key={index} className={`p-2 rounded-lg ${msg.fromMe ? 'bg-blue-100 dark:bg-blue-900 ml-4' : 'bg-gray-100 dark:bg-gray-800 mr-4'}`}>
-                          <div className="text-sm font-medium">{msg.fromMe ? 'You' : selectedChatFriend.displayName || selectedChatFriend.firstName || selectedChatFriend.username}</div>
+                          <div className="text-sm font-medium">{msg.fromMe ? t('you') : selectedChatFriend.displayName || selectedChatFriend.firstName || selectedChatFriend.username}</div>
                           <div className="text-sm">{msg.message}</div>
                           <div className="text-xs text-muted-foreground mt-1">{msg.timestamp}</div>
                         </div>
                       ))
                     ) : (
                       <div className="text-center py-8 text-muted-foreground">
-                        No messages yet. Start a conversation with your friend!
+                        {t('noMessages')}
                       </div>
                     )}
                   </div>
@@ -598,7 +600,7 @@ export function Friends() {
                   <Input
                     value={chatMessage}
                     onChange={(e) => setChatMessage(e.target.value)}
-                    placeholder="Type a message..."
+                    placeholder={t('typeMessage')}
                     onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
                   />
                   <Button

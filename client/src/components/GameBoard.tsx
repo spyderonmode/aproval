@@ -719,8 +719,8 @@ export function GameBoard({ game, onGameOver, gameMode, user, lastMessage, sendM
 
       
       toast({
-        title: "Invalid move",
-        description: "Position already occupied",
+        title: t('invalidMove'),
+        description: t('positionOccupied'),
         variant: "destructive",
       });
       return;
@@ -742,8 +742,8 @@ export function GameBoard({ game, onGameOver, gameMode, user, lastMessage, sendM
       if (!isPlayerX && !isPlayerO) {
         console.log('❌ User is not a player in this game');
         toast({
-          title: "Not a player",
-          description: "You are not a player in this game",
+          title: t('notAPlayer'),
+          description: t('notPlayerInGame'),
           variant: "destructive",
         });
         return;
@@ -762,8 +762,8 @@ export function GameBoard({ game, onGameOver, gameMode, user, lastMessage, sendM
           (game.playerXInfo?.firstName || 'Player X') : 
           (game.playerOInfo?.firstName || 'Player O');
         toast({
-          title: "Not your turn",
-          description: `Waiting for ${currentPlayerName} to make a move`,
+          title: t('notYourTurn'),
+          description: `${t('waitingFor')} ${currentPlayerName} ${t('toMakeMove')}`,
           variant: "destructive",
         });
         return;
