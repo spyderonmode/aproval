@@ -1781,6 +1781,44 @@ export async function registerRoutes(app: Express): Promise<Server> {
               roomConnections.get(data.roomId)!.add(connectionId);
               console.log(`🏠 Room ${data.roomId} now has ${roomConnections.get(data.roomId)?.size} connections`);
               
+              // If there's an active game in this room, send the game state to the joining user
+              if (activeGame && activeGame.status === 'active') {
+                console.log(`🎮 Sending active game state to joining user ${connection.userId}`);
+                
+                // Get player information with achievements
+                const [playerXInfo, playerOInfo] = await Promise.all([
+                  storage.getUser(activeGame.playerXId),
+                  activeGame.playerOId && activeGame.playerOId !== 'AI' ? storage.getUser(activeGame.playerOId) : Promise.resolve(null)
+                ]);
+                
+                // Get achievements for both players
+                const [playerXAchievements, playerOAchievements] = await Promise.all([
+                  playerXInfo ? storage.getUserAchievements(activeGame.playerXId) : Promise.resolve([]),
+                  playerOInfo ? storage.getUserAchievements(activeGame.playerOId) : Promise.resolve([])
+                ]);
+                
+                const gameWithPlayers = {
+                  ...activeGame,
+                  playerXInfo: playerXInfo ? {
+                    ...playerXInfo,
+                    achievements: playerXAchievements.slice(0, 3)
+                  } : playerXInfo,
+                  playerOInfo: playerOInfo ? {
+                    ...playerOInfo,
+                    achievements: playerOAchievements.slice(0, 3)
+                  } : playerOInfo,
+                  gameMode: 'online'
+                };
+                
+                // Send game state to the joining user
+                connection.ws.send(JSON.stringify({
+                  type: 'game_started',
+                  game: gameWithPlayers,
+                  gameId: activeGame.id,
+                  roomId: data.roomId,
+                }));
+              }
+              
               // Notify all participants in the room about the new connection
               const roomConnIds = roomConnections.get(data.roomId);
               if (roomConnIds) {
