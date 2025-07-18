@@ -1056,8 +1056,8 @@ export class DatabaseStorage implements IStorage {
       .from(roomInvitations)
       .where(
         and(
-          eq(roomInvitations.roomId, roomId),
-          eq(roomInvitations.invitedId, invitedId),
+          sql`${roomInvitations.roomId}::text = ${roomId}`,
+          sql`${roomInvitations.invitedId} = ${invitedId}`,
           eq(roomInvitations.status, 'pending')
         )
       );
@@ -1125,11 +1125,11 @@ export class DatabaseStorage implements IStorage {
         }
       })
       .from(roomInvitations)
-      .innerJoin(rooms, eq(roomInvitations.roomId, rooms.id))
-      .innerJoin(users, eq(roomInvitations.inviterId, users.id))
+      .innerJoin(rooms, sql`${roomInvitations.roomId}::text = ${rooms.id}::text`)
+      .innerJoin(users, sql`${roomInvitations.inviterId} = ${users.id}`)
       .where(
         and(
-          eq(roomInvitations.invitedId, userId),
+          sql`${roomInvitations.invitedId} = ${userId}`,
           eq(roomInvitations.status, 'pending'),
           sql`${roomInvitations.expiresAt} > NOW()`
         )
@@ -1150,7 +1150,7 @@ export class DatabaseStorage implements IStorage {
         status: response,
         respondedAt: new Date(),
       })
-      .where(eq(roomInvitations.id, invitationId));
+      .where(sql`${roomInvitations.id}::text = ${invitationId}`);
   }
 
   async expireOldInvitations(): Promise<void> {
