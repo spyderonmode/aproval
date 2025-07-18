@@ -14,7 +14,7 @@ export function PlayerList({ roomId }: PlayerListProps) {
   const { data: participants = [], isLoading } = useQuery({
     queryKey: ["/api/rooms", roomId, "participants"],
     enabled: !!roomId && isAuthenticated,
-    refetchInterval: isAuthenticated ? 5000 : false, // Refresh every 5 seconds only when authenticated
+    refetchInterval: (!!roomId && isAuthenticated) ? 5000 : false, // Refresh every 5 seconds only when authenticated and room exists
   });
 
   if (isLoading) {
