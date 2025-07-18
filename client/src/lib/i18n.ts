@@ -1402,30 +1402,7 @@ export const translations = {
   },
 
   // Achievement Descriptions
-  speedDemonDesc: {
-    en: 'Win 20 total games to unlock the Christmas theme - keep playing!',
-    ar: 'اربح 20 لعبة إجمالية لفتح موضوع عيد الميلاد - استمر في اللعب!',
-    bn: 'ক্রিসমাস থিম আনলক করতে মোট 20টি গেম জিতুন - খেলা চালিয়ে যান!',
-    hi: 'क्रिसमस थीम अनलॉक करने के लिए कुल 20 गेम जीतें - खेलते रहें!',
-    es: '¡Gana 20 juegos en total para desbloquear el tema navideño - sigue jugando!',
-    id: 'Menangkan total 20 permainan untuk membuka tema Natal - terus bermain!'
-  },
-  legendDesc: {
-    en: 'Achieve 50 total wins to become a true legend with animated border!',
-    ar: 'حقق 50 فوزًا إجماليًا لتصبح أسطورة حقيقية مع حدود متحركة!',
-    bn: 'অ্যানিমেটেড বর্ডার সহ সত্যিকারের কিংবদন্তি হতে মোট 50টি জয় অর্জন করুন!',
-    hi: 'एनिमेटेड बॉर्डर के साथ सच्चे लीজेंड बनने के लिए कुल 50 जीत हासिल करें!',
-    es: '¡Consigue 50 victorias totales para convertirte en una verdadera leyenda con borde animado!',
-    id: 'Raih total 50 kemenangan untuk menjadi legenda sejati dengan border animasi!'
-  },
-  championDesc: {
-    en: 'Achieve 100 total wins to become an ultimate champion with cosmic border!',
-    ar: 'حقق 100 فوزًا إجماليًا لتصبح بطلاً نهائيًا مع حدود كونية!',
-    bn: 'কসমিক বর্ডার সহ চূড়ান্ত চ্যাম্পিয়ন হতে মোট 100টি জয় অর্জন করুন!',
-    hi: 'कॉस्मिक बॉर्डर के साथ अंतिम चैंपियन बनने के लिए कुल 100 जीत हासिल करें!',
-    es: '¡Consigue 100 victorias totales para convertirte en un campeón definitivo con borde cósmico!',
-    id: 'Raih total 100 kemenangan untuk menjadi juara utama dengan border kosmik!'
-  },
+
 
   // Missing Chat & Friends Translations
   sendMessage: {
@@ -1532,14 +1509,6 @@ export const translations = {
     es: 'Dirección de Correo',
     id: 'Alamat Email'
   },
-  username: {
-    en: 'Username',
-    ar: 'اسم المستخدم',
-    bn: 'ব্যবহারকারীর নাম',
-    hi: 'उपयोगकर्ता नाम',
-    es: 'Nombre de Usuario',
-    id: 'Nama Pengguna'
-  },
 
   // Additional Friends & Chat Translations
   noPendingRequests: {
@@ -1598,14 +1567,7 @@ export const translations = {
     es: 'Juegos Totales',
     id: 'Total Permainan'
   },
-  draws: {
-    en: 'Draws',
-    ar: 'التعادل',
-    bn: 'ড্র',
-    hi: 'ड्रॉ',
-    es: 'Empates',
-    id: 'Seri'
-  },
+
   yourWinRate: {
     en: 'Your Win Rate',
     ar: 'معدل انتصارك',
@@ -1661,22 +1623,6 @@ export const translations = {
     hi: 'खोजें',
     es: 'Buscar',
     id: 'Cari'
-  },
-  requests: {
-    en: 'Requests',
-    ar: 'الطلبات',
-    bn: 'অনুরোধ',
-    hi: 'अनुरोध',
-    es: 'Solicitudes',
-    id: 'Permintaan'
-  },
-  addFriend: {
-    en: 'Add Friend',
-    ar: 'إضافة صديق',
-    bn: 'বন্ধু যোগ করুন',
-    hi: 'मित्र जोड़ें',
-    es: 'Agregar Amigo',
-    id: 'Tambah Teman'
   },
   send: {
     en: 'Send',
@@ -1761,31 +1707,7 @@ export const translations = {
     id: 'untuk bergerak'
   },
 
-  // Profile Manager Translations
-  editProfile: {
-    en: 'Edit Profile',
-    ar: 'تحرير الملف الشخصي',
-    bn: 'প্রোফাইল সম্পাদনা',
-    hi: 'प्रोफाइल संपादित करें',
-    es: 'Editar Perfil',
-    id: 'Edit Profil'
-  },
-  profilePicture: {
-    en: 'Profile Picture',
-    ar: 'صورة الملف الشخصي',
-    bn: 'প্রোফাইল ছবি',
-    hi: 'प्रोफाइल चित्र',
-    es: 'Foto de Perfil',
-    id: 'Foto Profil'
-  },
-  uploadPhoto: {
-    en: 'Upload Photo',
-    ar: 'رفع صورة',
-    bn: 'ছবি আপলোড',
-    hi: 'फोटो अपलोड करें',
-    es: 'Subir Foto',
-    id: 'Unggah Foto'
-  },
+
   uploading: {
     en: 'Uploading...',
     ar: 'جاري الرفع...',
@@ -1794,14 +1716,7 @@ export const translations = {
     es: 'Subiendo...',
     id: 'Mengunggah...'
   },
-  displayName: {
-    en: 'Display Name',
-    ar: 'اسم العرض',
-    bn: 'প্রদর্শন নাম',
-    hi: 'प्रदर्शन नाम',
-    es: 'Nombre para Mostrar',
-    id: 'Nama Tampilan'
-  },
+
   enterDisplayName: {
     en: 'Enter your display name',
     ar: 'أدخل اسم العرض الخاص بك',
@@ -1810,22 +1725,7 @@ export const translations = {
     es: 'Ingresa tu nombre para mostrar',
     id: 'Masukkan nama tampilan Anda'
   },
-  cancel: {
-    en: 'Cancel',
-    ar: 'إلغاء',
-    bn: 'বাতিল',
-    hi: 'रद्द करें',
-    es: 'Cancelar',
-    id: 'Batal'
-  },
-  saveChanges: {
-    en: 'Save Changes',
-    ar: 'حفظ التغييرات',
-    bn: 'পরিবর্তন সংরক্ষণ',
-    hi: 'परिवर्तन सेव करें',
-    es: 'Guardar Cambios',
-    id: 'Simpan Perubahan'
-  },
+
   saving: {
     en: 'Saving...',
     ar: 'جاري الحفظ...',
@@ -1849,30 +1749,6 @@ export const translations = {
     hi: 'आपकी प्रोफाइल सफलतापूर्वक अपडेट हो गई है',
     es: 'Tu perfil ha sido actualizado exitosamente',
     id: 'Profil Anda telah berhasil diperbarui'
-  },
-  unauthorized: {
-    en: 'Unauthorized',
-    ar: 'غير مخول',
-    bn: 'অনুমোদিত নয়',
-    hi: 'अनधिकृत',
-    es: 'No autorizado',
-    id: 'Tidak diizinkan'
-  },
-  loggedOutLoggingIn: {
-    en: 'You are logged out. Logging in again...',
-    ar: 'لقد تم تسجيل خروجك. جاري تسجيل الدخول مرة أخرى...',
-    bn: 'আপনি লগ আউট হয়েছেন। আবার লগ ইন করা হচ্ছে...',
-    hi: 'आप लॉग आउट हो गए हैं। फिर से लॉग इन कर रहे हैं...',
-    es: 'Has cerrado sesión. Iniciando sesión de nuevo...',
-    id: 'Anda telah logout. Sedang login lagi...'
-  },
-  error: {
-    en: 'Error',
-    ar: 'خطأ',
-    bn: 'ত্রুটি',
-    hi: 'त्रुटि',
-    es: 'Error',
-    id: 'Kesalahan'
   },
   fileTooLarge: {
     en: 'File too large',
@@ -1923,23 +1799,6 @@ export const translations = {
     id: 'Gagal membaca file gambar'
   },
 
-  // Game Board Controls
-  chat: {
-    en: 'Chat',
-    ar: 'دردشة',
-    bn: 'চ্যাট',
-    hi: 'चैट',
-    es: 'Chat',
-    id: 'Chat'
-  },
-  resetGame: {
-    en: 'Reset Game',
-    ar: 'إعادة تعيين اللعبة',
-    bn: 'গেম রিসেট',
-    hi: 'गेम रीसेट करें',
-    es: 'Reiniciar Juego',
-    id: 'Reset Permainan'
-  },
 
   // Invite Friends Modal
   inviteFriendsTo: {
@@ -1974,14 +1833,7 @@ export const translations = {
     es: 'Falló al enviar invitación',
     id: 'Gagal mengirim undangan'
   },
-  loadingFriends: {
-    en: 'Loading friends...',
-    ar: 'جاري تحميل الأصدقاء...',
-    bn: 'বন্ধুদের লোড করা হচ্ছে...',
-    hi: 'मित्र लोड हो रहे हैं...',
-    es: 'Cargando amigos...',
-    id: 'Memuat teman...'
-  },
+
   noFriendsFound: {
     en: 'No Friends Found',
     ar: 'لم يتم العثور على أصدقاء',
@@ -2031,15 +1883,7 @@ export const translations = {
     id: 'Undang'
   },
 
-  // Chat Popup
-  you: {
-    en: 'You',
-    ar: 'أنت',
-    bn: 'আপনি',
-    hi: 'आप',
-    es: 'Tú',
-    id: 'Anda'
-  },
+
   failedToSendMessage: {
     en: 'Failed to send message',
     ar: 'فشل في إرسال الرسالة',
@@ -2056,14 +1900,7 @@ export const translations = {
     es: 'Aún no hay mensajes. ¡Inicia una conversación!',
     id: 'Belum ada pesan. Mulai percakapan!'
   },
-  typeMessage: {
-    en: 'Type a message...',
-    ar: 'اكتب رسالة...',
-    bn: 'একটি বার্তা টাইপ করুন...',
-    hi: 'एक संदेश टाइप करें...',
-    es: 'Escribe un mensaje...',
-    id: 'Ketik pesan...'
-  },
+
 
   // Invitation Popup
   invitationAccepted: {
@@ -2074,14 +1911,7 @@ export const translations = {
     es: 'Invitación Aceptada',
     id: 'Undangan Diterima'
   },
-  joinedRoomSuccessfully: {
-    en: 'Joined room successfully!',
-    ar: 'انضممت إلى الغرفة بنجاح!',
-    bn: 'সফলভাবে রুমে যোগ দিয়েছেন!',
-    hi: 'सफलतापूर्वक कमरे में शामिल हो गए!',
-    es: '¡Te uniste a la sala exitosamente!',
-    id: 'Berhasil bergabung dengan ruangan!'
-  },
+
   invitationDeclined: {
     en: 'Invitation Declined',
     ar: 'تم رفض الدعوة',
@@ -2114,14 +1944,7 @@ export const translations = {
     es: '{inviterName} te invitó a unirte a su sala',
     id: '{inviterName} mengundang Anda untuk bergabung dengan ruangan mereka'
   },
-  room: {
-    en: 'Room',
-    ar: 'الغرفة',
-    bn: 'রুম',
-    hi: 'कमरा',
-    es: 'Sala',
-    id: 'Ruangan'
-  },
+
   gameRoom: {
     en: 'Game Room',
     ar: 'غرفة اللعبة',
@@ -2130,14 +1953,7 @@ export const translations = {
     es: 'Sala de Juego',
     id: 'Ruang Permainan'
   },
-  accept: {
-    en: 'Accept',
-    ar: 'قبول',
-    bn: 'গ্রহণ',
-    hi: 'स्वीकार करें',
-    es: 'Aceptar',
-    id: 'Terima'
-  },
+
   decline: {
     en: 'Decline',
     ar: 'رفض',
