@@ -801,8 +801,8 @@ export default function Home() {
         </div>
       </nav>
 
-      <div className="max-w-7xl mx-auto px-4 py-6 md:px-6 md:py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 md:gap-8">
+      <div className="max-w-7xl mx-auto px-3 py-4 sm:px-4 sm:py-6 md:px-6 md:py-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6 md:gap-8">
           {/* Game Board Section */}
           <div className="lg:col-span-2">
             {currentGame ? (
@@ -829,11 +829,11 @@ export default function Home() {
             )}
 
             {/* Game Rules */}
-            <Card className="mt-6 bg-slate-800 border-slate-700">
-              <CardHeader>
-                <CardTitle className="text-lg">{t('gameRules')}</CardTitle>
+            <Card className="mt-4 sm:mt-6 bg-slate-800 border-slate-700">
+              <CardHeader className="pb-3">
+                <CardTitle className="text-base sm:text-lg">{t('gameRules')}</CardTitle>
               </CardHeader>
-              <CardContent className="space-y-3 text-sm text-gray-300">
+              <CardContent className="space-y-2 sm:space-y-3 text-xs sm:text-sm text-gray-300 pt-0">
                 <div className="flex items-start space-x-2">
                   <div className="w-1.5 h-1.5 bg-green-500 rounded-full mt-2"></div>
                   <span>{t('horizontalWin')}</span>
@@ -855,29 +855,29 @@ export default function Home() {
           </div>
 
           {/* Sidebar */}
-          <div className="space-y-6">
+          <div className="space-y-4 sm:space-y-6">
             {/* User Profile */}
             <Card className="bg-slate-800 border-slate-700">
-              <CardHeader>
-                <CardTitle className="text-lg flex items-center space-x-2">
-                  <User className="w-5 h-5" />
+              <CardHeader className="pb-3">
+                <CardTitle className="text-base sm:text-lg flex items-center space-x-2">
+                  <User className="w-4 h-4 sm:w-5 sm:h-5" />
                   <span>Profile</span>
                 </CardTitle>
               </CardHeader>
-              <CardContent>
+              <CardContent className="pt-0">
                 <div className="text-center">
                   {user?.profilePicture ? (
                     <img 
                       src={user.profilePicture} 
                       alt="Profile" 
-                      className="w-16 h-16 rounded-full object-cover mx-auto mb-3"
+                      className="w-12 h-12 sm:w-16 sm:h-16 rounded-full object-cover mx-auto mb-2 sm:mb-3"
                     />
                   ) : (
-                    <div className="w-16 h-16 bg-primary rounded-full flex items-center justify-center mx-auto mb-3">
-                      <User className="w-8 h-8 text-white" />
+                    <div className="w-12 h-12 sm:w-16 sm:h-16 bg-primary rounded-full flex items-center justify-center mx-auto mb-2 sm:mb-3">
+                      <User className="w-6 h-6 sm:w-8 sm:h-8 text-white" />
                     </div>
                   )}
-                  <p className="text-sm text-gray-300 mb-3">
+                  <p className="text-xs sm:text-sm text-gray-300 mb-2 sm:mb-3 px-2 truncate">
                     {user?.displayName || user?.username || 'Player'}
                   </p>
                   <ProfileManager user={user} open={false} />
@@ -981,31 +981,31 @@ export default function Home() {
 
             {/* Game Statistics */}
             <Card className="bg-slate-800 border-slate-700">
-              <CardHeader>
-                <CardTitle className="text-lg">{t('gameStats')}</CardTitle>
+              <CardHeader className="pb-3">
+                <CardTitle className="text-base sm:text-lg">{t('gameStats')}</CardTitle>
               </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-2 gap-4 text-center">
-                  <div className="p-3 bg-slate-700 rounded-lg">
-                    <div className="text-2xl font-bold text-blue-500">
+              <CardContent className="pt-0">
+                <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-2 xl:grid-cols-4 gap-3 text-center">
+                  <div className="p-2 sm:p-3 bg-slate-700 rounded-lg">
+                    <div className="text-xl sm:text-2xl font-bold text-blue-500">
                       {userStats?.wins || 0}
                     </div>
                     <div className="text-xs text-gray-400">{t('wins')}</div>
                   </div>
-                  <div className="p-3 bg-slate-700 rounded-lg">
-                    <div className="text-2xl font-bold text-red-500">
+                  <div className="p-2 sm:p-3 bg-slate-700 rounded-lg">
+                    <div className="text-xl sm:text-2xl font-bold text-red-500">
                       {userStats?.losses || 0}
                     </div>
                     <div className="text-xs text-gray-400">{t('losses')}</div>
                   </div>
-                  <div className="p-3 bg-slate-700 rounded-lg">
-                    <div className="text-2xl font-bold text-yellow-500">
+                  <div className="p-2 sm:p-3 bg-slate-700 rounded-lg">
+                    <div className="text-xl sm:text-2xl font-bold text-yellow-500">
                       {userStats?.draws || 0}
                     </div>
                     <div className="text-xs text-gray-400">{t('draws')}</div>
                   </div>
-                  <div className="p-3 bg-slate-700 rounded-lg">
-                    <div className="text-2xl font-bold text-gray-400">
+                  <div className="p-2 sm:p-3 bg-slate-700 rounded-lg">
+                    <div className="text-xl sm:text-2xl font-bold text-gray-400">
                       {(userStats?.wins || 0) + (userStats?.losses || 0) + (userStats?.draws || 0)}
                     </div>
                     <div className="text-xs text-gray-400">{t('total')}</div>
