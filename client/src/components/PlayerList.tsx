@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { useAuth } from "@/hooks/useAuth";
 import { User, Eye } from "lucide-react";
 
 interface PlayerListProps {
@@ -8,10 +9,12 @@ interface PlayerListProps {
 }
 
 export function PlayerList({ roomId }: PlayerListProps) {
+  const { isAuthenticated } = useAuth();
+  
   const { data: participants = [], isLoading } = useQuery({
     queryKey: ["/api/rooms", roomId, "participants"],
-    enabled: !!roomId,
-    refetchInterval: 5000, // Refresh every 5 seconds
+    enabled: !!roomId && isAuthenticated,
+    refetchInterval: isAuthenticated ? 5000 : false, // Refresh every 5 seconds only when authenticated
   });
 
   if (isLoading) {

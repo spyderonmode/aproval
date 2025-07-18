@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/hooks/useAuth";
 import { UserPlus, X, Check, Clock } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -16,11 +17,13 @@ export function InvitationPopup({ onRoomJoin }: InvitationPopupProps) {
   const [visibleInvitation, setVisibleInvitation] = useState<any>(null);
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const { isAuthenticated } = useAuth();
 
-  // Fetch room invitations
+  // Fetch room invitations only when authenticated
   const { data: invitations = [] } = useQuery({
     queryKey: ['/api/room-invitations'],
-    refetchInterval: 3000,
+    refetchInterval: isAuthenticated ? 3000 : false,
+    enabled: isAuthenticated,
   });
 
   // Show the first pending invitation as a popup

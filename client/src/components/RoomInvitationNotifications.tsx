@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
+import { useAuth } from '@/hooks/useAuth';
 import { apiRequest } from '@/lib/queryClient';
 import { Home, Clock, Check, X, Users } from 'lucide-react';
 
@@ -15,11 +16,13 @@ export function RoomInvitationNotifications({ onRoomJoin }: RoomInvitationNotifi
   const [processedInvitations, setProcessedInvitations] = useState<Set<string>>(new Set());
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const { isAuthenticated } = useAuth();
 
-  // Fetch room invitations
+  // Fetch room invitations only when authenticated
   const { data: invitations = [], isLoading } = useQuery({
     queryKey: ['/api/room-invitations'],
-    refetchInterval: 10000, // Refresh every 10 seconds
+    refetchInterval: isAuthenticated ? 10000 : false, // Refresh every 10 seconds only when authenticated
+    enabled: isAuthenticated,
   });
 
   // Respond to invitation mutation
