@@ -563,17 +563,10 @@ export default function Home() {
         if (response.ok) {
           const newGame = await response.json();
           console.log('🎮 New game created for play again:', newGame);
+          console.log('🎮 Game created successfully, waiting for server broadcast to all participants');
           
-          // Ensure the game has a fresh status
-          const gameWithFreshStatus = {
-            ...newGame,
-            status: 'active',
-            board: {},
-            currentPlayer: 'X'
-          };
-          
-          setCurrentGame(gameWithFreshStatus);
-          console.log('🎮 Game created successfully, server will broadcast to all participants');
+          // Don't set the game locally - let the server broadcast handle it
+          // This ensures both players get the exact same game state at the same time
 
           // Sound effects removed as requested
         } else {
