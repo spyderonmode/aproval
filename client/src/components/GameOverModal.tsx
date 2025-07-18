@@ -1,4 +1,7 @@
+import React from "react";
 import { Home, RefreshCw } from "lucide-react";
+import { ConfettiExplosion } from "./ConfettiExplosion";
+import { useAudio } from "../hooks/useAudio";
 
 interface GameOverModalProps {
   open: boolean;
@@ -10,6 +13,8 @@ interface GameOverModalProps {
 }
 
 export function GameOverModal({ open, onClose, result, onPlayAgain, isCreatingGame = false, onMainMenu }: GameOverModalProps) {
+  const { playSound } = useAudio();
+  
   // Simple safety checks
   if (!open) return null;
   if (!result) {
@@ -22,6 +27,14 @@ export function GameOverModal({ open, onClose, result, onPlayAgain, isCreatingGa
   // Super simple logic - no complex conditionals
   const isDraw = result.condition === 'draw';
   const winner = result.winner;
+  
+  // Play celebration sound and show confetti for wins (not draws)
+  React.useEffect(() => {
+    if (open && !isDraw && winner) {
+      // Play celebration sound
+      playSound('celebrate');
+    }
+  }, [open, isDraw, winner, playSound]);
   
   // Get proper player names and info - only for online games
   const isOnlineGame = result.game?.gameMode === 'online';
@@ -49,22 +62,30 @@ export function GameOverModal({ open, onClose, result, onPlayAgain, isCreatingGa
   const winnerInfo = isOnlineGame ? (winner === 'X' ? result.playerXInfo : result.playerOInfo) : null;
 
   return (
-    <div 
-      style={{
-        position: 'fixed',
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0,
-        backgroundColor: 'rgba(0, 0, 0, 0.9)',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        zIndex: 9999,
-        padding: '16px'
-      }}
-      onClick={onClose}
-    >
+    <>
+      {/* Confetti explosion for wins */}
+      <ConfettiExplosion 
+        active={open && !isDraw && winner !== null} 
+        duration={4000}
+        particleCount={150}
+      />
+      
+      <div 
+        style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundColor: 'rgba(0, 0, 0, 0.9)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 9999,
+          padding: '16px'
+        }}
+        onClick={onClose}
+      >
       <div 
         style={{
           backgroundColor: '#1e293b',
@@ -198,5 +219,6 @@ export function GameOverModal({ open, onClose, result, onPlayAgain, isCreatingGa
         </div>
       </div>
     </div>
+    </>
   );
 }

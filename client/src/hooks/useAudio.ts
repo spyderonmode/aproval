@@ -84,6 +84,17 @@ export function useAudio() {
         setTimeout(() => generateTone(659, 0.2), 100); // E5
         setTimeout(() => generateTone(784, 0.3), 200); // G5
         break;
+      case 'celebrate':
+        // Victory celebration sound - ascending major scale
+        generateTone(523, 0.15); // C5
+        setTimeout(() => generateTone(587, 0.15), 120); // D5
+        setTimeout(() => generateTone(659, 0.15), 240); // E5
+        setTimeout(() => generateTone(698, 0.15), 360); // F5
+        setTimeout(() => generateTone(784, 0.15), 480); // G5
+        setTimeout(() => generateTone(880, 0.15), 600); // A5
+        setTimeout(() => generateTone(988, 0.15), 720); // B5
+        setTimeout(() => generateTone(1047, 0.4), 840); // C6 (triumphant finale)
+        break;
       case 'lose':
         generateTone(392, 0.2); // G4
         setTimeout(() => generateTone(349, 0.2), 100); // F4
