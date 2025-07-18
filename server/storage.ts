@@ -848,35 +848,56 @@ export class DatabaseStorage implements IStorage {
       throw new Error('Users are already friends');
     }
 
-    // Check if friend request already exists (in either direction)
+    // Check if friend request already exists (in either direction) - check all statuses
     const existingRequest = await db
       .select()
       .from(friendRequests)
-      .where(and(
-        or(
-          and(
-            eq(friendRequests.requesterId, requesterId),
-            eq(friendRequests.requestedId, requestedId)
-          ),
-          and(
-            eq(friendRequests.requesterId, requestedId),
-            eq(friendRequests.requestedId, requesterId)
-          )
+      .where(or(
+        and(
+          eq(friendRequests.requesterId, requesterId),
+          eq(friendRequests.requestedId, requestedId)
         ),
-        eq(friendRequests.status, 'pending')
+        and(
+          eq(friendRequests.requesterId, requestedId),
+          eq(friendRequests.requestedId, requesterId)
+        )
       ));
 
     if (existingRequest.length > 0) {
-      throw new Error('Friend request already exists');
+      const request = existingRequest[0];
+      if (request.status === 'pending') {
+        throw new Error('Friend request already exists');
+      } else if (request.status === 'accepted') {
+        throw new Error('Users are already friends');
+      } else if (request.status === 'rejected') {
+        // Allow new request if previous was rejected
+        // Delete the old rejected request first
+        await db
+          .delete(friendRequests)
+          .where(eq(friendRequests.id, request.id));
+      }
     }
 
-    const [friendRequest] = await db
-      .insert(friendRequests)
-      .values({
-        requesterId,
-        requestedId,
-      })
-      .returning();
+    // Try to insert with error handling for constraint violations
+    try {
+      const [friendRequest] = await db
+        .insert(friendRequests)
+        .values({
+          requesterId,
+          requestedId,
+        })
+        .returning();
+      
+      return friendRequest;
+    } catch (error: any) {
+      // Handle constraint violations
+      if (error.code === '23505') {
+        // Unique constraint violation - friend request already exists
+        throw new Error('Friend request already exists');
+      }
+      // Re-throw other errors
+      throw error;
+    }
     
     return friendRequest;
   }
