@@ -47,10 +47,7 @@ export function OnlineUsersModal({ open, onClose, currentRoom, user }: OnlineUse
 
   const blockUserMutation = useMutation({
     mutationFn: async (userId: string) => {
-      return await apiRequest('/api/users/block', {
-        method: 'POST',
-        body: { userId },
-      });
+      return await apiRequest('POST', '/api/users/block', { userId });
     },
     onSuccess: (_, userId) => {
       setBlockedUsers(prev => new Set(prev).add(userId));
@@ -71,10 +68,7 @@ export function OnlineUsersModal({ open, onClose, currentRoom, user }: OnlineUse
 
   const unblockUserMutation = useMutation({
     mutationFn: async (userId: string) => {
-      return await apiRequest('/api/users/unblock', {
-        method: 'POST',
-        body: { userId },
-      });
+      return await apiRequest('POST', '/api/users/unblock', { userId });
     },
     onSuccess: (_, userId) => {
       setBlockedUsers(prev => {
