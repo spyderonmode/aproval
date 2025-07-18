@@ -655,6 +655,9 @@ export class DatabaseStorage implements IStorage {
       const newAchievements: Achievement[] = [];
       
       // Only grant achievements that the user actually qualifies for
+      const totalGames = userStats.wins + userStats.losses + userStats.draws;
+      console.log(`📊 Detailed stats - wins: ${userStats.wins}, losses: ${userStats.losses}, draws: ${userStats.draws}, total: ${totalGames}`);
+      
       const achievementRules = [
         {
           type: 'first_win',
@@ -689,7 +692,7 @@ export class DatabaseStorage implements IStorage {
           name: 'veteranPlayer',
           description: 'playOneHundredTotalGames',
           icon: '🎖️',
-          condition: (userStats.wins + userStats.losses + userStats.draws) >= 100,
+          condition: totalGames >= 100,
         },
       ];
 

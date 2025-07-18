@@ -86,7 +86,19 @@ export function AchievementModal({ open, onClose, userId }: AchievementModalProp
   });
 
   const recalculateAchievements = useMutation({
-    mutationFn: () => apiRequest('/api/achievements/recalculate', { method: 'POST' }),
+    mutationFn: async () => {
+      const response = await fetch('/api/achievements/recalculate', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+      });
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      return response.json();
+    },
     onSuccess: (data) => {
       console.log('✅ Recalculation successful:', data);
       queryClient.invalidateQueries({ queryKey: ['/api/achievements'] });
