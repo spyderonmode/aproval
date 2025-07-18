@@ -232,6 +232,13 @@ export function AchievementModal({ open, onClose, userId, user }: AchievementMod
           </div>
         )}
 
+        {/* Achievement Border Selector */}
+        {user && (
+          <div className="pt-6 border-t border-gray-200 dark:border-gray-700">
+            <AchievementBorderSelector user={user} />
+          </div>
+        )}
+
         <div className="flex justify-end pt-4 border-t border-gray-200 dark:border-gray-700 flex-shrink-0">
           <Button onClick={onClose} variant="default">Close</Button>
         </div>
