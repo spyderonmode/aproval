@@ -1,5 +1,6 @@
 import React from "react";
 import { Home, RefreshCw } from "lucide-react";
+import { useAudio } from "../hooks/useAudio";
 
 interface GameOverModalProps {
   open: boolean;
@@ -11,6 +12,8 @@ interface GameOverModalProps {
 }
 
 export function GameOverModal({ open, onClose, result, onPlayAgain, isCreatingGame = false, onMainMenu }: GameOverModalProps) {
+  const { playSound } = useAudio();
+  
   // Simple safety checks
   if (!open) return null;
   if (!result) {
@@ -23,6 +26,21 @@ export function GameOverModal({ open, onClose, result, onPlayAgain, isCreatingGa
   // Super simple logic - no complex conditionals
   const isDraw = result.condition === 'draw';
   const winner = result.winner;
+  
+  // Play celebration sound for wins (not draws)
+  React.useEffect(() => {
+    if (open && !isDraw && winner) {
+      const timer = setTimeout(() => {
+        try {
+          playSound('celebrate');
+        } catch (error) {
+          console.warn('Celebration sound failed:', error);
+        }
+      }, 200);
+      
+      return () => clearTimeout(timer);
+    }
+  }, [open, isDraw, winner, playSound]);
   
   // Get proper player names and info - only for online games
   const isOnlineGame = result.game?.gameMode === 'online';
@@ -50,7 +68,55 @@ export function GameOverModal({ open, onClose, result, onPlayAgain, isCreatingGa
   const winnerInfo = isOnlineGame ? (winner === 'X' ? result.playerXInfo : result.playerOInfo) : null;
 
   return (
-    <div 
+    <>
+      {/* Simple confetti effect for wins */}
+      {open && !isDraw && winner && (
+        <div
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            width: '100%',
+            height: '100%',
+            pointerEvents: 'none',
+            zIndex: 10001,
+            overflow: 'hidden'
+          }}
+        >
+          {Array.from({ length: 30 }, (_, i) => (
+            <div
+              key={i}
+              style={{
+                position: 'absolute',
+                left: `${Math.random() * 100}%`,
+                top: '-10px',
+                width: '8px',
+                height: '8px',
+                backgroundColor: ['#ff6b6b', '#4ecdc4', '#45b7d1', '#f9ca24', '#f0932b', '#6c5ce7'][Math.floor(Math.random() * 6)],
+                borderRadius: '50%',
+                animation: `confetti-fall ${2 + Math.random() * 3}s ease-out forwards`,
+                animationDelay: `${Math.random() * 2}s`
+              }}
+            />
+          ))}
+          <style dangerouslySetInnerHTML={{
+            __html: `
+              @keyframes confetti-fall {
+                0% {
+                  transform: translateY(-100vh) rotate(0deg);
+                  opacity: 1;
+                }
+                100% {
+                  transform: translateY(100vh) rotate(720deg);
+                  opacity: 0;
+                }
+              }
+            `
+          }} />
+        </div>
+      )}
+      
+      <div 
         style={{
           position: 'fixed',
           top: 0,
@@ -199,5 +265,6 @@ export function GameOverModal({ open, onClose, result, onPlayAgain, isCreatingGa
         </div>
       </div>
     </div>
+    </>
   );
 }
