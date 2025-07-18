@@ -26,7 +26,7 @@ import { Badge } from "@/components/ui/badge";
 import { GamepadIcon, LogOut, User, Zap, Loader2, Users, Settings, Menu, X, Palette, Trophy, Languages } from "lucide-react";
 import { logout } from "@/lib/firebase";
 import { useTranslation } from "@/contexts/LanguageContext";
-import { LanguageSelector } from "@/components/LanguageSelector";
+import { CustomLanguageSelector } from "@/components/CustomLanguageSelector";
 
 export default function Home() {
   const { user } = useAuth();
@@ -687,7 +687,7 @@ export default function Home() {
                         <span className="text-sm text-gray-300">{t('language')}</span>
                       </div>
                       <div className="relative z-[9999]">
-                        <LanguageSelector />
+                        <CustomLanguageSelector />
                       </div>
                     </div>
                     
