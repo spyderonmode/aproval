@@ -34,14 +34,14 @@ export function InvitationPopup({ onRoomJoin }: InvitationPopupProps) {
   }, [invitations]);
 
   const respondToInvitationMutation = useMutation({
-    mutationFn: async (data: { invitationId: string, response: 'accept' | 'decline' }) => {
+    mutationFn: async (data: { invitationId: string, response: 'accepted' | 'rejected' }) => {
       const response = await apiRequest('POST', `/api/room-invitations/${data.invitationId}/respond`, {
         response: data.response
       });
       return response.json();
     },
     onSuccess: (data, variables) => {
-      if (variables.response === 'accept') {
+      if (variables.response === 'accepted') {
         onRoomJoin(data.room);
         toast({
           title: "Invitation Accepted",
@@ -69,7 +69,7 @@ export function InvitationPopup({ onRoomJoin }: InvitationPopupProps) {
     if (visibleInvitation) {
       respondToInvitationMutation.mutate({
         invitationId: visibleInvitation.id,
-        response: 'accept'
+        response: 'accepted'
       });
     }
   };
@@ -78,7 +78,7 @@ export function InvitationPopup({ onRoomJoin }: InvitationPopupProps) {
     if (visibleInvitation) {
       respondToInvitationMutation.mutate({
         invitationId: visibleInvitation.id,
-        response: 'decline'
+        response: 'rejected'
       });
     }
   };
