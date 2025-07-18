@@ -3,56 +3,56 @@ import { useCallback } from 'react';
 export const useConfettiSound = () => {
   const playExplosionSound = useCallback(() => {
     try {
-      // Create a simple celebration sound using Web Audio API
+      // Check if Web Audio API is supported
+      if (!window.AudioContext && !(window as any).webkitAudioContext) {
+        console.log('Web Audio API not supported');
+        return;
+      }
+
       const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
       
-      // Create multiple tones for a celebration effect
-      const frequencies = [523, 659, 784, 1047]; // C5, E5, G5, C6
-      const duration = 0.8;
-      
-      frequencies.forEach((freq, index) => {
-        const oscillator = audioContext.createOscillator();
-        const gainNode = audioContext.createGain();
-        
-        oscillator.connect(gainNode);
-        gainNode.connect(audioContext.destination);
-        
-        oscillator.frequency.setValueAtTime(freq, audioContext.currentTime);
-        oscillator.type = 'sine';
-        
-        // Fade in and out
-        gainNode.gain.setValueAtTime(0, audioContext.currentTime);
-        gainNode.gain.linearRampToValueAtTime(0.1, audioContext.currentTime + 0.1);
-        gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + duration);
-        
-        oscillator.start(audioContext.currentTime + index * 0.1);
-        oscillator.stop(audioContext.currentTime + duration);
-      });
-      
-      // Add some noise burst for sparkle effect
-      const noiseBuffer = audioContext.createBuffer(1, audioContext.sampleRate * 0.3, audioContext.sampleRate);
-      const noiseData = noiseBuffer.getChannelData(0);
-      
-      for (let i = 0; i < noiseData.length; i++) {
-        noiseData[i] = (Math.random() * 2 - 1) * 0.05; // Low volume white noise
+      // Resume audio context if suspended (required for some browsers)
+      if (audioContext.state === 'suspended') {
+        audioContext.resume().then(() => {
+          playSimpleSound(audioContext);
+        });
+      } else {
+        playSimpleSound(audioContext);
       }
       
-      const noiseSource = audioContext.createBufferSource();
-      const noiseGain = audioContext.createGain();
-      
-      noiseSource.buffer = noiseBuffer;
-      noiseSource.connect(noiseGain);
-      noiseGain.connect(audioContext.destination);
-      
-      noiseGain.gain.setValueAtTime(0.3, audioContext.currentTime);
-      noiseGain.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3);
-      
-      noiseSource.start(audioContext.currentTime);
-      
     } catch (error) {
-      console.log('Audio not supported or failed:', error);
+      console.log('Audio failed:', error);
     }
   }, []);
+
+  const playSimpleSound = (audioContext: AudioContext) => {
+    try {
+      // Create a simple celebration sound
+      const oscillator = audioContext.createOscillator();
+      const gainNode = audioContext.createGain();
+      
+      oscillator.connect(gainNode);
+      gainNode.connect(audioContext.destination);
+      
+      // Play a happy chord progression
+      oscillator.frequency.setValueAtTime(523, audioContext.currentTime); // C5
+      oscillator.frequency.setValueAtTime(659, audioContext.currentTime + 0.2); // E5
+      oscillator.frequency.setValueAtTime(784, audioContext.currentTime + 0.4); // G5
+      
+      oscillator.type = 'sine';
+      
+      // Volume control
+      gainNode.gain.setValueAtTime(0, audioContext.currentTime);
+      gainNode.gain.linearRampToValueAtTime(0.1, audioContext.currentTime + 0.1);
+      gainNode.gain.linearRampToValueAtTime(0, audioContext.currentTime + 0.8);
+      
+      oscillator.start(audioContext.currentTime);
+      oscillator.stop(audioContext.currentTime + 0.8);
+      
+    } catch (error) {
+      console.log('Simple sound failed:', error);
+    }
+  };
 
   return { playExplosionSound };
 };
