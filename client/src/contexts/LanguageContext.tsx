@@ -49,8 +49,17 @@ export function useTranslation() {
   const { language } = useLanguage();
   
   return {
-    t: (key: TranslationKey) => {
-      return translations[key]?.[language] || translations[key]?.en || key;
+    t: (key: TranslationKey, variables?: Record<string, string>) => {
+      let translation = translations[key]?.[language] || translations[key]?.en || key;
+      
+      // Replace variables in the translation
+      if (variables) {
+        Object.entries(variables).forEach(([varKey, value]) => {
+          translation = translation.replace(new RegExp(`{${varKey}}`, 'g'), value);
+        });
+      }
+      
+      return translation;
     },
     language
   };

@@ -1939,6 +1939,212 @@ export const translations = {
     hi: 'गेम रीसेट करें',
     es: 'Reiniciar Juego',
     id: 'Reset Permainan'
+  },
+
+  // Invite Friends Modal
+  inviteFriendsTo: {
+    en: 'Invite Friends to',
+    ar: 'دعوة الأصدقاء إلى',
+    bn: 'বন্ধুদের আমন্ত্রণ জানান',
+    hi: 'मित्रों को आमंत्रित करें',
+    es: 'Invitar Amigos a',
+    id: 'Undang Teman ke'
+  },
+  invitationSent: {
+    en: 'Invitation Sent',
+    ar: 'تم إرسال الدعوة',
+    bn: 'আমন্ত্রণ পাঠানো হয়েছে',
+    hi: 'निमंत्रण भेजा गया',
+    es: 'Invitación Enviada',
+    id: 'Undangan Terkirim'
+  },
+  friendInvitedToRoom: {
+    en: 'Your friend has been invited to join the room!',
+    ar: 'تم دعوة صديقك للانضمام إلى الغرفة!',
+    bn: 'আপনার বন্ধুকে রুমে যোগ দিতে আমন্ত্রণ জানানো হয়েছে!',
+    hi: 'आपके मित्र को कमरे में शामिल होने के लिए आमंत्रित किया गया है!',
+    es: '¡Tu amigo ha sido invitado a unirse a la sala!',
+    id: 'Teman Anda telah diundang untuk bergabung dengan ruangan!'
+  },
+  failedToSendInvitation: {
+    en: 'Failed to send invitation',
+    ar: 'فشل في إرسال الدعوة',
+    bn: 'আমন্ত্রণ পাঠাতে ব্যর্থ',
+    hi: 'निमंत्रण भेजने में असफल',
+    es: 'Falló al enviar invitación',
+    id: 'Gagal mengirim undangan'
+  },
+  loadingFriends: {
+    en: 'Loading friends...',
+    ar: 'جاري تحميل الأصدقاء...',
+    bn: 'বন্ধুদের লোড করা হচ্ছে...',
+    hi: 'मित्र लोड हो रहे हैं...',
+    es: 'Cargando amigos...',
+    id: 'Memuat teman...'
+  },
+  noFriendsFound: {
+    en: 'No Friends Found',
+    ar: 'لم يتم العثور على أصدقاء',
+    bn: 'কোন বন্ধু খুঁজে পাওয়া যায়নি',
+    hi: 'कोई मित्र नहीं मिला',
+    es: 'No se encontraron amigos',
+    id: 'Tidak ada teman ditemukan'
+  },
+  addFriendsFirstToInvite: {
+    en: 'Add some friends first to invite them to your rooms!',
+    ar: 'أضف بعض الأصدقاء أولاً لدعوتهم إلى غرفك!',
+    bn: 'প্রথমে কিছু বন্ধু যোগ করুন তাদের আপনার রুমে আমন্ত্রণ জানাতে!',
+    hi: 'पहले कुछ मित्र जोड़ें ताकि आप उन्हें अपने कमरों में आमंत्रित कर सकें!',
+    es: '¡Agrega algunos amigos primero para invitarlos a tus salas!',
+    id: 'Tambahkan beberapa teman dulu untuk mengundang mereka ke ruangan Anda!'
+  },
+  selectFriendsToInvite: {
+    en: 'Select friends to invite to your room:',
+    ar: 'اختر الأصدقاء لدعوتهم إلى غرفتك:',
+    bn: 'আপনার রুমে আমন্ত্রণ জানাতে বন্ধুদের নির্বাচন করুন:',
+    hi: 'अपने कमरे में आमंत्रित करने के लिए मित्रों का चयन करें:',
+    es: 'Selecciona amigos para invitar a tu sala:',
+    id: 'Pilih teman untuk diundang ke ruangan Anda:'
+  },
+  invited: {
+    en: 'Invited',
+    ar: 'مدعو',
+    bn: 'আমন্ত্রিত',
+    hi: 'आमंत्रित',
+    es: 'Invitado',
+    id: 'Diundang'
+  },
+  sending: {
+    en: 'Sending...',
+    ar: 'جاري الإرسال...',
+    bn: 'পাঠানো হচ্ছে...',
+    hi: 'भेजा जा रहा है...',
+    es: 'Enviando...',
+    id: 'Mengirim...'
+  },
+  invite: {
+    en: 'Invite',
+    ar: 'دعوة',
+    bn: 'আমন্ত্রণ',
+    hi: 'आमंत्रित करें',
+    es: 'Invitar',
+    id: 'Undang'
+  },
+
+  // Chat Popup
+  you: {
+    en: 'You',
+    ar: 'أنت',
+    bn: 'আপনি',
+    hi: 'आप',
+    es: 'Tú',
+    id: 'Anda'
+  },
+  failedToSendMessage: {
+    en: 'Failed to send message',
+    ar: 'فشل في إرسال الرسالة',
+    bn: 'বার্তা পাঠাতে ব্যর্থ',
+    hi: 'संदेश भेजने में असफल',
+    es: 'Falló al enviar mensaje',
+    id: 'Gagal mengirim pesan'
+  },
+  noMessagesYet: {
+    en: 'No messages yet. Start a conversation!',
+    ar: 'لا توجد رسائل بعد. ابدأ محادثة!',
+    bn: 'এখনও কোন বার্তা নেই। একটি কথোপকথন শুরু করুন!',
+    hi: 'अभी तक कोई संदेश नहीं। बातचीत शुरू करें!',
+    es: 'Aún no hay mensajes. ¡Inicia una conversación!',
+    id: 'Belum ada pesan. Mulai percakapan!'
+  },
+  typeMessage: {
+    en: 'Type a message...',
+    ar: 'اكتب رسالة...',
+    bn: 'একটি বার্তা টাইপ করুন...',
+    hi: 'एक संदेश टाइप करें...',
+    es: 'Escribe un mensaje...',
+    id: 'Ketik pesan...'
+  },
+
+  // Invitation Popup
+  invitationAccepted: {
+    en: 'Invitation Accepted',
+    ar: 'تم قبول الدعوة',
+    bn: 'আমন্ত্রণ গৃহীত',
+    hi: 'निमंत्रण स्वीकार किया गया',
+    es: 'Invitación Aceptada',
+    id: 'Undangan Diterima'
+  },
+  joinedRoomSuccessfully: {
+    en: 'Joined room successfully!',
+    ar: 'انضممت إلى الغرفة بنجاح!',
+    bn: 'সফলভাবে রুমে যোগ দিয়েছেন!',
+    hi: 'सफलतापूर्वक कमरे में शामिल हो गए!',
+    es: '¡Te uniste a la sala exitosamente!',
+    id: 'Berhasil bergabung dengan ruangan!'
+  },
+  invitationDeclined: {
+    en: 'Invitation Declined',
+    ar: 'تم رفض الدعوة',
+    bn: 'আমন্ত্রণ প্রত্যাখ্যান',
+    hi: 'निमंत्रण अस्वीकार किया गया',
+    es: 'Invitación Rechazada',
+    id: 'Undangan Ditolak'
+  },
+  youDeclinedInvitation: {
+    en: 'You declined the room invitation.',
+    ar: 'لقد رفضت دعوة الغرفة.',
+    bn: 'আপনি রুমের আমন্ত্রণ প্রত্যাখ্যান করেছেন।',
+    hi: 'आपने कमरे का निमंत्रण अस्वीकार कर दिया।',
+    es: 'Rechazaste la invitación a la sala.',
+    id: 'Anda menolak undangan ruangan.'
+  },
+  roomInvitation: {
+    en: 'Room Invitation',
+    ar: 'دعوة الغرفة',
+    bn: 'রুমের আমন্ত্রণ',
+    hi: 'कमरे का निमंत्रण',
+    es: 'Invitación a la Sala',
+    id: 'Undangan Ruangan'
+  },
+  invitedYouToJoinRoom: {
+    en: '{inviterName} invited you to join their room',
+    ar: '{inviterName} دعاك للانضمام إلى غرفته',
+    bn: '{inviterName} আপনাকে তাদের রুমে যোগ দিতে আমন্ত্রণ জানিয়েছে',
+    hi: '{inviterName} ने आपको अपने कमरे में शामिल होने के लिए आमंत्रित किया',
+    es: '{inviterName} te invitó a unirte a su sala',
+    id: '{inviterName} mengundang Anda untuk bergabung dengan ruangan mereka'
+  },
+  room: {
+    en: 'Room',
+    ar: 'الغرفة',
+    bn: 'রুম',
+    hi: 'कमरा',
+    es: 'Sala',
+    id: 'Ruangan'
+  },
+  gameRoom: {
+    en: 'Game Room',
+    ar: 'غرفة اللعبة',
+    bn: 'গেম রুম',
+    hi: 'गेम रूम',
+    es: 'Sala de Juego',
+    id: 'Ruang Permainan'
+  },
+  accept: {
+    en: 'Accept',
+    ar: 'قبول',
+    bn: 'গ্রহণ',
+    hi: 'स्वीकार करें',
+    es: 'Aceptar',
+    id: 'Terima'
+  },
+  decline: {
+    en: 'Decline',
+    ar: 'رفض',
+    bn: 'প্রত্যাখ্যান',
+    hi: 'अस्वीकार करें',
+    es: 'Rechazar',
+    id: 'Tolak'
   }
 } as const;
 

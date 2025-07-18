@@ -7,6 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
 import { apiRequest } from '@/lib/queryClient';
 import { UserPlus, Users, Send, Check } from 'lucide-react';
+import { useTranslation } from '@/contexts/LanguageContext';
 
 interface InviteFriendsModalProps {
   open: boolean;
@@ -16,6 +17,7 @@ interface InviteFriendsModalProps {
 }
 
 export function InviteFriendsModal({ open, onClose, roomId, roomName }: InviteFriendsModalProps) {
+  const { t } = useTranslation();
   const [invitedFriends, setInvitedFriends] = useState<Set<string>>(new Set());
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -37,14 +39,14 @@ export function InviteFriendsModal({ open, onClose, roomId, roomName }: InviteFr
     onSuccess: (_, friendId) => {
       setInvitedFriends(prev => new Set([...prev, friendId]));
       toast({
-        title: "Invitation Sent",
-        description: "Your friend has been invited to join the room!",
+        title: t('invitationSent'),
+        description: t('friendInvitedToRoom'),
       });
     },
     onError: (error: any) => {
       toast({
-        title: "Error",
-        description: error.message || "Failed to send invitation",
+        title: t('error'),
+        description: error.message || t('failedToSendInvitation'),
         variant: "destructive",
       });
     },
@@ -65,7 +67,7 @@ export function InviteFriendsModal({ open, onClose, roomId, roomName }: InviteFr
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <UserPlus className="h-5 w-5 text-blue-500" />
-            Invite Friends to {roomName}
+{t('inviteFriendsTo')} {roomName}
           </DialogTitle>
         </DialogHeader>
         
@@ -73,20 +75,20 @@ export function InviteFriendsModal({ open, onClose, roomId, roomName }: InviteFr
           {friendsLoading ? (
             <div className="text-center py-8">
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto"></div>
-              <p className="text-sm text-gray-600 dark:text-gray-300 mt-2">Loading friends...</p>
+              <p className="text-sm text-gray-600 dark:text-gray-300 mt-2">{t('loadingFriends')}</p>
             </div>
           ) : friends.length === 0 ? (
             <div className="text-center py-8 text-muted-foreground">
               <Users className="h-12 w-12 mx-auto text-gray-400 mb-3" />
-              <h3 className="font-medium text-lg mb-2">No Friends Found</h3>
+              <h3 className="font-medium text-lg mb-2">{t('noFriendsFound')}</h3>
               <p className="text-sm">
-                Add some friends first to invite them to your rooms!
+                {t('addFriendsFirstToInvite')}
               </p>
             </div>
           ) : (
             <div className="space-y-3">
               <div className="text-sm text-gray-600 dark:text-gray-300 mb-3">
-                Select friends to invite to your room:
+                {t('selectFriendsToInvite')}
               </div>
               
               {friends.map((friend: any) => {
@@ -131,7 +133,7 @@ export function InviteFriendsModal({ open, onClose, roomId, roomName }: InviteFr
                               className="bg-green-50 border-green-200 text-green-700 dark:bg-green-900/20 dark:border-green-700 dark:text-green-400"
                             >
                               <Check className="h-4 w-4 mr-1" />
-                              Invited
+                              {t('invited')}
                             </Button>
                           ) : (
                             <Button
@@ -141,7 +143,7 @@ export function InviteFriendsModal({ open, onClose, roomId, roomName }: InviteFr
                               className="bg-blue-500 hover:bg-blue-600 text-white"
                             >
                               <Send className="h-4 w-4 mr-1" />
-                              {isInviting ? 'Sending...' : 'Invite'}
+                              {isInviting ? t('sending') : t('invite')}
                             </Button>
                           )}
                         </div>
@@ -158,7 +160,7 @@ export function InviteFriendsModal({ open, onClose, roomId, roomName }: InviteFr
               variant="outline"
               onClick={handleClose}
             >
-              Close
+              {t('close')}
             </Button>
           </div>
         </div>

@@ -8,12 +8,14 @@ import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
 import { UserPlus, X, Check, Clock } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useTranslation } from "@/contexts/LanguageContext";
 
 interface InvitationPopupProps {
   onRoomJoin: (room: any) => void;
 }
 
 export function InvitationPopup({ onRoomJoin }: InvitationPopupProps) {
+  const { t } = useTranslation();
   const [visibleInvitation, setVisibleInvitation] = useState<any>(null);
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -47,13 +49,13 @@ export function InvitationPopup({ onRoomJoin }: InvitationPopupProps) {
       if (variables.response === 'accepted') {
         onRoomJoin(data.room);
         toast({
-          title: "Invitation Accepted",
-          description: `Joined room successfully!`,
+          title: t('invitationAccepted'),
+          description: t('joinedRoomSuccessfully'),
         });
       } else {
         toast({
-          title: "Invitation Declined",
-          description: "You declined the room invitation.",
+          title: t('invitationDeclined'),
+          description: t('youDeclinedInvitation'),
         });
       }
       queryClient.invalidateQueries({ queryKey: ['/api/room-invitations'] });
@@ -61,7 +63,7 @@ export function InvitationPopup({ onRoomJoin }: InvitationPopupProps) {
     },
     onError: (error) => {
       toast({
-        title: "Error",
+        title: t('error'),
         description: error.message,
         variant: "destructive",
       });
@@ -106,7 +108,7 @@ export function InvitationPopup({ onRoomJoin }: InvitationPopupProps) {
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <UserPlus className="w-5 h-5 text-blue-400" />
-                <CardTitle className="text-lg text-white">Room Invitation</CardTitle>
+                <CardTitle className="text-lg text-white">{t('roomInvitation')}</CardTitle>
               </div>
               <Button
                 variant="ghost"
@@ -121,14 +123,14 @@ export function InvitationPopup({ onRoomJoin }: InvitationPopupProps) {
           <CardContent className="space-y-4">
             <div className="text-center space-y-2">
               <div className="text-white font-medium">
-                {visibleInvitation.inviterName} invited you to join their room
+{t('invitedYouToJoinRoom', { inviterName: visibleInvitation.inviterName })}
               </div>
               <div className="text-blue-200 text-sm">
-                Room: {visibleInvitation.roomCode}
+{t('room')}: {visibleInvitation.roomCode}
               </div>
               <Badge variant="secondary" className="bg-blue-600/30 text-blue-200 border-blue-400/30">
                 <Clock className="w-3 h-3 mr-1" />
-                Game Room
+{t('gameRoom')}
               </Badge>
             </div>
             
@@ -139,7 +141,7 @@ export function InvitationPopup({ onRoomJoin }: InvitationPopupProps) {
                 className="flex-1 bg-green-600 hover:bg-green-700 text-white"
               >
                 <Check className="w-4 h-4 mr-2" />
-                Accept
+{t('accept')}
               </Button>
               <Button
                 onClick={handleDecline}
@@ -148,7 +150,7 @@ export function InvitationPopup({ onRoomJoin }: InvitationPopupProps) {
                 className="flex-1 border-red-500/50 text-red-300 hover:bg-red-500/20"
               >
                 <X className="w-4 h-4 mr-2" />
-                Decline
+{t('decline')}
               </Button>
             </div>
           </CardContent>
