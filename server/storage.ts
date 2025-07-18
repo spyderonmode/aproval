@@ -34,7 +34,7 @@ import {
   type InsertRoomInvitation,
 } from "@shared/schema";
 import { db } from "./db";
-import { eq, and, desc, count, or, ne, isNull, isNotNull, sql, exists } from "drizzle-orm";
+import { eq, and, desc, count, or, ne, isNull, isNotNull, sql, exists, inArray } from "drizzle-orm";
 
 export interface IStorage {
   // User operations - mandatory for Replit Auth
@@ -609,11 +609,26 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getUserAchievements(userId: string): Promise<Achievement[]> {
-    return await db
+    // First get current achievements
+    const currentAchievements = await db
       .select()
       .from(achievements)
       .where(eq(achievements.userId, userId))
       .orderBy(desc(achievements.unlockedAt));
+
+    // Auto-validate achievements if user has any
+    if (currentAchievements.length > 0) {
+      await this.validateUserAchievements(userId);
+      
+      // Get updated achievements after validation
+      return await db
+        .select()
+        .from(achievements)
+        .where(eq(achievements.userId, userId))
+        .orderBy(desc(achievements.unlockedAt));
+    }
+
+    return currentAchievements;
   }
 
   async hasAchievement(userId: string, achievementType: string): Promise<boolean> {
@@ -625,6 +640,82 @@ export class DatabaseStorage implements IStorage {
         eq(achievements.achievementType, achievementType)
       ));
     return !!achievement;
+  }
+
+  async validateUserAchievements(userId: string): Promise<void> {
+    try {
+      // Get current user stats
+      const userStats = await this.getUserStats(userId);
+      const totalGames = userStats.wins + userStats.losses + userStats.draws;
+      
+      // Get existing achievements
+      const existingAchievements = await db
+        .select()
+        .from(achievements)
+        .where(eq(achievements.userId, userId));
+      
+      // Define what achievements should exist
+      const shouldHaveAchievements = [];
+      
+      if (userStats.wins >= 1) shouldHaveAchievements.push('first_win');
+      if (userStats.wins >= 20) shouldHaveAchievements.push('speed_demon');
+      if (userStats.wins >= 50) shouldHaveAchievements.push('legend');
+      if (userStats.wins >= 100) shouldHaveAchievements.push('champion');
+      if (totalGames >= 100) shouldHaveAchievements.push('veteran_player');
+      
+      // Check for incorrect achievements
+      const incorrectAchievements = existingAchievements.filter(
+        achievement => !shouldHaveAchievements.includes(achievement.achievementType)
+      );
+      
+      // Remove incorrect achievements
+      if (incorrectAchievements.length > 0) {
+        console.log(`🔄 Auto-removing ${incorrectAchievements.length} incorrect achievements for user: ${userId}`);
+        await db
+          .delete(achievements)
+          .where(and(
+            eq(achievements.userId, userId),
+            inArray(achievements.achievementType, incorrectAchievements.map(a => a.achievementType))
+          ));
+      }
+      
+      // Add missing achievements
+      const existingTypes = existingAchievements.map(a => a.achievementType);
+      const missingAchievements = shouldHaveAchievements.filter(
+        type => !existingTypes.includes(type)
+      );
+      
+      if (missingAchievements.length > 0) {
+        console.log(`🔄 Auto-adding ${missingAchievements.length} missing achievements for user: ${userId}`);
+        
+        const achievementData = {
+          'first_win': { name: 'firstVictoryTitle', description: 'winYourVeryFirstGame', icon: '🏆' },
+          'speed_demon': { name: 'speedDemon', description: 'winTwentyTotalGames', icon: '⚡' },
+          'legend': { name: 'legend', description: 'achieveFiftyTotalWins', icon: '🌟' },
+          'champion': { name: 'champion', description: 'achieveOneHundredTotalWins', icon: '👑' },
+          'veteran_player': { name: 'veteranPlayer', description: 'playOneHundredTotalGames', icon: '🎖️' }
+        };
+        
+        for (const type of missingAchievements) {
+          const data = achievementData[type];
+          if (data) {
+            await db
+              .insert(achievements)
+              .values({
+                userId,
+                achievementType: type,
+                achievementName: data.name,
+                description: data.description,
+                icon: data.icon,
+                metadata: {},
+              })
+              .onConflictDoNothing();
+          }
+        }
+      }
+    } catch (error) {
+      console.error('Error validating achievements:', error);
+    }
   }
 
   async recalculateUserAchievements(userId: string): Promise<{ removed: number; added: Achievement[] }> {

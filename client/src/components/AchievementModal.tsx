@@ -1,11 +1,9 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { AchievementBadge } from "./AchievementBadge";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { Loader2, Trophy, Target, Star, Crown, Zap, Medal, RefreshCw } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
+import { Loader2, Trophy, Target, Star } from "lucide-react";
 import { useTranslation } from "@/contexts/LanguageContext";
-import { apiRequest } from "@/lib/queryClient";
-import { useToast } from "@/hooks/use-toast";
 
 interface AchievementModalProps {
   open: boolean;
@@ -15,8 +13,6 @@ interface AchievementModalProps {
 
 export function AchievementModal({ open, onClose, userId }: AchievementModalProps) {
   const { t } = useTranslation();
-  const { toast } = useToast();
-  const queryClient = useQueryClient();
   
   // Helper function to get translated achievement name and description
   const getTranslatedName = (achievementType: string, originalName: string): string => {
@@ -85,37 +81,7 @@ export function AchievementModal({ open, onClose, userId }: AchievementModalProp
     enabled: open,
   });
 
-  const recalculateAchievements = useMutation({
-    mutationFn: async () => {
-      const response = await fetch('/api/achievements/recalculate', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        credentials: 'include',
-      });
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      return response.json();
-    },
-    onSuccess: (data) => {
-      console.log('✅ Recalculation successful:', data);
-      queryClient.invalidateQueries({ queryKey: ['/api/achievements'] });
-      toast({
-        title: "Achievements Updated",
-        description: `Removed ${data.removed} incorrect achievements and added ${data.added} correct ones.`,
-      });
-    },
-    onError: (error) => {
-      console.error('❌ Recalculation failed:', error);
-      toast({
-        title: "Error",
-        description: error.message || "Failed to recalculate achievements. Please try again.",
-        variant: "destructive",
-      });
-    },
-  });
+
 
   const achievementCategories = [
     {
@@ -248,22 +214,7 @@ export function AchievementModal({ open, onClose, userId }: AchievementModalProp
           </div>
         )}
 
-        <div className="flex justify-between pt-4 border-t border-gray-200 dark:border-gray-700 flex-shrink-0">
-          {!userId && (
-            <Button 
-              onClick={() => recalculateAchievements.mutate()} 
-              variant="outline" 
-              disabled={recalculateAchievements.isPending}
-              className="flex items-center gap-2"
-            >
-              {recalculateAchievements.isPending ? (
-                <Loader2 className="w-4 h-4 animate-spin" />
-              ) : (
-                <RefreshCw className="w-4 h-4" />
-              )}
-              Fix Achievements
-            </Button>
-          )}
+        <div className="flex justify-end pt-4 border-t border-gray-200 dark:border-gray-700 flex-shrink-0">
           <Button onClick={onClose} variant="default">Close</Button>
         </div>
       </DialogContent>
