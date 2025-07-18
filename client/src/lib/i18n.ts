@@ -688,20 +688,20 @@ export const translations = {
     en: 'Online',
     ar: 'متصل',
     bn: 'অনলাইন',
-    hi: 'ऑनलाइन',
+    hi: 'ऑनलাइन',
     es: 'En línea',
     id: 'Online'
   },
-  players: {
+  playersLabel: {
     en: 'Players',
     ar: 'اللاعبون',
     bn: 'খেলোয়াড়',
-    hi: 'खिलाड़ी',
+    hi: 'खিলাড़ী',
     es: 'Jugadores',
     id: 'Pemain'
   },
-  onePlayers: {
-    en: '1 Players',
+  onePlayer: {
+    en: '1 Player',
     ar: '1 لاعب',
     bn: '১ জন খেলোয়াড়',
     hi: '1 खिलाड़ी',
@@ -734,7 +734,7 @@ export const translations = {
     es: 'ID del Juego',
     id: 'ID Permainan'
   },
-  room: {
+  roomLabel: {
     en: 'Room',
     ar: 'الغرفة',
     bn: 'রুম',
@@ -1069,7 +1069,7 @@ export const translations = {
   },
   
   // Room and Matchmaking
-  roomName: {
+  roomNameInput: {
     en: 'Room Name',
     ar: 'اسم الغرفة',
     bn: 'রুমের নাম',
@@ -1833,11 +1833,11 @@ export const translations = {
     es: 'ACTIVO',
     id: 'AKTIF'
   },
-  room: {
+  roomName: {
     en: 'Room',
     ar: 'غرفة',
     bn: 'রুম',
-    hi: 'कमरा',
+    hi: 'कमরा',
     es: 'Sala',
     id: 'Ruang'
   },
@@ -1889,7 +1889,7 @@ export const translations = {
     es: 'Jugadores y Espectadores',
     id: 'Pemain & Penonton'
   },
-  players: {
+  playersCount: {
     en: 'Players',
     ar: 'اللاعبون',
     bn: 'খেলোয়াড়',
@@ -1971,7 +1971,7 @@ export const translations = {
     es: 'Ver perfiles de jugadores y gestionar interacciones',
     id: 'Lihat profil pemain dan kelola interaksi'
   },
-  profile: {
+  profileMenu: {
     en: 'Profile',
     ar: 'الملف الشخصي',
     bn: 'প্রোফাইল',

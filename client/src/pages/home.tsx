@@ -708,7 +708,7 @@ export default function Home() {
                         className="bg-slate-700 border-slate-600 text-white hover:bg-slate-600 text-xs cursor-pointer"
                       >
                         <Palette className="h-3 w-3 mr-1" />
-                        Change
+                        {t('change')}
                       </Button>
                     </div>
                     
@@ -732,7 +732,7 @@ export default function Home() {
                         }}
                         className="bg-slate-700 border-slate-600 text-white hover:bg-slate-600 text-xs"
                       >
-                        {onlineUserCount} Players
+                        {onlineUserCount} {t('playersLabel')}
                       </Button>
                     </div>
                     
@@ -740,7 +740,7 @@ export default function Home() {
                     <div className="flex items-center justify-between">
                       <div className="flex items-center space-x-2">
                         <Trophy className="w-4 h-4 text-gray-400" />
-                        <span className="text-sm text-gray-300">Achievements</span>
+                        <span className="text-sm text-gray-300">{t('achievements')}</span>
                       </div>
                       <Button
                         variant="outline"
@@ -752,7 +752,7 @@ export default function Home() {
                         className="bg-slate-700 border-slate-600 text-white hover:bg-slate-600 text-xs"
                       >
                         <Trophy className="h-3 w-3 mr-1" />
-                        View
+                        {t('view')}
                       </Button>
                     </div>
                     
@@ -760,7 +760,7 @@ export default function Home() {
                     <div className="flex items-center justify-between">
                       <div className="flex items-center space-x-2">
                         <Settings className="w-4 h-4 text-gray-400" />
-                        <span className="text-sm text-gray-300">Profile Settings</span>
+                        <span className="text-sm text-gray-300">{t('profileSettings')}</span>
                       </div>
                       <Button
                         variant="outline"
