@@ -1,6 +1,5 @@
 import React from "react";
 import { Home, RefreshCw } from "lucide-react";
-import { useAudio } from "../hooks/useAudio";
 
 interface GameOverModalProps {
   open: boolean;
@@ -12,8 +11,6 @@ interface GameOverModalProps {
 }
 
 export function GameOverModal({ open, onClose, result, onPlayAgain, isCreatingGame = false, onMainMenu }: GameOverModalProps) {
-  const { playSound } = useAudio();
-  
   // Simple safety checks
   if (!open) return null;
   if (!result) {
@@ -26,21 +23,6 @@ export function GameOverModal({ open, onClose, result, onPlayAgain, isCreatingGa
   // Super simple logic - no complex conditionals
   const isDraw = result.condition === 'draw';
   const winner = result.winner;
-  
-  // Play celebration sound for wins (not draws)
-  React.useEffect(() => {
-    if (open && !isDraw && winner) {
-      const timer = setTimeout(() => {
-        try {
-          playSound('celebrate');
-        } catch (error) {
-          console.warn('Celebration sound failed:', error);
-        }
-      }, 200);
-      
-      return () => clearTimeout(timer);
-    }
-  }, [open, isDraw, winner, playSound]);
   
   // Get proper player names and info - only for online games
   const isOnlineGame = result.game?.gameMode === 'online';
@@ -68,7 +50,50 @@ export function GameOverModal({ open, onClose, result, onPlayAgain, isCreatingGa
   const winnerInfo = isOnlineGame ? (winner === 'X' ? result.playerXInfo : result.playerOInfo) : null;
 
   return (
-    <div 
+    <>
+      {/* Simple confetti using emojis for wins */}
+      {open && !isDraw && winner && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          width: '100%',
+          height: '100%',
+          pointerEvents: 'none',
+          zIndex: 10000
+        }}>
+          <div style={{
+            position: 'absolute',
+            top: '10%',
+            left: '20%',
+            fontSize: '40px',
+            animation: 'bounce 2s infinite'
+          }}>🎉</div>
+          <div style={{
+            position: 'absolute',
+            top: '20%',
+            right: '20%',
+            fontSize: '40px',
+            animation: 'bounce 2s infinite 0.5s'
+          }}>🎊</div>
+          <div style={{
+            position: 'absolute',
+            bottom: '20%',
+            left: '30%',
+            fontSize: '40px',
+            animation: 'bounce 2s infinite 1s'
+          }}>🎈</div>
+          <div style={{
+            position: 'absolute',
+            bottom: '30%',
+            right: '30%',
+            fontSize: '40px',
+            animation: 'bounce 2s infinite 1.5s'
+          }}>✨</div>
+        </div>
+      )}
+      
+      <div 
         style={{
           position: 'fixed',
           top: 0,
@@ -224,5 +249,6 @@ export function GameOverModal({ open, onClose, result, onPlayAgain, isCreatingGa
         </div>
       </div>
     </div>
+    </>
   );
 }
