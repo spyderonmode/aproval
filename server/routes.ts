@@ -28,6 +28,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
     console.log('ℹ️ Room invitations table already exists or error:', error.message);
   }
 
+  // Clean up friendship data inconsistencies
+  try {
+    await storage.cleanupFriendshipData();
+    console.log('✅ Friendship data cleanup completed');
+  } catch (error) {
+    console.log('ℹ️ Friendship data cleanup error:', error.message);
+  }
+
   const connections = new Map<string, WSConnection>();
   const roomConnections = new Map<string, Set<string>>();
   const matchmakingQueue: string[] = []; // Queue of user IDs waiting for matches

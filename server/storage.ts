@@ -98,6 +98,7 @@ export interface IStorage {
   getFriends(userId: string): Promise<User[]>;
   removeFriend(userId: string, friendId: string): Promise<void>;
   areFriends(userId: string, friendId: string): Promise<boolean>;
+  cleanupFriendshipData(): Promise<void>;
   getHeadToHeadStats(userId: string, friendId: string): Promise<{
     totalGames: number;
     userWins: number;
@@ -1041,6 +1042,76 @@ export class DatabaseStorage implements IStorage {
       ));
 
     return !!friendship;
+  }
+
+  async cleanupFriendshipData(): Promise<void> {
+    try {
+      // Clean up accepted friend requests that don't have corresponding friendships
+      const acceptedRequests = await db
+        .select()
+        .from(friendRequests)
+        .where(eq(friendRequests.status, 'accepted'));
+
+      for (const request of acceptedRequests) {
+        const friendshipExists = await this.areFriends(request.requesterId, request.requestedId);
+        
+        if (!friendshipExists) {
+          // Create missing friendship
+          const user1Id = request.requesterId < request.requestedId ? request.requesterId : request.requestedId;
+          const user2Id = request.requesterId < request.requestedId ? request.requestedId : request.requesterId;
+
+          await db
+            .insert(friendships)
+            .values({
+              user1Id,
+              user2Id,
+            })
+            .onConflictDoNothing();
+          
+          console.log(`Created missing friendship for users: ${request.requesterId} and ${request.requestedId}`);
+        }
+      }
+
+      // Clean up friend requests that have friendships but are still marked as pending
+      const friendshipsList = await db.select().from(friendships);
+      
+      for (const friendship of friendshipsList) {
+        // Check for pending requests between these friends
+        const pendingRequests = await db
+          .select()
+          .from(friendRequests)
+          .where(and(
+            or(
+              and(
+                eq(friendRequests.requesterId, friendship.user1Id),
+                eq(friendRequests.requestedId, friendship.user2Id)
+              ),
+              and(
+                eq(friendRequests.requesterId, friendship.user2Id),
+                eq(friendRequests.requestedId, friendship.user1Id)
+              )
+            ),
+            eq(friendRequests.status, 'pending')
+          ));
+
+        // Update pending requests to accepted since friendship exists
+        for (const request of pendingRequests) {
+          await db
+            .update(friendRequests)
+            .set({
+              status: 'accepted',
+              respondedAt: new Date(),
+            })
+            .where(eq(friendRequests.id, request.id));
+          
+          console.log(`Updated pending request to accepted for users: ${request.requesterId} and ${request.requestedId}`);
+        }
+      }
+
+      console.log('Friendship data cleanup completed');
+    } catch (error) {
+      console.error('Error during friendship data cleanup:', error);
+    }
   }
 
   async getHeadToHeadStats(userId: string, friendId: string): Promise<{
