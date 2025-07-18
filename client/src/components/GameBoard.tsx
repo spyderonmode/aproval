@@ -46,6 +46,16 @@ const hasChampionAchievement = (achievements: any[]): boolean => {
   return achievements?.some(achievement => achievement.achievementType === 'champion') || false;
 };
 
+// Helper function to check if player has Grandmaster achievement (200 wins)
+const hasGrandmasterAchievement = (achievements: any[]): boolean => {
+  return achievements?.some(achievement => achievement.achievementType === 'grandmaster') || false;
+};
+
+// Helper function to check if player has Ultimate Veteran achievement (500 games)
+const hasUltimateVeteranAchievement = (achievements: any[]): boolean => {
+  return achievements?.some(achievement => achievement.achievementType === 'ultimate_veteran') || false;
+};
+
 // Function to get winning positions for highlighting
 const getWinningPositions = (board: Record<string, string>, player: string): number[] => {
   // Check horizontal wins
@@ -919,7 +929,104 @@ export function GameBoard({ game, onGameOver, gameMode, user, lastMessage, sendM
               </AnimatePresence>
               
               <div className="flex flex-col items-end">
-                {hasChampionAchievement(game?.playerXInfo?.achievements) ? (
+                {hasUltimateVeteranAchievement(game?.playerXInfo?.achievements) ? (
+                  <motion.div
+                    animate={{
+                      boxShadow: [
+                        "0 0 15px #ff6347, 0 0 30px #ff4500, 0 0 45px #ff8c00, 0 0 60px #ffd700, 0 0 75px #ff6347",
+                        "0 0 20px #ff1493, 0 0 40px #dc143c, 0 0 60px #b22222, 0 0 80px #8b0000, 0 0 100px #ff1493",
+                        "0 0 18px #ff6600, 0 0 36px #ff3300, 0 0 54px #ff0000, 0 0 72px #cc0000, 0 0 90px #ff6600",
+                        "0 0 25px #ffa500, 0 0 50px #ff8c00, 0 0 75px #ff7f50, 0 0 100px #ff6347, 0 0 125px #ffa500"
+                      ],
+                      scale: [1, 1.05, 1.03, 1.07, 1],
+                      rotate: [0, 2, -1, 3, 0],
+                      filter: [
+                        "brightness(1) saturate(1)",
+                        "brightness(1.2) saturate(1.3)",
+                        "brightness(1.1) saturate(1.1)",
+                        "brightness(1.3) saturate(1.4)",
+                        "brightness(1) saturate(1)"
+                      ]
+                    }}
+                    transition={{
+                      duration: 2,
+                      repeat: Infinity,
+                      ease: "easeInOut"
+                    }}
+                    className="px-2 py-1 rounded-lg border-3 border-double border-orange-600 bg-gradient-to-r from-red-900/30 via-orange-800/30 to-red-900/30 relative overflow-hidden"
+                    style={{
+                      background: "linear-gradient(45deg, rgba(255, 69, 0, 0.2), rgba(255, 140, 0, 0.15), rgba(255, 99, 71, 0.2), rgba(255, 165, 0, 0.15))",
+                      backgroundSize: "400% 400%",
+                      animation: "gradient-shift 3s ease infinite"
+                    }}
+                  >
+                    <motion.span 
+                      className={`text-sm ${theme.textColor} max-w-24 truncate font-black relative z-10`}
+                      animate={{
+                        textShadow: [
+                          "0 0 8px #ff6347, 0 0 12px #ff4500, 0 0 16px #ffd700",
+                          "0 0 10px #ff1493, 0 0 15px #dc143c, 0 0 20px #8b0000",
+                          "0 0 9px #ff6600, 0 0 13px #ff3300, 0 0 17px #cc0000",
+                          "0 0 12px #ffa500, 0 0 18px #ff8c00, 0 0 24px #ff7f50"
+                        ]
+                      }}
+                      transition={{
+                        duration: 2,
+                        repeat: Infinity,
+                        ease: "easeInOut"
+                      }}
+                    >
+                      {gameMode === 'online' 
+                        ? (game?.playerXInfo?.firstName || game?.playerXInfo?.displayName || game?.playerXInfo?.username || 'Player X')
+                        : 'Player X'}
+                    </motion.span>
+                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-orange-400/20 to-transparent animate-shimmer"></div>
+                  </motion.div>
+                ) : hasGrandmasterAchievement(game?.playerXInfo?.achievements) ? (
+                  <motion.div
+                    animate={{
+                      boxShadow: [
+                        "0 0 12px #e0e7ff, 0 0 24px #c7d2fe, 0 0 36px #a5b4fc, 0 0 48px #818cf8",
+                        "0 0 16px #f3f4f6, 0 0 32px #e5e7eb, 0 0 48px #d1d5db, 0 0 64px #9ca3af",
+                        "0 0 14px #ddd6fe, 0 0 28px #c4b5fd, 0 0 42px #a78bfa, 0 0 56px #8b5cf6",
+                        "0 0 18px #fef3c7, 0 0 36px #fde68a, 0 0 54px #fcd34d, 0 0 72px #f59e0b"
+                      ],
+                      scale: [1, 1.03, 1.01, 1.04, 1],
+                      rotate: [0, 1, -0.5, 1.5, 0]
+                    }}
+                    transition={{
+                      duration: 2.5,
+                      repeat: Infinity,
+                      ease: "easeInOut"
+                    }}
+                    className="px-2 py-1 rounded-lg border-2 border-indigo-400 bg-gradient-to-r from-indigo-900/25 via-gray-800/25 to-indigo-900/25 relative"
+                    style={{
+                      background: "linear-gradient(45deg, rgba(99, 102, 241, 0.15), rgba(156, 163, 175, 0.1), rgba(139, 92, 246, 0.15), rgba(245, 158, 11, 0.1))",
+                      backgroundSize: "300% 300%",
+                    }}
+                  >
+                    <motion.span 
+                      className={`text-sm ${theme.textColor} max-w-24 truncate font-bold`}
+                      animate={{
+                        textShadow: [
+                          "0 0 6px #818cf8",
+                          "0 0 8px #9ca3af",
+                          "0 0 7px #8b5cf6",
+                          "0 0 9px #f59e0b"
+                        ]
+                      }}
+                      transition={{
+                        duration: 2.5,
+                        repeat: Infinity,
+                        ease: "easeInOut"
+                      }}
+                    >
+                      {gameMode === 'online' 
+                        ? (game?.playerXInfo?.firstName || game?.playerXInfo?.displayName || game?.playerXInfo?.username || 'Player X')
+                        : 'Player X'}
+                    </motion.span>
+                  </motion.div>
+                ) : hasChampionAchievement(game?.playerXInfo?.achievements) ? (
                   <motion.div
                     animate={{
                       boxShadow: [
@@ -1062,7 +1169,104 @@ export function GameBoard({ game, onGameOver, gameMode, user, lastMessage, sendM
               </AnimatePresence>
               
               <div className="flex flex-col items-end">
-                {hasChampionAchievement(game?.playerOInfo?.achievements) ? (
+                {hasUltimateVeteranAchievement(game?.playerOInfo?.achievements) ? (
+                  <motion.div
+                    animate={{
+                      boxShadow: [
+                        "0 0 15px #ff6347, 0 0 30px #ff4500, 0 0 45px #ff8c00, 0 0 60px #ffd700, 0 0 75px #ff6347",
+                        "0 0 20px #ff1493, 0 0 40px #dc143c, 0 0 60px #b22222, 0 0 80px #8b0000, 0 0 100px #ff1493",
+                        "0 0 18px #ff6600, 0 0 36px #ff3300, 0 0 54px #ff0000, 0 0 72px #cc0000, 0 0 90px #ff6600",
+                        "0 0 25px #ffa500, 0 0 50px #ff8c00, 0 0 75px #ff7f50, 0 0 100px #ff6347, 0 0 125px #ffa500"
+                      ],
+                      scale: [1, 1.05, 1.03, 1.07, 1],
+                      rotate: [0, 2, -1, 3, 0],
+                      filter: [
+                        "brightness(1) saturate(1)",
+                        "brightness(1.2) saturate(1.3)",
+                        "brightness(1.1) saturate(1.1)",
+                        "brightness(1.3) saturate(1.4)",
+                        "brightness(1) saturate(1)"
+                      ]
+                    }}
+                    transition={{
+                      duration: 2,
+                      repeat: Infinity,
+                      ease: "easeInOut"
+                    }}
+                    className="px-2 py-1 rounded-lg border-3 border-double border-orange-600 bg-gradient-to-r from-red-900/30 via-orange-800/30 to-red-900/30 relative overflow-hidden"
+                    style={{
+                      background: "linear-gradient(45deg, rgba(255, 69, 0, 0.2), rgba(255, 140, 0, 0.15), rgba(255, 99, 71, 0.2), rgba(255, 165, 0, 0.15))",
+                      backgroundSize: "400% 400%",
+                      animation: "gradient-shift 3s ease infinite"
+                    }}
+                  >
+                    <motion.span 
+                      className={`text-sm ${theme.textColor} max-w-24 truncate font-black relative z-10`}
+                      animate={{
+                        textShadow: [
+                          "0 0 8px #ff6347, 0 0 12px #ff4500, 0 0 16px #ffd700",
+                          "0 0 10px #ff1493, 0 0 15px #dc143c, 0 0 20px #8b0000",
+                          "0 0 9px #ff6600, 0 0 13px #ff3300, 0 0 17px #cc0000",
+                          "0 0 12px #ffa500, 0 0 18px #ff8c00, 0 0 24px #ff7f50"
+                        ]
+                      }}
+                      transition={{
+                        duration: 2,
+                        repeat: Infinity,
+                        ease: "easeInOut"
+                      }}
+                    >
+                      {gameMode === 'online' 
+                        ? (game?.playerOInfo?.firstName || game?.playerOInfo?.displayName || game?.playerOInfo?.username || 'Player O')
+                        : (gameMode === 'ai' ? 'AI' : 'Player O')}
+                    </motion.span>
+                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-orange-400/20 to-transparent animate-shimmer"></div>
+                  </motion.div>
+                ) : hasGrandmasterAchievement(game?.playerOInfo?.achievements) ? (
+                  <motion.div
+                    animate={{
+                      boxShadow: [
+                        "0 0 12px #e0e7ff, 0 0 24px #c7d2fe, 0 0 36px #a5b4fc, 0 0 48px #818cf8",
+                        "0 0 16px #f3f4f6, 0 0 32px #e5e7eb, 0 0 48px #d1d5db, 0 0 64px #9ca3af",
+                        "0 0 14px #ddd6fe, 0 0 28px #c4b5fd, 0 0 42px #a78bfa, 0 0 56px #8b5cf6",
+                        "0 0 18px #fef3c7, 0 0 36px #fde68a, 0 0 54px #fcd34d, 0 0 72px #f59e0b"
+                      ],
+                      scale: [1, 1.03, 1.01, 1.04, 1],
+                      rotate: [0, 1, -0.5, 1.5, 0]
+                    }}
+                    transition={{
+                      duration: 2.5,
+                      repeat: Infinity,
+                      ease: "easeInOut"
+                    }}
+                    className="px-2 py-1 rounded-lg border-2 border-indigo-400 bg-gradient-to-r from-indigo-900/25 via-gray-800/25 to-indigo-900/25 relative"
+                    style={{
+                      background: "linear-gradient(45deg, rgba(99, 102, 241, 0.15), rgba(156, 163, 175, 0.1), rgba(139, 92, 246, 0.15), rgba(245, 158, 11, 0.1))",
+                      backgroundSize: "300% 300%",
+                    }}
+                  >
+                    <motion.span 
+                      className={`text-sm ${theme.textColor} max-w-24 truncate font-bold`}
+                      animate={{
+                        textShadow: [
+                          "0 0 6px #818cf8",
+                          "0 0 8px #9ca3af",
+                          "0 0 7px #8b5cf6",
+                          "0 0 9px #f59e0b"
+                        ]
+                      }}
+                      transition={{
+                        duration: 2.5,
+                        repeat: Infinity,
+                        ease: "easeInOut"
+                      }}
+                    >
+                      {gameMode === 'online' 
+                        ? (game?.playerOInfo?.firstName || game?.playerOInfo?.displayName || game?.playerOInfo?.username || 'Player O')
+                        : (gameMode === 'ai' ? 'AI' : 'Player O')}
+                    </motion.span>
+                  </motion.div>
+                ) : hasChampionAchievement(game?.playerOInfo?.achievements) ? (
                   <motion.div
                     animate={{
                       boxShadow: [
