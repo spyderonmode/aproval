@@ -2036,6 +2036,30 @@ export const translations = {
     es: 'El usuario ha sido desbloqueado exitosamente',
     id: 'Pengguna telah berhasil dibuka blokirnya'
   },
+  addFriend: {
+    en: 'Add Friend',
+    ar: 'إضافة صديق',
+    bn: 'বন্ধু যোগ করুন',
+    hi: 'मित्र जोड़ें',
+    es: 'Agregar Amigo',
+    id: 'Tambah Teman'
+  },
+  friendRequestSent: {
+    en: 'Friend Request Sent',
+    ar: 'تم إرسال طلب الصداقة',
+    bn: 'বন্ধুত্বের অনুরোধ পাঠানো হয়েছে',
+    hi: 'मित्रता का अनुरोध भेजा गया',
+    es: 'Solicitud de Amistad Enviada',
+    id: 'Permintaan Pertemanan Dikirim'
+  },
+  friendRequestSentSuccessfully: {
+    en: 'Friend request has been sent successfully',
+    ar: 'تم إرسال طلب الصداقة بنجاح',
+    bn: 'বন্ধুত্বের অনুরোধ সফলভাবে পাঠানো হয়েছে',
+    hi: 'मित्रता का अनुरोध सफलतापूर्वक भेजा गया',
+    es: 'La solicitud de amistad ha sido enviada exitosamente',
+    id: 'Permintaan pertemanan telah berhasil dikirim'
+  },
   justNow: {
     en: 'Just now',
     ar: 'الآن',

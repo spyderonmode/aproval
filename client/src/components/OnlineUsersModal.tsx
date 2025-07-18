@@ -8,7 +8,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { useToast } from "@/hooks/use-toast";
 import { useTranslation } from "@/contexts/LanguageContext";
 import { apiRequest } from "@/lib/queryClient";
-import { User, Clock, Users, UserX, UserCheck, Eye } from "lucide-react";
+import { User, Clock, Users, UserX, UserCheck, Eye, UserPlus } from "lucide-react";
 import { showUserFriendlyError } from "@/lib/errorUtils";
 import { UserProfileModal } from "./UserProfileModal";
 
@@ -24,6 +24,7 @@ export function OnlineUsersModal({ open, onClose, currentRoom, user }: OnlineUse
   const { t } = useTranslation();
   const queryClient = useQueryClient();
   const [blockedUsers, setBlockedUsers] = useState<Set<string>>(new Set());
+  const [friends, setFriends] = useState<Set<string>>(new Set());
   const [profileUser, setProfileUser] = useState<any>(null);
   const [showProfileModal, setShowProfileModal] = useState(false);
 
@@ -39,12 +40,25 @@ export function OnlineUsersModal({ open, onClose, currentRoom, user }: OnlineUse
     enabled: open,
   });
 
+  // Fetch friends
+  const { data: friendsData } = useQuery({
+    queryKey: ["/api/friends"],
+    enabled: open,
+  });
+
   // Update blocked users state when data changes
   useEffect(() => {
     if (blockedUsersData) {
       setBlockedUsers(new Set(blockedUsersData.map((blocked: any) => blocked.blockedId)));
     }
   }, [blockedUsersData]);
+
+  // Update friends state when data changes
+  useEffect(() => {
+    if (friendsData) {
+      setFriends(new Set(friendsData.map((friend: any) => friend.id)));
+    }
+  }, [friendsData]);
 
 
 
@@ -86,6 +100,23 @@ export function OnlineUsersModal({ open, onClose, currentRoom, user }: OnlineUse
     },
   });
 
+  const sendFriendRequestMutation = useMutation({
+    mutationFn: async (requestedId: string) => {
+      return await apiRequest('POST', '/api/friends/request', { requestedId });
+    },
+    onSuccess: (_, requestedId) => {
+      queryClient.invalidateQueries({ queryKey: ["/api/friends"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/friends/requests"] });
+      toast({
+        title: t('friendRequestSent'),
+        description: t('friendRequestSentSuccessfully'),
+      });
+    },
+    onError: (error: any) => {
+      showUserFriendlyError(error, toast);
+    },
+  });
+
 
 
 
@@ -98,7 +129,9 @@ export function OnlineUsersModal({ open, onClose, currentRoom, user }: OnlineUse
     unblockUserMutation.mutate(userId);
   };
 
-
+  const handleAddFriend = (userId: string) => {
+    sendFriendRequestMutation.mutate(userId);
+  };
 
   const handleViewProfile = (user: any) => {
     setProfileUser(user);
@@ -148,6 +181,7 @@ export function OnlineUsersModal({ open, onClose, currentRoom, user }: OnlineUse
                     {onlineUsers?.users?.length > 0 ? (
                       onlineUsers.users.map((user: any) => {
                         const isBlocked = blockedUsers.has(user.userId);
+                        const isFriend = friends.has(user.userId);
                         return (
                           <Card key={user.userId} className={`p-3 cursor-pointer transition-colors ${isBlocked ? 'opacity-50 border-red-200 dark:border-red-800' : 'hover:bg-slate-50 dark:hover:bg-slate-800'}`}>
                             <div className="space-y-2">
@@ -194,6 +228,19 @@ export function OnlineUsersModal({ open, onClose, currentRoom, user }: OnlineUse
                                     <Eye className="h-4 w-4 mr-1" />
                                     {t('profile')}
                                   </Button>
+                                  
+                                  {!isFriend && !isBlocked && (
+                                    <Button
+                                      size="sm"
+                                      variant="outline"
+                                      onClick={() => handleAddFriend(user.userId)}
+                                      disabled={sendFriendRequestMutation.isPending}
+                                      className="text-green-600 hover:text-green-700"
+                                    >
+                                      <UserPlus className="h-4 w-4 mr-1" />
+                                      {t('addFriend')}
+                                    </Button>
+                                  )}
                                   
                                   {isBlocked ? (
                                     <Button
