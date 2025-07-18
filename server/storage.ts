@@ -129,7 +129,7 @@ export class DatabaseStorage implements IStorage {
         status VARCHAR(20) DEFAULT 'pending' CHECK (status IN ('pending', 'accepted', 'rejected', 'expired')),
         invited_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         responded_at TIMESTAMP,
-        expires_at TIMESTAMP DEFAULT (CURRENT_TIMESTAMP + INTERVAL '24 hours'),
+        expires_at TIMESTAMP DEFAULT (CURRENT_TIMESTAMP + INTERVAL '30 seconds'),
         UNIQUE(room_id, invited_id)
       )
     `);
@@ -1374,7 +1374,10 @@ export class DatabaseStorage implements IStorage {
 
   // Room Invitation operations
   async sendRoomInvitation(roomId: string, inviterId: string, invitedId: string): Promise<RoomInvitation> {
-    // Check if invitation already exists
+    // First, clean up expired invitations
+    await this.expireOldInvitations();
+    
+    // Check if active invitation already exists (not expired)
     const existingInvitation = await db
       .select()
       .from(roomInvitations)
@@ -1382,7 +1385,8 @@ export class DatabaseStorage implements IStorage {
         and(
           sql`${roomInvitations.roomId}::text = ${roomId}`,
           sql`${roomInvitations.invitedId} = ${invitedId}`,
-          eq(roomInvitations.status, 'pending')
+          eq(roomInvitations.status, 'pending'),
+          sql`${roomInvitations.expiresAt} > NOW()`
         )
       );
 
@@ -1390,9 +1394,9 @@ export class DatabaseStorage implements IStorage {
       throw new Error('Invitation already sent to this user for this room');
     }
 
-    // Create expiration date (24 hours from now)
+    // Create expiration date (30 seconds from now)
     const expiresAt = new Date();
-    expiresAt.setHours(expiresAt.getHours() + 24);
+    expiresAt.setSeconds(expiresAt.getSeconds() + 30);
 
     const [invitation] = await db
       .insert(roomInvitations)
@@ -1408,6 +1412,8 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getRoomInvitations(userId: string): Promise<(RoomInvitation & { room: Room; inviter: User; invited: User })[]> {
+    // First, clean up expired invitations
+    await this.expireOldInvitations();
     const invitations = await db
       .select({
         id: roomInvitations.id,
@@ -1468,6 +1474,9 @@ export class DatabaseStorage implements IStorage {
   }
 
   async respondToRoomInvitation(invitationId: string, response: 'accepted' | 'rejected'): Promise<void> {
+    // Clean up expired invitations first
+    await this.expireOldInvitations();
+    
     await db
       .update(roomInvitations)
       .set({
@@ -1478,18 +1487,23 @@ export class DatabaseStorage implements IStorage {
   }
 
   async expireOldInvitations(): Promise<void> {
-    await db
-      .update(roomInvitations)
-      .set({
-        status: 'expired',
-        respondedAt: new Date(),
-      })
-      .where(
-        and(
-          eq(roomInvitations.status, 'pending'),
-          sql`${roomInvitations.expiresAt} <= NOW()`
-        )
-      );
+    try {
+      // Update expired invitations to 'expired' status
+      await db
+        .update(roomInvitations)
+        .set({ 
+          status: 'expired',
+          respondedAt: sql`NOW()`
+        })
+        .where(
+          and(
+            eq(roomInvitations.status, 'pending'),
+            sql`${roomInvitations.expiresAt} <= NOW()`
+          )
+        );
+    } catch (error) {
+      console.error('Error expiring old invitations:', error);
+    }
   }
 }
 
