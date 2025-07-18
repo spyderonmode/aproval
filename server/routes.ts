@@ -372,6 +372,44 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Debug endpoint to check user achievements and stats
+  app.get('/api/debug/user-achievements', requireAuth, async (req: any, res) => {
+    try {
+      const userId = req.session.user.userId;
+      const userStats = await storage.getUserStats(userId);
+      const userAchievements = await storage.getUserAchievements(userId);
+      
+      res.json({
+        userId,
+        stats: userStats,
+        achievements: userAchievements,
+        achievementCount: userAchievements.length
+      });
+    } catch (error) {
+      console.error("Error getting debug info:", error);
+      res.status(500).json({ message: "Failed to get debug info" });
+    }
+  });
+
+  // Recalculate achievements endpoint
+  app.post('/api/achievements/recalculate', requireAuth, async (req: any, res) => {
+    try {
+      const userId = req.session.user.userId;
+      const result = await storage.recalculateUserAchievements(userId);
+      
+      res.json({
+        success: true,
+        message: 'Achievements recalculated successfully',
+        removed: result.removed,
+        added: result.added.length,
+        achievements: result.added
+      });
+    } catch (error) {
+      console.error("Error recalculating achievements:", error);
+      res.status(500).json({ message: "Failed to recalculate achievements" });
+    }
+  });
+
   // Get head-to-head stats
   app.get('/api/friends/:friendId/stats', requireAuth, async (req: any, res) => {
     try {
