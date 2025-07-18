@@ -869,7 +869,11 @@ export class DatabaseStorage implements IStorage {
       if (request.status === 'pending') {
         throw new Error('Friend request already exists');
       } else if (request.status === 'accepted') {
-        throw new Error('Users are already friends');
+        // This should not happen if friendship was properly removed, but clean it up
+        await db
+          .delete(friendRequests)
+          .where(eq(friendRequests.id, request.id));
+        console.log('Cleaned up orphaned accepted friend request');
       } else if (request.status === 'rejected') {
         // Allow new request if previous was rejected
         // Delete the old rejected request first
@@ -899,8 +903,6 @@ export class DatabaseStorage implements IStorage {
       // Re-throw other errors
       throw error;
     }
-    
-    return friendRequest;
   }
 
   async getFriendRequests(userId: string): Promise<(FriendRequest & { requester: User; requested: User })[]> {
@@ -1024,11 +1026,28 @@ export class DatabaseStorage implements IStorage {
   }
 
   async removeFriend(userId: string, friendId: string): Promise<void> {
+    // Delete the friendship record
     await db
       .delete(friendships)
       .where(or(
         and(eq(friendships.user1Id, userId), eq(friendships.user2Id, friendId)),
         and(eq(friendships.user1Id, friendId), eq(friendships.user2Id, userId))
+      ));
+
+    // Also delete any accepted friend requests between these users
+    await db
+      .delete(friendRequests)
+      .where(or(
+        and(
+          eq(friendRequests.requesterId, userId),
+          eq(friendRequests.requestedId, friendId),
+          eq(friendRequests.status, 'accepted')
+        ),
+        and(
+          eq(friendRequests.requesterId, friendId),
+          eq(friendRequests.requestedId, userId),
+          eq(friendRequests.status, 'accepted')
+        )
       ));
   }
 
@@ -1056,19 +1075,13 @@ export class DatabaseStorage implements IStorage {
         const friendshipExists = await this.areFriends(request.requesterId, request.requestedId);
         
         if (!friendshipExists) {
-          // Create missing friendship
-          const user1Id = request.requesterId < request.requestedId ? request.requesterId : request.requestedId;
-          const user2Id = request.requesterId < request.requestedId ? request.requestedId : request.requesterId;
-
+          // Delete orphaned accepted friend request instead of creating friendship
+          // This prevents the "already friends" error when trying to send new requests
           await db
-            .insert(friendships)
-            .values({
-              user1Id,
-              user2Id,
-            })
-            .onConflictDoNothing();
+            .delete(friendRequests)
+            .where(eq(friendRequests.id, request.id));
           
-          console.log(`Created missing friendship for users: ${request.requesterId} and ${request.requestedId}`);
+          console.log(`Removed orphaned accepted friend request for users: ${request.requesterId} and ${request.requestedId}`);
         }
       }
 

@@ -361,6 +361,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Cleanup friendship data endpoint (for debugging)
+  app.post('/api/friends/cleanup', requireAuth, async (req: any, res) => {
+    try {
+      await storage.cleanupFriendshipData();
+      res.json({ success: true, message: 'Friendship data cleanup completed' });
+    } catch (error) {
+      console.error("Error during friendship cleanup:", error);
+      res.status(500).json({ message: "Failed to cleanup friendship data" });
+    }
+  });
+
   // Get head-to-head stats
   app.get('/api/friends/:friendId/stats', requireAuth, async (req: any, res) => {
     try {
