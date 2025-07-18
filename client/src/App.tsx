@@ -11,7 +11,6 @@ import Home from "@/pages/home";
 import Auth from "@/pages/auth";
 import VerifyEmail from "@/pages/verify-email";
 import ResetPassword from "@/pages/reset-password";
-import ShopPage from "@/pages/shop";
 import NotFound from "@/pages/not-found";
 import { Component } from "react";
 
@@ -76,9 +75,6 @@ function Router() {
     <Switch>
       <Route path="/auth">
         {isAuthenticated && user?.isEmailVerified ? <Home /> : <Auth />}
-      </Route>
-      <Route path="/shop">
-        {isAuthenticated && user?.isEmailVerified ? <ShopPage /> : <Auth />}
       </Route>
       <Route path="/verify-email" component={VerifyEmail} />
       <Route path="/reset-password" component={ResetPassword} />

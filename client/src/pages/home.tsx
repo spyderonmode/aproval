@@ -22,9 +22,8 @@ import { Friends } from "@/components/Friends";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { GamepadIcon, LogOut, User, Zap, Loader2, Users, Settings, Menu, X, Palette, Trophy, ShoppingCart, Coins } from "lucide-react";
+import { GamepadIcon, LogOut, User, Zap, Loader2, Users, Settings, Menu, X, Palette, Trophy } from "lucide-react";
 import { logout } from "@/lib/firebase";
-import { Link } from "wouter";
 
 export default function Home() {
   const { user } = useAuth();
@@ -646,12 +645,6 @@ export default function Home() {
                 {isConnected ? 'Online' : 'Offline'}
               </span>
             </div>
-            <div className="flex items-center space-x-1 md:space-x-2 bg-yellow-500/20 border border-yellow-500/30 rounded-full px-2 py-1">
-              <Coins className="w-3 h-3 text-yellow-500" />
-              <span className="text-xs md:text-sm text-yellow-500 font-medium">
-                {user?.coins || 0}
-              </span>
-            </div>
             <div className="relative" ref={headerSidebarRef}>
               <Button 
                 variant="outline" 
@@ -720,25 +713,6 @@ export default function Home() {
                       >
                         {onlineUserCount} Players
                       </Button>
-                    </div>
-                    
-                    {/* Shop */}
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center space-x-2">
-                        <ShoppingCart className="w-4 h-4 text-gray-400" />
-                        <span className="text-sm text-gray-300">Shop</span>
-                      </div>
-                      <Link href="/shop">
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => setShowHeaderSidebar(false)}
-                          className="bg-slate-700 border-slate-600 text-white hover:bg-slate-600 text-xs"
-                        >
-                          <ShoppingCart className="h-3 w-3 mr-1" />
-                          Browse
-                        </Button>
-                      </Link>
                     </div>
                     
                     {/* Achievements */}
