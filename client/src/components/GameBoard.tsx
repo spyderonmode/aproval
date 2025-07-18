@@ -11,6 +11,7 @@ import { motion, AnimatePresence } from "framer-motion"; // Added back for winni
 import { useTheme } from "@/contexts/ThemeContext";
 import { User, MessageCircle } from "lucide-react";
 import { QuickChatPanel } from '@/components/QuickChatPanel';
+import { UserProfileModal } from '@/components/UserProfileModal';
 
 const VALID_POSITIONS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15];
 
@@ -192,6 +193,16 @@ export function GameBoard({ game, onGameOver, gameMode, user, lastMessage, sendM
   const [messageTimeouts, setMessageTimeouts] = useState<{ X?: NodeJS.Timeout; O?: NodeJS.Timeout }>({});
   const [showChatPanel, setShowChatPanel] = useState(false);
   
+  // Profile modal state
+  const [profileModalOpen, setProfileModalOpen] = useState(false);
+  const [selectedProfile, setSelectedProfile] = useState<{
+    userId: string;
+    username: string;
+    displayName: string;
+    profilePicture?: string;
+    profileImageUrl?: string;
+  } | null>(null);
+  
   // Update winning line when game has winning positions
   useEffect(() => {
     if (game?.winningPositions) {
@@ -217,6 +228,20 @@ export function GameBoard({ game, onGameOver, gameMode, user, lastMessage, sendM
       }
     }
   }, [game, user, gameMode]);
+
+  // Profile modal functions
+  const handleProfileClick = (playerInfo: any) => {
+    if (gameMode === 'online' && playerInfo) {
+      setSelectedProfile({
+        userId: playerInfo.id,
+        username: playerInfo.username || playerInfo.firstName || 'Player',
+        displayName: playerInfo.displayName || playerInfo.firstName || 'Player',
+        profilePicture: playerInfo.profilePicture,
+        profileImageUrl: playerInfo.profileImageUrl
+      });
+      setProfileModalOpen(true);
+    }
+  };
 
   // Player message functions
   const setPlayerMessage = (player: 'X' | 'O', messageText: string) => {
@@ -864,7 +889,8 @@ export function GameBoard({ game, onGameOver, gameMode, user, lastMessage, sendM
   const theme = themes[currentTheme];
   
   return (
-    <Card className={`${theme.boardStyle}`}>
+    <>
+      <Card className={`${theme.boardStyle}`}>
       <CardHeader>
         <div className="flex items-start justify-between">
           <CardTitle className={`text-2xl ${theme.textColor}`}>Game Board</CardTitle>
@@ -926,12 +952,23 @@ export function GameBoard({ game, onGameOver, gameMode, user, lastMessage, sendM
                     ))}
                   </div>
                 )}
+                {gameMode === 'online' && game?.playerXInfo && (
+                  <div className="flex items-center gap-2 mt-1">
+                    <span className="text-xs text-orange-600 dark:text-orange-400" title="Current Win Streak">
+                      🔥 {game.playerXInfo.currentWinStreak || 0}
+                    </span>
+                    <span className="text-xs text-purple-600 dark:text-purple-400" title="Best Win Streak">
+                      ⚡ {game.playerXInfo.bestWinStreak || 0}
+                    </span>
+                  </div>
+                )}
               </div>
               {gameMode === 'online' && (game?.playerXInfo?.profileImageUrl || game?.playerXInfo?.profilePicture) ? (
                 <img 
                   src={game.playerXInfo.profileImageUrl || game.playerXInfo.profilePicture} 
                   alt="Player X" 
-                  className="w-6 h-6 rounded-full object-cover"
+                  className="w-6 h-6 rounded-full object-cover cursor-pointer hover:ring-2 hover:ring-blue-500 transition-all"
+                  onClick={() => handleProfileClick(game.playerXInfo)}
                 />
               ) : (
                 <div className="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center">
@@ -998,12 +1035,23 @@ export function GameBoard({ game, onGameOver, gameMode, user, lastMessage, sendM
                     ))}
                   </div>
                 )}
+                {gameMode === 'online' && game?.playerOInfo && (
+                  <div className="flex items-center gap-2 mt-1">
+                    <span className="text-xs text-orange-600 dark:text-orange-400" title="Current Win Streak">
+                      🔥 {game.playerOInfo.currentWinStreak || 0}
+                    </span>
+                    <span className="text-xs text-purple-600 dark:text-purple-400" title="Best Win Streak">
+                      ⚡ {game.playerOInfo.bestWinStreak || 0}
+                    </span>
+                  </div>
+                )}
               </div>
               {gameMode === 'online' && (game?.playerOInfo?.profileImageUrl || game?.playerOInfo?.profilePicture) ? (
                 <img 
                   src={game.playerOInfo.profileImageUrl || game.playerOInfo.profilePicture} 
                   alt="Player O" 
-                  className="w-6 h-6 rounded-full object-cover"
+                  className="w-6 h-6 rounded-full object-cover cursor-pointer hover:ring-2 hover:ring-red-500 transition-all"
+                  onClick={() => handleProfileClick(game.playerOInfo)}
                 />
               ) : (
                 <div className="w-6 h-6 bg-red-500 rounded-full flex items-center justify-center">
@@ -1083,6 +1131,20 @@ export function GameBoard({ game, onGameOver, gameMode, user, lastMessage, sendM
         </div>
       </CardContent>
 
-    </Card>
+      </Card>
+      
+      {/* User Profile Modal */}
+      {selectedProfile && (
+        <UserProfileModal
+          open={profileModalOpen}
+          onClose={() => setProfileModalOpen(false)}
+          userId={selectedProfile.userId}
+          username={selectedProfile.username}
+          displayName={selectedProfile.displayName}
+          profilePicture={selectedProfile.profilePicture}
+          profileImageUrl={selectedProfile.profileImageUrl}
+        />
+      )}
+    </>
   );
 }

@@ -279,9 +279,19 @@ export class DatabaseStorage implements IStorage {
     if (!user) return;
 
     const updates: any = {};
-    if (result === 'win') updates.wins = (user.wins || 0) + 1;
-    if (result === 'loss') updates.losses = (user.losses || 0) + 1;
-    if (result === 'draw') updates.draws = (user.draws || 0) + 1;
+    if (result === 'win') {
+      updates.wins = (user.wins || 0) + 1;
+      const currentStreak = (user.currentWinStreak || 0) + 1;
+      updates.currentWinStreak = currentStreak;
+      if (currentStreak > (user.bestWinStreak || 0)) {
+        updates.bestWinStreak = currentStreak;
+      }
+    } else {
+      // Reset current win streak on loss or draw
+      updates.currentWinStreak = 0;
+      if (result === 'loss') updates.losses = (user.losses || 0) + 1;
+      if (result === 'draw') updates.draws = (user.draws || 0) + 1;
+    }
 
     await db.update(users).set(updates).where(eq(users.id, userId));
   }
@@ -356,23 +366,27 @@ export class DatabaseStorage implements IStorage {
     };
   }
 
-  async getOnlineGameStats(userId: string): Promise<{ wins: number; losses: number; draws: number; totalGames: number }> {
+  async getOnlineGameStats(userId: string): Promise<{ wins: number; losses: number; draws: number; totalGames: number; currentWinStreak: number; bestWinStreak: number }> {
     // Since we're properly updating user stats in the database, just return the user's stats
     // This represents their online game performance since we only update stats for online games
     const user = await this.getUser(userId);
     if (!user) {
-      return { wins: 0, losses: 0, draws: 0, totalGames: 0 };
+      return { wins: 0, losses: 0, draws: 0, totalGames: 0, currentWinStreak: 0, bestWinStreak: 0 };
     }
 
     const wins = user.wins || 0;
     const losses = user.losses || 0;
     const draws = user.draws || 0;
+    const currentWinStreak = user.currentWinStreak || 0;
+    const bestWinStreak = user.bestWinStreak || 0;
 
     return {
       wins,
       losses,
       draws,
-      totalGames: wins + losses + draws
+      totalGames: wins + losses + draws,
+      currentWinStreak,
+      bestWinStreak
     };
   }
 

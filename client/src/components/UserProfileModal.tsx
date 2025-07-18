@@ -19,6 +19,8 @@ interface OnlineGameStats {
   losses: number;
   draws: number;
   totalGames: number;
+  currentWinStreak: number;
+  bestWinStreak: number;
 }
 
 export function UserProfileModal({ 
@@ -166,6 +168,29 @@ export function UserProfileModal({
                   </div>
                   <div className="text-2xl font-bold text-blue-700 dark:text-blue-400">
                     {stats.totalGames}
+                  </div>
+                </div>
+              </div>
+              
+              {/* Win Streak Information */}
+              <div className="grid grid-cols-2 gap-4">
+                <div className="bg-orange-50 dark:bg-orange-900/20 p-4 rounded-lg text-center">
+                  <div className="flex items-center justify-center gap-2 mb-2">
+                    <span className="text-orange-600 text-lg">🔥</span>
+                    <span className="text-sm font-medium text-orange-600">Current Streak</span>
+                  </div>
+                  <div className="text-2xl font-bold text-orange-700 dark:text-orange-400">
+                    {stats.currentWinStreak}
+                  </div>
+                </div>
+                
+                <div className="bg-purple-50 dark:bg-purple-900/20 p-4 rounded-lg text-center">
+                  <div className="flex items-center justify-center gap-2 mb-2">
+                    <span className="text-purple-600 text-lg">⚡</span>
+                    <span className="text-sm font-medium text-purple-600">Best Streak</span>
+                  </div>
+                  <div className="text-2xl font-bold text-purple-700 dark:text-purple-400">
+                    {stats.bestWinStreak}
                   </div>
                 </div>
               </div>
