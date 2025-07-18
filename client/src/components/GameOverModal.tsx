@@ -1,7 +1,5 @@
 import React from "react";
 import { Home, RefreshCw } from "lucide-react";
-import { SimpleConfetti } from "./SimpleConfetti";
-import { useAudio } from "../hooks/useAudio";
 
 interface GameOverModalProps {
   open: boolean;
@@ -13,8 +11,6 @@ interface GameOverModalProps {
 }
 
 export function GameOverModal({ open, onClose, result, onPlayAgain, isCreatingGame = false, onMainMenu }: GameOverModalProps) {
-  const { playSound } = useAudio();
-  
   // Simple safety checks
   if (!open) return null;
   if (!result) {
@@ -27,22 +23,6 @@ export function GameOverModal({ open, onClose, result, onPlayAgain, isCreatingGa
   // Super simple logic - no complex conditionals
   const isDraw = result.condition === 'draw';
   const winner = result.winner;
-  
-  // Play celebration sound for wins (not draws)
-  React.useEffect(() => {
-    if (open && !isDraw && winner) {
-      // Delay the sound slightly to ensure modal is fully rendered
-      const timer = setTimeout(() => {
-        try {
-          playSound('celebrate');
-        } catch (error) {
-          console.warn('Celebration sound failed:', error);
-        }
-      }, 100);
-      
-      return () => clearTimeout(timer);
-    }
-  }, [open, isDraw, winner, playSound]);
   
   // Get proper player names and info - only for online games
   const isOnlineGame = result.game?.gameMode === 'online';
@@ -70,11 +50,7 @@ export function GameOverModal({ open, onClose, result, onPlayAgain, isCreatingGa
   const winnerInfo = isOnlineGame ? (winner === 'X' ? result.playerXInfo : result.playerOInfo) : null;
 
   return (
-    <>
-      {/* Simple confetti for wins */}
-      <SimpleConfetti active={open && !isDraw && winner !== null} />
-      
-      <div 
+    <div 
         style={{
           position: 'fixed',
           top: 0,
@@ -223,6 +199,5 @@ export function GameOverModal({ open, onClose, result, onPlayAgain, isCreatingGa
         </div>
       </div>
     </div>
-    </>
   );
 }
