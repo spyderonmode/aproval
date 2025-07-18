@@ -64,7 +64,7 @@ export function OnlineUsersModal({ open, onClose, currentRoom, user }: OnlineUse
 
   const blockUserMutation = useMutation({
     mutationFn: async (userId: string) => {
-      return await apiRequest('POST', '/api/users/block', { userId });
+      return await apiRequest('/api/users/block', { method: 'POST', body: { userId } });
     },
     onSuccess: (_, userId) => {
       setBlockedUsers(prev => new Set(prev).add(userId));
@@ -81,7 +81,7 @@ export function OnlineUsersModal({ open, onClose, currentRoom, user }: OnlineUse
 
   const unblockUserMutation = useMutation({
     mutationFn: async (userId: string) => {
-      return await apiRequest('POST', '/api/users/unblock', { userId });
+      return await apiRequest('/api/users/unblock', { method: 'POST', body: { userId } });
     },
     onSuccess: (_, userId) => {
       setBlockedUsers(prev => {
@@ -102,7 +102,7 @@ export function OnlineUsersModal({ open, onClose, currentRoom, user }: OnlineUse
 
   const sendFriendRequestMutation = useMutation({
     mutationFn: async (requestedId: string) => {
-      return await apiRequest('POST', '/api/friends/request', { requestedId });
+      return await apiRequest('/api/friends/request', { method: 'POST', body: { requestedId } });
     },
     onSuccess: (_, requestedId) => {
       queryClient.invalidateQueries({ queryKey: ["/api/friends"] });

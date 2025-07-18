@@ -602,7 +602,7 @@ export function GameBoard({ game, onGameOver, gameMode, user, lastMessage, sendM
         throw new Error('Game is finished');
       }
       
-      return await apiRequest('POST', `/api/games/${game.id}/moves`, { position });
+      return await apiRequest(`/api/games/${game.id}/moves`, { method: 'POST', body: { position } });
     },
     onSuccess: (data) => {
       console.log('🎯 Move mutation success:', data);

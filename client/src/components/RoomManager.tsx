@@ -41,7 +41,7 @@ export function RoomManager({
     queryKey: ['room-participants', currentRoom?.id],
     queryFn: async () => {
       if (!currentRoom) return [];
-      const response = await apiRequest('GET', `/api/rooms/${currentRoom.id}/participants`);
+      const response = await apiRequest(`/api/rooms/${currentRoom.id}/participants`);
       return response.json();
     },
     enabled: !!currentRoom,
@@ -49,7 +49,7 @@ export function RoomManager({
 
   const joinRoomMutation = useMutation({
     mutationFn: async (data: { code: string, role: 'player' | 'spectator' }) => {
-      const response = await apiRequest('POST', `/api/rooms/${data.code}/join`, { role: data.role });
+      const response = await apiRequest(`/api/rooms/${data.code}/join`, { method: 'POST', body: { role: data.role } });
       return response.json();
     },
     onSuccess: (data) => {
@@ -84,7 +84,7 @@ export function RoomManager({
     mutationFn: async () => {
       if (!currentRoom) throw new Error('No room selected');
       
-      const response = await apiRequest('POST', `/api/rooms/${currentRoom.id}/start-game`, {});
+      const response = await apiRequest(`/api/rooms/${currentRoom.id}/start-game`, { method: 'POST', body: {} });
       return response.json();
     },
     onSuccess: (game) => {

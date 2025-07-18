@@ -66,7 +66,7 @@ export function Friends() {
   // Send friend request mutation
   const sendFriendRequest = useMutation({
     mutationFn: async (requestedId: string) => {
-      return await apiRequest('POST', '/api/friends/request', { requestedId });
+      return await apiRequest('/api/friends/request', { method: 'POST', body: { requestedId } });
     },
     onSuccess: () => {
       toast({
@@ -85,7 +85,7 @@ export function Friends() {
   // Respond to friend request mutation
   const respondToFriendRequest = useMutation({
     mutationFn: async ({ requestId, response }: { requestId: string; response: 'accepted' | 'rejected' }) => {
-      return await apiRequest('POST', '/api/friends/respond', { requestId, response });
+      return await apiRequest('/api/friends/respond', { method: 'POST', body: { requestId, response } });
     },
     onSuccess: () => {
       toast({
@@ -103,7 +103,7 @@ export function Friends() {
   // Remove friend mutation
   const removeFriend = useMutation({
     mutationFn: async (friendId: string) => {
-      return await apiRequest('DELETE', `/api/friends/${friendId}`);
+      return await apiRequest(`/api/friends/${friendId}`, { method: 'DELETE' });
     },
     onSuccess: () => {
       toast({
@@ -125,7 +125,7 @@ export function Friends() {
   // Chat functionality
   const sendMessageMutation = useMutation({
     mutationFn: async ({ targetUserId, message }: { targetUserId: string; message: string }) => {
-      return await apiRequest('POST', '/api/chat/send', { targetUserId, message });
+      return await apiRequest('/api/chat/send', { method: 'POST', body: { targetUserId, message } });
     },
     onSuccess: (data, variables) => {
       if (selectedChatFriend) {
@@ -229,7 +229,7 @@ export function Friends() {
 
     setIsSearching(true);
     try {
-      const response = await apiRequest('POST', '/api/users/search', { name: searchName.trim() });
+      const response = await apiRequest('/api/users/search', { method: 'POST', body: { name: searchName.trim() } });
       
       if (!response.ok) {
         const errorData = await response.json();

@@ -28,7 +28,7 @@ export function ProfileManager({ user, open = false, onClose }: ProfileManagerPr
 
   const updateProfileMutation = useMutation({
     mutationFn: async (data: { displayName?: string; profilePicture?: string }) => {
-      const response = await apiRequest('PUT', '/api/auth/profile', data);
+      const response = await apiRequest('/api/auth/profile', { method: 'PUT', body: data });
       return response.json();
     },
     onSuccess: (updatedUser) => {

@@ -31,8 +31,9 @@ export function InviteFriendsModal({ open, onClose, roomId, roomName }: InviteFr
   // Send invitation mutation
   const sendInvitationMutation = useMutation({
     mutationFn: async (friendId: string) => {
-      const response = await apiRequest('POST', `/api/rooms/${roomId}/invite`, {
-        invitedId: friendId,
+      const response = await apiRequest(`/api/rooms/${roomId}/invite`, {
+        method: 'POST',
+        body: { invitedId: friendId }
       });
       return response.json();
     },

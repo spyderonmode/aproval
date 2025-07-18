@@ -40,8 +40,9 @@ export function InvitationPopup({ onRoomJoin }: InvitationPopupProps) {
 
   const respondToInvitationMutation = useMutation({
     mutationFn: async (data: { invitationId: string, response: 'accepted' | 'rejected' }) => {
-      const response = await apiRequest('POST', `/api/room-invitations/${data.invitationId}/respond`, {
-        response: data.response
+      const response = await apiRequest(`/api/room-invitations/${data.invitationId}/respond`, {
+        method: 'POST',
+        body: { response: data.response }
       });
       return response.json();
     },

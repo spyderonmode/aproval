@@ -35,7 +35,7 @@ export function MatchmakingModal({ open, onClose, onMatchFound, user }: Matchmak
 
   const joinMatchmakingMutation = useMutation({
     mutationFn: async () => {
-      const response = await apiRequest('POST', '/api/matchmaking/join', {});
+      const response = await apiRequest('/api/matchmaking/join', { method: 'POST', body: {} });
       return response.json();
     },
     onSuccess: (data) => {
@@ -79,7 +79,7 @@ export function MatchmakingModal({ open, onClose, onMatchFound, user }: Matchmak
 
   const leaveMatchmakingMutation = useMutation({
     mutationFn: async () => {
-      const response = await apiRequest('POST', '/api/matchmaking/leave', {});
+      const response = await apiRequest('/api/matchmaking/leave', { method: 'POST', body: {} });
       return response.json();
     },
     onSuccess: () => {

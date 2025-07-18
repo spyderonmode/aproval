@@ -77,7 +77,7 @@ export function ChatPopup({
 
   const sendMessageMutation = useMutation({
     mutationFn: async ({ targetUserId, message }: { targetUserId: string; message: string }) => {
-      return await apiRequest('POST', '/api/chat/send', { targetUserId, message });
+      return await apiRequest('/api/chat/send', { method: 'POST', body: { targetUserId, message } });
     },
     onSuccess: () => {
       if (activeChatUser) {

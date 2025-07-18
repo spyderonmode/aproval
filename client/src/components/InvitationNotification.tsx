@@ -27,7 +27,8 @@ export function InvitationNotification({ invitation, onAccept, onDismiss }: Invi
     try {
       // Join the room
       await apiRequest(`/api/rooms/${invitation.roomId}/join`, {
-        method: 'POST'
+        method: 'POST',
+        body: { role: 'player' }
       });
       
       onAccept(invitation.roomId);

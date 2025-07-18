@@ -27,7 +27,7 @@ export function CreateRoomModal({ open, onClose, onRoomCreated }: CreateRoomModa
 
   const createRoomMutation = useMutation({
     mutationFn: async (roomData: any) => {
-      const response = await apiRequest('POST', '/api/rooms', roomData);
+      const response = await apiRequest('/api/rooms', { method: 'POST', body: roomData });
       return response.json();
     },
     onSuccess: (room) => {
