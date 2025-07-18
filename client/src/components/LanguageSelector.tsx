@@ -28,7 +28,12 @@ export function LanguageSelector() {
           <ChevronDown className="w-4 h-4" />
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-56 z-[9999] bg-popover border border-border shadow-lg">
+      <DropdownMenuContent 
+        align="end" 
+        className="w-56 z-[9999] bg-slate-800 border border-slate-600 shadow-2xl"
+        style={{ zIndex: 9999 }}
+        sideOffset={8}
+      >
         {Object.entries(languages).map(([code, info]) => (
           <DropdownMenuItem
             key={code}

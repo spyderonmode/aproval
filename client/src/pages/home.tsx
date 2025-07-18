@@ -674,19 +674,21 @@ export default function Home() {
               
               {/* Header Sidebar */}
               {showHeaderSidebar && (
-                <div className="absolute right-0 top-full mt-2 w-64 bg-slate-800 border border-slate-700 rounded-lg shadow-lg z-50">
-                  <div className="p-4 space-y-4">
+                <div className="absolute right-0 top-full mt-2 w-64 bg-slate-800 border border-slate-700 rounded-lg shadow-lg z-50 overflow-visible">
+                  <div className="p-4 space-y-4 overflow-visible">
                     <div className="text-sm font-medium text-gray-300 border-b border-slate-700 pb-2">
                       {t('quickActions')}
                     </div>
                     
                     {/* Language Selector */}
-                    <div className="flex items-center justify-between">
+                    <div className="flex items-center justify-between overflow-visible">
                       <div className="flex items-center space-x-2">
                         <Languages className="w-4 h-4 text-gray-400" />
                         <span className="text-sm text-gray-300">{t('language')}</span>
                       </div>
-                      <LanguageSelector />
+                      <div className="relative z-[9999]">
+                        <LanguageSelector />
+                      </div>
                     </div>
                     
                     {/* Theme Selector */}
