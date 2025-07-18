@@ -23,13 +23,16 @@ import { InvitationPopup } from "@/components/InvitationPopup";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { GamepadIcon, LogOut, User, Zap, Loader2, Users, Settings, Menu, X, Palette, Trophy } from "lucide-react";
+import { GamepadIcon, LogOut, User, Zap, Loader2, Users, Settings, Menu, X, Palette, Trophy, Languages } from "lucide-react";
 import { logout } from "@/lib/firebase";
+import { useTranslation } from "@/contexts/LanguageContext";
+import { LanguageSelector } from "@/components/LanguageSelector";
 
 export default function Home() {
   const { user } = useAuth();
   const { isConnected, lastMessage, joinRoom, leaveRoom, sendMessage } = useWebSocket();
   const { toast } = useToast();
+  const { t } = useTranslation();
   // Sound effects removed as requested
   const [selectedMode, setSelectedMode] = useState<'ai' | 'pass-play' | 'online'>('ai');
   const [aiDifficulty, setAiDifficulty] = useState<'easy' | 'medium' | 'hard'>('medium');
@@ -677,11 +680,20 @@ export default function Home() {
                       Quick Actions
                     </div>
                     
+                    {/* Language Selector */}
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center space-x-2">
+                        <Languages className="w-4 h-4 text-gray-400" />
+                        <span className="text-sm text-gray-300">{t('language')}</span>
+                      </div>
+                      <LanguageSelector />
+                    </div>
+                    
                     {/* Theme Selector */}
                     <div className="flex items-center justify-between">
                       <div className="flex items-center space-x-2">
                         <Palette className="w-4 h-4 text-gray-400" />
-                        <span className="text-sm text-gray-300">Theme</span>
+                        <span className="text-sm text-gray-300">{t('theme')}</span>
                       </div>
                       <Button
                         variant="outline"
@@ -709,7 +721,7 @@ export default function Home() {
                     <div className="flex items-center justify-between">
                       <div className="flex items-center space-x-2">
                         <Users className="w-4 h-4 text-gray-400" />
-                        <span className="text-sm text-gray-300">Online Players</span>
+                        <span className="text-sm text-gray-300">{t('onlineUsers')}</span>
                       </div>
                       <Button
                         variant="outline"

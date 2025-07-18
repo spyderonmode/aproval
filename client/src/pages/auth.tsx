@@ -9,6 +9,8 @@ import { useAuth } from "@/hooks/useAuth";
 import { EmailVerificationModal } from "@/components/EmailVerificationModal";
 import { ForgotPasswordModal } from "@/components/ForgotPasswordModal";
 import { GamepadIcon, Mail } from "lucide-react";
+import { useTranslation } from "@/contexts/LanguageContext";
+import { LanguageSelector } from "@/components/LanguageSelector";
 
 export default function Auth() {
   const [isLogin, setIsLogin] = useState(true);
@@ -21,6 +23,7 @@ export default function Auth() {
   const [registrationEmail, setRegistrationEmail] = useState("");
   const { toast } = useToast();
   const [, setLocation] = useLocation();
+  const { t } = useTranslation();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -111,19 +114,22 @@ export default function Auth() {
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center p-4">
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
-          <div className="flex justify-center mb-4">
+          <div className="flex justify-center items-center gap-4 mb-4">
             <div className="w-16 h-16 bg-primary rounded-2xl flex items-center justify-center">
               <GamepadIcon className="w-8 h-8 text-white" />
             </div>
+            <div className="ml-auto">
+              <LanguageSelector />
+            </div>
           </div>
-          <h1 className="text-3xl font-bold text-white mb-2">TicTac 3x5</h1>
-          <p className="text-slate-400">Strategic Tic-Tac-Toe Reimagined</p>
+          <h1 className="text-3xl font-bold text-white mb-2">{t('appName')}</h1>
+          <p className="text-slate-400">{t('strategicTicTacToe')}</p>
         </div>
 
         <Card className="bg-slate-800 border-slate-700">
           <CardHeader className="space-y-1">
             <CardTitle className="text-2xl text-white">
-              {isLogin ? "Welcome back" : "Create account"}
+              {isLogin ? t('login') : t('register')}
             </CardTitle>
             <CardDescription className="text-slate-400">
               {isLogin 
@@ -150,7 +156,7 @@ export default function Auth() {
               </div>
               {!isLogin && (
                 <div className="space-y-2">
-                  <Label htmlFor="email" className="text-slate-300">Email</Label>
+                  <Label htmlFor="email" className="text-slate-300">{t('email')}</Label>
                   <Input
                     id="email"
                     type="email"
@@ -166,7 +172,7 @@ export default function Auth() {
                 </div>
               )}
               <div className="space-y-2">
-                <Label htmlFor="password" className="text-slate-300">Password</Label>
+                <Label htmlFor="password" className="text-slate-300">{t('password')}</Label>
                 <Input
                   id="password"
                   type="password"
@@ -182,7 +188,7 @@ export default function Auth() {
                 className="w-full bg-primary hover:bg-primary/90"
                 disabled={isLoading}
               >
-                {isLoading ? "Please wait..." : (isLogin ? "Sign In" : "Sign Up")}
+                {isLoading ? t('loading') : (isLogin ? t('login') : t('register'))}
               </Button>
             </form>
             

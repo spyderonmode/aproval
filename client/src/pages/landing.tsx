@@ -2,9 +2,12 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { GamepadIcon } from "lucide-react";
 import { useLocation } from "wouter";
+import { useTranslation } from "@/contexts/LanguageContext";
+import { LanguageSelector } from "@/components/LanguageSelector";
 
 export default function Landing() {
   const [, setLocation] = useLocation();
+  const { t } = useTranslation();
 
   const handleLogin = () => {
     setLocation("/auth");
@@ -19,14 +22,17 @@ export default function Landing() {
             <div className="w-10 h-10 bg-primary rounded-lg flex items-center justify-center">
               <GamepadIcon className="w-6 h-6 text-white" />
             </div>
-            <h1 className="text-xl font-bold text-white">TicTac 3x5</h1>
+            <h1 className="text-xl font-bold text-white">{t('appName')}</h1>
           </div>
-          <Button 
-            onClick={handleLogin}
-            className="bg-primary hover:bg-primary/90"
-          >
-            Get Started
-          </Button>
+          <div className="flex items-center gap-4">
+            <LanguageSelector />
+            <Button 
+              onClick={handleLogin}
+              className="bg-primary hover:bg-primary/90"
+            >
+              {t('getStarted')}
+            </Button>
+          </div>
         </div>
       </nav>
 
@@ -34,18 +40,18 @@ export default function Landing() {
       <div className="max-w-7xl mx-auto px-6 py-16">
         <div className="text-center mb-16">
           <h2 className="text-5xl font-bold text-white mb-6">
-            Strategic Tic-Tac-Toe
-            <span className="block text-primary">Game</span>
+            {t('strategicTicTacToe')}
+            <span className="block text-primary">{t('game')}</span>
           </h2>
           <p className="text-xl text-slate-300 max-w-3xl mx-auto mb-8">
-            Experience the classic game on a 3x5 grid with strategic gameplay.
+            {t('gameDescription')}
           </p>
           <Button 
             size="lg" 
             onClick={handleLogin}
             className="bg-primary hover:bg-primary/90 text-lg px-8 py-3"
           >
-            Start Playing Now
+            {t('startPlayingNow')}
           </Button>
         </div>
       </div>
