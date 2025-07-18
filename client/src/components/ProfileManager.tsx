@@ -70,10 +70,10 @@ export function ProfileManager({ user, open = false, onClose }: ProfileManagerPr
     const file = event.target.files?.[0];
     if (!file) return;
 
-    if (file.size > 5 * 1024 * 1024) { // 5MB limit
+    if (file.size > 1 * 1024 * 1024) { // 1MB limit
       toast({
         title: t('fileTooLarge'),
-        description: t('selectImageUnder5MB'),
+        description: t('selectImageUnder1MB'),
         variant: "destructive",
       });
       return;

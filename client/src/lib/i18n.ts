@@ -1751,6 +1751,14 @@ export const translations = {
     es: 'Archivo demasiado grande',
     id: 'File terlalu besar'
   },
+  selectImageUnder1MB: {
+    en: 'Please select an image under 1MB',
+    ar: 'يرجى اختيار صورة أقل من 1 ميجابايت',
+    bn: 'অনুগ্রহ করে ১MB এর কম একটি ছবি নির্বাচন করুন',
+    hi: 'कृपया 1MB से कम का चित्र चुनें',
+    es: 'Por favor selecciona una imagen menor a 1MB',
+    id: 'Silakan pilih gambar di bawah 1MB'
+  },
   selectImageUnder5MB: {
     en: 'Please select an image under 5MB',
     ar: 'يرجى اختيار صورة أقل من 5 ميجابايت',

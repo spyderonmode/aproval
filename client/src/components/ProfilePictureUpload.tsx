@@ -20,11 +20,11 @@ export function ProfilePictureUpload({ user }: ProfilePictureUploadProps) {
     const file = event.target.files?.[0];
     if (!file || !user) return;
 
-    // Check file size (max 5MB)
-    if (file.size > 5 * 1024 * 1024) {
+    // Check file size (max 1MB)
+    if (file.size > 1 * 1024 * 1024) {
       toast({
         title: "File too large",
-        description: "Please select an image smaller than 5MB",
+        description: "Please select an image smaller than 1MB",
         variant: "destructive",
       });
       return;
@@ -115,7 +115,7 @@ export function ProfilePictureUpload({ user }: ProfilePictureUploadProps) {
           </Button>
         </label>
         <p className="text-sm text-muted-foreground">
-          Max size: 5MB. Formats: JPG, PNG, GIF
+          Max size: 1MB. Formats: JPG, PNG, GIF
         </p>
       </div>
     </div>
