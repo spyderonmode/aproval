@@ -88,6 +88,7 @@ export function AchievementModal({ open, onClose, userId }: AchievementModalProp
   const recalculateAchievements = useMutation({
     mutationFn: () => apiRequest('/api/achievements/recalculate', { method: 'POST' }),
     onSuccess: (data) => {
+      console.log('✅ Recalculation successful:', data);
       queryClient.invalidateQueries({ queryKey: ['/api/achievements'] });
       toast({
         title: "Achievements Updated",
@@ -95,9 +96,10 @@ export function AchievementModal({ open, onClose, userId }: AchievementModalProp
       });
     },
     onError: (error) => {
+      console.error('❌ Recalculation failed:', error);
       toast({
         title: "Error",
-        description: "Failed to recalculate achievements. Please try again.",
+        description: error.message || "Failed to recalculate achievements. Please try again.",
         variant: "destructive",
       });
     },

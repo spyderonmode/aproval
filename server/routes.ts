@@ -395,7 +395,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post('/api/achievements/recalculate', requireAuth, async (req: any, res) => {
     try {
       const userId = req.session.user.userId;
+      console.log(`🔄 Recalculation request for user: ${userId}`);
+      
       const result = await storage.recalculateUserAchievements(userId);
+      
+      console.log(`✅ Recalculation successful - removed: ${result.removed}, added: ${result.added.length}`);
       
       res.json({
         success: true,
@@ -405,8 +409,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
         achievements: result.added
       });
     } catch (error) {
-      console.error("Error recalculating achievements:", error);
-      res.status(500).json({ message: "Failed to recalculate achievements" });
+      console.error("❌ Error recalculating achievements:", error);
+      console.error("Error details:", error.message);
+      console.error("Stack trace:", error.stack);
+      res.status(500).json({ 
+        error: "Failed to recalculate achievements",
+        details: error.message 
+      });
     }
   });
 

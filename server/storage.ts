@@ -644,7 +644,7 @@ export class DatabaseStorage implements IStorage {
       console.log(`🏆 Existing achievements count: ${existingAchievements.length}`);
       
       // Remove all existing achievements for this user
-      const deletedResult = await db
+      await db
         .delete(achievements)
         .where(eq(achievements.userId, userId));
       
@@ -698,26 +698,26 @@ export class DatabaseStorage implements IStorage {
         if (rule.condition) {
           try {
             console.log(`✅ Creating achievement: ${rule.type} for user with ${userStats.wins} wins`);
-            const newAchievement = await this.createAchievement({
-              userId,
-              achievementType: rule.type,
-              achievementName: rule.name,
-              description: rule.description,
-              icon: rule.icon,
-              metadata: {},
-            });
+            
+            // Create achievement with direct database insert instead of using createAchievement
+            const [newAchievement] = await db
+              .insert(achievements)
+              .values({
+                userId,
+                achievementType: rule.type,
+                achievementName: rule.name,
+                description: rule.description,
+                icon: rule.icon,
+                metadata: {},
+              })
+              .returning();
+            
             if (newAchievement) {
               newAchievements.push(newAchievement);
-              
-              // Unlock special themes for certain achievements
-              if (rule.type === 'speed_demon') {
-                await this.unlockTheme(userId, 'christmas');
-              } else if (rule.type === 'veteran_player') {
-                await this.unlockTheme(userId, 'summer');
-              }
+              console.log(`✅ Achievement created: ${rule.type}`);
             }
           } catch (error) {
-            console.error('Error creating achievement during recalculation:', error);
+            console.error(`❌ Error creating achievement ${rule.type}:`, error);
           }
         }
       }
@@ -725,7 +725,7 @@ export class DatabaseStorage implements IStorage {
       console.log(`🎉 Added ${newAchievements.length} new achievements`);
       return { removed: removedCount, added: newAchievements };
     } catch (error) {
-      console.error('Error during achievement recalculation:', error);
+      console.error('❌ Error during achievement recalculation:', error);
       throw error;
     }
   }
