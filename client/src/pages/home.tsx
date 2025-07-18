@@ -18,6 +18,7 @@ import { OnlineUsersModal } from "@/components/OnlineUsersModal";
 import { ThemeSelector } from "@/components/ThemeSelector";
 import { AchievementModal } from "@/components/AchievementModal";
 import { Friends } from "@/components/Friends";
+import { RoomInvitationNotifications } from "@/components/RoomInvitationNotifications";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -882,6 +883,9 @@ export default function Home() {
               aiDifficulty={aiDifficulty}
               onDifficultyChange={setAiDifficulty}
             />
+
+            {/* Room Invitations */}
+            <RoomInvitationNotifications onRoomJoin={handleRoomJoin} />
 
             {/* Online Room Management */}
             {selectedMode === 'online' && (

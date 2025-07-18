@@ -55,6 +55,15 @@ export function useWebSocket() {
           });
           window.dispatchEvent(chatEvent);
         }
+
+        // Handle room invitation messages
+        if (message.type === 'room_invitation') {
+          console.log('📧 Received room invitation:', message.invitation);
+          const invitationEvent = new CustomEvent('room_invitation_received', {
+            detail: message.invitation
+          });
+          window.dispatchEvent(invitationEvent);
+        }
         
         setLastMessage(message);
       } catch (error) {

@@ -7,7 +7,8 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { isUnauthorizedError } from "@/lib/authUtils";
-import { Plus, LogOut, Play } from "lucide-react";
+import { Plus, LogOut, Play, UserPlus } from "lucide-react";
+import { InviteFriendsModal } from "./InviteFriendsModal";
 
 interface RoomManagerProps {
   currentRoom: any;
@@ -29,6 +30,7 @@ export function RoomManager({
   user 
 }: RoomManagerProps) {
   const [joinCode, setJoinCode] = useState("");
+  const [showInviteModal, setShowInviteModal] = useState(false);
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -191,40 +193,65 @@ export function RoomManager({
             </div>
 
             {/* Room Actions */}
-            <div className="flex space-x-2">
-              {/* Check if user is room owner */}
-              {currentRoom.ownerId === (user?.userId || user?.id) ? (
+            <div className="space-y-2">
+              {/* Main action buttons */}
+              <div className="flex space-x-2">
+                {/* Check if user is room owner */}
+                {currentRoom.ownerId === (user?.userId || user?.id) ? (
+                  <Button
+                    onClick={() => {
+                      console.log('🎮 Start game button clicked');
+                      startGameMutation.mutate();
+                    }}
+                    disabled={startGameMutation.isPending}
+                    className="flex-1 bg-primary hover:bg-primary/90"
+                  >
+                    <Play className="w-4 h-4 mr-2" />
+                    {startGameMutation.isPending ? 'Starting...' : 'Start Game'}
+                  </Button>
+                ) : (
+                  <Button
+                    disabled
+                    className="flex-1 bg-gray-600 cursor-not-allowed"
+                  >
+                    <Play className="w-4 h-4 mr-2" />
+                    Wait for Start
+                  </Button>
+                )}
                 <Button
-                  onClick={() => {
-                    console.log('🎮 Start game button clicked');
-                    startGameMutation.mutate();
-                  }}
-                  disabled={startGameMutation.isPending}
-                  className="flex-1 bg-primary hover:bg-primary/90"
+                  variant="outline"
+                  onClick={handleLeaveRoom}
+                  className="border-red-600 text-red-600 hover:bg-red-600 hover:text-white"
                 >
-                  <Play className="w-4 h-4 mr-2" />
-                  {startGameMutation.isPending ? 'Starting...' : 'Start Game'}
+                  <LogOut className="w-4 h-4" />
                 </Button>
-              ) : (
+              </div>
+              
+              {/* Invite friends button (only for room owner) */}
+              {currentRoom.ownerId === (user?.userId || user?.id) && (
                 <Button
-                  disabled
-                  className="flex-1 bg-gray-600 cursor-not-allowed"
+                  onClick={() => setShowInviteModal(true)}
+                  variant="outline"
+                  className="w-full border-blue-500 text-blue-500 hover:bg-blue-500 hover:text-white"
                 >
-                  <Play className="w-4 h-4 mr-2" />
-                  Wait for Start
+                  <UserPlus className="w-4 h-4 mr-2" />
+                  Invite Friends
                 </Button>
               )}
-              <Button
-                variant="outline"
-                onClick={handleLeaveRoom}
-                className="border-red-600 text-red-600 hover:bg-red-600 hover:text-white"
-              >
-                <LogOut className="w-4 h-4" />
-              </Button>
             </div>
           </>
         )}
       </CardContent>
+      
+      {/* Invite Friends Modal */}
+      {currentRoom && (
+        <InviteFriendsModal
+          open={showInviteModal}
+          onClose={() => setShowInviteModal(false)}
+          roomId={currentRoom.id}
+          roomName={currentRoom.name}
+        />
+      )}
     </Card>
   );
 }

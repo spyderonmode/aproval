@@ -142,6 +142,20 @@ export const friendships = pgTable("friendships", {
   index("unique_friendship").on(table.user1Id, table.user2Id),
 ]);
 
+export const roomInvitations = pgTable("room_invitations", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  roomId: uuid("room_id").references(() => rooms.id).notNull(),
+  inviterId: varchar("inviter_id").references(() => users.id).notNull(),
+  invitedId: varchar("invited_id").references(() => users.id).notNull(),
+  status: varchar("status").default("pending"), // pending, accepted, rejected, expired
+  invitedAt: timestamp("invited_at").defaultNow(),
+  respondedAt: timestamp("responded_at"),
+  expiresAt: timestamp("expires_at").notNull(), // Invitations expire after 24 hours
+}, (table) => [
+  // Prevent duplicate room invitations
+  index("unique_room_invitation").on(table.roomId, table.invitedId),
+]);
+
 // Relations
 export const usersRelations = relations(users, ({ many }) => ({
   ownedRooms: many(rooms),
@@ -158,12 +172,15 @@ export const usersRelations = relations(users, ({ many }) => ({
   receivedFriendRequests: many(friendRequests, { relationName: "requested" }),
   friendshipsAsUser1: many(friendships, { relationName: "user1" }),
   friendshipsAsUser2: many(friendships, { relationName: "user2" }),
+  sentRoomInvitations: many(roomInvitations, { relationName: "inviter" }),
+  receivedRoomInvitations: many(roomInvitations, { relationName: "invited" }),
 }));
 
 export const roomsRelations = relations(rooms, ({ one, many }) => ({
   owner: one(users, { fields: [rooms.ownerId], references: [users.id] }),
   participants: many(roomParticipants),
   games: many(games),
+  invitations: many(roomInvitations),
 }));
 
 export const gamesRelations = relations(games, ({ one, many }) => ({
@@ -207,11 +224,22 @@ export const friendshipsRelations = relations(friendships, ({ one }) => ({
   user2: one(users, { fields: [friendships.user2Id], references: [users.id], relationName: "user2" }),
 }));
 
+export const roomInvitationsRelations = relations(roomInvitations, ({ one }) => ({
+  room: one(rooms, { fields: [roomInvitations.roomId], references: [rooms.id] }),
+  inviter: one(users, { fields: [roomInvitations.inviterId], references: [users.id], relationName: "inviter" }),
+  invited: one(users, { fields: [roomInvitations.invitedId], references: [users.id], relationName: "invited" }),
+}));
+
 // Schemas
 export const insertRoomSchema = createInsertSchema(rooms).pick({
   name: true,
   maxPlayers: true,
   isPrivate: true,
+});
+
+export const insertRoomInvitationSchema = createInsertSchema(roomInvitations).pick({
+  roomId: true,
+  invitedId: true,
 });
 
 export const insertGameSchema = createInsertSchema(games).pick({
@@ -280,6 +308,8 @@ export type UpsertUser = typeof users.$inferInsert;
 export type User = typeof users.$inferSelect;
 export type Room = typeof rooms.$inferSelect;
 export type Game = typeof games.$inferSelect;
+export type RoomInvitation = typeof roomInvitations.$inferSelect;
+export type InsertRoomInvitation = z.infer<typeof insertRoomInvitationSchema>;
 export type Move = typeof moves.$inferSelect;
 export type RoomParticipant = typeof roomParticipants.$inferSelect;
 export type BlockedUser = typeof blockedUsers.$inferSelect;
@@ -297,3 +327,4 @@ export type InsertRoomParticipant = z.infer<typeof insertRoomParticipantSchema>;
 export type InsertBlockedUser = z.infer<typeof insertBlockedUserSchema>;
 export type InsertAchievement = z.infer<typeof insertAchievementSchema>;
 export type InsertUserTheme = z.infer<typeof insertUserThemeSchema>;
+export type InsertRoomInvitation = z.infer<typeof insertRoomInvitationSchema>;

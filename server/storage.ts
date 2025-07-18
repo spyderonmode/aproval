@@ -9,6 +9,7 @@ import {
   userThemes,
   friendRequests,
   friendships,
+  roomInvitations,
   type User,
   type UpsertUser,
   type Room,
@@ -20,6 +21,7 @@ import {
   type UserTheme,
   type FriendRequest,
   type Friendship,
+  type RoomInvitation,
   type InsertRoom,
   type InsertGame,
   type InsertMove,
@@ -29,6 +31,7 @@ import {
   type InsertUserTheme,
   type InsertFriendRequest,
   type InsertFriendship,
+  type InsertRoomInvitation,
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, and, desc, count, or, ne, isNull, isNotNull, sql, exists } from "drizzle-orm";
@@ -103,6 +106,12 @@ export interface IStorage {
     userWinRate: number;
     friendWinRate: number;
   }>;
+
+  // Room Invitation operations
+  sendRoomInvitation(roomId: string, inviterId: string, invitedId: string): Promise<RoomInvitation>;
+  getRoomInvitations(userId: string): Promise<(RoomInvitation & { room: Room; inviter: User; invited: User })[]>;
+  respondToRoomInvitation(invitationId: string, response: 'accepted' | 'rejected'): Promise<void>;
+  expireOldInvitations(): Promise<void>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -987,6 +996,126 @@ export class DatabaseStorage implements IStorage {
       userWinRate,
       friendWinRate,
     };
+  }
+
+  // Room Invitation operations
+  async sendRoomInvitation(roomId: string, inviterId: string, invitedId: string): Promise<RoomInvitation> {
+    // Check if invitation already exists
+    const existingInvitation = await db
+      .select()
+      .from(roomInvitations)
+      .where(
+        and(
+          eq(roomInvitations.roomId, roomId),
+          eq(roomInvitations.invitedId, invitedId),
+          eq(roomInvitations.status, 'pending')
+        )
+      );
+
+    if (existingInvitation.length > 0) {
+      throw new Error('Invitation already sent to this user for this room');
+    }
+
+    // Create expiration date (24 hours from now)
+    const expiresAt = new Date();
+    expiresAt.setHours(expiresAt.getHours() + 24);
+
+    const [invitation] = await db
+      .insert(roomInvitations)
+      .values({
+        roomId,
+        inviterId,
+        invitedId,
+        expiresAt,
+      })
+      .returning();
+
+    return invitation;
+  }
+
+  async getRoomInvitations(userId: string): Promise<(RoomInvitation & { room: Room; inviter: User; invited: User })[]> {
+    const invitations = await db
+      .select({
+        id: roomInvitations.id,
+        roomId: roomInvitations.roomId,
+        inviterId: roomInvitations.inviterId,
+        invitedId: roomInvitations.invitedId,
+        status: roomInvitations.status,
+        invitedAt: roomInvitations.invitedAt,
+        respondedAt: roomInvitations.respondedAt,
+        expiresAt: roomInvitations.expiresAt,
+        room: rooms,
+        inviter: {
+          id: users.id,
+          email: users.email,
+          firstName: users.firstName,
+          lastName: users.lastName,
+          displayName: users.displayName,
+          username: users.username,
+          profileImageUrl: users.profileImageUrl,
+          wins: users.wins,
+          losses: users.losses,
+          draws: users.draws,
+          createdAt: users.createdAt,
+          updatedAt: users.updatedAt,
+        },
+        invited: {
+          id: users.id,
+          email: users.email,
+          firstName: users.firstName,
+          lastName: users.lastName,
+          displayName: users.displayName,
+          username: users.username,
+          profileImageUrl: users.profileImageUrl,
+          wins: users.wins,
+          losses: users.losses,
+          draws: users.draws,
+          createdAt: users.createdAt,
+          updatedAt: users.updatedAt,
+        }
+      })
+      .from(roomInvitations)
+      .innerJoin(rooms, eq(roomInvitations.roomId, rooms.id))
+      .innerJoin(users, eq(roomInvitations.inviterId, users.id))
+      .where(
+        and(
+          eq(roomInvitations.invitedId, userId),
+          eq(roomInvitations.status, 'pending'),
+          sql`${roomInvitations.expiresAt} > NOW()`
+        )
+      )
+      .orderBy(desc(roomInvitations.invitedAt));
+
+    return invitations.map(inv => ({
+      ...inv,
+      inviter: inv.inviter,
+      invited: inv.invited
+    }));
+  }
+
+  async respondToRoomInvitation(invitationId: string, response: 'accepted' | 'rejected'): Promise<void> {
+    await db
+      .update(roomInvitations)
+      .set({
+        status: response,
+        respondedAt: new Date(),
+      })
+      .where(eq(roomInvitations.id, invitationId));
+  }
+
+  async expireOldInvitations(): Promise<void> {
+    await db
+      .update(roomInvitations)
+      .set({
+        status: 'expired',
+        respondedAt: new Date(),
+      })
+      .where(
+        and(
+          eq(roomInvitations.status, 'pending'),
+          sql`${roomInvitations.expiresAt} <= NOW()`
+        )
+      );
   }
 }
 

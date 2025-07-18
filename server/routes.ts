@@ -363,6 +363,157 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Room Invitation system routes
+  // Send room invitation
+  app.post('/api/rooms/:roomId/invite', requireAuth, async (req: any, res) => {
+    try {
+      const { roomId } = req.params;
+      const { invitedId } = req.body;
+      const inviterId = req.session.user.userId;
+      
+      if (!invitedId) {
+        return res.status(400).json({ error: 'Invited user ID is required' });
+      }
+      
+      // Check if room exists and user is the owner
+      const room = await storage.getRoomById(roomId);
+      if (!room) {
+        return res.status(404).json({ error: 'Room not found' });
+      }
+      
+      if (room.ownerId !== inviterId) {
+        return res.status(403).json({ error: 'Only room owner can send invitations' });
+      }
+      
+      // Check if invited user is not the inviter
+      if (inviterId === invitedId) {
+        return res.status(400).json({ error: 'Cannot invite yourself' });
+      }
+      
+      // Check if user is already in the room
+      const participants = await storage.getRoomParticipants(roomId);
+      const isAlreadyInRoom = participants.some(p => p.userId === invitedId);
+      if (isAlreadyInRoom) {
+        return res.status(400).json({ error: 'User is already in the room' });
+      }
+      
+      // Send invitation
+      const invitation = await storage.sendRoomInvitation(roomId, inviterId, invitedId);
+      
+      // Send WebSocket notification to invited user
+      const inviterInfo = await storage.getUser(inviterId);
+      const targetConnections = Array.from(connections.entries())
+        .filter(([_, connection]) => connection.userId === invitedId);
+      
+      if (targetConnections.length > 0) {
+        const notification = {
+          type: 'room_invitation',
+          invitation: {
+            id: invitation.id,
+            roomId: room.id,
+            roomName: room.name,
+            roomCode: room.code,
+            inviterId: inviterId,
+            inviterName: inviterInfo?.displayName || inviterInfo?.username || 'Unknown',
+            timestamp: new Date().toISOString()
+          }
+        };
+        
+        targetConnections.forEach(([_, connection]) => {
+          if (connection.ws.readyState === WebSocket.OPEN) {
+            connection.ws.send(JSON.stringify(notification));
+          }
+        });
+      }
+      
+      res.json({ success: true, invitation });
+    } catch (error) {
+      console.error("Error sending room invitation:", error);
+      res.status(500).json({ error: error.message || "Failed to send room invitation" });
+    }
+  });
+
+  // Get room invitations
+  app.get('/api/room-invitations', requireAuth, async (req: any, res) => {
+    try {
+      const userId = req.session.user.userId;
+      
+      // Clean up expired invitations first
+      await storage.expireOldInvitations();
+      
+      const invitations = await storage.getRoomInvitations(userId);
+      res.json(invitations);
+    } catch (error) {
+      console.error("Error getting room invitations:", error);
+      res.status(500).json({ message: "Failed to get room invitations" });
+    }
+  });
+
+  // Respond to room invitation
+  app.post('/api/room-invitations/:invitationId/respond', requireAuth, async (req: any, res) => {
+    try {
+      const { invitationId } = req.params;
+      const { response } = req.body; // 'accepted' or 'rejected'
+      const userId = req.session.user.userId;
+      
+      if (!response || !['accepted', 'rejected'].includes(response)) {
+        return res.status(400).json({ error: 'Response must be "accepted" or "rejected"' });
+      }
+      
+      // Get invitation details first
+      const invitations = await storage.getRoomInvitations(userId);
+      const invitation = invitations.find(inv => inv.id === invitationId);
+      
+      if (!invitation) {
+        return res.status(404).json({ error: 'Invitation not found or expired' });
+      }
+      
+      if (invitation.invitedId !== userId) {
+        return res.status(403).json({ error: 'Not authorized to respond to this invitation' });
+      }
+      
+      // Respond to invitation
+      await storage.respondToRoomInvitation(invitationId, response);
+      
+      if (response === 'accepted') {
+        // Add user to room as participant
+        await storage.addRoomParticipant({
+          roomId: invitation.roomId,
+          userId: userId,
+          role: 'player',
+        });
+        
+        // Send WebSocket notification to room about new participant
+        const userInfo = await storage.getUser(userId);
+        const roomConnections_invite = roomConnections.get(invitation.roomId);
+        if (roomConnections_invite) {
+          roomConnections_invite.forEach(connectionId => {
+            const connection = connections.get(connectionId);
+            if (connection && connection.ws.readyState === WebSocket.OPEN) {
+              connection.ws.send(JSON.stringify({
+                type: 'user_joined_room',
+                userId: userId,
+                userInfo: {
+                  displayName: userInfo?.displayName || userInfo?.username,
+                  username: userInfo?.username,
+                  profileImageUrl: userInfo?.profileImageUrl
+                },
+                roomId: invitation.roomId
+              }));
+            }
+          });
+        }
+        
+        res.json({ success: true, message: 'Invitation accepted', room: invitation.room });
+      } else {
+        res.json({ success: true, message: 'Invitation rejected' });
+      }
+    } catch (error) {
+      console.error("Error responding to room invitation:", error);
+      res.status(500).json({ error: error.message || "Failed to respond to room invitation" });
+    }
+  });
+
   // Search users by name
   app.post('/api/users/search', requireAuth, async (req: any, res) => {
     try {
