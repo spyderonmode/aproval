@@ -19,6 +19,7 @@ import { ThemeSelector } from "@/components/ThemeSelector";
 import { AchievementModal } from "@/components/AchievementModal";
 import { Friends } from "@/components/Friends";
 import { RoomInvitationNotifications } from "@/components/RoomInvitationNotifications";
+import { InvitationPopup } from "@/components/InvitationPopup";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -1068,6 +1069,9 @@ export default function Home() {
         open={showAchievements}
         onClose={() => setShowAchievements(false)}
       />
+
+      {/* Global Room Invitation Popup */}
+      <InvitationPopup onRoomJoin={handleRoomJoin} />
 
     </div>
   );
