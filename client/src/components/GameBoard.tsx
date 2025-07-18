@@ -56,6 +56,16 @@ const hasUltimateVeteranAchievement = (achievements: any[]): boolean => {
   return achievements?.some(achievement => achievement.achievementType === 'ultimate_veteran') || false;
 };
 
+// Helper function to check if player has First Win achievement
+const hasFirstWinAchievement = (achievements: any[]): boolean => {
+  return achievements?.some(achievement => achievement.achievementType === 'first_win') || false;
+};
+
+// Helper function to check if player has Speed Demon achievement
+const hasSpeedDemonAchievement = (achievements: any[]): boolean => {
+  return achievements?.some(achievement => achievement.achievementType === 'speed_demon') || false;
+};
+
 // Helper function to get the selected achievement border for display
 const getSelectedAchievementBorder = (playerInfo: any): string | null => {
   // If player has selectedAchievementBorder, use that (including null for no border)
@@ -69,6 +79,8 @@ const getSelectedAchievementBorder = (playerInfo: any): string | null => {
   if (hasGrandmasterAchievement(achievements)) return 'grandmaster';
   if (hasChampionAchievement(achievements)) return 'champion';
   if (hasLegendAchievement(achievements)) return 'legend';
+  if (hasSpeedDemonAchievement(achievements)) return 'speed_demon';
+  if (hasFirstWinAchievement(achievements)) return 'first_win';
   
   return null; // No border
 };
@@ -76,6 +88,37 @@ const getSelectedAchievementBorder = (playerInfo: any): string | null => {
 // Helper function to render achievement borders based on selected type
 const renderAchievementBorder = (borderType: string | null, playerName: string, theme: any) => {
   switch (borderType) {
+    case 'first_win':
+      return (
+        <div className="px-2 py-1 rounded-md border border-yellow-400 bg-yellow-100 dark:bg-yellow-900/20">
+          <span className={`text-sm ${theme.textColor} max-w-24 truncate font-semibold`}>
+            {playerName}
+          </span>
+        </div>
+      );
+    case 'speed_demon':
+      return (
+        <motion.div
+          animate={{
+            boxShadow: [
+              "0 0 6px #3b82f6, 0 0 12px #1d4ed8, 0 0 18px #1e40af",
+              "0 0 8px #8b5cf6, 0 0 16px #7c3aed, 0 0 24px #6d28d9",
+              "0 0 6px #06b6d4, 0 0 12px #0891b2, 0 0 18px #0e7490"
+            ],
+            scale: [1, 1.02, 1],
+          }}
+          transition={{
+            duration: 1.8,
+            repeat: Infinity,
+            ease: "easeInOut"
+          }}
+          className="px-2 py-1 rounded-md border-2 border-blue-500 bg-blue-900/20"
+        >
+          <span className={`text-sm ${theme.textColor} max-w-24 truncate font-bold`}>
+            {playerName}
+          </span>
+        </motion.div>
+      );
     case 'ultimate_veteran':
       return (
         <motion.div
