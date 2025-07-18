@@ -125,15 +125,22 @@ export default function Home() {
             // Force complete state update to ensure game appears
             setCurrentGame(prevGame => {
               console.log('🎮 Game state update - prev:', prevGame, 'new:', lastMessage.game);
-              // Force a complete new game object to ensure React re-renders
+              console.log('🎮 Game mode from message:', lastMessage.game.gameMode);
+              console.log('🎮 Board from message:', lastMessage.game.board);
+              console.log('🎮 Current player from message:', lastMessage.game.currentPlayer);
+              // Use the actual game state from the message, don't reset it
               const newGame = {
                 ...lastMessage.game,
                 status: 'active',
-                board: {},
-                currentPlayer: 'X',
+                gameMode: lastMessage.game.gameMode || 'online', // Ensure game mode is set
+                // Keep the actual board state and current player from the server
+                board: lastMessage.game.board || {},
+                currentPlayer: lastMessage.game.currentPlayer || 'X',
                 timestamp: Date.now() // Force re-render
               };
               console.log('🎮 Final game object being set:', newGame);
+              console.log('🎮 Final game mode:', newGame.gameMode);
+              console.log('🎮 Final board state:', newGame.board);
               return newGame;
             });
             // Reset creating state since game was successfully created
@@ -176,9 +183,9 @@ export default function Home() {
             // Sound effects removed as requested
           } else if (currentRoom && (lastMessage.roomId === currentRoom.id || lastMessage.gameId)) {
             // If we're in the room but don't have currentGame set, set it from the move message
-            console.log('🎮 Spectator receiving move for room game');
+            console.log('🎮 Spectator or disconnected player receiving move for room game');
             if (!currentGame) {
-              // Create a basic game object for spectators with player info
+              // Create a basic game object for spectators/rejoining players with player info
               setCurrentGame({
                 id: lastMessage.gameId,
                 roomId: currentRoom.id,
