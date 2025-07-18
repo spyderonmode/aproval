@@ -512,6 +512,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
           });
         }
         
+        // Also send notification to ALL online users about participant list update
+        const participants = await storage.getRoomParticipants(invitation.roomId);
+        const allConnections = Array.from(connections.values());
+        allConnections.forEach(connection => {
+          if (connection.ws.readyState === WebSocket.OPEN) {
+            connection.ws.send(JSON.stringify({
+              type: 'room_participants_updated',
+              roomId: invitation.roomId,
+              participants: participants
+            }));
+          }
+        });
+        
         res.json({ success: true, message: 'Invitation accepted', room: invitation.room });
       } else {
         res.json({ success: true, message: 'Invitation rejected' });
