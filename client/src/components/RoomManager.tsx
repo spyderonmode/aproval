@@ -71,17 +71,7 @@ export function RoomManager({
     mutationFn: async () => {
       if (!currentRoom) throw new Error('No room selected');
       
-      const gamePayload: any = {
-        roomId: currentRoom.id,
-        gameMode: gameMode,
-      };
-      
-      // Only include playerOId if it's not null/undefined
-      if (gameMode === 'ai') {
-        gamePayload.playerOId = 'AI';
-      }
-      
-      const response = await apiRequest('POST', '/api/games', gamePayload);
+      const response = await apiRequest('POST', `/api/rooms/${currentRoom.id}/start-game`, {});
       return response.json();
     },
     onSuccess: (game) => {
@@ -180,8 +170,12 @@ export function RoomManager({
             <div className="p-3 bg-slate-700 rounded-lg">
               <div className="flex items-center justify-between mb-2">
                 <span className="font-medium">Current Room</span>
-                <Badge variant="secondary" className="bg-green-600">
-                  ACTIVE
+                <Badge variant="secondary" className={`${
+                  currentRoom.status === 'playing' ? 'bg-orange-600' : 
+                  currentRoom.status === 'waiting' ? 'bg-green-600' : 'bg-gray-600'
+                }`}>
+                  {currentRoom.status === 'playing' ? 'PLAYING' : 
+                   currentRoom.status === 'waiting' ? 'WAITING' : 'ACTIVE'}
                 </Badge>
               </div>
               <div className="text-sm text-gray-400">
@@ -196,18 +190,19 @@ export function RoomManager({
             <div className="space-y-2">
               {/* Main action buttons */}
               <div className="flex space-x-2">
-                {/* Check if user is room owner */}
+                {/* Check if user is room owner and room status */}
                 {currentRoom.ownerId === (user?.userId || user?.id) ? (
                   <Button
                     onClick={() => {
                       console.log('🎮 Start game button clicked');
                       startGameMutation.mutate();
                     }}
-                    disabled={startGameMutation.isPending}
+                    disabled={startGameMutation.isPending || currentRoom.status === 'playing'}
                     className="flex-1 bg-primary hover:bg-primary/90"
                   >
                     <Play className="w-4 h-4 mr-2" />
-                    {startGameMutation.isPending ? 'Starting...' : 'Start Game'}
+                    {startGameMutation.isPending ? 'Starting...' : 
+                     currentRoom.status === 'playing' ? 'Game Running' : 'Start Game'}
                   </Button>
                 ) : (
                   <Button
@@ -215,7 +210,7 @@ export function RoomManager({
                     className="flex-1 bg-gray-600 cursor-not-allowed"
                   >
                     <Play className="w-4 h-4 mr-2" />
-                    Wait for Start
+                    {currentRoom.status === 'playing' ? 'Game Running' : 'Wait for Start'}
                   </Button>
                 )}
                 <Button

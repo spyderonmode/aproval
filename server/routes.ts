@@ -796,8 +796,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
               gameMode: 'online'
             };
             
-            // Update room status to active
-            await storage.updateRoomStatus(room.id, 'active');
+            // Update room status to playing
+            await storage.updateRoomStatus(room.id, 'playing');
             
             // Broadcast game start to all room participants
             const roomConnections_broadcast = roomConnections.get(room.id);
@@ -943,6 +943,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "Room not found" });
       }
       
+      // Check if room is already in "playing" status
+      if (room.status === 'playing') {
+        return res.status(400).json({ message: "Game is already running in this room" });
+      }
+      
       // Check if user is a player in the room (both players can start games)
       const participants = await storage.getRoomParticipants(roomId);
       const isPlayer = participants.some(p => p.userId === userId && p.role === 'player');
@@ -986,6 +991,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       const game = await storage.createGame(gameData);
       console.log('🎮 New game created:', game.id);
+      
+      // Update room status to "playing"
+      await storage.updateRoomStatus(roomId, 'playing');
+      console.log('🎮 Room status updated to "playing"');
       
       // Get player information with achievements
       const [playerXInfo, playerOInfo] = await Promise.all([
@@ -1394,9 +1403,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
           }
         }
         
-        // Update room status
+        // Update room status back to waiting so new games can start
         if (game.roomId) {
-          await storage.updateRoomStatus(game.roomId, 'finished');
+          await storage.updateRoomStatus(game.roomId, 'waiting');
         }
         
         // Broadcast game over to room with winner info after 2-3 second delay
@@ -1495,9 +1504,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
           }
         }
         
-        // Update room status
+        // Update room status back to waiting so new games can start
         if (game.roomId) {
-          await storage.updateRoomStatus(game.roomId, 'finished');
+          await storage.updateRoomStatus(game.roomId, 'waiting');
         }
         
         // Broadcast game over to room
@@ -1606,7 +1615,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
                 // AI games don't grant achievements (only online games do)
                 
                 if (game.roomId) {
-                  await storage.updateRoomStatus(game.roomId, 'finished');
+                  await storage.updateRoomStatus(game.roomId, 'waiting');
                 }
                 
                 // Broadcast AI win to room
@@ -1632,7 +1641,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
                 // AI games don't grant achievements (only online games do)
                 
                 if (game.roomId) {
-                  await storage.updateRoomStatus(game.roomId, 'finished');
+                  await storage.updateRoomStatus(game.roomId, 'waiting');
                 }
                 
                 // Broadcast AI draw to room
