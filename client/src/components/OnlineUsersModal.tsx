@@ -113,7 +113,22 @@ export function OnlineUsersModal({ open, onClose, currentRoom, user }: OnlineUse
       });
     },
     onError: (error: any) => {
-      showUserFriendlyError(error, toast);
+      // Handle specific friend request errors
+      if (error.message?.includes('already exists') || error.message?.includes('already sent')) {
+        toast({
+          title: t('error'),
+          description: t('friendRequestAlreadyExists'),
+          variant: 'destructive',
+        });
+      } else if (error.message?.includes('already friends')) {
+        toast({
+          title: t('error'),
+          description: t('alreadyFriends'),
+          variant: 'destructive',
+        });
+      } else {
+        showUserFriendlyError(error, toast);
+      }
     },
   });
 

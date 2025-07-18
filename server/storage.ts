@@ -848,18 +848,26 @@ export class DatabaseStorage implements IStorage {
       throw new Error('Users are already friends');
     }
 
-    // Check if friend request already exists
+    // Check if friend request already exists (in either direction)
     const existingRequest = await db
       .select()
       .from(friendRequests)
       .where(and(
-        eq(friendRequests.requesterId, requesterId),
-        eq(friendRequests.requestedId, requestedId),
+        or(
+          and(
+            eq(friendRequests.requesterId, requesterId),
+            eq(friendRequests.requestedId, requestedId)
+          ),
+          and(
+            eq(friendRequests.requesterId, requestedId),
+            eq(friendRequests.requestedId, requesterId)
+          )
+        ),
         eq(friendRequests.status, 'pending')
       ));
 
     if (existingRequest.length > 0) {
-      throw new Error('Friend request already sent');
+      throw new Error('Friend request already exists');
     }
 
     const [friendRequest] = await db

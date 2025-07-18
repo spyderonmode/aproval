@@ -2052,6 +2052,22 @@ export const translations = {
     es: 'La solicitud de amistad ha sido enviada exitosamente',
     id: 'Permintaan pertemanan telah berhasil dikirim'
   },
+  friendRequestAlreadyExists: {
+    en: 'Friend request already exists between you and this user',
+    ar: 'طلب الصداقة موجود بالفعل بينك وبين هذا المستخدم',
+    bn: 'আপনার এবং এই ব্যবহারকারীর মধ্যে বন্ধুত্বের অনুরোধ ইতিমধ্যে বিদ্যমান',
+    hi: 'आपके और इस उपयोगकर्ता के बीच मित्रता का अनुरोध पहले से मौजूद है',
+    es: 'Ya existe una solicitud de amistad entre tú y este usuario',
+    id: 'Permintaan pertemanan sudah ada antara Anda dan pengguna ini'
+  },
+  alreadyFriends: {
+    en: 'You are already friends with this user',
+    ar: 'أنت صديق بالفعل مع هذا المستخدم',
+    bn: 'আপনি ইতিমধ্যে এই ব্যবহারকারীর সাথে বন্ধু',
+    hi: 'आप पहले से ही इस उपयोगकर्ता के मित्र हैं',
+    es: 'Ya eres amigo de este usuario',
+    id: 'Anda sudah berteman dengan pengguna ini'
+  },
   justNow: {
     en: 'Just now',
     ar: 'الآن',
