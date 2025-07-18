@@ -916,18 +916,18 @@ export function GameBoard({ game, onGameOver, gameMode, user, lastMessage, sendM
                   <motion.div
                     animate={{
                       boxShadow: [
-                        "0 0 5px #ffd700, 0 0 10px #ffd700, 0 0 15px #ffd700",
-                        "0 0 10px #ff6b6b, 0 0 20px #ff6b6b, 0 0 30px #ff6b6b",
-                        "0 0 5px #4ecdc4, 0 0 10px #4ecdc4, 0 0 15px #4ecdc4",
-                        "0 0 10px #ffd700, 0 0 20px #ffd700, 0 0 30px #ffd700"
+                        "0 0 8px #ff4500, 0 0 16px #ff6600, 0 0 24px #ff8800",
+                        "0 0 12px #ff0000, 0 0 24px #ff3300, 0 0 36px #ff6600",
+                        "0 0 8px #ff8800, 0 0 16px #ffaa00, 0 0 24px #ffcc00",
+                        "0 0 10px #ff4500, 0 0 20px #ff6600, 0 0 30px #ff8800"
                       ]
                     }}
                     transition={{
-                      duration: 2,
+                      duration: 1.5,
                       repeat: Infinity,
                       ease: "easeInOut"
                     }}
-                    className="px-2 py-1 rounded-md border-2 border-yellow-400"
+                    className="px-2 py-1 rounded-md border-2 border-orange-500"
                   >
                     <span className={`text-sm ${theme.textColor} max-w-24 truncate font-bold`}>
                       {gameMode === 'online' 
@@ -1013,18 +1013,18 @@ export function GameBoard({ game, onGameOver, gameMode, user, lastMessage, sendM
                   <motion.div
                     animate={{
                       boxShadow: [
-                        "0 0 5px #ffd700, 0 0 10px #ffd700, 0 0 15px #ffd700",
-                        "0 0 10px #ff6b6b, 0 0 20px #ff6b6b, 0 0 30px #ff6b6b",
-                        "0 0 5px #4ecdc4, 0 0 10px #4ecdc4, 0 0 15px #4ecdc4",
-                        "0 0 10px #ffd700, 0 0 20px #ffd700, 0 0 30px #ffd700"
+                        "0 0 8px #ff4500, 0 0 16px #ff6600, 0 0 24px #ff8800",
+                        "0 0 12px #ff0000, 0 0 24px #ff3300, 0 0 36px #ff6600",
+                        "0 0 8px #ff8800, 0 0 16px #ffaa00, 0 0 24px #ffcc00",
+                        "0 0 10px #ff4500, 0 0 20px #ff6600, 0 0 30px #ff8800"
                       ]
                     }}
                     transition={{
-                      duration: 2,
+                      duration: 1.5,
                       repeat: Infinity,
                       ease: "easeInOut"
                     }}
-                    className="px-2 py-1 rounded-md border-2 border-yellow-400"
+                    className="px-2 py-1 rounded-md border-2 border-orange-500"
                   >
                     <span className={`text-sm ${theme.textColor} max-w-24 truncate font-bold`}>
                       {gameMode === 'online' 

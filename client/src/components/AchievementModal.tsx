@@ -20,7 +20,7 @@ export function AchievementModal({ open, onClose, userId }: AchievementModalProp
     {
       title: "Victory Achievements",
       icon: <Trophy className="w-5 h-5" />,
-      types: ['first_win', 'win_streak_5', 'win_streak_10', 'speed_demon']
+      types: ['first_win', 'win_streak_5', 'win_streak_10', 'speed_demon', 'legend']
     },
     {
       title: "Skill Achievements", 
@@ -47,6 +47,7 @@ export function AchievementModal({ open, onClose, userId }: AchievementModalProp
     { type: 'speed_demon', name: 'Speed Demon', description: 'Win 20 total games to unlock the Christmas theme - keep playing!', icon: '⚡' },
     { type: 'veteran_player', name: 'Veteran Player', description: 'Play 100 total games (wins + losses + draws) to unlock the Summer theme', icon: '🎖️' },
     { type: 'comeback_king', name: 'Comeback King', description: 'Win a game after losing 5 games in a row - prove your resilience!', icon: '👑' },
+    { type: 'legend', name: 'Legend', description: 'Achieve 50 total wins to become a true legend with animated fire border!', icon: '🌟' },
   ];
 
   return (
