@@ -1,5 +1,6 @@
 import React from "react";
-import { Home, RefreshCw } from "lucide-react";
+import { Home, RefreshCw, Volume2 } from "lucide-react";
+import { useClickAudio } from '@/hooks/useClickAudio';
 
 interface GameOverModalProps {
   open: boolean;
@@ -11,6 +12,8 @@ interface GameOverModalProps {
 }
 
 export function GameOverModal({ open, onClose, result, onPlayAgain, isCreatingGame = false, onMainMenu }: GameOverModalProps) {
+  const { playSound, initAudio } = useClickAudio();
+  
   // Simple safety checks
   if (!open) return null;
   if (!result) {
@@ -214,6 +217,30 @@ export function GameOverModal({ open, onClose, result, onPlayAgain, isCreatingGa
               <p style={{ fontSize: '14px', color: '#9ca3af' }}>
                 {result.condition === 'horizontal' ? 'Horizontal line' : 'Diagonal line'}
               </p>
+              
+              {/* Sound button for celebration */}
+              <button
+                onClick={() => {
+                  initAudio();
+                  playSound();
+                }}
+                style={{
+                  marginTop: '12px',
+                  padding: '8px 16px',
+                  borderRadius: '8px',
+                  backgroundColor: '#059669',
+                  color: 'white',
+                  border: 'none',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                  fontSize: '14px'
+                }}
+              >
+                <Volume2 size={16} />
+                Play Celebration
+              </button>
             </div>
           )}
         </div>
