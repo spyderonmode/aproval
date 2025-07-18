@@ -1598,8 +1598,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
         const nextPlayer = getOpponentSymbol(playerSymbol);
         await storage.updateCurrentPlayer(gameId, nextPlayer);
         
+        // Add a small delay to ensure database transaction is fully committed
+        await new Promise(resolve => setTimeout(resolve, 100));
+        
+        // Verify the update was successful by fetching fresh game state
+        const updatedGame = await storage.getGame(gameId);
         console.log(`✅ MOVE SUCCESSFUL: ${playerSymbol} at position ${position}`);
         console.log(`- Next player: ${nextPlayer}`);
+        console.log(`- Database current player: ${updatedGame?.currentPlayer}`);
         console.log(`- Broadcasting to room: ${game.roomId}`);
         
         // Broadcast move to room AFTER updating current player (INCLUDING SPECTATORS)
@@ -1618,6 +1624,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
             playerOInfo ? storage.getUserAchievements(game.playerOId) : Promise.resolve([])
           ]);
           
+          // Use the verified current player from database
+          const actualCurrentPlayer = updatedGame?.currentPlayer || nextPlayer;
+          
           // Prepare the message once to avoid JSON.stringify overhead
           const moveMessage = JSON.stringify({
             type: 'move',
@@ -1626,7 +1635,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
             position,
             player: playerSymbol,
             board: newBoard,
-            currentPlayer: nextPlayer,
+            currentPlayer: actualCurrentPlayer,
             playerXInfo: playerXInfo ? {
               displayName: playerXInfo.displayName,
               firstName: playerXInfo.firstName,
@@ -1645,10 +1654,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
             } : null
           });
           
-          // Faster broadcast without extensive logging
+          // Enhanced broadcast with debugging
+          console.log(`📡 Broadcasting move to ${roomUsers.size} users:`, {
+            position,
+            player: playerSymbol,
+            currentPlayer: actualCurrentPlayer,
+            nextPlayerExpected: nextPlayer,
+            gameId: gameId.substring(0, 8)
+          });
+          
           roomUsers.forEach(connectionId => {
             const connection = connections.get(connectionId);
             if (connection && connection.ws.readyState === WebSocket.OPEN) {
+              console.log(`📡 Sending move to user ${connection.userId}: currentPlayer=${actualCurrentPlayer}`);
               connection.ws.send(moveMessage);
             }
           });
