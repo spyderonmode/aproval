@@ -46,6 +46,7 @@ function formatUserFriendlyError(errorMessage: string): string {
   // Common error message mappings
   const errorMappings: Record<string, string> = {
     "You are blocked by this user": "This user has blocked you and you cannot send messages to them.",
+    "Target user connection not found": "Your friend is offline. You can send messages when they are online.",
     "User not found": "This user could not be found.",
     "Not authenticated": "Please log in to continue.",
     "Access denied": "You don't have permission to perform this action.",
