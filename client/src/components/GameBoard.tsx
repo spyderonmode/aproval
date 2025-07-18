@@ -1064,13 +1064,16 @@ export function GameBoard({ game, onGameOver, gameMode, user, lastMessage, sendM
             <span>Chat</span>
           </Button>
           
-          <Button 
-            variant="destructive"
-            onClick={resetGame}
-            disabled={makeMoveMutation.isPending}
-          >
-            Reset Game
-          </Button>
+          {/* Only show Reset Game button for non-online modes */}
+          {gameMode !== 'online' && (
+            <Button 
+              variant="destructive"
+              onClick={resetGame}
+              disabled={makeMoveMutation.isPending}
+            >
+              Reset Game
+            </Button>
+          )}
         </div>
         
         {/* Quick Chat Panel */}
