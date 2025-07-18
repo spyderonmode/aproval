@@ -19,19 +19,19 @@ export function GameModeSelector({ selectedMode, onModeChange, aiDifficulty, onD
       id: 'ai' as const,
       name: t('aiMode'),
       icon: Bot,
-      description: 'Challenge the computer'
+      description: t('challengeComputer')
     },
     {
       id: 'pass-play' as const,
       name: t('passPlayMode'),
       icon: GamepadIcon,
-      description: 'Local multiplayer'
+      description: t('localMultiplayer')
     },
     {
       id: 'online' as const,
       name: t('onlineMode'),
       icon: Users,
-      description: 'Play with friends online'
+      description: t('playWithFriends')
     }
   ];
 

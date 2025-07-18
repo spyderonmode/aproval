@@ -775,7 +775,7 @@ export default function Home() {
                         }}
                         className="bg-slate-700 border-slate-600 text-white hover:bg-slate-600 text-xs"
                       >
-                        Settings
+{t('settings')}
                       </Button>
                     </div>
                     
@@ -788,7 +788,7 @@ export default function Home() {
                         className="w-full bg-red-700 border-red-600 text-white hover:bg-red-600 justify-start"
                       >
                         <LogOut className="w-4 h-4 mr-2" />
-                        Logout
+{t('logout')}
                       </Button>
                     </div>
                   </div>
@@ -829,32 +829,24 @@ export default function Home() {
             {/* Game Rules */}
             <Card className="mt-6 bg-slate-800 border-slate-700">
               <CardHeader>
-                <CardTitle className="text-lg">Game Rules</CardTitle>
+                <CardTitle className="text-lg">{t('gameRules')}</CardTitle>
               </CardHeader>
               <CardContent className="space-y-3 text-sm text-gray-300">
                 <div className="flex items-start space-x-2">
                   <div className="w-1.5 h-1.5 bg-green-500 rounded-full mt-2"></div>
-                  <span><strong>Horizontal Win:</strong> Get 4 symbols in a row horizontally</span>
+                  <span>{t('horizontalWin')}</span>
                 </div>
                 <div className="flex items-start space-x-2">
                   <div className="w-1.5 h-1.5 bg-blue-500 rounded-full mt-2"></div>
-                  <span><strong>Vertical Win:</strong> Get 3 symbols in a column vertically</span>
+                  <span>{t('verticalWin')}</span>
                 </div>
                 <div className="flex items-start space-x-2">
                   <div className="w-1.5 h-1.5 bg-purple-500 rounded-full mt-2"></div>
-                  <span><strong>Diagonal Win:</strong> Get 3 symbols diagonally (positions 5, 10, 15 restricted)</span>
+                  <span>{t('diagonalWin')}</span>
                 </div>
                 <div className="flex items-start space-x-2">
                   <div className="w-1.5 h-1.5 bg-yellow-500 rounded-full mt-2"></div>
-                  <span><strong>Grid Layout:</strong> 3 rows × 5 columns (positions 1-15)</span>
-                </div>
-                <div className="flex items-start space-x-2">
-                  <div className="w-1.5 h-1.5 bg-orange-500 rounded-full mt-2"></div>
-                  <span><strong>Valid Diagonal Patterns:</strong> [1,7,13], [2,8,14], [3,7,11], [4,8,12]</span>
-                </div>
-                <div className="flex items-start space-x-2">
-                  <div className="w-1.5 h-1.5 bg-red-500 rounded-full mt-2"></div>
-                  <span><strong>Restricted:</strong> No diagonal wins using the rightmost column (5, 10, 15)</span>
+                  <span>{t('gridLayout')}</span>
                 </div>
               </CardContent>
             </Card>

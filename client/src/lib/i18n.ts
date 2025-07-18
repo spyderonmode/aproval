@@ -123,184 +123,188 @@ export const translations = {
     id: 'Mode Online'
   },
   
-  // Difficulty
-  difficulty: {
-    en: 'Difficulty',
-    ar: 'الصعوبة',
-    bn: 'অসুবিধা',
-    hi: 'कठिनाई',
-    es: 'Dificultad',
-    id: 'Kesulitan'
+  // Game Rules
+  gameRules: {
+    en: 'Game Rules',
+    ar: 'قواعد اللعبة',
+    bn: 'গেমের নিয়ম',
+    hi: 'गेम नियम',
+    es: 'Reglas del Juego',
+    id: 'Aturan Permainan'
   },
-  easy: {
-    en: 'Easy',
-    ar: 'سهل',
-    bn: 'সহজ',
-    hi: 'आसान',
-    es: 'Fácil',
-    id: 'Mudah'
+  horizontalWin: {
+    en: 'Horizontal Win: Get 4 symbols in a row horizontally',
+    ar: 'الفوز الأفقي: احصل على 4 رموز في صف أفقي',
+    bn: 'অনুভূমিক জয়: একটি সারিতে 4টি চিহ্ন পান',
+    hi: 'क्षैतिज जीत: एक पंक्ति में 4 प्रतीक प्राप्त करें',
+    es: 'Victoria Horizontal: Consigue 4 símbolos en una fila horizontal',
+    id: 'Kemenangan Horizontal: Dapatkan 4 simbol dalam baris horizontal'
   },
-  medium: {
-    en: 'Medium',
-    ar: 'متوسط',
-    bn: 'মধ্যম',
-    hi: 'मध्यम',
-    es: 'Medio',
-    id: 'Sedang'
+  verticalWin: {
+    en: 'Vertical Win: Get 3 symbols in a column vertically',
+    ar: 'الفوز العمودي: احصل على 3 رموز في عمود عمودي',
+    bn: 'উল্লম্ব জয়: একটি কলামে 3টি চিহ্ন পান',
+    hi: 'ऊर्ध्वाधर जीत: एक कॉलम में 3 प्रतीक प्राप्त करें',
+    es: 'Victoria Vertical: Consigue 3 símbolos en una columna vertical',
+    id: 'Kemenangan Vertikal: Dapatkan 3 simbol dalam kolom vertikal'
   },
-  hard: {
-    en: 'Hard',
-    ar: 'صعب',
-    bn: 'কঠিন',
-    hi: 'कठिन',
-    es: 'Difícil',
-    id: 'Sulit'
+  diagonalWin: {
+    en: 'Diagonal Win: Get 3 symbols diagonally (positions 5, 10, 15 restricted)',
+    ar: 'الفوز القطري: احصل على 3 رموز قطرياً (المواضع 5، 10، 15 محظورة)',
+    bn: 'কর্ণ জয়: কর্ণভাবে 3টি চিহ্ন পান (অবস্থান 5, 10, 15 সীমিত)',
+    hi: 'विकर्ण जीत: विकर्ण में 3 प्रतीक प्राप्त करें (स्थिति 5, 10, 15 प्रतिबंधित)',
+    es: 'Victoria Diagonal: Consigue 3 símbolos en diagonal (posiciones 5, 10, 15 restringidas)',
+    id: 'Kemenangan Diagonal: Dapatkan 3 simbol secara diagonal (posisi 5, 10, 15 terbatas)'
   },
-  
-  // Game Status
-  yourTurn: {
-    en: 'Your Turn',
-    ar: 'دورك',
-    bn: 'আপনার পালা',
-    hi: 'आपकी बारी',
-    es: 'Tu Turno',
-    id: 'Giliran Anda'
-  },
-  opponentTurn: {
-    en: "Opponent's Turn",
-    ar: 'دور الخصم',
-    bn: 'প্রতিপক্ষের পালা',
-    hi: 'प्रतिद्वंद्वी की बारी',
-    es: 'Turno del Oponente',
-    id: 'Giliran Lawan'
-  },
-  waiting: {
-    en: 'Waiting...',
-    ar: 'انتظار...',
-    bn: 'অপেক্ষা করছে...',
-    hi: 'प्रतीक्षा...',
-    es: 'Esperando...',
-    id: 'Menunggu...'
+  gridLayout: {
+    en: 'Grid Layout: 3 rows × 5 columns (positions 1-15)',
+    ar: 'تخطيط الشبكة: 3 صفوف × 5 أعمدة (المواضع 1-15)',
+    bn: 'গ্রিড লেআউট: 3 সারি × 5 কলাম (অবস্থান 1-15)',
+    hi: 'ग्रिड लेआउट: 3 पंक्तियाँ × 5 कॉलम (स्थिति 1-15)',
+    es: 'Diseño de Cuadrícula: 3 filas × 5 columnas (posiciones 1-15)',
+    id: 'Tata Letak Grid: 3 baris × 5 kolom (posisi 1-15)'
   },
   
-  // Game Results
-  youWin: {
-    en: 'You Win!',
-    ar: 'لقد فزت!',
-    bn: 'আপনি জিতেছেন!',
-    hi: 'आप जीत गए!',
-    es: '¡Ganaste!',
-    id: 'Anda Menang!'
+  // Quick Chat Messages
+  quickChat: {
+    en: 'Quick Chat',
+    ar: 'دردشة سريعة',
+    bn: 'দ্রুত চ্যাট',
+    hi: 'त्वरित चैट',
+    es: 'Chat Rápido',
+    id: 'Chat Cepat'
   },
-  youLose: {
-    en: 'You Lose!',
-    ar: 'لقد خسرت!',
-    bn: 'আপনি হেরেছেন!',
-    hi: 'आप हार गए!',
-    es: '¡Perdiste!',
-    id: 'Anda Kalah!'
+  goodLuck: {
+    en: 'Good luck!',
+    ar: 'حظ سعيد!',
+    bn: 'শুভকামনা!',
+    hi: 'शुभकामनाएँ!',
+    es: '¡Buena suerte!',
+    id: 'Semoga beruntung!'
   },
-  draw: {
-    en: 'Draw!',
-    ar: 'تعادل!',
-    bn: 'ড্র!',
-    hi: 'बराबरी!',
-    es: '¡Empate!',
-    id: 'Seri!'
+  wellPlayed: {
+    en: 'Well played!',
+    ar: 'لعب جيد!',
+    bn: 'ভাল খেলেছেন!',
+    hi: 'अच्छा खेला!',
+    es: '¡Bien jugado!',
+    id: 'Permainan bagus!'
+  },
+  niceMove: {
+    en: 'Nice move!',
+    ar: 'حركة جيدة!',
+    bn: 'চমৎকার চাল!',
+    hi: 'अच्छी चाल!',
+    es: '¡Buen movimiento!',
+    id: 'Gerakan bagus!'
+  },
+  greatStrategy: {
+    en: 'Great strategy!',
+    ar: 'استراتيجية رائعة!',
+    bn: 'দুর্দান্ত কৌশল!',
+    hi: 'बेहतरीन रणनीति!',
+    es: '¡Gran estrategia!',
+    id: 'Strategi hebat!'
+  },
+  playFaster: {
+    en: 'Play faster!',
+    ar: 'العب بسرعة أكبر!',
+    bn: 'আরো দ্রুত খেলুন!',
+    hi: 'तेज़ खेलें!',
+    es: '¡Juega más rápido!',
+    id: 'Main lebih cepat!'
+  },
+  takeYourTime: {
+    en: 'Take your time',
+    ar: 'خذ وقتك',
+    bn: 'সময় নিন',
+    hi: 'अपना समय लें',
+    es: 'Tómate tu tiempo',
+    id: 'Ambil waktu Anda'
+  },
+  goodGame: {
+    en: 'Good game!',
+    ar: 'لعبة جيدة!',
+    bn: 'ভাল গেম!',
+    hi: 'अच्छा गेम!',
+    es: '¡Buen juego!',
+    id: 'Permainan bagus!'
+  },
+  thanksForGame: {
+    en: 'Thanks for the game!',
+    ar: 'شكرا على اللعبة!',
+    bn: 'গেমের জন্য ধন্যবাদ!',
+    hi: 'गेम के लिए धन्यवाद!',
+    es: '¡Gracias por el juego!',
+    id: 'Terima kasih untuk permainannya!'
+  },
+  oneMore: {
+    en: 'One more?',
+    ar: 'واحدة أخرى؟',
+    bn: 'আরো একটি?',
+    hi: 'एक और?',
+    es: '¿Una más?',
+    id: 'Satu lagi?'
+  },
+  impressive: {
+    en: 'Impressive!',
+    ar: 'مثير للإعجاب!',
+    bn: 'চমৎকার!',
+    hi: 'प्रभावशाली!',
+    es: '¡Impresionante!',
+    id: 'Mengesankan!'
+  },
+  thinking: {
+    en: 'Thinking...',
+    ar: 'أفكر...',
+    bn: 'ভাবছি...',
+    hi: 'सोच रहा हूं...',
+    es: 'Pensando...',
+    id: 'Berpikir...'
+  },
+  readyToPlay: {
+    en: 'Ready to play!',
+    ar: 'جاهز للعب!',
+    bn: 'খেলার জন্য প্রস্তুত!',
+    hi: 'खेलने के लिए तैयार!',
+    es: '¡Listo para jugar!',
+    id: 'Siap bermain!'
   },
   
-  // Buttons
-  newGame: {
-    en: 'New Game',
-    ar: 'لعبة جديدة',
-    bn: 'নতুন গেম',
-    hi: 'नया गेम',
-    es: 'Nuevo Juego',
-    id: 'Permainan Baru'
-  },
-  playAgain: {
-    en: 'Play Again',
-    ar: 'العب مرة أخرى',
-    bn: 'আবার খেলুন',
-    hi: 'फिर से खेलें',
-    es: 'Jugar de Nuevo',
-    id: 'Main Lagi'
-  },
-  cancel: {
-    en: 'Cancel',
-    ar: 'إلغاء',
-    bn: 'বাতিল',
-    hi: 'रद्द करें',
-    es: 'Cancelar',
-    id: 'Batal'
-  },
+  // UI Elements
   close: {
     en: 'Close',
     ar: 'إغلاق',
     bn: 'বন্ধ',
-    hi: 'बंद करें',
+    hi: 'बंद',
     es: 'Cerrar',
     id: 'Tutup'
   },
-  
-  // Room Management
-  createRoom: {
-    en: 'Create Room',
-    ar: 'إنشاء غرفة',
-    bn: 'রুম তৈরি করুন',
-    hi: 'रूम बनाएं',
-    es: 'Crear Sala',
-    id: 'Buat Ruang'
+  chat: {
+    en: 'Chat',
+    ar: 'دردشة',
+    bn: 'চ্যাট',
+    hi: 'चैट',
+    es: 'Chat',
+    id: 'Chat'
   },
-  joinRoom: {
-    en: 'Join Room',
-    ar: 'انضم للغرفة',
-    bn: 'রুমে যোগ দিন',
-    hi: 'रूम में शामिल हों',
-    es: 'Unirse a Sala',
-    id: 'Bergabung ke Ruang'
-  },
-  roomName: {
-    en: 'Room Name',
-    ar: 'اسم الغرفة',
-    bn: 'রুমের নাম',
-    hi: 'रूम का नाम',
-    es: 'Nombre de Sala',
-    id: 'Nama Ruang'
-  },
-  roomCode: {
-    en: 'Room Code',
-    ar: 'كود الغرفة',
-    bn: 'রুম কোড',
-    hi: 'रूम कोड',
-    es: 'Código de Sala',
-    id: 'Kode Ruang'
+  resetGame: {
+    en: 'Reset Game',
+    ar: 'إعادة تعيين اللعبة',
+    bn: 'গেম রিসেট',
+    hi: 'गेम रीसेट',
+    es: 'Reiniciar Juego',
+    id: 'Reset Permainan'
   },
   
-  // Profile
-  profile: {
-    en: 'Profile',
-    ar: 'الملف الشخصي',
-    bn: 'প্রোফাইল',
-    hi: 'प्रोफाइल',
-    es: 'Perfil',
-    id: 'Profil'
-  },
-  displayName: {
-    en: 'Display Name',
-    ar: 'الاسم المعروض',
-    bn: 'প্রদর্শন নাম',
-    hi: 'प्रदर्शन नाम',
-    es: 'Nombre Mostrado',
-    id: 'Nama Tampilan'
-  },
-  email: {
-    en: 'Email',
-    ar: 'البريد الإلكتروني',
-    bn: 'ইমেইল',
-    hi: 'ईमेल',
-    es: 'Correo',
-    id: 'Email'
+  // Auth Forms
+  username: {
+    en: 'Username',
+    ar: 'اسم المستخدم',
+    bn: 'ব্যবহারকারীর নাম',
+    hi: 'उपयोगकर्ता नाम',
+    es: 'Nombre de Usuario',
+    id: 'Nama Pengguna'
   },
   password: {
     en: 'Password',
@@ -310,83 +314,39 @@ export const translations = {
     es: 'Contraseña',
     id: 'Kata Sandi'
   },
-  
-  // Statistics
-  stats: {
-    en: 'Statistics',
-    ar: 'الإحصائيات',
-    bn: 'পরিসংখ্যান',
-    hi: 'आंकड़े',
-    es: 'Estadísticas',
-    id: 'Statistik'
-  },
-  wins: {
-    en: 'Wins',
-    ar: 'الانتصارات',
-    bn: 'জয়',
-    hi: 'जीत',
-    es: 'Victorias',
-    id: 'Menang'
-  },
-  losses: {
-    en: 'Losses',
-    ar: 'الهزائم',
-    bn: 'পরাজয়',
-    hi: 'हार',
-    es: 'Derrotas',
-    id: 'Kalah'
-  },
-  draws: {
-    en: 'Draws',
-    ar: 'التعادل',
-    bn: 'ড্র',
-    hi: 'बराबरी',
-    es: 'Empates',
-    id: 'Seri'
+  email: {
+    en: 'Email',
+    ar: 'البريد الإلكتروني',
+    bn: 'ইমেইল',
+    hi: 'ईमेल',
+    es: 'Correo Electrónico',
+    id: 'Email'
   },
   
-  // Common
-  loading: {
-    en: 'Loading...',
-    ar: 'جاري التحميل...',
-    bn: 'লোড হচ্ছে...',
-    hi: 'लोड हो रहा है...',
-    es: 'Cargando...',
-    id: 'Memuat...'
+  // Game Status
+  playerTurn: {
+    en: "Player %s's Turn",
+    ar: 'دور اللاعب %s',
+    bn: 'খেলোয়াড় %s এর পালা',
+    hi: 'खिलाड़ी %s की बारी',
+    es: 'Turno del Jugador %s',
+    id: 'Giliran Pemain %s'
   },
-  error: {
-    en: 'Error',
-    ar: 'خطأ',
-    bn: 'ত্রুটি',
-    hi: 'त्रुटि',
-    es: 'Error',
-    id: 'Kesalahan'
+  winner: {
+    en: 'Winner: %s',
+    ar: 'الفائز: %s',
+    bn: 'বিজয়ী: %s',
+    hi: 'विजेता: %s',
+    es: 'Ganador: %s',
+    id: 'Pemenang: %s'
   },
-  success: {
-    en: 'Success',
-    ar: 'نجح',
-    bn: 'সফল',
-    hi: 'सफल',
-    es: 'Éxito',
-    id: 'Berhasil'
-  },
-  
-  // Language Selection
-  language: {
-    en: 'Language',
-    ar: 'اللغة',
-    bn: 'ভাষা',
-    hi: 'भाषा',
-    es: 'Idioma',
-    id: 'Bahasa'
-  },
-  selectLanguage: {
-    en: 'Select Language',
-    ar: 'اختر اللغة',
-    bn: 'ভাষা নির্বাচন করুন',
-    hi: 'भाषा चुनें',
-    es: 'Seleccionar Idioma',
-    id: 'Pilih Bahasa'
+  draw: {
+    en: 'Draw!',
+    ar: 'تعادل!',
+    bn: 'ড্র!',
+    hi: 'ड्रॉ!',
+    es: '¡Empate!',
+    id: 'Seri!'
   },
   
   // Settings
@@ -406,85 +366,73 @@ export const translations = {
     es: 'Tema',
     id: 'Tema'
   },
-  
-  // Online Features
-  onlineUsers: {
-    en: 'Online Users',
-    ar: 'المستخدمون المتصلون',
-    bn: 'অনলাইন ব্যবহারকারী',
-    hi: 'ऑनलाइन उपयोगकर्ता',
-    es: 'Usuarios en Línea',
-    id: 'Pengguna Online'
-  },
-  achievements: {
-    en: 'Achievements',
-    ar: 'الإنجازات',
-    bn: 'অর্জন',
-    hi: 'उपलब्धियां',
-    es: 'Logros',
-    id: 'Prestasi'
-  },
-  friends: {
-    en: 'Friends',
-    ar: 'الأصدقاء',
-    bn: 'বন্ধু',
-    hi: 'मित्र',
-    es: 'Amigos',
-    id: 'Teman'
+  language: {
+    en: 'Language',
+    ar: 'اللغة',
+    bn: 'ভাষা',
+    hi: 'भाषा',
+    es: 'Idioma',
+    id: 'Bahasa'
   },
   
-  // Error Messages
-  connectionError: {
-    en: 'Connection Error',
-    ar: 'خطأ في الاتصال',
-    bn: 'সংযোগ ত্রুটি',
-    hi: 'कनेक्शन त्रुटि',
-    es: 'Error de Conexión',
-    id: 'Kesalahan Koneksi'
+  // AI Difficulty Levels
+  difficulty: {
+    en: 'Difficulty',
+    ar: 'مستوى الصعوبة',
+    bn: 'কঠিনতা',
+    hi: 'कठिनाई',
+    es: 'Dificultad',
+    id: 'Tingkat Kesulitan'
   },
-  gameNotFound: {
-    en: 'Game not found',
-    ar: 'لم يتم العثور على اللعبة',
-    bn: 'গেম পাওয়া যায়নি',
-    hi: 'गेम नहीं मिला',
-    es: 'Juego no encontrado',
-    id: 'Permainan tidak ditemukan'
+  easy: {
+    en: 'Easy',
+    ar: 'سهل',
+    bn: 'সহজ',
+    hi: 'आसान',
+    es: 'Fácil',
+    id: 'Mudah'
+  },
+  medium: {
+    en: 'Medium',
+    ar: 'متوسط',
+    bn: 'মাঝারি',
+    hi: 'मध्यम',
+    es: 'Medio',
+    id: 'Sedang'
+  },
+  hard: {
+    en: 'Hard',
+    ar: 'صعب',
+    bn: 'কঠিন',
+    hi: 'कठिन',
+    es: 'Difícil',
+    id: 'Sulit'
   },
   
-  // Game Rules
-  gameRules: {
-    en: 'Game Rules',
-    ar: 'قواعد اللعبة',
-    bn: 'গেম নিয়ম',
-    hi: 'गेम नियम',
-    es: 'Reglas del Juego',
-    id: 'Aturan Permainan'
+  // Game Mode Descriptions
+  challengeComputer: {
+    en: 'Challenge the computer',
+    ar: 'تحدي الحاسوب',
+    bn: 'কম্পিউটারকে চ্যালেঞ্জ করুন',
+    hi: 'कंप्यूटर को चुनौती दें',
+    es: 'Desafía a la computadora',
+    id: 'Tantang komputer'
   },
-  
-  // Chat
-  chat: {
-    en: 'Chat',
-    ar: 'الدردشة',
-    bn: 'চ্যাট',
-    hi: 'चैट',
-    es: 'Chat',
-    id: 'Chat'
+  localMultiplayer: {
+    en: 'Local multiplayer',
+    ar: 'متعدد اللاعبين المحلي',
+    bn: 'স্থানীয় বহুখেলোয়াড়',
+    hi: 'स्थानीय मल्टीप्लेयर',
+    es: 'Multijugador local',
+    id: 'Multiplayer lokal'
   },
-  sendMessage: {
-    en: 'Send Message',
-    ar: 'إرسال رسالة',
-    bn: 'বার্তা পাঠান',
-    hi: 'संदेश भेजें',
-    es: 'Enviar Mensaje',
-    id: 'Kirim Pesan'
-  },
-  typeMessage: {
-    en: 'Type a message...',
-    ar: 'اكتب رسالة...',
-    bn: 'একটি বার্তা টাইপ করুন...',
-    hi: 'एक संदेश टाइप करें...',
-    es: 'Escribe un mensaje...',
-    id: 'Ketik pesan...'
+  playWithFriends: {
+    en: 'Play with friends online',
+    ar: 'العب مع الأصدقاء عبر الإنترنت',
+    bn: 'অনলাইনে বন্ধুদের সাথে খেলুন',
+    hi: 'दोस्तों के साथ ऑनलाइन खेलें',
+    es: 'Juega con amigos en línea',
+    id: 'Bermain dengan teman secara online'
   }
 } as const;
 
