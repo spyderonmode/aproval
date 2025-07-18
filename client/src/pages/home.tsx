@@ -674,14 +674,14 @@ export default function Home() {
               
               {/* Header Sidebar */}
               {showHeaderSidebar && (
-                <div className="absolute right-0 top-full mt-2 w-64 bg-slate-800 border border-slate-700 rounded-lg shadow-lg z-[9999] overflow-visible header-sidebar">
+                <div className="absolute right-0 top-full mt-2 w-64 bg-slate-800 border border-slate-700 rounded-lg shadow-lg z-50 overflow-visible">
                   <div className="p-4 space-y-4 overflow-visible">
                     <div className="text-sm font-medium text-gray-300 border-b border-slate-700 pb-2">
                       {t('quickActions')}
                     </div>
                     
                     {/* Language Selector */}
-                    <div className="flex items-center justify-between overflow-visible sidebar-item">
+                    <div className="flex items-center justify-between overflow-visible">
                       <div className="flex items-center space-x-2">
                         <Languages className="w-4 h-4 text-gray-400" />
                         <span className="text-sm text-gray-300">{t('language')}</span>
@@ -692,7 +692,7 @@ export default function Home() {
                     </div>
                     
                     {/* Theme Selector */}
-                    <div className="flex items-center justify-between sidebar-item">
+                    <div className="flex items-center justify-between">
                       <div className="flex items-center space-x-2">
                         <Palette className="w-4 h-4 text-gray-400" />
                         <span className="text-sm text-gray-300">{t('theme')}</span>
@@ -715,12 +715,12 @@ export default function Home() {
                     </div>
                     
                     {/* Friends */}
-                    <div className="w-full sidebar-item">
+                    <div className="w-full">
                       <Friends />
                     </div>
                     
                     {/* Online Players */}
-                    <div className="flex items-center justify-between sidebar-item">
+                    <div className="flex items-center justify-between">
                       <div className="flex items-center space-x-2">
                         <Users className="w-4 h-4 text-gray-400" />
                         <span className="text-sm text-gray-300">{t('onlineUsers')}</span>
@@ -739,7 +739,7 @@ export default function Home() {
                     </div>
                     
                     {/* Achievements */}
-                    <div className="flex items-center justify-between sidebar-item">
+                    <div className="flex items-center justify-between">
                       <div className="flex items-center space-x-2">
                         <Trophy className="w-4 h-4 text-gray-400" />
                         <span className="text-sm text-gray-300">{t('achievements')}</span>
@@ -759,7 +759,7 @@ export default function Home() {
                     </div>
                     
                     {/* Profile Settings */}
-                    <div className="flex items-center justify-between sidebar-item">
+                    <div className="flex items-center justify-between">
                       <div className="flex items-center space-x-2">
                         <Settings className="w-4 h-4 text-gray-400" />
                         <span className="text-sm text-gray-300">{t('profileSettings')}</span>
@@ -801,10 +801,10 @@ export default function Home() {
         </div>
       </nav>
 
-      <div className="max-w-7xl mx-auto px-4 py-6 md:px-6 md:py-8 main-content">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 md:gap-8 content-container">
+      <div className="max-w-7xl mx-auto px-4 py-6 md:px-6 md:py-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 md:gap-8">
           {/* Game Board Section */}
-          <div className="lg:col-span-2 game-board-container">
+          <div className="lg:col-span-2">
             {currentGame ? (
               <div>
                 <div className="mb-4 text-center">
