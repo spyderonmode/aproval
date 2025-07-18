@@ -51,7 +51,7 @@ export function GameOverModal({ open, onClose, result, onPlayAgain, isCreatingGa
 
   return (
     <>
-      {/* Sparkle confetti all over the screen for wins */}
+      {/* Sparkle explosion effect for wins */}
       {open && !isDraw && winner && (
         <div style={{
           position: 'fixed',
@@ -62,28 +62,37 @@ export function GameOverModal({ open, onClose, result, onPlayAgain, isCreatingGa
           pointerEvents: 'none',
           zIndex: 10000
         }}>
-          {/* Generate 50 sparkles scattered across the screen */}
-          {Array.from({ length: 50 }, (_, i) => {
+          {/* Generate 60 sparkles that explode outward from center */}
+          {Array.from({ length: 60 }, (_, i) => {
             const colors = ['#ff6b6b', '#4ecdc4', '#45b7d1', '#f9ca24', '#f0932b', '#eb4d4b', '#6c5ce7', '#a29bfe', '#00b894', '#e17055'];
-            const size = Math.random() * 8 + 4; // 4-12px
-            const left = Math.random() * 100; // 0-100%
-            const top = Math.random() * 100; // 0-100%
-            const delay = Math.random() * 2; // 0-2s delay
+            const size = Math.random() * 10 + 3; // 3-13px
+            const angle = (360 / 60) * i + Math.random() * 20; // Spread around 360 degrees
+            const distance = Math.random() * 300 + 150; // 150-450px from center
+            const duration = Math.random() * 1.5 + 1.5; // 1.5-3s animation
+            const delay = Math.random() * 0.3; // 0-0.3s delay
+            
+            // Calculate final position based on angle and distance
+            const radian = (angle * Math.PI) / 180;
+            const dx = Math.cos(radian) * distance;
+            const dy = Math.sin(radian) * distance;
             
             return (
               <div
                 key={i}
                 style={{
                   position: 'absolute',
-                  left: `${left}%`,
-                  top: `${top}%`,
+                  left: '50%',
+                  top: '50%',
                   width: `${size}px`,
                   height: `${size}px`,
                   backgroundColor: colors[Math.floor(Math.random() * colors.length)],
                   borderRadius: '50%',
-                  animation: `sparkle-twinkle 1.5s ease-in-out infinite ${delay}s`,
-                  boxShadow: `0 0 ${size}px ${colors[Math.floor(Math.random() * colors.length)]}`
-                }}
+                  animation: `sparkle-explode ${duration}s ease-out ${delay}s forwards`,
+                  boxShadow: `0 0 ${size * 2}px ${colors[Math.floor(Math.random() * colors.length)]}`,
+                  transform: 'translate(-50%, -50%)',
+                  '--dx': `${dx}px`,
+                  '--dy': `${dy}px`
+                } as React.CSSProperties}
               />
             );
           })}
@@ -125,14 +134,18 @@ export function GameOverModal({ open, onClose, result, onPlayAgain, isCreatingGa
             0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(251, 191, 36, 0.7); }
             100% { transform: scale(1.1); box-shadow: 0 0 0 10px rgba(251, 191, 36, 0); }
           }
-          @keyframes sparkle-twinkle {
-            0%, 100% { 
-              opacity: 0.3; 
-              transform: scale(0.8); 
+          @keyframes sparkle-explode {
+            0% {
+              transform: translate(-50%, -50%) scale(0);
+              opacity: 1;
             }
-            50% { 
-              opacity: 1; 
-              transform: scale(1.2); 
+            20% {
+              transform: translate(-50%, -50%) scale(1.5);
+              opacity: 1;
+            }
+            100% {
+              transform: translate(calc(-50% + var(--dx)), calc(-50% + var(--dy))) scale(0.3);
+              opacity: 0;
             }
           }
         `}</style>
