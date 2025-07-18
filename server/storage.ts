@@ -1377,7 +1377,18 @@ export class DatabaseStorage implements IStorage {
     // First, clean up expired invitations
     await this.expireOldInvitations();
     
-    // Check if active invitation already exists (not expired)
+    // Remove any existing invitations for this room and user (regardless of status)
+    // This ensures we can always send a new invitation
+    await db
+      .delete(roomInvitations)
+      .where(
+        and(
+          sql`${roomInvitations.roomId}::text = ${roomId}`,
+          sql`${roomInvitations.invitedId} = ${invitedId}`
+        )
+      );
+    
+    // Check if active invitation already exists (not expired) - this should now be unnecessary but kept as safety check
     const existingInvitation = await db
       .select()
       .from(roomInvitations)
