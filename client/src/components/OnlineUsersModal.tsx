@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
+import { useTranslation } from "@/contexts/LanguageContext";
 import { apiRequest } from "@/lib/queryClient";
 import { User, Clock, Users, UserX, UserCheck, Eye } from "lucide-react";
 import { showUserFriendlyError } from "@/lib/errorUtils";
@@ -20,6 +21,7 @@ interface OnlineUsersModalProps {
 
 export function OnlineUsersModal({ open, onClose, currentRoom, user }: OnlineUsersModalProps) {
   const { toast } = useToast();
+  const { t } = useTranslation();
   const queryClient = useQueryClient();
   const [blockedUsers, setBlockedUsers] = useState<Set<string>>(new Set());
   const [profileUser, setProfileUser] = useState<any>(null);
@@ -54,8 +56,8 @@ export function OnlineUsersModal({ open, onClose, currentRoom, user }: OnlineUse
       setBlockedUsers(prev => new Set(prev).add(userId));
       queryClient.invalidateQueries({ queryKey: ["/api/users/blocked"] });
       toast({
-        title: "User blocked",
-        description: "User has been blocked successfully",
+        title: t('userBlocked'),
+        description: t('userBlockedSuccessfully'),
       });
     },
     onError: (error: any) => {
@@ -75,8 +77,8 @@ export function OnlineUsersModal({ open, onClose, currentRoom, user }: OnlineUse
       });
       queryClient.invalidateQueries({ queryKey: ["/api/users/blocked"] });
       toast({
-        title: "User unblocked",
-        description: "User has been unblocked successfully",
+        title: t('userUnblocked'),
+        description: t('userUnblockedSuccessfully'),
       });
     },
     onError: (error: any) => {
@@ -109,14 +111,14 @@ export function OnlineUsersModal({ open, onClose, currentRoom, user }: OnlineUse
     const diff = Date.now() - new Date(lastSeen).getTime();
     const minutes = Math.floor(diff / 60000);
     
-    if (minutes < 1) return "Just now";
-    if (minutes < 60) return `${minutes}m ago`;
+    if (minutes < 1) return t('justNow');
+    if (minutes < 60) return `${minutes}${t('minutesAgo')}`;
     
     const hours = Math.floor(minutes / 60);
-    if (hours < 24) return `${hours}h ago`;
+    if (hours < 24) return `${hours}${t('hoursAgo')}`;
     
     const days = Math.floor(hours / 24);
-    return `${days}d ago`;
+    return `${days}${t('daysAgo')}`;
   };
 
   return (
@@ -125,14 +127,14 @@ export function OnlineUsersModal({ open, onClose, currentRoom, user }: OnlineUse
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Users className="h-5 w-5" />
-            Online Players ({onlineUsers?.total || 0})
+            {t('onlinePlayers')} ({onlineUsers?.total || 0})
           </DialogTitle>
         </DialogHeader>
         
         <div className="space-y-4">
           <div className="bg-blue-50 dark:bg-blue-950 border border-blue-200 dark:border-blue-800 rounded-lg p-3">
             <p className="text-sm text-blue-800 dark:text-blue-200">
-              <strong>Online Players:</strong> View player profiles and manage interactions.
+              <strong>{t('onlinePlayers')}:</strong> {t('viewPlayerProfilesAndManageInteractions')}
             </p>
           </div>
               
@@ -154,7 +156,7 @@ export function OnlineUsersModal({ open, onClose, currentRoom, user }: OnlineUse
                                   {user.profilePicture || user.profileImageUrl ? (
                                     <img
                                       src={user.profilePicture || user.profileImageUrl}
-                                      alt="Profile"
+                                      alt={t('profile')}
                                       className="h-10 w-10 rounded-full object-cover"
                                     />
                                   ) : (
@@ -167,7 +169,7 @@ export function OnlineUsersModal({ open, onClose, currentRoom, user }: OnlineUse
                                       {user.displayName || user.firstName || user.username}
                                       {isBlocked && (
                                         <Badge variant="destructive" className="text-xs">
-                                          Blocked
+                                          {t('blocked')}
                                         </Badge>
                                       )}
                                     </h3>
@@ -180,7 +182,7 @@ export function OnlineUsersModal({ open, onClose, currentRoom, user }: OnlineUse
                                 
                                 <div className="flex items-center gap-2">
                                   {user.inRoom && (
-                                    <Badge variant="secondary">In Room</Badge>
+                                    <Badge variant="secondary">{t('inRoom')}</Badge>
                                   )}
                                   
                                   <Button
@@ -190,7 +192,7 @@ export function OnlineUsersModal({ open, onClose, currentRoom, user }: OnlineUse
                                     className="text-blue-600 hover:text-blue-700"
                                   >
                                     <Eye className="h-4 w-4 mr-1" />
-                                    Profile
+                                    {t('profile')}
                                   </Button>
                                   
                                   {isBlocked ? (
@@ -202,7 +204,7 @@ export function OnlineUsersModal({ open, onClose, currentRoom, user }: OnlineUse
                                       className="text-green-600 hover:text-green-700"
                                     >
                                       <UserCheck className="h-4 w-4 mr-1" />
-                                      Unblock
+                                      {t('unblock')}
                                     </Button>
                                   ) : (
                                     <Button
@@ -213,7 +215,7 @@ export function OnlineUsersModal({ open, onClose, currentRoom, user }: OnlineUse
                                       className="text-red-600 hover:text-red-700"
                                     >
                                       <UserX className="h-4 w-4 mr-1" />
-                                      Block
+                                      {t('block')}
                                     </Button>
                                   )}
                                 </div>
@@ -239,7 +241,7 @@ export function OnlineUsersModal({ open, onClose, currentRoom, user }: OnlineUse
                       })
                     ) : (
                       <div className="text-center py-8 text-muted-foreground">
-                        No other players online
+                        {t('noOtherPlayersOnline')}
                       </div>
                     )}
                   </div>

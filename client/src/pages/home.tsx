@@ -949,7 +949,7 @@ export default function Home() {
                     {currentRoom && (
                       <div className="flex items-center space-x-2">
                         <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                        <span className="text-sm">Connected to room {currentRoom.code}</span>
+                        <span className="text-sm">{t('connectedToRoom')} {currentRoom.code}</span>
                       </div>
                     )}
                   </div>

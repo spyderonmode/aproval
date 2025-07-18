@@ -1954,6 +1954,160 @@ export const translations = {
     id: 'MENONTON'
   },
 
+  // Online Players Modal
+  onlinePlayers: {
+    en: 'Online Players',
+    ar: 'اللاعبون المتصلون',
+    bn: 'অনলাইন খেলোয়াড়',
+    hi: 'ऑनलाइन खिलाड़ी',
+    es: 'Jugadores en Línea',
+    id: 'Pemain Online'
+  },
+  viewPlayerProfilesAndManageInteractions: {
+    en: 'View player profiles and manage interactions',
+    ar: 'عرض ملفات اللاعبين وإدارة التفاعلات',
+    bn: 'খেলোয়াড়ের প্রোফাইল দেখুন এবং মিথস্ক্রিয়া পরিচালনা করুন',
+    hi: 'खिलाड़ी प्रोफाइल देखें और बातचीत प्रबंधित करें',
+    es: 'Ver perfiles de jugadores y gestionar interacciones',
+    id: 'Lihat profil pemain dan kelola interaksi'
+  },
+  profile: {
+    en: 'Profile',
+    ar: 'الملف الشخصي',
+    bn: 'প্রোফাইল',
+    hi: 'प्रोफाइल',
+    es: 'Perfil',
+    id: 'Profil'
+  },
+  blocked: {
+    en: 'Blocked',
+    ar: 'محظور',
+    bn: 'অবরুদ্ধ',
+    hi: 'अवरुद्ध',
+    es: 'Bloqueado',
+    id: 'Diblokir'
+  },
+  inRoom: {
+    en: 'In Room',
+    ar: 'في الغرفة',
+    bn: 'রুমে',
+    hi: 'कमरे में',
+    es: 'En Sala',
+    id: 'Di Ruang'
+  },
+  block: {
+    en: 'Block',
+    ar: 'حظر',
+    bn: 'অবরোধ',
+    hi: 'ब्लॉक',
+    es: 'Bloquear',
+    id: 'Blokir'
+  },
+  unblock: {
+    en: 'Unblock',
+    ar: 'إلغاء الحظر',
+    bn: 'অবরোধ সরান',
+    hi: 'अनब्लॉक',
+    es: 'Desbloquear',
+    id: 'Buka Blokir'
+  },
+  userBlocked: {
+    en: 'User blocked',
+    ar: 'تم حظر المستخدم',
+    bn: 'ব্যবহারকারী অবরুদ্ধ',
+    hi: 'उपयोगकर्ता अवरुद्ध',
+    es: 'Usuario bloqueado',
+    id: 'Pengguna diblokir'
+  },
+  userBlockedSuccessfully: {
+    en: 'User has been blocked successfully',
+    ar: 'تم حظر المستخدم بنجاح',
+    bn: 'ব্যবহারকারী সফলভাবে অবরুদ্ধ হয়েছে',
+    hi: 'उपयोगकर्ता सफलतापूर्वक अवरुद्ध कर दिया गया',
+    es: 'El usuario ha sido bloqueado exitosamente',
+    id: 'Pengguna telah berhasil diblokir'
+  },
+  userUnblocked: {
+    en: 'User unblocked',
+    ar: 'تم إلغاء حظر المستخدم',
+    bn: 'ব্যবহারকারীর অবরোধ সরানো হয়েছে',
+    hi: 'उपयोगकर्ता अनब्लॉक',
+    es: 'Usuario desbloqueado',
+    id: 'Pengguna dibuka blokirnya'
+  },
+  userUnblockedSuccessfully: {
+    en: 'User has been unblocked successfully',
+    ar: 'تم إلغاء حظر المستخدم بنجاح',
+    bn: 'ব্যবহারকারীর অবরোধ সফলভাবে সরানো হয়েছে',
+    hi: 'उपयोगकर्ता सफलतापूर्वक अनब्लॉक कर दिया गया',
+    es: 'El usuario ha sido desbloqueado exitosamente',
+    id: 'Pengguna telah berhasil dibuka blokirnya'
+  },
+  justNow: {
+    en: 'Just now',
+    ar: 'الآن',
+    bn: 'এইমাত্র',
+    hi: 'अभी',
+    es: 'Ahora mismo',
+    id: 'Baru saja'
+  },
+  minutesAgo: {
+    en: 'm ago',
+    ar: 'د مضت',
+    bn: 'মিনিট আগে',
+    hi: 'मिनट पहले',
+    es: 'm hace',
+    id: 'm lalu'
+  },
+  hoursAgo: {
+    en: 'h ago',
+    ar: 'س مضت',
+    bn: 'ঘন্টা আগে',
+    hi: 'घंटे पहले',
+    es: 'h hace',
+    id: 'j lalu'
+  },
+  daysAgo: {
+    en: 'd ago',
+    ar: 'ي مضت',
+    bn: 'দিন আগে',
+    hi: 'दिन पहले',
+    es: 'd hace',
+    id: 'h lalu'
+  },
+  noOtherPlayersOnline: {
+    en: 'No other players online',
+    ar: 'لا يوجد لاعبون آخرون متصلون',
+    bn: 'অন্য কোন খেলোয়াড় অনলাইনে নেই',
+    hi: 'कोई अन्य खिलाड़ी ऑनलाइन नहीं',
+    es: 'No hay otros jugadores en línea',
+    id: 'Tidak ada pemain lain yang online'
+  },
+  connectedToRoom: {
+    en: 'Connected to room',
+    ar: 'متصل بالغرفة',
+    bn: 'রুমে সংযুক্ত',
+    hi: 'कमरे से जुड़ा हुआ',
+    es: 'Conectado a la sala',
+    id: 'Terhubung ke ruang'
+  },
+  startGame: {
+    en: 'Start Game',
+    ar: 'بدء اللعبة',
+    bn: 'খেলা শুরু করুন',
+    hi: 'खेल शुरू करें',
+    es: 'Iniciar Juego',
+    id: 'Mulai Permainan'
+  },
+  inviteFriends: {
+    en: 'Invite Friends',
+    ar: 'دعوة الأصدقاء',
+    bn: 'বন্ধুদের আমন্ত্রণ জানান',
+    hi: 'दोस्तों को आमंत्रित करें',
+    es: 'Invitar Amigos',
+    id: 'Undang Teman'
+  },
+
   // Invite Friends Modal
   inviteFriendsTo: {
     en: 'Invite Friends to',
