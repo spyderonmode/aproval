@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -33,6 +33,17 @@ export function RoomManager({
   const [showInviteModal, setShowInviteModal] = useState(false);
   const { toast } = useToast();
   const queryClient = useQueryClient();
+
+  // Fetch participants for the current room
+  const { data: participants = [] } = useQuery({
+    queryKey: ['room-participants', currentRoom?.id],
+    queryFn: async () => {
+      if (!currentRoom) return [];
+      const response = await apiRequest('GET', `/api/rooms/${currentRoom.id}/participants`);
+      return response.json();
+    },
+    enabled: !!currentRoom,
+  });
 
   const joinRoomMutation = useMutation({
     mutationFn: async (data: { code: string, role: 'player' | 'spectator' }) => {
@@ -190,8 +201,8 @@ export function RoomManager({
             <div className="space-y-2">
               {/* Main action buttons */}
               <div className="flex space-x-2">
-                {/* Check if user is room owner and room status */}
-                {currentRoom.ownerId === (user?.userId || user?.id) ? (
+                {/* Check if user is a player in the room */}
+                {participants.some(p => p.userId === (user?.userId || user?.id) && p.role === 'player') ? (
                   <Button
                     onClick={() => {
                       console.log('🎮 Start game button clicked');

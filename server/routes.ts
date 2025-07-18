@@ -948,13 +948,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Game is already running in this room" });
       }
       
-      // Check if user is the room owner (only room owner can start games)
-      if (room.ownerId !== userId) {
-        return res.status(403).json({ message: "Only the room owner can start games" });
-      }
-      
       // Get room participants
       const participants = await storage.getRoomParticipants(roomId);
+      
+      // Check if user is a player in the room (both players can start games)
+      const isPlayer = participants.some(p => p.userId === userId && p.role === 'player');
+      if (!isPlayer) {
+        return res.status(403).json({ message: "Only players can start games" });
+      }
       
       // Check if there's already an active game in this room
       const existingGame = await storage.getActiveGameByRoomId(roomId);
