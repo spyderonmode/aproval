@@ -8,6 +8,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { User, Clock, Users, UserX, UserCheck, Eye } from "lucide-react";
+import { showUserFriendlyError } from "@/lib/errorUtils";
 import { UserProfileModal } from "./UserProfileModal";
 
 interface OnlineUsersModalProps {
@@ -58,11 +59,7 @@ export function OnlineUsersModal({ open, onClose, currentRoom, user }: OnlineUse
       });
     },
     onError: (error: any) => {
-      toast({
-        title: "Error",
-        description: error.message || "Failed to block user",
-        variant: "destructive",
-      });
+      showUserFriendlyError(error, toast);
     },
   });
 
@@ -83,11 +80,7 @@ export function OnlineUsersModal({ open, onClose, currentRoom, user }: OnlineUse
       });
     },
     onError: (error: any) => {
-      toast({
-        title: "Error",
-        description: error.message || "Failed to unblock user",
-        variant: "destructive",
-      });
+      showUserFriendlyError(error, toast);
     },
   });
 

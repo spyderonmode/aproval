@@ -9,6 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
 import { isUnauthorizedError } from "@/lib/authUtils";
+import { showUserFriendlyError } from "@/lib/errorUtils";
 
 interface CreateRoomModalProps {
   open: boolean;
@@ -48,11 +49,7 @@ export function CreateRoomModal({ open, onClose, onRoomCreated }: CreateRoomModa
         }, 500);
         return;
       }
-      toast({
-        title: "Error",
-        description: error.message,
-        variant: "destructive",
-      });
+      showUserFriendlyError(error, toast);
     },
   });
 

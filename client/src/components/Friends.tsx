@@ -10,6 +10,7 @@ import { Users, UserPlus, UserCheck, UserX, Trophy, TrendingUp, Calendar, Loader
 import { useToast } from '@/hooks/use-toast';
 import { apiRequest } from '@/lib/queryClient';
 import { User } from '@shared/schema';
+import { showUserFriendlyError } from '@/lib/errorUtils';
 
 interface FriendRequest {
   id: string;
@@ -75,11 +76,7 @@ export function Friends() {
       queryClient.invalidateQueries({ queryKey: ['/api/friends/requests'] });
     },
     onError: (error: any) => {
-      toast({
-        title: "Error",
-        description: error.message || "Failed to send friend request",
-        variant: "destructive",
-      });
+      showUserFriendlyError(error, toast);
     },
   });
 
@@ -97,11 +94,7 @@ export function Friends() {
       queryClient.invalidateQueries({ queryKey: ['/api/friends'] });
     },
     onError: (error: any) => {
-      toast({
-        title: "Error",
-        description: error.message || "Failed to respond to friend request",
-        variant: "destructive",
-      });
+      showUserFriendlyError(error, toast);
     },
   });
 
@@ -119,11 +112,7 @@ export function Friends() {
       setSelectedFriend(null);
     },
     onError: (error: any) => {
-      toast({
-        title: "Error",
-        description: error.message || "Failed to remove friend",
-        variant: "destructive",
-      });
+      showUserFriendlyError(error, toast);
     },
   });
 
@@ -157,11 +146,7 @@ export function Friends() {
     },
     onError: (error: any) => {
       console.error('Chat message error:', error);
-      toast({
-        title: "Error",
-        description: error.message || "Failed to send message",
-        variant: "destructive",
-      });
+      showUserFriendlyError(error, toast);
     },
   });
 
@@ -258,11 +243,7 @@ export function Friends() {
       }
     } catch (error: any) {
       console.error("Friend search error:", error);
-      toast({
-        title: "Search Error",
-        description: error.message || "Failed to search for users",
-        variant: "destructive",
-      });
+      showUserFriendlyError(error, toast);
       setSearchResults([]);
     } finally {
       setIsSearching(false);
