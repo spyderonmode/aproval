@@ -184,88 +184,89 @@ export function OnlineUsersModal({ open, onClose, currentRoom, user }: OnlineUse
                         const isFriend = friends.has(user.userId);
                         return (
                           <Card key={user.userId} className={`p-3 cursor-pointer transition-colors ${isBlocked ? 'opacity-50 border-red-200 dark:border-red-800' : 'hover:bg-slate-50 dark:hover:bg-slate-800'}`}>
-                            <div className="space-y-2">
-                              <div className="flex items-center justify-between">
-                                <div className="flex items-center gap-3">
-                                  {user.profilePicture || user.profileImageUrl ? (
-                                    <img
-                                      src={user.profilePicture || user.profileImageUrl}
-                                      alt={t('profile')}
-                                      className="h-10 w-10 rounded-full object-cover"
-                                    />
-                                  ) : (
-                                    <div className="h-10 w-10 rounded-full bg-blue-600 flex items-center justify-center">
-                                      <User className="h-5 w-5 text-white" />
-                                    </div>
-                                  )}
-                                  <div>
-                                    <h3 className="font-medium flex items-center gap-2">
+                            <div className="space-y-3">
+                              {/* User Info Row */}
+                              <div className="flex items-center gap-3">
+                                {user.profilePicture || user.profileImageUrl ? (
+                                  <img
+                                    src={user.profilePicture || user.profileImageUrl}
+                                    alt={t('profile')}
+                                    className="h-10 w-10 rounded-full object-cover"
+                                  />
+                                ) : (
+                                  <div className="h-10 w-10 rounded-full bg-blue-600 flex items-center justify-center">
+                                    <User className="h-5 w-5 text-white" />
+                                  </div>
+                                )}
+                                <div className="flex-1">
+                                  <div className="flex items-center gap-2 mb-1">
+                                    <h3 className="font-medium">
                                       {user.displayName || user.firstName || user.username}
-                                      {isBlocked && (
-                                        <Badge variant="destructive" className="text-xs">
-                                          {t('blocked')}
-                                        </Badge>
-                                      )}
                                     </h3>
-                                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                                      <Clock className="h-3 w-3" />
-                                      {formatLastSeen(user.lastSeen)}
-                                    </div>
+                                    {isBlocked && (
+                                      <Badge variant="destructive" className="text-xs">
+                                        {t('blocked')}
+                                      </Badge>
+                                    )}
+                                    {user.inRoom && (
+                                      <Badge variant="secondary" className="text-xs">{t('inRoom')}</Badge>
+                                    )}
+                                  </div>
+                                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                                    <Clock className="h-3 w-3" />
+                                    {formatLastSeen(user.lastSeen)}
                                   </div>
                                 </div>
+                              </div>
+                              
+                              {/* Action Buttons Row */}
+                              <div className="flex items-center gap-2 flex-wrap">
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  onClick={() => handleViewProfile(user)}
+                                  className="text-blue-600 hover:text-blue-700"
+                                >
+                                  <Eye className="h-4 w-4 mr-1" />
+                                  {t('profile')}
+                                </Button>
                                 
-                                <div className="flex items-center gap-2">
-                                  {user.inRoom && (
-                                    <Badge variant="secondary">{t('inRoom')}</Badge>
-                                  )}
-                                  
+                                {!isFriend && !isBlocked && (
                                   <Button
                                     size="sm"
                                     variant="outline"
-                                    onClick={() => handleViewProfile(user)}
-                                    className="text-blue-600 hover:text-blue-700"
+                                    onClick={() => handleAddFriend(user.userId)}
+                                    disabled={sendFriendRequestMutation.isPending}
+                                    className="text-green-600 hover:text-green-700"
                                   >
-                                    <Eye className="h-4 w-4 mr-1" />
-                                    {t('profile')}
+                                    <UserPlus className="h-4 w-4 mr-1" />
+                                    {t('addFriend')}
                                   </Button>
-                                  
-                                  {!isFriend && !isBlocked && (
-                                    <Button
-                                      size="sm"
-                                      variant="outline"
-                                      onClick={() => handleAddFriend(user.userId)}
-                                      disabled={sendFriendRequestMutation.isPending}
-                                      className="text-green-600 hover:text-green-700"
-                                    >
-                                      <UserPlus className="h-4 w-4 mr-1" />
-                                      {t('addFriend')}
-                                    </Button>
-                                  )}
-                                  
-                                  {isBlocked ? (
-                                    <Button
-                                      size="sm"
-                                      variant="outline"
-                                      onClick={() => handleUnblockUser(user.userId)}
-                                      disabled={unblockUserMutation.isPending}
-                                      className="text-green-600 hover:text-green-700"
-                                    >
-                                      <UserCheck className="h-4 w-4 mr-1" />
-                                      {t('unblock')}
-                                    </Button>
-                                  ) : (
-                                    <Button
-                                      size="sm"
-                                      variant="outline"
-                                      onClick={() => handleBlockUser(user.userId)}
-                                      disabled={blockUserMutation.isPending}
-                                      className="text-red-600 hover:text-red-700"
-                                    >
-                                      <UserX className="h-4 w-4 mr-1" />
-                                      {t('block')}
-                                    </Button>
-                                  )}
-                                </div>
+                                )}
+                                
+                                {isBlocked ? (
+                                  <Button
+                                    size="sm"
+                                    variant="outline"
+                                    onClick={() => handleUnblockUser(user.userId)}
+                                    disabled={unblockUserMutation.isPending}
+                                    className="text-green-600 hover:text-green-700"
+                                  >
+                                    <UserCheck className="h-4 w-4 mr-1" />
+                                    {t('unblock')}
+                                  </Button>
+                                ) : (
+                                  <Button
+                                    size="sm"
+                                    variant="outline"
+                                    onClick={() => handleBlockUser(user.userId)}
+                                    disabled={blockUserMutation.isPending}
+                                    className="text-red-600 hover:text-red-700"
+                                  >
+                                    <UserX className="h-4 w-4 mr-1" />
+                                    {t('block')}
+                                  </Button>
+                                )}
                               </div>
                               
                               {user.achievements && user.achievements.length > 0 && (
