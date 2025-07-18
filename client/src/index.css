@@ -63,6 +63,11 @@
   background-color: #1e293b !important;
 }
 
+/* Ensure dropdown menus appear above all other content */
+[data-radix-dropdown-menu-content] {
+  z-index: 9999 !important;
+}
+
 /* RTL Language Support */
 [dir="rtl"] {
   direction: rtl;

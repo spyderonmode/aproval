@@ -28,7 +28,7 @@ export function LanguageSelector() {
           <ChevronDown className="w-4 h-4" />
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-56">
+      <DropdownMenuContent align="end" className="w-56 z-[9999] bg-popover border border-border shadow-lg">
         {Object.entries(languages).map(([code, info]) => (
           <DropdownMenuItem
             key={code}
