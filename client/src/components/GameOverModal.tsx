@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import { Home, RefreshCw } from "lucide-react";
-import { useSimpleAudio } from '@/hooks/useSimpleAudio';
+import { useAudioFile } from '@/hooks/useAudioFile';
 
 interface GameOverModalProps {
   open: boolean;
@@ -12,7 +12,7 @@ interface GameOverModalProps {
 }
 
 export function GameOverModal({ open, onClose, result, onPlayAgain, isCreatingGame = false, onMainMenu }: GameOverModalProps) {
-  const { playCelebrationSound } = useSimpleAudio();
+  const { playCelebrationSound } = useAudioFile();
   
   // Simple safety checks
   if (!open) return null;
