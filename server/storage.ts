@@ -628,87 +628,106 @@ export class DatabaseStorage implements IStorage {
   }
 
   async recalculateUserAchievements(userId: string): Promise<{ removed: number; added: Achievement[] }> {
-    // Get current user stats
-    const userStats = await this.getUserStats(userId);
-    
-    // Remove all existing achievements for this user
-    const deletedResult = await db
-      .delete(achievements)
-      .where(eq(achievements.userId, userId));
-    
-    const removedCount = deletedResult.rowCount || 0;
-    
-    // Define correct achievement conditions based on current stats only
-    const newAchievements: Achievement[] = [];
-    
-    // Only grant achievements that the user actually qualifies for
-    const achievementRules = [
-      {
-        type: 'first_win',
-        name: 'firstVictoryTitle',
-        description: 'winYourVeryFirstGame',
-        icon: '🏆',
-        condition: userStats.wins >= 1,
-      },
-      {
-        type: 'speed_demon',
-        name: 'speedDemon',
-        description: 'winTwentyTotalGames',
-        icon: '⚡',
-        condition: userStats.wins >= 20,
-      },
-      {
-        type: 'legend',
-        name: 'legend',
-        description: 'achieveFiftyTotalWins',
-        icon: '🌟',
-        condition: userStats.wins >= 50,
-      },
-      {
-        type: 'champion',
-        name: 'champion',
-        description: 'achieveOneHundredTotalWins',
-        icon: '👑',
-        condition: userStats.wins >= 100,
-      },
-      {
-        type: 'veteran_player',
-        name: 'veteranPlayer',
-        description: 'playOneHundredTotalGames',
-        icon: '🎖️',
-        condition: (userStats.wins + userStats.losses + userStats.draws) >= 100,
-      },
-    ];
+    try {
+      console.log(`🔄 Recalculating achievements for user: ${userId}`);
+      
+      // Get current user stats
+      const userStats = await this.getUserStats(userId);
+      console.log(`📊 User stats:`, userStats);
+      
+      // Get existing achievements count first
+      const existingAchievements = await db
+        .select()
+        .from(achievements)
+        .where(eq(achievements.userId, userId));
+      
+      console.log(`🏆 Existing achievements count: ${existingAchievements.length}`);
+      
+      // Remove all existing achievements for this user
+      const deletedResult = await db
+        .delete(achievements)
+        .where(eq(achievements.userId, userId));
+      
+      const removedCount = existingAchievements.length;
+      console.log(`🗑️ Removed ${removedCount} existing achievements`);
+      
+      // Define correct achievement conditions based on current stats only
+      const newAchievements: Achievement[] = [];
+      
+      // Only grant achievements that the user actually qualifies for
+      const achievementRules = [
+        {
+          type: 'first_win',
+          name: 'firstVictoryTitle',
+          description: 'winYourVeryFirstGame',
+          icon: '🏆',
+          condition: userStats.wins >= 1,
+        },
+        {
+          type: 'speed_demon',
+          name: 'speedDemon',
+          description: 'winTwentyTotalGames',
+          icon: '⚡',
+          condition: userStats.wins >= 20,
+        },
+        {
+          type: 'legend',
+          name: 'legend',
+          description: 'achieveFiftyTotalWins',
+          icon: '🌟',
+          condition: userStats.wins >= 50,
+        },
+        {
+          type: 'champion',
+          name: 'champion',
+          description: 'achieveOneHundredTotalWins',
+          icon: '👑',
+          condition: userStats.wins >= 100,
+        },
+        {
+          type: 'veteran_player',
+          name: 'veteranPlayer',
+          description: 'playOneHundredTotalGames',
+          icon: '🎖️',
+          condition: (userStats.wins + userStats.losses + userStats.draws) >= 100,
+        },
+      ];
 
-    // Grant achievements based on current stats
-    for (const rule of achievementRules) {
-      if (rule.condition) {
-        try {
-          const newAchievement = await this.createAchievement({
-            userId,
-            achievementType: rule.type,
-            achievementName: rule.name,
-            description: rule.description,
-            icon: rule.icon,
-            metadata: {},
-          });
-          if (newAchievement) {
-            newAchievements.push(newAchievement);
-            
-            // Unlock special themes for certain achievements
-            if (rule.type === 'speed_demon') {
-              await this.unlockTheme(userId, 'christmas');
-            } else if (rule.type === 'veteran_player') {
-              await this.unlockTheme(userId, 'summer');
+      // Grant achievements based on current stats
+      for (const rule of achievementRules) {
+        if (rule.condition) {
+          try {
+            console.log(`✅ Creating achievement: ${rule.type} for user with ${userStats.wins} wins`);
+            const newAchievement = await this.createAchievement({
+              userId,
+              achievementType: rule.type,
+              achievementName: rule.name,
+              description: rule.description,
+              icon: rule.icon,
+              metadata: {},
+            });
+            if (newAchievement) {
+              newAchievements.push(newAchievement);
+              
+              // Unlock special themes for certain achievements
+              if (rule.type === 'speed_demon') {
+                await this.unlockTheme(userId, 'christmas');
+              } else if (rule.type === 'veteran_player') {
+                await this.unlockTheme(userId, 'summer');
+              }
             }
+          } catch (error) {
+            console.error('Error creating achievement during recalculation:', error);
           }
-        } catch (error) {
-          console.error('Error creating achievement during recalculation:', error);
         }
       }
-    }
 
-    return { removed: removedCount, added: newAchievements };
+      console.log(`🎉 Added ${newAchievements.length} new achievements`);
+      return { removed: removedCount, added: newAchievements };
+    } catch (error) {
+      console.error('Error during achievement recalculation:', error);
+      throw error;
+    }
   }
 
   async checkAndGrantAchievements(userId: string, gameResult: 'win' | 'loss' | 'draw', gameData?: any): Promise<Achievement[]> {
