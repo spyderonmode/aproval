@@ -127,8 +127,8 @@ export function RoomManager({
   const handleLeaveRoom = () => {
     onRoomLeave();
     toast({
-      title: "Left Room",
-      description: "You have left the room",
+      title: t('leftRoom'),
+      description: t('youHaveLeftTheRoom'),
     });
   };
 
@@ -182,17 +182,17 @@ export function RoomManager({
             {/* Current Room */}
             <div className="p-3 bg-slate-700 rounded-lg">
               <div className="flex items-center justify-between mb-2">
-                <span className="font-medium">Current Room</span>
+                <span className="font-medium">{t('currentRoom')}</span>
                 <Badge variant="secondary" className={`${
                   currentRoom.status === 'playing' ? 'bg-orange-600' : 
                   currentRoom.status === 'waiting' ? 'bg-green-600' : 'bg-gray-600'
                 }`}>
-                  {currentRoom.status === 'playing' ? 'PLAYING' : 
-                   currentRoom.status === 'waiting' ? 'WAITING' : 'ACTIVE'}
+                  {currentRoom.status === 'playing' ? t('playing') : 
+                   currentRoom.status === 'waiting' ? t('waiting') : t('active')}
                 </Badge>
               </div>
               <div className="text-sm text-gray-400">
-                Room #{currentRoom.code}
+                {t('room')} #{currentRoom.code}
               </div>
               <div className="text-sm text-gray-400">
                 {currentRoom.name}
@@ -214,8 +214,8 @@ export function RoomManager({
                     className="flex-1 bg-primary hover:bg-primary/90"
                   >
                     <Play className="w-4 h-4 mr-2" />
-                    {startGameMutation.isPending ? 'Starting...' : 
-                     currentRoom.status === 'playing' ? 'Game Running' : 'Start Game'}
+                    {startGameMutation.isPending ? t('starting') : 
+                     currentRoom.status === 'playing' ? t('gameRunning') : t('startGame')}
                   </Button>
                 ) : (
                   <Button
@@ -223,7 +223,7 @@ export function RoomManager({
                     className="flex-1 bg-gray-600 cursor-not-allowed"
                   >
                     <Play className="w-4 h-4 mr-2" />
-                    {currentRoom.status === 'playing' ? 'Game Running' : 'Wait for Start'}
+                    {currentRoom.status === 'playing' ? t('gameRunning') : t('waitForStart')}
                   </Button>
                 )}
                 <Button
@@ -243,7 +243,7 @@ export function RoomManager({
                   className="w-full border-blue-500 text-blue-500 hover:bg-blue-500 hover:text-white"
                 >
                   <UserPlus className="w-4 h-4 mr-2" />
-                  Invite Friends
+                  {t('inviteFriends')}
                 </Button>
               )}
             </div>

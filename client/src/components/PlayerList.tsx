@@ -2,6 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useAuth } from "@/hooks/useAuth";
+import { useTranslation } from "@/contexts/LanguageContext";
 import { User, Eye } from "lucide-react";
 
 interface PlayerListProps {
@@ -10,6 +11,7 @@ interface PlayerListProps {
 
 export function PlayerList({ roomId }: PlayerListProps) {
   const { isAuthenticated } = useAuth();
+  const { t } = useTranslation();
   
   const { data: participants = [], isLoading } = useQuery({
     queryKey: ["/api/rooms", roomId, "participants"],
@@ -21,7 +23,7 @@ export function PlayerList({ roomId }: PlayerListProps) {
     return (
       <Card className="bg-slate-800 border-slate-700">
         <CardHeader>
-          <CardTitle className="text-lg">Players & Spectators</CardTitle>
+          <CardTitle className="text-lg">{t('playersAndSpectators')}</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="animate-pulse">
@@ -40,18 +42,18 @@ export function PlayerList({ roomId }: PlayerListProps) {
   return (
     <Card className="bg-slate-800 border-slate-700">
       <CardHeader>
-        <CardTitle className="text-lg">Players & Spectators</CardTitle>
+        <CardTitle className="text-lg">{t('playersAndSpectators')}</CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
         {/* Players */}
         <div>
           <h4 className="text-sm font-medium text-gray-400 mb-2">
-            Players ({players.length}/2)
+            {t('players')} ({players.length}/2)
           </h4>
           <div className="space-y-2">
             {players.length === 0 ? (
               <div className="text-sm text-gray-500 text-center py-4">
-                No players in room
+                {t('noPlayersInRoom')}
               </div>
             ) : (
               players.map((participant, index) => (
@@ -60,7 +62,7 @@ export function PlayerList({ roomId }: PlayerListProps) {
                     {participant.user.profileImageUrl ? (
                       <img 
                         src={participant.user.profileImageUrl} 
-                        alt="Player Avatar" 
+                        alt={t('playerAvatar')} 
                         className="w-8 h-8 rounded-full object-cover"
                       />
                     ) : (
@@ -69,7 +71,7 @@ export function PlayerList({ roomId }: PlayerListProps) {
                       </div>
                     )}
                     <span className="text-sm">
-                      {participant.user.firstName || participant.user.username || 'Anonymous'}
+                      {participant.user.firstName || participant.user.username || t('anonymous')}
                     </span>
                   </div>
                   <div className="flex items-center space-x-2">
@@ -89,12 +91,12 @@ export function PlayerList({ roomId }: PlayerListProps) {
         {/* Spectators */}
         <div>
           <h4 className="text-sm font-medium text-gray-400 mb-2">
-            Spectators ({spectators.length})
+            {t('spectators')} ({spectators.length})
           </h4>
           <div className="space-y-2">
             {spectators.length === 0 ? (
               <div className="text-sm text-gray-500 text-center py-2">
-                No spectators
+                {t('noSpectators')}
               </div>
             ) : (
               spectators.map((participant) => (
@@ -103,7 +105,7 @@ export function PlayerList({ roomId }: PlayerListProps) {
                     {participant.user.profileImageUrl ? (
                       <img 
                         src={participant.user.profileImageUrl} 
-                        alt="Spectator Avatar" 
+                        alt={t('spectatorAvatar')} 
                         className="w-8 h-8 rounded-full object-cover"
                       />
                     ) : (
@@ -112,12 +114,12 @@ export function PlayerList({ roomId }: PlayerListProps) {
                       </div>
                     )}
                     <span className="text-sm">
-                      {participant.user.firstName || participant.user.username || 'Anonymous'}
+                      {participant.user.firstName || participant.user.username || t('anonymous')}
                     </span>
                   </div>
                   <Badge variant="secondary" className="bg-gray-600 text-xs">
                     <Eye className="w-3 h-3 mr-1" />
-                    WATCHING
+                    {t('watching')}
                   </Badge>
                 </div>
               ))

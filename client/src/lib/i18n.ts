@@ -1800,6 +1800,160 @@ export const translations = {
   },
 
 
+  // Room Management
+  currentRoom: {
+    en: 'Current Room',
+    ar: 'الغرفة الحالية',
+    bn: 'বর্তমান রুম',
+    hi: 'वर्तमान कमरा',
+    es: 'Sala Actual',
+    id: 'Ruang Saat Ini'
+  },
+  waiting: {
+    en: 'WAITING',
+    ar: 'انتظار',
+    bn: 'অপেক্ষা',
+    hi: 'प्रतीक्षा',
+    es: 'ESPERANDO',
+    id: 'MENUNGGU'
+  },
+  playing: {
+    en: 'PLAYING',
+    ar: 'يلعب',
+    bn: 'খেলছে',
+    hi: 'खेल रहा',
+    es: 'JUGANDO',
+    id: 'BERMAIN'
+  },
+  active: {
+    en: 'ACTIVE',
+    ar: 'نشط',
+    bn: 'সক্রিয়',
+    hi: 'सक्रिय',
+    es: 'ACTIVO',
+    id: 'AKTIF'
+  },
+  room: {
+    en: 'Room',
+    ar: 'غرفة',
+    bn: 'রুম',
+    hi: 'कमरा',
+    es: 'Sala',
+    id: 'Ruang'
+  },
+  starting: {
+    en: 'Starting...',
+    ar: 'جاري البدء...',
+    bn: 'শুরু হচ্ছে...',
+    hi: 'शुरू हो रहा...',
+    es: 'Iniciando...',
+    id: 'Memulai...'
+  },
+  gameRunning: {
+    en: 'Game Running',
+    ar: 'اللعبة تعمل',
+    bn: 'গেম চলছে',
+    hi: 'गेम चल रहा',
+    es: 'Juego en Curso',
+    id: 'Permainan Berjalan'
+  },
+  waitForStart: {
+    en: 'Wait for Start',
+    ar: 'انتظار البداية',
+    bn: 'শুরুর জন্য অপেক্ষা',
+    hi: 'शुरुआत का इंतजार',
+    es: 'Esperar Inicio',
+    id: 'Tunggu Mulai'
+  },
+  leftRoom: {
+    en: 'Left Room',
+    ar: 'غادر الغرفة',
+    bn: 'রুম ছেড়েছেন',
+    hi: 'कमरा छोड़ दिया',
+    es: 'Salió de la Sala',
+    id: 'Keluar Ruang'
+  },
+  youHaveLeftTheRoom: {
+    en: 'You have left the room',
+    ar: 'لقد غادرت الغرفة',
+    bn: 'আপনি রুম ছেড়েছেন',
+    hi: 'आपने कमरा छोड़ दिया है',
+    es: 'Has salido de la sala',
+    id: 'Anda telah meninggalkan ruang'
+  },
+  playersAndSpectators: {
+    en: 'Players & Spectators',
+    ar: 'اللاعبون والمتفرجون',
+    bn: 'খেলোয়াড় এবং দর্শক',
+    hi: 'खिलाड़ी और दर्शक',
+    es: 'Jugadores y Espectadores',
+    id: 'Pemain & Penonton'
+  },
+  players: {
+    en: 'Players',
+    ar: 'اللاعبون',
+    bn: 'খেলোয়াড়',
+    hi: 'खिलाड़ी',
+    es: 'Jugadores',
+    id: 'Pemain'
+  },
+  spectators: {
+    en: 'Spectators',
+    ar: 'المتفرجون',
+    bn: 'দর্শক',
+    hi: 'दर्शक',
+    es: 'Espectadores',
+    id: 'Penonton'
+  },
+  noPlayersInRoom: {
+    en: 'No players in room',
+    ar: 'لا يوجد لاعبون في الغرفة',
+    bn: 'রুমে কোন খেলোয়াড় নেই',
+    hi: 'कमरे में कोई खिलाड़ी नहीं',
+    es: 'No hay jugadores en la sala',
+    id: 'Tidak ada pemain di ruang'
+  },
+  noSpectators: {
+    en: 'No spectators',
+    ar: 'لا يوجد متفرجون',
+    bn: 'কোন দর্শক নেই',
+    hi: 'कोई दर्शक नहीं',
+    es: 'No hay espectadores',
+    id: 'Tidak ada penonton'
+  },
+  playerAvatar: {
+    en: 'Player Avatar',
+    ar: 'صورة اللاعب',
+    bn: 'খেলোয়াড়ের ছবি',
+    hi: 'खिलाड़ी अवतार',
+    es: 'Avatar del Jugador',
+    id: 'Avatar Pemain'
+  },
+  spectatorAvatar: {
+    en: 'Spectator Avatar',
+    ar: 'صورة المتفرج',
+    bn: 'দর্শকের ছবি',
+    hi: 'दर्शक अवतार',
+    es: 'Avatar del Espectador',
+    id: 'Avatar Penonton'
+  },
+  anonymous: {
+    en: 'Anonymous',
+    ar: 'مجهول',
+    bn: 'অজ্ঞাত',
+    hi: 'गुमनाम',
+    es: 'Anónimo',
+    id: 'Anonim'
+  },
+  watching: {
+    en: 'WATCHING',
+    ar: 'يشاهد',
+    bn: 'দেখছে',
+    hi: 'देख रहा',
+    es: 'VIENDO',
+    id: 'MENONTON'
+  },
+
   // Invite Friends Modal
   inviteFriendsTo: {
     en: 'Invite Friends to',
