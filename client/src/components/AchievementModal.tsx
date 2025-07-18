@@ -41,6 +41,10 @@ export function AchievementModal({ open, onClose, userId }: AchievementModalProp
         return t('legend');
       case 'champion':
         return t('champion');
+      case 'grandmaster':
+        return t('grandmaster');
+      case 'ultimate_veteran':
+        return t('ultimateVeteran');
       default:
         return originalName;
     }
@@ -72,6 +76,10 @@ export function AchievementModal({ open, onClose, userId }: AchievementModalProp
         return t('achieveFiftyTotalWins');
       case 'champion':
         return t('achieveOneHundredTotalWins');
+      case 'grandmaster':
+        return t('achieveTwoHundredTotalWins');
+      case 'ultimate_veteran':
+        return t('playFiveHundredTotalGames');
       default:
         return originalDescription;
     }
@@ -87,7 +95,7 @@ export function AchievementModal({ open, onClose, userId }: AchievementModalProp
     {
       title: t('victoryAchievements'),
       icon: <Trophy className="w-5 h-5" />,
-      types: ['first_win', 'win_streak_5', 'win_streak_10', 'speed_demon', 'legend', 'champion']
+      types: ['first_win', 'win_streak_5', 'win_streak_10', 'speed_demon', 'legend', 'champion', 'grandmaster']
     },
     {
       title: t('skillAchievements'), 
@@ -97,7 +105,7 @@ export function AchievementModal({ open, onClose, userId }: AchievementModalProp
     {
       title: t('experienceAchievements'),
       icon: <Star className="w-5 h-5" />,
-      types: ['veteran_player']
+      types: ['veteran_player', 'ultimate_veteran']
     }
   ];
 
@@ -116,6 +124,8 @@ export function AchievementModal({ open, onClose, userId }: AchievementModalProp
     { type: 'comeback_king', name: t('comebackKing'), description: t('winAfterLosingFive'), icon: '👑' },
     { type: 'legend', name: t('legend'), description: t('achieveFiftyTotalWins'), icon: '🌟' },
     { type: 'champion', name: t('champion'), description: t('achieveOneHundredTotalWins'), icon: '👑' },
+    { type: 'grandmaster', name: t('grandmaster'), description: t('achieveTwoHundredTotalWins'), icon: '💎' },
+    { type: 'ultimate_veteran', name: t('ultimateVeteran'), description: t('playFiveHundredTotalGames'), icon: '🔥' },
   ];
 
   return (

@@ -44,6 +44,10 @@ export function AchievementBadge({ achievement, size = 'md' }: AchievementBadgeP
         return t('legend');
       case 'champion':
         return t('champion');
+      case 'grandmaster':
+        return t('grandmaster');
+      case 'ultimate_veteran':
+        return t('ultimateVeteran');
       default:
         return originalName;
     }
@@ -75,6 +79,10 @@ export function AchievementBadge({ achievement, size = 'md' }: AchievementBadgeP
         return t('achieveFiftyTotalWins');
       case 'champion':
         return t('achieveOneHundredTotalWins');
+      case 'grandmaster':
+        return t('achieveTwoHundredTotalWins');
+      case 'ultimate_veteran':
+        return t('playFiveHundredTotalGames');
       default:
         return originalDescription;
     }

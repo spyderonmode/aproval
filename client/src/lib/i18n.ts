@@ -639,9 +639,41 @@ export const translations = {
     en: 'Achieve 100 total wins to become an ultimate champion with cosmic border!',
     ar: 'حقق 100 فوز للحصول على لقب البطل النهائي مع حدود كونية!',
     bn: 'কসমিক বর্ডার সহ চূড়ান্ত চ্যাম্পিয়ন হতে ১০০টি জয় অর্জন করুন!',
-    hi: 'कॉस्मिक बॉर्डर के साथ अल्टिमेट चैंपियन बनने के लिए 100 जीत हासिल करें!',
+    hi: 'कॉस्मিक बॉर्डर के साथ अल्टिमेट चैंपियन बनने के लिए 100 जीत हासिल करें!',
     es: '¡Consigue 100 victorias para convertirte en el campeón definitivo con borde cósmico!',
     id: 'Raih 100 kemenangan untuk menjadi juara ultimate dengan border kosmik!'
+  },
+  grandmaster: {
+    en: 'Grandmaster',
+    ar: 'الأستاذ الأكبر',
+    bn: 'গ্র্যান্ডমাস্টার',
+    hi: 'ग्रैंडमास्टर',
+    es: 'Gran Maestro',
+    id: 'Grandmaster'
+  },
+  achieveTwoHundredTotalWins: {
+    en: 'Achieve 200 total wins',
+    ar: 'حقق 200 فوز إجمالي',
+    bn: '২০০টি মোট জয় অর্জন করুন',
+    hi: '200 कुल जीत हासिल करें',
+    es: 'Consigue 200 victorias totales',
+    id: 'Raih 200 kemenangan total'
+  },
+  ultimateVeteran: {
+    en: 'Ultimate Veteran',
+    ar: 'المحارب الأقصى',
+    bn: 'চূড়ান্ত ভেটেরান',
+    hi: 'अल्टिमेट वेटेरन',
+    es: 'Veterano Supremo',
+    id: 'Veteran Ultimate'
+  },
+  playFiveHundredTotalGames: {
+    en: 'Play 500 total games',
+    ar: 'العب 500 لعبة إجمالية',
+    bn: '৫০০টি মোট গেম খেলুন',
+    hi: '500 कुल गेम खेलें',
+    es: 'Juega 500 juegos totales',
+    id: 'Mainkan 500 permainan total'
   },
   
   // Quick Actions

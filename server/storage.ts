@@ -661,7 +661,9 @@ export class DatabaseStorage implements IStorage {
       if (userStats.wins >= 20) shouldHaveAchievements.push('speed_demon');
       if (userStats.wins >= 50) shouldHaveAchievements.push('legend');
       if (userStats.wins >= 100) shouldHaveAchievements.push('champion');
+      if (userStats.wins >= 200) shouldHaveAchievements.push('grandmaster');
       if (totalGames >= 100) shouldHaveAchievements.push('veteran_player');
+      if (totalGames >= 500) shouldHaveAchievements.push('ultimate_veteran');
       
       // Check for incorrect achievements
       const incorrectAchievements = existingAchievements.filter(
@@ -693,7 +695,9 @@ export class DatabaseStorage implements IStorage {
           'speed_demon': { name: 'speedDemon', description: 'winTwentyTotalGames', icon: '⚡' },
           'legend': { name: 'legend', description: 'achieveFiftyTotalWins', icon: '🌟' },
           'champion': { name: 'champion', description: 'achieveOneHundredTotalWins', icon: '👑' },
-          'veteran_player': { name: 'veteranPlayer', description: 'playOneHundredTotalGames', icon: '🎖️' }
+          'grandmaster': { name: 'grandmaster', description: 'achieveTwoHundredTotalWins', icon: '💎' },
+          'veteran_player': { name: 'veteranPlayer', description: 'playOneHundredTotalGames', icon: '🎖️' },
+          'ultimate_veteran': { name: 'ultimateVeteran', description: 'playFiveHundredTotalGames', icon: '🔥' }
         };
         
         for (const type of missingAchievements) {
@@ -784,6 +788,20 @@ export class DatabaseStorage implements IStorage {
           description: 'playOneHundredTotalGames',
           icon: '🎖️',
           condition: totalGames >= 100,
+        },
+        {
+          type: 'grandmaster',
+          name: 'grandmaster',
+          description: 'achieveTwoHundredTotalWins',
+          icon: '💎',
+          condition: userStats.wins >= 200,
+        },
+        {
+          type: 'ultimate_veteran',
+          name: 'ultimateVeteran',
+          description: 'playFiveHundredTotalGames',
+          icon: '🔥',
+          condition: totalGames >= 500,
         },
       ];
 
@@ -894,6 +912,20 @@ export class DatabaseStorage implements IStorage {
         description: 'achieveOneHundredTotalWins',
         icon: '👑',
         condition: gameResult === 'win' && userStats.wins === 100, // Only when exactly reaching 100 wins
+      },
+      {
+        type: 'grandmaster',
+        name: 'grandmaster',
+        description: 'achieveTwoHundredTotalWins',
+        icon: '💎',
+        condition: gameResult === 'win' && userStats.wins === 200, // Only when exactly reaching 200 wins
+      },
+      {
+        type: 'ultimate_veteran',
+        name: 'ultimateVeteran',
+        description: 'playFiveHundredTotalGames',
+        icon: '🔥',
+        condition: (userStats.wins + userStats.losses + userStats.draws) === 500, // Only when exactly reaching 500 games
       },
     ];
 
