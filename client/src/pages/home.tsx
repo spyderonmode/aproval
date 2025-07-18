@@ -122,6 +122,10 @@ export default function Home() {
             console.log('🎮 Player X ID:', lastMessage.game.playerXId);
             console.log('🎮 Player O ID:', lastMessage.game.playerOId);
             console.log('🎮 Current player:', lastMessage.game.currentPlayer);
+            
+            // Ensure game mode is set to online when receiving game_started
+            console.log('🎮 Setting selectedMode to online for game_started');
+            setSelectedMode('online');
             // Force complete state update to ensure game appears
             setCurrentGame(prevGame => {
               console.log('🎮 Game state update - prev:', prevGame, 'new:', lastMessage.game);
@@ -336,6 +340,10 @@ export default function Home() {
       console.log('🏠 Already in this room, skipping duplicate join');
       return;
     }
+    
+    // Automatically switch to online mode when joining a room
+    console.log('🏠 Switching to online mode for room join');
+    setSelectedMode('online');
     
     setCurrentRoom(room);
     joinRoom(room.id);
