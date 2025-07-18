@@ -20,6 +20,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Auth middleware
   setupAuth(app);
 
+  // Create room_invitations table if it doesn't exist
+  try {
+    await storage.createRoomInvitationsTable();
+    console.log('✅ Room invitations table ready');
+  } catch (error) {
+    console.log('ℹ️ Room invitations table already exists or error:', error.message);
+  }
+
   const connections = new Map<string, WSConnection>();
   const roomConnections = new Map<string, Set<string>>();
   const matchmakingQueue: string[] = []; // Queue of user IDs waiting for matches

@@ -108,6 +108,7 @@ export interface IStorage {
   }>;
 
   // Room Invitation operations
+  createRoomInvitationsTable(): Promise<void>;
   sendRoomInvitation(roomId: string, inviterId: string, invitedId: string): Promise<RoomInvitation>;
   getRoomInvitations(userId: string): Promise<(RoomInvitation & { room: Room; inviter: User; invited: User })[]>;
   respondToRoomInvitation(invitationId: string, response: 'accepted' | 'rejected'): Promise<void>;
@@ -115,6 +116,55 @@ export interface IStorage {
 }
 
 export class DatabaseStorage implements IStorage {
+  // Database initialization
+  async createRoomInvitationsTable(): Promise<void> {
+    // First create the table without foreign key constraints
+    await db.execute(sql`
+      CREATE TABLE IF NOT EXISTS room_invitations (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        room_id UUID NOT NULL,
+        inviter_id VARCHAR NOT NULL,
+        invited_id VARCHAR NOT NULL,
+        status VARCHAR(20) DEFAULT 'pending' CHECK (status IN ('pending', 'accepted', 'rejected', 'expired')),
+        invited_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        responded_at TIMESTAMP,
+        expires_at TIMESTAMP DEFAULT (CURRENT_TIMESTAMP + INTERVAL '24 hours'),
+        UNIQUE(room_id, invited_id)
+      )
+    `);
+    
+    // Add foreign key constraints if they don't exist
+    try {
+      await db.execute(sql`
+        ALTER TABLE room_invitations 
+        ADD CONSTRAINT room_invitations_room_id_fkey 
+        FOREIGN KEY (room_id) REFERENCES rooms(id) ON DELETE CASCADE
+      `);
+    } catch (e) {
+      // Constraint may already exist
+    }
+    
+    try {
+      await db.execute(sql`
+        ALTER TABLE room_invitations 
+        ADD CONSTRAINT room_invitations_inviter_id_fkey 
+        FOREIGN KEY (inviter_id) REFERENCES users(id) ON DELETE CASCADE
+      `);
+    } catch (e) {
+      // Constraint may already exist
+    }
+    
+    try {
+      await db.execute(sql`
+        ALTER TABLE room_invitations 
+        ADD CONSTRAINT room_invitations_invited_id_fkey 
+        FOREIGN KEY (invited_id) REFERENCES users(id) ON DELETE CASCADE
+      `);
+    } catch (e) {
+      // Constraint may already exist
+    }
+  }
+
   // User operations
   async getUser(id: string): Promise<User | undefined> {
     const [user] = await db.select().from(users).where(eq(users.id, id));
