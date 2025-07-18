@@ -23,7 +23,7 @@ import { InvitationPopup } from "@/components/InvitationPopup";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { GamepadIcon, LogOut, User, Zap, Loader2, Users, Settings, Menu, X, Palette, Trophy, UserPlus } from "lucide-react";
+import { GamepadIcon, LogOut, User, Zap, Loader2, Users, Settings, Menu, X, Palette, Trophy } from "lucide-react";
 import { logout } from "@/lib/firebase";
 
 export default function Home() {
@@ -707,28 +707,6 @@ export default function Home() {
                       </Button>
                     </div>
                     
-                    {/* Check Invitations */}
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center space-x-2">
-                        <UserPlus className="w-4 h-4 text-gray-400" />
-                        <span className="text-sm text-gray-300">Check Invitations</span>
-                      </div>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => {
-                          // Trigger invitation polling resume via custom event
-                          const event = new CustomEvent('resumeInvitationPolling');
-                          window.dispatchEvent(event);
-                          setShowHeaderSidebar(false);
-                        }}
-                        className="bg-slate-700 border-slate-600 text-white hover:bg-slate-600 text-xs"
-                      >
-                        <UserPlus className="h-3 w-3 mr-1" />
-                        Check
-                      </Button>
-                    </div>
-
                     {/* Friends */}
                     <div className="w-full">
                       <Friends />

@@ -15,16 +15,15 @@ interface InvitationPopupProps {
 
 export function InvitationPopup({ onRoomJoin }: InvitationPopupProps) {
   const [visibleInvitation, setVisibleInvitation] = useState<any>(null);
-  const [invitationPollingPaused, setInvitationPollingPaused] = useState(false);
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const { isAuthenticated } = useAuth();
 
-  // Fetch room invitations only when authenticated and not paused
+  // Fetch room invitations only when authenticated
   const { data: invitations = [] } = useQuery({
     queryKey: ['/api/room-invitations'],
-    refetchInterval: (isAuthenticated && !invitationPollingPaused) ? 3000 : false,
-    enabled: isAuthenticated && !invitationPollingPaused,
+    refetchInterval: isAuthenticated ? 3000 : false,
+    enabled: isAuthenticated,
   });
 
   // Show the first pending invitation as a popup
@@ -36,18 +35,6 @@ export function InvitationPopup({ onRoomJoin }: InvitationPopupProps) {
       setVisibleInvitation(null);
     }
   }, [invitations]);
-
-  // Listen for resume polling event
-  useEffect(() => {
-    const handleResumePolling = () => {
-      setInvitationPollingPaused(false);
-    };
-
-    window.addEventListener('resumeInvitationPolling', handleResumePolling);
-    return () => {
-      window.removeEventListener('resumeInvitationPolling', handleResumePolling);
-    };
-  }, []);
 
   const respondToInvitationMutation = useMutation({
     mutationFn: async (data: { invitationId: string, response: 'accepted' | 'rejected' }) => {
@@ -71,8 +58,6 @@ export function InvitationPopup({ onRoomJoin }: InvitationPopupProps) {
       }
       queryClient.invalidateQueries({ queryKey: ['/api/room-invitations'] });
       setVisibleInvitation(null);
-      // Pause invitation polling after user responds
-      setInvitationPollingPaused(true);
     },
     onError: (error) => {
       toast({
