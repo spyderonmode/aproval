@@ -1,11 +1,12 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Users, UserPlus, UserCheck, UserX, Trophy, TrendingUp, Calendar, Loader2 } from 'lucide-react';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { Users, UserPlus, UserCheck, UserX, Trophy, TrendingUp, Calendar, Loader2, MessageCircle, Send } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { apiRequest } from '@/lib/queryClient';
 import { User } from '@shared/schema';
@@ -34,6 +35,10 @@ export function Friends() {
   const [isOpen, setIsOpen] = useState(false);
   const [searchName, setSearchName] = useState('');
   const [selectedFriend, setSelectedFriend] = useState<User | null>(null);
+  const [selectedChatFriend, setSelectedChatFriend] = useState<User | null>(null);
+  const [chatMessage, setChatMessage] = useState("");
+  const [chatHistory, setChatHistory] = useState<Map<string, any[]>>(new Map());
+  const [unreadMessages, setUnreadMessages] = useState<Map<string, number>>(new Map());
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -125,6 +130,111 @@ export function Friends() {
   // State for search results
   const [searchResults, setSearchResults] = useState<User[]>([]);
   const [isSearching, setIsSearching] = useState(false);
+
+  // Chat functionality
+  const sendMessageMutation = useMutation({
+    mutationFn: async ({ targetUserId, message }: { targetUserId: string; message: string }) => {
+      return await apiRequest('POST', '/api/chat/send', { targetUserId, message });
+    },
+    onSuccess: (data, variables) => {
+      if (selectedChatFriend) {
+        // Add the sent message to chat history for this user
+        const newMessage = {
+          fromMe: true,
+          message: chatMessage,
+          timestamp: new Date().toLocaleTimeString(),
+          userId: variables.targetUserId
+        };
+        
+        setChatHistory(prev => {
+          const newHistory = new Map(prev);
+          const userMessages = newHistory.get(selectedChatFriend.id) || [];
+          newHistory.set(selectedChatFriend.id, [...userMessages, newMessage]);
+          return newHistory;
+        });
+      }
+      setChatMessage("");
+    },
+    onError: (error: any) => {
+      console.error('Chat message error:', error);
+      toast({
+        title: "Error",
+        description: error.message || "Failed to send message",
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Handle incoming chat messages
+  useEffect(() => {
+    const handleChatMessage = (event: CustomEvent) => {
+      const data = event.detail;
+      
+      if (data.type === 'chat_message_received') {
+        // Only handle messages if Friends modal is open and we're actively chatting
+        if (!isOpen || !selectedChatFriend) {
+          // Add to unread messages count
+          setUnreadMessages(prev => {
+            const newUnread = new Map(prev);
+            const currentUnread = newUnread.get(data.message.senderId) || 0;
+            newUnread.set(data.message.senderId, currentUnread + 1);
+            return newUnread;
+          });
+          return;
+        }
+        
+        // Only handle messages from the currently selected friend
+        if (selectedChatFriend.id !== data.message.senderId) return;
+        
+        const incomingMessage = {
+          fromMe: false,
+          message: data.message.message,
+          timestamp: new Date(data.message.timestamp).toLocaleTimeString(),
+          userId: data.message.senderId,
+          senderName: data.message.senderName
+        };
+        
+        // Add to chat history for this sender
+        setChatHistory(prev => {
+          const newHistory = new Map(prev);
+          const userMessages = newHistory.get(data.message.senderId) || [];
+          newHistory.set(data.message.senderId, [...userMessages, incomingMessage]);
+          return newHistory;
+        });
+      }
+    };
+
+    // Only listen for events when modal is open
+    if (isOpen) {
+      window.addEventListener('chat_message_received', handleChatMessage as EventListener);
+      
+      return () => {
+        window.removeEventListener('chat_message_received', handleChatMessage as EventListener);
+      };
+    }
+  }, [isOpen, selectedChatFriend]);
+
+  const handleSendMessage = () => {
+    if (!chatMessage.trim() || !selectedChatFriend) return;
+    
+    sendMessageMutation.mutate({ 
+      targetUserId: selectedChatFriend.id, 
+      message: chatMessage.trim() 
+    });
+  };
+
+  const startChatWithFriend = (friend: User) => {
+    setSelectedChatFriend(friend);
+    // Clear unread messages for this friend
+    setUnreadMessages(prev => {
+      const newUnread = new Map(prev);
+      newUnread.delete(friend.id);
+      return newUnread;
+    });
+  };
+
+  // Get current chat messages for selected friend
+  const currentChatMessages = selectedChatFriend ? chatHistory.get(selectedChatFriend.id) || [] : [];
 
   // Find users by name for friend requests
   const findUsersByName = async () => {
@@ -233,16 +343,35 @@ export function Friends() {
                         </div>
                       </div>
                     </div>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        removeFriend.mutate(friend.id);
-                      }}
-                    >
-                      <UserX className="h-4 w-4" />
-                    </Button>
+                    <div className="flex gap-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          startChatWithFriend(friend);
+                        }}
+                        className="relative"
+                      >
+                        <MessageCircle className="h-4 w-4 mr-1" />
+                        Chat
+                        {unreadMessages.get(friend.id) && (
+                          <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                            {unreadMessages.get(friend.id)}
+                          </span>
+                        )}
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          removeFriend.mutate(friend.id);
+                        }}
+                      >
+                        <UserX className="h-4 w-4" />
+                      </Button>
+                    </div>
                   </div>
                 ))}
               </div>
@@ -429,6 +558,77 @@ export function Friends() {
               ) : (
                 <div className="text-center py-8">Loading stats...</div>
               )}
+            </DialogContent>
+          </Dialog>
+        )}
+
+        {/* Chat modal */}
+        {selectedChatFriend && (
+          <Dialog open={!!selectedChatFriend} onOpenChange={() => setSelectedChatFriend(null)}>
+            <DialogContent className="sm:max-w-[500px]">
+              <DialogHeader>
+                <DialogTitle className="flex items-center gap-3">
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => setSelectedChatFriend(null)}
+                  >
+                    ← Back
+                  </Button>
+                  <div className="flex items-center gap-3">
+                    {selectedChatFriend.profileImageUrl ? (
+                      <img
+                        src={selectedChatFriend.profileImageUrl}
+                        alt={selectedChatFriend.displayName || `${selectedChatFriend.firstName} ${selectedChatFriend.lastName || ''}`.trim()}
+                        className="h-8 w-8 rounded-full object-cover"
+                      />
+                    ) : (
+                      <div className="h-8 w-8 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-medium">
+                        {selectedChatFriend.firstName?.[0] || '?'}{selectedChatFriend.lastName?.[0] || ''}
+                      </div>
+                    )}
+                    <span className="font-medium">
+                      Chat with {selectedChatFriend.displayName || `${selectedChatFriend.firstName} ${selectedChatFriend.lastName || ''}`.trim()}
+                    </span>
+                  </div>
+                </DialogTitle>
+              </DialogHeader>
+              
+              <div className="space-y-4">
+                <ScrollArea className="h-[300px] w-full">
+                  <div className="space-y-2">
+                    {currentChatMessages.length > 0 ? (
+                      currentChatMessages.map((msg, index) => (
+                        <div key={index} className={`p-2 rounded-lg ${msg.fromMe ? 'bg-blue-100 dark:bg-blue-900 ml-4' : 'bg-gray-100 dark:bg-gray-800 mr-4'}`}>
+                          <div className="text-sm font-medium">{msg.fromMe ? 'You' : selectedChatFriend.displayName || selectedChatFriend.firstName || selectedChatFriend.username}</div>
+                          <div className="text-sm">{msg.message}</div>
+                          <div className="text-xs text-muted-foreground mt-1">{msg.timestamp}</div>
+                        </div>
+                      ))
+                    ) : (
+                      <div className="text-center py-8 text-muted-foreground">
+                        No messages yet. Start a conversation with your friend!
+                      </div>
+                    )}
+                  </div>
+                </ScrollArea>
+                
+                <div className="flex gap-2">
+                  <Input
+                    value={chatMessage}
+                    onChange={(e) => setChatMessage(e.target.value)}
+                    placeholder="Type a message..."
+                    onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
+                  />
+                  <Button
+                    size="sm"
+                    onClick={handleSendMessage}
+                    disabled={!chatMessage.trim() || sendMessageMutation.isPending}
+                  >
+                    <Send className="h-4 w-4" />
+                  </Button>
+                </div>
+              </div>
             </DialogContent>
           </Dialog>
         )}
