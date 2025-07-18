@@ -1,6 +1,5 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { Home, RefreshCw } from "lucide-react";
-import { useClickAudio } from '@/hooks/useClickAudio';
 
 interface GameOverModalProps {
   open: boolean;
@@ -12,8 +11,6 @@ interface GameOverModalProps {
 }
 
 export function GameOverModal({ open, onClose, result, onPlayAgain, isCreatingGame = false, onMainMenu }: GameOverModalProps) {
-  const { playSound, initAudio } = useClickAudio();
-  
   // Simple safety checks
   if (!open) return null;
   if (!result) {
@@ -26,17 +23,6 @@ export function GameOverModal({ open, onClose, result, onPlayAgain, isCreatingGa
   // Super simple logic - no complex conditionals
   const isDraw = result.condition === 'draw';
   const winner = result.winner;
-  
-  // Auto-play celebration sound when someone wins
-  useEffect(() => {
-    if (open && !isDraw && winner) {
-      // Initialize audio and play after a short delay
-      setTimeout(() => {
-        initAudio();
-        playSound();
-      }, 500);
-    }
-  }, [open, isDraw, winner, initAudio, playSound]);
   
   // Get proper player names and info - only for online games
   const isOnlineGame = result.game?.gameMode === 'online';
