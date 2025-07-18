@@ -9,6 +9,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { useToast } from "@/hooks/use-toast";
 import { isUnauthorizedError } from "@/lib/authUtils";
 import { User, Upload, X } from "lucide-react";
+import { useTranslation } from "@/contexts/LanguageContext";
 
 interface ProfileManagerProps {
   user: any;
@@ -17,6 +18,7 @@ interface ProfileManagerProps {
 }
 
 export function ProfileManager({ user, open = false, onClose }: ProfileManagerProps) {
+  const { t } = useTranslation();
   const [displayName, setDisplayName] = useState(user?.displayName || user?.username || '');
   const [profilePicture, setProfilePicture] = useState(user?.profilePicture || '');
   const [isUploading, setIsUploading] = useState(false);
@@ -39,16 +41,16 @@ export function ProfileManager({ user, open = false, onClose }: ProfileManagerPr
       });
       
       toast({
-        title: "Profile updated",
-        description: "Your profile has been updated successfully",
+        title: t('profileUpdated'),
+        description: t('profileUpdatedSuccess'),
       });
       onClose?.();
     },
     onError: (error) => {
       if (isUnauthorizedError(error)) {
         toast({
-          title: "Unauthorized",
-          description: "You are logged out. Logging in again...",
+          title: t('unauthorized'),
+          description: t('loggedOutLoggingIn'),
           variant: "destructive",
         });
         setTimeout(() => {
@@ -57,7 +59,7 @@ export function ProfileManager({ user, open = false, onClose }: ProfileManagerPr
         return;
       }
       toast({
-        title: "Error",
+        title: t('error'),
         description: error.message,
         variant: "destructive",
       });
@@ -70,8 +72,8 @@ export function ProfileManager({ user, open = false, onClose }: ProfileManagerPr
 
     if (file.size > 5 * 1024 * 1024) { // 5MB limit
       toast({
-        title: "File too large",
-        description: "Please select an image under 5MB",
+        title: t('fileTooLarge'),
+        description: t('selectImageUnder5MB'),
         variant: "destructive",
       });
       return;
@@ -79,8 +81,8 @@ export function ProfileManager({ user, open = false, onClose }: ProfileManagerPr
 
     if (!file.type.startsWith('image/')) {
       toast({
-        title: "Invalid file type",
-        description: "Please select an image file",
+        title: t('invalidFileType'),
+        description: t('selectImageFile'),
         variant: "destructive",
       });
       return;
@@ -97,8 +99,8 @@ export function ProfileManager({ user, open = false, onClose }: ProfileManagerPr
     
     reader.onerror = () => {
       toast({
-        title: "Upload failed",
-        description: "Failed to read the image file",
+        title: t('uploadFailed'),
+        description: t('failedToReadImage'),
         variant: "destructive",
       });
       setIsUploading(false);
@@ -123,12 +125,12 @@ export function ProfileManager({ user, open = false, onClose }: ProfileManagerPr
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>Edit Profile</DialogTitle>
+          <DialogTitle>{t('editProfile')}</DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
           {/* Profile Picture Section */}
           <div className="space-y-2">
-            <Label>Profile Picture</Label>
+            <Label>{t('profilePicture')}</Label>
             <div className="flex items-center space-x-4">
               <div className="relative">
                 {profilePicture ? (
@@ -167,7 +169,7 @@ export function ProfileManager({ user, open = false, onClose }: ProfileManagerPr
                   disabled={isUploading}
                 >
                   <Upload className="w-4 h-4 mr-2" />
-                  {isUploading ? 'Uploading...' : 'Upload Photo'}
+                  {isUploading ? t('uploading') : t('uploadPhoto')}
                 </Button>
               </div>
             </div>
@@ -175,18 +177,18 @@ export function ProfileManager({ user, open = false, onClose }: ProfileManagerPr
 
           {/* Display Name */}
           <div className="space-y-2">
-            <Label htmlFor="displayName">Display Name</Label>
+            <Label htmlFor="displayName">{t('displayName')}</Label>
             <Input
               id="displayName"
               value={displayName}
               onChange={(e) => setDisplayName(e.target.value)}
-              placeholder="Enter your display name"
+              placeholder={t('enterDisplayName')}
             />
           </div>
 
           {/* Username (read-only) */}
           <div className="space-y-2">
-            <Label htmlFor="username">Username</Label>
+            <Label htmlFor="username">{t('username')}</Label>
             <Input
               id="username"
               value={user?.username || ''}
@@ -197,13 +199,13 @@ export function ProfileManager({ user, open = false, onClose }: ProfileManagerPr
 
           <div className="flex justify-end space-x-2 pt-4">
             <Button type="button" variant="outline" onClick={onClose}>
-              Cancel
+              {t('cancel')}
             </Button>
             <Button 
               type="submit" 
               disabled={updateProfileMutation.isPending}
             >
-              {updateProfileMutation.isPending ? 'Saving...' : 'Save Changes'}
+              {updateProfileMutation.isPending ? t('saving') : t('saveChanges')}
             </Button>
           </div>
         </form>

@@ -1759,6 +1759,168 @@ export const translations = {
     hi: 'चाल बनाने के लिए',
     es: 'para hacer un movimiento',
     id: 'untuk bergerak'
+  },
+
+  // Profile Manager Translations
+  editProfile: {
+    en: 'Edit Profile',
+    ar: 'تحرير الملف الشخصي',
+    bn: 'প্রোফাইল সম্পাদনা',
+    hi: 'प्रोफाइल संपादित करें',
+    es: 'Editar Perfil',
+    id: 'Edit Profil'
+  },
+  profilePicture: {
+    en: 'Profile Picture',
+    ar: 'صورة الملف الشخصي',
+    bn: 'প্রোফাইল ছবি',
+    hi: 'प्रोफाइल चित्र',
+    es: 'Foto de Perfil',
+    id: 'Foto Profil'
+  },
+  uploadPhoto: {
+    en: 'Upload Photo',
+    ar: 'رفع صورة',
+    bn: 'ছবি আপলোড',
+    hi: 'फोटो अपलोड करें',
+    es: 'Subir Foto',
+    id: 'Unggah Foto'
+  },
+  uploading: {
+    en: 'Uploading...',
+    ar: 'جاري الرفع...',
+    bn: 'আপলোড করা হচ্ছে...',
+    hi: 'अपलोड हो रहा है...',
+    es: 'Subiendo...',
+    id: 'Mengunggah...'
+  },
+  displayName: {
+    en: 'Display Name',
+    ar: 'اسم العرض',
+    bn: 'প্রদর্শন নাম',
+    hi: 'प्रदर्शन नाम',
+    es: 'Nombre para Mostrar',
+    id: 'Nama Tampilan'
+  },
+  enterDisplayName: {
+    en: 'Enter your display name',
+    ar: 'أدخل اسم العرض الخاص بك',
+    bn: 'আপনার প্রদর্শন নাম লিখুন',
+    hi: 'अपना प्रदर्शन नाम दर्ज करें',
+    es: 'Ingresa tu nombre para mostrar',
+    id: 'Masukkan nama tampilan Anda'
+  },
+  cancel: {
+    en: 'Cancel',
+    ar: 'إلغاء',
+    bn: 'বাতিল',
+    hi: 'रद्द करें',
+    es: 'Cancelar',
+    id: 'Batal'
+  },
+  saveChanges: {
+    en: 'Save Changes',
+    ar: 'حفظ التغييرات',
+    bn: 'পরিবর্তন সংরক্ষণ',
+    hi: 'परिवर्तन सेव करें',
+    es: 'Guardar Cambios',
+    id: 'Simpan Perubahan'
+  },
+  saving: {
+    en: 'Saving...',
+    ar: 'جاري الحفظ...',
+    bn: 'সংরক্ষণ করা হচ্ছে...',
+    hi: 'सेव हो रहा है...',
+    es: 'Guardando...',
+    id: 'Menyimpan...'
+  },
+  profileUpdated: {
+    en: 'Profile updated',
+    ar: 'تم تحديث الملف الشخصي',
+    bn: 'প্রোফাইল আপডেট হয়েছে',
+    hi: 'प्रोफाइल अपडेट हो गया',
+    es: 'Perfil actualizado',
+    id: 'Profil diperbarui'
+  },
+  profileUpdatedSuccess: {
+    en: 'Your profile has been updated successfully',
+    ar: 'تم تحديث ملفك الشخصي بنجاح',
+    bn: 'আপনার প্রোফাইল সফলভাবে আপডেট হয়েছে',
+    hi: 'आपकी प्रोफाइल सफलतापूर्वक अपडेट हो गई है',
+    es: 'Tu perfil ha sido actualizado exitosamente',
+    id: 'Profil Anda telah berhasil diperbarui'
+  },
+  unauthorized: {
+    en: 'Unauthorized',
+    ar: 'غير مخول',
+    bn: 'অনুমোদিত নয়',
+    hi: 'अनधिकृत',
+    es: 'No autorizado',
+    id: 'Tidak diizinkan'
+  },
+  loggedOutLoggingIn: {
+    en: 'You are logged out. Logging in again...',
+    ar: 'لقد تم تسجيل خروجك. جاري تسجيل الدخول مرة أخرى...',
+    bn: 'আপনি লগ আউট হয়েছেন। আবার লগ ইন করা হচ্ছে...',
+    hi: 'आप लॉग आउट हो गए हैं। फिर से लॉग इन कर रहे हैं...',
+    es: 'Has cerrado sesión. Iniciando sesión de nuevo...',
+    id: 'Anda telah logout. Sedang login lagi...'
+  },
+  error: {
+    en: 'Error',
+    ar: 'خطأ',
+    bn: 'ত্রুটি',
+    hi: 'त्रुटि',
+    es: 'Error',
+    id: 'Kesalahan'
+  },
+  fileTooLarge: {
+    en: 'File too large',
+    ar: 'الملف كبير جدا',
+    bn: 'ফাইল খুব বড়',
+    hi: 'फाइल बहुत बड़ी',
+    es: 'Archivo demasiado grande',
+    id: 'File terlalu besar'
+  },
+  selectImageUnder5MB: {
+    en: 'Please select an image under 5MB',
+    ar: 'يرجى اختيار صورة أقل من 5 ميجابايت',
+    bn: 'অনুগ্রহ করে ৫MB এর কম একটি ছবি নির্বাচন করুন',
+    hi: 'कृपया 5MB से कम का चित्र चुनें',
+    es: 'Por favor selecciona una imagen menor a 5MB',
+    id: 'Silakan pilih gambar di bawah 5MB'
+  },
+  invalidFileType: {
+    en: 'Invalid file type',
+    ar: 'نوع ملف غير صالح',
+    bn: 'অবৈধ ফাইল ধরন',
+    hi: 'अमान्य फाइल प्रकार',
+    es: 'Tipo de archivo inválido',
+    id: 'Jenis file tidak valid'
+  },
+  selectImageFile: {
+    en: 'Please select an image file',
+    ar: 'يرجى اختيار ملف صورة',
+    bn: 'অনুগ্রহ করে একটি ছবির ফাইল নির্বাচন করুন',
+    hi: 'कृपया एक छवि फाइल चुनें',
+    es: 'Por favor selecciona un archivo de imagen',
+    id: 'Silakan pilih file gambar'
+  },
+  uploadFailed: {
+    en: 'Upload failed',
+    ar: 'فشل في الرفع',
+    bn: 'আপলোড ব্যর্থ',
+    hi: 'अपलोड असफल',
+    es: 'Fallo al subir',
+    id: 'Gagal mengunggah'
+  },
+  failedToReadImage: {
+    en: 'Failed to read the image file',
+    ar: 'فشل في قراءة ملف الصورة',
+    bn: 'ছবির ফাইল পড়তে ব্যর্থ',
+    hi: 'छवि फाइल पढ़ने में असफल',
+    es: 'Falló al leer el archivo de imagen',
+    id: 'Gagal membaca file gambar'
   }
 } as const;
 
