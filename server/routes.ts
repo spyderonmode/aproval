@@ -28,6 +28,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
     console.log('ℹ️ Room invitations table already exists or error:', error.message);
   }
 
+  // Create messages table if it doesn't exist
+  try {
+    await storage.createMessagesTable();
+    console.log('✅ Messages table ready');
+  } catch (error) {
+    console.log('ℹ️ Messages table already exists or error:', error.message);
+  }
+
   const connections = new Map<string, WSConnection>();
   const roomConnections = new Map<string, Set<string>>();
   const matchmakingQueue: string[] = []; // Queue of user IDs waiting for matches
@@ -1713,6 +1721,98 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Message endpoints
+  app.post('/api/messages/send', requireAuth, async (req: any, res) => {
+    try {
+      const senderId = req.session.user.userId;
+      const { receiverId, message } = req.body;
+
+      // Validate input
+      if (!receiverId || !message || !message.trim()) {
+        return res.status(400).json({ message: "Receiver ID and message are required" });
+      }
+
+      // Check if the receiver exists
+      const receiver = await storage.getUser(receiverId);
+      if (!receiver) {
+        return res.status(404).json({ message: "Receiver not found" });
+      }
+
+      // Send the message
+      const newMessage = await storage.sendMessage(senderId, receiverId, message.trim());
+
+      // If receiver is online, deliver the message via WebSocket
+      const receiverConnections = Array.from(connections.entries())
+        .filter(([_, connection]) => connection.userId === receiverId && connection.ws.readyState === WebSocket.OPEN);
+
+      if (receiverConnections.length > 0) {
+        const sender = await storage.getUser(senderId);
+        receiverConnections.forEach(([_, connection]) => {
+          connection.ws.send(JSON.stringify({
+            type: 'chat_message_received',
+            messageId: newMessage.id,
+            senderId,
+            senderInfo: sender,
+            message: newMessage.message,
+            timestamp: newMessage.sentAt
+          }));
+        });
+        
+        // Mark as delivered if sent successfully
+        await storage.markMessageAsDelivered(newMessage.id);
+      }
+
+      res.json(newMessage);
+    } catch (error) {
+      console.error("Error sending message:", error);
+      res.status(500).json({ message: "Failed to send message" });
+    }
+  });
+
+  app.get('/api/messages/:friendId', requireAuth, async (req: any, res) => {
+    try {
+      const userId = req.session.user.userId;
+      const { friendId } = req.params;
+      const limit = parseInt(req.query.limit) || 50;
+
+      // Check if the friend exists
+      const friend = await storage.getUser(friendId);
+      if (!friend) {
+        return res.status(404).json({ message: "Friend not found" });
+      }
+
+      // Get messages between the two users
+      const messages = await storage.getMessages(userId, friendId, limit);
+
+      res.json(messages);
+    } catch (error) {
+      console.error("Error fetching messages:", error);
+      res.status(500).json({ message: "Failed to fetch messages" });
+    }
+  });
+
+  app.get('/api/messages/unread/count', requireAuth, async (req: any, res) => {
+    try {
+      const userId = req.session.user.userId;
+      const count = await storage.getUnreadMessageCount(userId);
+      res.json({ count });
+    } catch (error) {
+      console.error("Error fetching unread count:", error);
+      res.status(500).json({ message: "Failed to fetch unread count" });
+    }
+  });
+
+  app.post('/api/messages/:messageId/read', requireAuth, async (req: any, res) => {
+    try {
+      const { messageId } = req.params;
+      await storage.markMessageAsRead(messageId);
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Error marking message as read:", error);
+      res.status(500).json({ message: "Failed to mark message as read" });
+    }
+  });
+
   const httpServer = createServer(app);
 
   // WebSocket server
@@ -1748,6 +1848,31 @@ export async function registerRoutes(app: Express): Promise<Server> {
               displayName: userInfo?.displayName || userInfo?.firstName || 'Anonymous',
               lastSeen: new Date()
             });
+            
+            // Check for undelivered messages and send them
+            try {
+              const undeliveredMessages = await storage.getUndeliveredMessages(data.userId);
+              for (const message of undeliveredMessages) {
+                const sender = await storage.getUser(message.senderId);
+                ws.send(JSON.stringify({
+                  type: 'chat_message_received',
+                  messageId: message.id,
+                  senderId: message.senderId,
+                  senderInfo: sender,
+                  message: message.message,
+                  timestamp: message.sentAt
+                }));
+                
+                // Mark as delivered
+                await storage.markMessageAsDelivered(message.id);
+              }
+              
+              if (undeliveredMessages.length > 0) {
+                console.log(`📧 Delivered ${undeliveredMessages.length} offline messages to user ${data.userId}`);
+              }
+            } catch (error) {
+              console.error('Error delivering offline messages:', error);
+            }
             
             // Broadcast updated online count to all connected users
             const onlineCount = onlineUsers.size;

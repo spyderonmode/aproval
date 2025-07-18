@@ -156,6 +156,23 @@ export const roomInvitations = pgTable("room_invitations", {
   index("unique_room_invitation").on(table.roomId, table.invitedId),
 ]);
 
+export const messages = pgTable("messages", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  senderId: varchar("sender_id").references(() => users.id).notNull(),
+  receiverId: varchar("receiver_id").references(() => users.id).notNull(),
+  message: text("message").notNull(),
+  sentAt: timestamp("sent_at").defaultNow(),
+  deliveredAt: timestamp("delivered_at"), // when the message was delivered to the recipient
+  readAt: timestamp("read_at"), // when the message was read by the recipient
+  isDelivered: boolean("is_delivered").default(false),
+  isRead: boolean("is_read").default(false),
+}, (table) => [
+  // Index for efficient queries by sender/receiver
+  index("idx_messages_sender").on(table.senderId),
+  index("idx_messages_receiver").on(table.receiverId),
+  index("idx_messages_sent_at").on(table.sentAt),
+]);
+
 // Relations
 export const usersRelations = relations(users, ({ many }) => ({
   ownedRooms: many(rooms),
@@ -174,6 +191,8 @@ export const usersRelations = relations(users, ({ many }) => ({
   friendshipsAsUser2: many(friendships, { relationName: "user2" }),
   sentRoomInvitations: many(roomInvitations, { relationName: "inviter" }),
   receivedRoomInvitations: many(roomInvitations, { relationName: "invited" }),
+  sentMessages: many(messages, { relationName: "sender" }),
+  receivedMessages: many(messages, { relationName: "receiver" }),
 }));
 
 export const roomsRelations = relations(rooms, ({ one, many }) => ({
@@ -230,6 +249,11 @@ export const roomInvitationsRelations = relations(roomInvitations, ({ one }) => 
   invited: one(users, { fields: [roomInvitations.invitedId], references: [users.id], relationName: "invited" }),
 }));
 
+export const messagesRelations = relations(messages, ({ one }) => ({
+  sender: one(users, { fields: [messages.senderId], references: [users.id], relationName: "sender" }),
+  receiver: one(users, { fields: [messages.receiverId], references: [users.id], relationName: "receiver" }),
+}));
+
 // Schemas
 export const insertRoomSchema = createInsertSchema(rooms).pick({
   name: true,
@@ -240,6 +264,12 @@ export const insertRoomSchema = createInsertSchema(rooms).pick({
 export const insertRoomInvitationSchema = createInsertSchema(roomInvitations).pick({
   roomId: true,
   invitedId: true,
+});
+
+export const insertMessageSchema = createInsertSchema(messages).pick({
+  senderId: true,
+  receiverId: true,
+  message: true,
 });
 
 export const insertGameSchema = createInsertSchema(games).pick({
@@ -310,6 +340,8 @@ export type Room = typeof rooms.$inferSelect;
 export type Game = typeof games.$inferSelect;
 export type RoomInvitation = typeof roomInvitations.$inferSelect;
 export type InsertRoomInvitation = z.infer<typeof insertRoomInvitationSchema>;
+export type Message = typeof messages.$inferSelect;
+export type InsertMessage = z.infer<typeof insertMessageSchema>;
 export type Move = typeof moves.$inferSelect;
 export type RoomParticipant = typeof roomParticipants.$inferSelect;
 export type BlockedUser = typeof blockedUsers.$inferSelect;
