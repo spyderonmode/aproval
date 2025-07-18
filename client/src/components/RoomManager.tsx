@@ -149,18 +149,18 @@ export function RoomManager({
                 className="bg-slate-700 border-slate-600 text-white"
                 maxLength={8}
               />
-              <div className="flex space-x-2">
+              <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2">
                 <Button 
                   onClick={() => handleJoinRoom('player')}
                   disabled={!joinCode.trim() || joinRoomMutation.isPending}
-                  className="flex-1 bg-green-600 hover:bg-green-700"
+                  className="w-full sm:flex-1 bg-green-600 hover:bg-green-700"
                 >
                   {t('joinAsPlayer')}
                 </Button>
                 <Button 
                   onClick={() => handleJoinRoom('spectator')}
                   disabled={!joinCode.trim() || joinRoomMutation.isPending}
-                  className="flex-1 bg-blue-600 hover:bg-blue-700"
+                  className="w-full sm:flex-1 bg-blue-600 hover:bg-blue-700"
                 >
                   {t('joinAsSpectator')}
                 </Button>
