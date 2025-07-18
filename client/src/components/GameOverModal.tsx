@@ -31,8 +31,12 @@ export function GameOverModal({ open, onClose, result, onPlayAgain, isCreatingGa
   // Play celebration sound and show confetti for wins (not draws)
   React.useEffect(() => {
     if (open && !isDraw && winner) {
-      // Play celebration sound
-      playSound('celebrate');
+      // Play celebration sound with error handling
+      try {
+        playSound('celebrate');
+      } catch (error) {
+        console.warn('Celebration sound failed:', error);
+      }
     }
   }, [open, isDraw, winner, playSound]);
   
@@ -64,11 +68,13 @@ export function GameOverModal({ open, onClose, result, onPlayAgain, isCreatingGa
   return (
     <>
       {/* Confetti explosion for wins */}
-      <ConfettiExplosion 
-        active={open && !isDraw && winner !== null} 
-        duration={4000}
-        particleCount={150}
-      />
+      {typeof window !== 'undefined' && (
+        <ConfettiExplosion 
+          active={open && !isDraw && winner !== null} 
+          duration={4000}
+          particleCount={150}
+        />
+      )}
       
       <div 
         style={{

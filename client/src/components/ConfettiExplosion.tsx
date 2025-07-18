@@ -30,9 +30,13 @@ export function ConfettiExplosion({
   const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
-    if (active) {
+    if (active && typeof window !== 'undefined') {
       // Create confetti pieces
       const newParticles: ConfettiPiece[] = [];
+      
+      // Safe window dimensions with fallbacks
+      const centerX = window.innerWidth ? window.innerWidth / 2 : 400;
+      const centerY = window.innerHeight ? window.innerHeight / 2 : 300;
       
       for (let i = 0; i < particleCount; i++) {
         const angle = (Math.PI * 2 * i) / particleCount;
@@ -40,8 +44,8 @@ export function ConfettiExplosion({
         
         newParticles.push({
           id: i,
-          x: window.innerWidth / 2,
-          y: window.innerHeight / 2,
+          x: centerX,
+          y: centerY,
           vx: Math.cos(angle) * velocity,
           vy: Math.sin(angle) * velocity - Math.random() * 5,
           rotation: Math.random() * 360,
@@ -57,7 +61,11 @@ export function ConfettiExplosion({
       
       // Animation loop
       let animationId: number;
+      let isAnimating = true;
+      
       const animate = () => {
+        if (!isAnimating) return;
+        
         setParticles(prevParticles => 
           prevParticles.map(particle => ({
             ...particle,
@@ -76,14 +84,20 @@ export function ConfettiExplosion({
       
       // Clean up after duration
       const timeout = setTimeout(() => {
+        isAnimating = false;
         setIsVisible(false);
-        cancelAnimationFrame(animationId);
+        if (animationId) {
+          cancelAnimationFrame(animationId);
+        }
         setTimeout(() => setParticles([]), 1000);
       }, duration);
       
       return () => {
+        isAnimating = false;
         clearTimeout(timeout);
-        cancelAnimationFrame(animationId);
+        if (animationId) {
+          cancelAnimationFrame(animationId);
+        }
       };
     }
   }, [active, duration, particleCount, colors]);
