@@ -1065,6 +1065,7 @@ export default function Home() {
       <AchievementModal 
         open={showAchievements}
         onClose={() => setShowAchievements(false)}
+        user={user}
       />
 
       {/* Global Room Invitation Popup */}

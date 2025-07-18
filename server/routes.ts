@@ -114,6 +114,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Update selected achievement border
+  app.post('/api/achievement-border/select', requireAuth, async (req: any, res) => {
+    try {
+      const userId = req.session.user.userId;
+      const { achievementType } = req.body;
+      
+      // Validate that user has this achievement if not null
+      if (achievementType && !await storage.hasAchievement(userId, achievementType)) {
+        return res.status(400).json({ message: "You don't have this achievement" });
+      }
+      
+      await storage.updateSelectedAchievementBorder(userId, achievementType);
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Error updating selected achievement border:", error);
+      res.status(500).json({ message: "Failed to update selected achievement border" });
+    }
+  });
+
   // Theme routes
   app.get('/api/themes', requireAuth, async (req: any, res) => {
     try {

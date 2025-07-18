@@ -1,6 +1,7 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { AchievementBadge } from "./AchievementBadge";
+import { AchievementBorderSelector } from "./AchievementBorderSelector";
 import { useQuery } from "@tanstack/react-query";
 import { Loader2, Trophy, Target, Star } from "lucide-react";
 import { useTranslation } from "@/contexts/LanguageContext";
@@ -9,9 +10,10 @@ interface AchievementModalProps {
   open: boolean;
   onClose: () => void;
   userId?: string;
+  user?: any;
 }
 
-export function AchievementModal({ open, onClose, userId }: AchievementModalProps) {
+export function AchievementModal({ open, onClose, userId, user }: AchievementModalProps) {
   const { t } = useTranslation();
   
   // Helper function to get translated achievement name and description
@@ -136,6 +138,12 @@ export function AchievementModal({ open, onClose, userId }: AchievementModalProp
             <Trophy className="w-5 h-5 sm:w-6 sm:h-6" />
             {userId ? t('playerAchievements') : t('yourAchievements')}
           </DialogTitle>
+          {/* Only show border selector for current user (not viewing other players) */}
+          {!userId && user && (
+            <div className="pt-3 border-t">
+              <AchievementBorderSelector user={user} />
+            </div>
+          )}
         </DialogHeader>
 
         {isLoading ? (

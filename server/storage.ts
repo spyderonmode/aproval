@@ -114,6 +114,9 @@ export interface IStorage {
   getRoomInvitations(userId: string): Promise<(RoomInvitation & { room: Room; inviter: User; invited: User })[]>;
   respondToRoomInvitation(invitationId: string, response: 'accepted' | 'rejected'): Promise<void>;
   expireOldInvitations(): Promise<void>;
+
+  // Achievement Border Selection
+  updateSelectedAchievementBorder(userId: string, achievementType: string | null): Promise<void>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -1546,6 +1549,21 @@ export class DatabaseStorage implements IStorage {
         );
     } catch (error) {
       console.error('Error expiring old invitations:', error);
+    }
+  }
+
+  async updateSelectedAchievementBorder(userId: string, achievementType: string | null): Promise<void> {
+    try {
+      await db
+        .update(users)
+        .set({ 
+          selectedAchievementBorder: achievementType,
+          updatedAt: new Date()
+        })
+        .where(eq(users.id, userId));
+    } catch (error) {
+      console.error('Error updating selected achievement border:', error);
+      throw error;
     }
   }
 }
