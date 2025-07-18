@@ -68,55 +68,7 @@ export function GameOverModal({ open, onClose, result, onPlayAgain, isCreatingGa
   const winnerInfo = isOnlineGame ? (winner === 'X' ? result.playerXInfo : result.playerOInfo) : null;
 
   return (
-    <>
-      {/* Simple confetti effect for wins */}
-      {open && !isDraw && winner && (
-        <div
-          style={{
-            position: 'fixed',
-            top: 0,
-            left: 0,
-            width: '100%',
-            height: '100%',
-            pointerEvents: 'none',
-            zIndex: 10001,
-            overflow: 'hidden'
-          }}
-        >
-          {Array.from({ length: 30 }, (_, i) => (
-            <div
-              key={i}
-              style={{
-                position: 'absolute',
-                left: `${Math.random() * 100}%`,
-                top: '-10px',
-                width: '8px',
-                height: '8px',
-                backgroundColor: ['#ff6b6b', '#4ecdc4', '#45b7d1', '#f9ca24', '#f0932b', '#6c5ce7'][Math.floor(Math.random() * 6)],
-                borderRadius: '50%',
-                animation: `confetti-fall ${2 + Math.random() * 3}s ease-out forwards`,
-                animationDelay: `${Math.random() * 2}s`
-              }}
-            />
-          ))}
-          <style dangerouslySetInnerHTML={{
-            __html: `
-              @keyframes confetti-fall {
-                0% {
-                  transform: translateY(-100vh) rotate(0deg);
-                  opacity: 1;
-                }
-                100% {
-                  transform: translateY(100vh) rotate(720deg);
-                  opacity: 0;
-                }
-              }
-            `
-          }} />
-        </div>
-      )}
-      
-      <div 
+    <div 
         style={{
           position: 'fixed',
           top: 0,
@@ -146,6 +98,12 @@ export function GameOverModal({ open, onClose, result, onPlayAgain, isCreatingGa
         }}
         onClick={(e) => e.stopPropagation()}
       >
+        <style>{`
+          @keyframes winner-pulse {
+            0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(251, 191, 36, 0.7); }
+            100% { transform: scale(1.1); box-shadow: 0 0 0 10px rgba(251, 191, 36, 0); }
+          }
+        `}</style>
         <h2 style={{ fontSize: '24px', fontWeight: 'bold', marginBottom: '24px', color: 'white' }}>
           Game Over!
         </h2>
@@ -183,7 +141,8 @@ export function GameOverModal({ open, onClose, result, onPlayAgain, isCreatingGa
                   alignItems: 'center',
                   justifyContent: 'center',
                   overflow: 'hidden',
-                  border: '4px solid #fbbf24'
+                  border: '4px solid #fbbf24',
+                  animation: 'winner-pulse 1s ease-in-out infinite alternate'
                 }}
               >
                 {isOnlineGame && (winnerInfo?.profilePicture || winnerInfo?.profileImageUrl) ? (
@@ -265,6 +224,5 @@ export function GameOverModal({ open, onClose, result, onPlayAgain, isCreatingGa
         </div>
       </div>
     </div>
-    </>
   );
 }
