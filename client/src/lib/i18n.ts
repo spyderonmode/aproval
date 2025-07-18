@@ -610,14 +610,7 @@ export const translations = {
     es: 'Tus Logros',
     id: 'Pencapaian Anda'
   },
-  firstVictory: {
-    en: 'First Victory',
-    ar: 'أول انتصار',
-    bn: 'প্রথম বিজয়',
-    hi: 'पहली विजय',
-    es: 'Primera Victoria',
-    id: 'Kemenangan Pertama'
-  },
+
   winYourFirstGame: {
     en: 'Win your first game',
     ar: 'اربح لعبتك الأولى',

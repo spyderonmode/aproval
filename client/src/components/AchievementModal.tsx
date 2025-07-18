@@ -14,15 +14,64 @@ interface AchievementModalProps {
 export function AchievementModal({ open, onClose, userId }: AchievementModalProps) {
   const { t } = useTranslation();
   
-  // Helper function to get translated achievement description
-  const getTranslatedDescription = (achievementType: string, originalDescription: string): string => {
+  // Helper function to get translated achievement name and description
+  const getTranslatedName = (achievementType: string, originalName: string): string => {
+    // Check if the original name is a translation key
+    if (originalName && !originalName.includes(' ')) {
+      return t(originalName);
+    }
+    
+    // Fallback for existing achievement names
     switch (achievementType) {
+      case 'first_win':
+        return t('firstVictoryTitle');
+      case 'win_streak_5':
+        return t('winStreakMaster');
+      case 'win_streak_10':
+        return t('unstoppable');
+      case 'master_of_diagonals':
+        return t('masterOfDiagonals');
       case 'speed_demon':
-        return t('speedDemonDesc');
+        return t('speedDemon');
+      case 'veteran_player':
+        return t('veteranPlayer');
+      case 'comeback_king':
+        return t('comebackKing');
       case 'legend':
-        return t('legendDesc');
+        return t('legend');
       case 'champion':
-        return t('championDesc');
+        return t('champion');
+      default:
+        return originalName;
+    }
+  };
+
+  const getTranslatedDescription = (achievementType: string, originalDescription: string): string => {
+    // Check if the original description is a translation key
+    if (originalDescription && !originalDescription.includes(' ')) {
+      return t(originalDescription);
+    }
+    
+    // Fallback for existing achievement descriptions
+    switch (achievementType) {
+      case 'first_win':
+        return t('winYourVeryFirstGame');
+      case 'win_streak_5':
+        return t('winFiveConsecutiveGames');
+      case 'win_streak_10':
+        return t('winTenConsecutiveGames');
+      case 'master_of_diagonals':
+        return t('winThreeGamesDiagonally');
+      case 'speed_demon':
+        return t('winTwentyTotalGames');
+      case 'veteran_player':
+        return t('playOneHundredTotalGames');
+      case 'comeback_king':
+        return t('winAfterLosingFive');
+      case 'legend':
+        return t('achieveFiftyTotalWins');
+      case 'champion':
+        return t('achieveOneHundredTotalWins');
       default:
         return originalDescription;
     }
@@ -115,7 +164,7 @@ export function AchievementModal({ open, onClose, userId }: AchievementModalProp
                               </div>
                               <div className="flex-1 min-w-0">
                                 <div className="font-semibold text-amber-800 dark:text-amber-200 text-sm">
-                                  {earned.achievementName}
+                                  {getTranslatedName(earned.achievementType, earned.achievementName)}
                                 </div>
                                 <div className="text-xs text-amber-700 dark:text-amber-300 mt-1 leading-tight">
                                   {getTranslatedDescription(earned.achievementType, earned.description)}
