@@ -622,9 +622,33 @@ export const translations = {
     en: 'Win your first game',
     ar: 'اربح لعبتك الأولى',
     bn: 'আপনার প্রথম গেম জিতুন',
-    hi: 'अपना पहला गेम জীতें',
+    hi: 'अपना पहला गেม জীতें',
     es: 'Gana tu primer juego',
     id: 'Menangkan permainan pertama Anda'
+  },
+  speedDemonDesc: {
+    en: 'Win 20 total games to unlock the Christmas theme - keep playing!',
+    ar: 'اربح 20 لعبة للحصول على مظهر عيد الميلاد - استمر في اللعب!',
+    bn: '২০টি গেম জিতুন ক্রিসমাস থিম আনলক করতে - খেলা চালিয়ে যান!',
+    hi: 'क्रिसमस थीम अनलॉक करने के लिए 20 गेम जीतें - खेलते रहें!',
+    es: 'Gana 20 juegos para desbloquear el tema navideño - ¡sigue jugando!',
+    id: 'Menangkan 20 permainan untuk membuka tema Natal - terus bermain!'
+  },
+  legendDesc: {
+    en: 'Achieve 50 total wins to become a true legend with animated border!',
+    ar: 'حقق 50 فوزاً للحصول على لقب أسطورة مع حدود متحركة!',
+    bn: 'অ্যানিমেটেড বর্ডার সহ প্রকৃত কিংবদন্তি হতে ৫০টি জয় অর্জন করুন!',
+    hi: 'एनिमेटेड बॉर्डर के साथ सच्चे लीजेंड बनने के लिए 50 जीत हासिल करें!',
+    es: '¡Consigue 50 victorias para convertirte en una verdadera leyenda con borde animado!',
+    id: 'Raih 50 kemenangan untuk menjadi legenda sejati dengan border animasi!'
+  },
+  championDesc: {
+    en: 'Achieve 100 total wins to become an ultimate champion with cosmic border!',
+    ar: 'حقق 100 فوز للحصول على لقب البطل النهائي مع حدود كونية!',
+    bn: 'কসমিক বর্ডার সহ চূড়ান্ত চ্যাম্পিয়ন হতে ১০০টি জয় অর্জন করুন!',
+    hi: 'कॉस्मिक बॉर्डर के साथ अल्टिमेट चैंपियन बनने के लिए 100 जीत हासिल करें!',
+    es: '¡Consigue 100 victorias para convertirte en el campeón definitivo con borde cósmico!',
+    id: 'Raih 100 kemenangan untuk menjadi juara ultimate dengan border kosmik!'
   },
   
   // Quick Actions
@@ -1350,6 +1374,90 @@ export const translations = {
     hi: 'लगभग हो गया...',
     es: 'Casi llegamos...',
     id: 'Hampir sampai...'
+  },
+
+  // Game Over Modal
+  gameOver: {
+    en: 'Game Over!',
+    ar: 'انتهت اللعبة!',
+    bn: 'খেলা শেষ!',
+    hi: 'खेल समाप्त!',
+    es: '¡Juego Terminado!',
+    id: 'Permainan Selesai!'
+  },
+  playerWins: {
+    en: 'Player {player} Wins!',
+    ar: 'اللاعب {player} يفوز!',
+    bn: 'খেলোয়াড় {player} জিতেছে!',
+    hi: 'खिलाड़ी {player} जीता!',
+    es: '¡Jugador {player} Gana!',
+    id: 'Pemain {player} Menang!'
+  },
+  diagonalLine: {
+    en: 'Diagonal line',
+    ar: 'خط قطري',
+    bn: 'কর্ণ রেখা',
+    hi: 'विकर्ण रेखा',
+    es: 'Línea diagonal',
+    id: 'Garis diagonal'
+  },
+  mainMenu: {
+    en: 'Main Menu',
+    ar: 'القائمة الرئيسية',
+    bn: 'প্রধান মেনু',
+    hi: 'मुख्य मेनू',
+    es: 'Menú Principal',
+    id: 'Menu Utama'
+  },
+  playAgain: {
+    en: 'Play Again',
+    ar: 'العب مرة أخرى',
+    bn: 'আবার খেলুন',
+    hi: 'फिर से खेलें',
+    es: 'Jugar de Nuevo',
+    id: 'Main Lagi'
+  },
+  itsADraw: {
+    en: "It's a Draw!",
+    ar: 'إنه تعادل!',
+    bn: 'এটি একটি ড্র!',
+    hi: 'यह एक ड्रॉ है!',
+    es: '¡Es un Empate!',
+    id: 'Ini Seri!'
+  },
+  horizontalLine: {
+    en: 'Horizontal line',
+    ar: 'خط أفقي',
+    bn: 'অনুভূমিক রেখা',
+    hi: 'क्षैतिज रेखा',
+    es: 'Línea horizontal',
+    id: 'Garis horizontal'
+  },
+
+  // Achievement Descriptions
+  speedDemonDesc: {
+    en: 'Win 20 total games to unlock the Christmas theme - keep playing!',
+    ar: 'اربح 20 لعبة إجمالية لفتح موضوع عيد الميلاد - استمر في اللعب!',
+    bn: 'ক্রিসমাস থিম আনলক করতে মোট 20টি গেম জিতুন - খেলা চালিয়ে যান!',
+    hi: 'क्रिसमस थीम अनलॉक करने के लिए कुल 20 गेम जीतें - खेलते रहें!',
+    es: '¡Gana 20 juegos en total para desbloquear el tema navideño - sigue jugando!',
+    id: 'Menangkan total 20 permainan untuk membuka tema Natal - terus bermain!'
+  },
+  legendDesc: {
+    en: 'Achieve 50 total wins to become a true legend with animated border!',
+    ar: 'حقق 50 فوزًا إجماليًا لتصبح أسطورة حقيقية مع حدود متحركة!',
+    bn: 'অ্যানিমেটেড বর্ডার সহ সত্যিকারের কিংবদন্তি হতে মোট 50টি জয় অর্জন করুন!',
+    hi: 'एनिमेटेड बॉर्डर के साथ सच्चे लीজेंड बनने के लिए कुल 50 जीत हासिल करें!',
+    es: '¡Consigue 50 victorias totales para convertirte en una verdadera leyenda con borde animado!',
+    id: 'Raih total 50 kemenangan untuk menjadi legenda sejati dengan border animasi!'
+  },
+  championDesc: {
+    en: 'Achieve 100 total wins to become an ultimate champion with cosmic border!',
+    ar: 'حقق 100 فوزًا إجماليًا لتصبح بطلاً نهائيًا مع حدود كونية!',
+    bn: 'কসমিক বর্ডার সহ চূড়ান্ত চ্যাম্পিয়ন হতে মোট 100টি জয় অর্জন করুন!',
+    hi: 'कॉस्मिक बॉर्डर के साथ अंतिम चैंपियन बनने के लिए कुल 100 जीत हासिल करें!',
+    es: '¡Consigue 100 victorias totales para convertirte en un campeón definitivo con borde cósmico!',
+    id: 'Raih total 100 kemenangan untuk menjadi juara utama dengan border kosmik!'
   }
 } as const;
 

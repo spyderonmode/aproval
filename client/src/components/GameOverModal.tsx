@@ -1,5 +1,6 @@
 import React from "react";
 import { Home, RefreshCw } from "lucide-react";
+import { useTranslation } from '../contexts/LanguageContext';
 
 interface GameOverModalProps {
   open: boolean;
@@ -11,6 +12,8 @@ interface GameOverModalProps {
 }
 
 export function GameOverModal({ open, onClose, result, onPlayAgain, isCreatingGame = false, onMainMenu }: GameOverModalProps) {
+  const { t } = useTranslation();
+  
   // Simple safety checks
   if (!open) return null;
   if (!result) {
@@ -150,7 +153,7 @@ export function GameOverModal({ open, onClose, result, onPlayAgain, isCreatingGa
           }
         `}</style>
         <h2 style={{ fontSize: '24px', fontWeight: 'bold', marginBottom: '24px', color: 'white' }}>
-          Game Over!
+          {t('gameOver')}
         </h2>
         
         <div style={{ marginBottom: '24px' }}>
@@ -170,7 +173,7 @@ export function GameOverModal({ open, onClose, result, onPlayAgain, isCreatingGa
               >
                 <span style={{ fontSize: '32px' }}>🤝</span>
               </div>
-              <p style={{ fontSize: '20px', color: '#d1d5db' }}>It's a Draw!</p>
+              <p style={{ fontSize: '20px', color: '#d1d5db' }}>{t('itsADraw')}</p>
             </div>
           ) : (
             <div>
@@ -208,11 +211,11 @@ export function GameOverModal({ open, onClose, result, onPlayAgain, isCreatingGa
               </div>
               
               <p style={{ fontSize: '20px', color: 'white', marginBottom: '16px' }}>
-                {winnerName} Wins!
+                {t('playerWins').replace('{player}', winnerName)}
               </p>
               
               <p style={{ fontSize: '14px', color: '#9ca3af' }}>
-                {result.condition === 'horizontal' ? 'Horizontal line' : 'Diagonal line'}
+                {result.condition === 'horizontal' ? t('horizontalLine') : t('diagonalLine')}
               </p>
             </div>
           )}
@@ -241,7 +244,7 @@ export function GameOverModal({ open, onClose, result, onPlayAgain, isCreatingGa
             }}
           >
             <Home style={{ width: '16px', height: '16px' }} />
-            Main Menu
+            {t('mainMenu')}
           </button>
           <button
             onClick={() => {
@@ -264,7 +267,7 @@ export function GameOverModal({ open, onClose, result, onPlayAgain, isCreatingGa
             }}
           >
             <RefreshCw style={{ width: '16px', height: '16px' }} />
-            Play Again
+            {t('playAgain')}
           </button>
         </div>
       </div>

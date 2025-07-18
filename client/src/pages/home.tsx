@@ -980,7 +980,7 @@ export default function Home() {
             {/* Game Statistics */}
             <Card className="bg-slate-800 border-slate-700">
               <CardHeader>
-                <CardTitle className="text-lg">Game Stats</CardTitle>
+                <CardTitle className="text-lg">{t('gameStats')}</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="grid grid-cols-2 gap-4 text-center">
@@ -988,25 +988,25 @@ export default function Home() {
                     <div className="text-2xl font-bold text-blue-500">
                       {userStats?.wins || 0}
                     </div>
-                    <div className="text-xs text-gray-400">Wins</div>
+                    <div className="text-xs text-gray-400">{t('wins')}</div>
                   </div>
                   <div className="p-3 bg-slate-700 rounded-lg">
                     <div className="text-2xl font-bold text-red-500">
                       {userStats?.losses || 0}
                     </div>
-                    <div className="text-xs text-gray-400">Losses</div>
+                    <div className="text-xs text-gray-400">{t('losses')}</div>
                   </div>
                   <div className="p-3 bg-slate-700 rounded-lg">
                     <div className="text-2xl font-bold text-yellow-500">
                       {userStats?.draws || 0}
                     </div>
-                    <div className="text-xs text-gray-400">Draws</div>
+                    <div className="text-xs text-gray-400">{t('draws')}</div>
                   </div>
                   <div className="p-3 bg-slate-700 rounded-lg">
                     <div className="text-2xl font-bold text-gray-400">
                       {(userStats?.wins || 0) + (userStats?.losses || 0) + (userStats?.draws || 0)}
                     </div>
-                    <div className="text-xs text-gray-400">Total</div>
+                    <div className="text-xs text-gray-400">{t('total')}</div>
                   </div>
                 </div>
               </CardContent>

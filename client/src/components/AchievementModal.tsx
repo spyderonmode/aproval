@@ -13,6 +13,20 @@ interface AchievementModalProps {
 
 export function AchievementModal({ open, onClose, userId }: AchievementModalProps) {
   const { t } = useTranslation();
+  
+  // Helper function to get translated achievement description
+  const getTranslatedDescription = (achievementType: string, originalDescription: string): string => {
+    switch (achievementType) {
+      case 'speed_demon':
+        return t('speedDemonDesc');
+      case 'legend':
+        return t('legendDesc');
+      case 'champion':
+        return t('championDesc');
+      default:
+        return originalDescription;
+    }
+  };
   const { data: achievements, isLoading } = useQuery({
     queryKey: userId ? ['/api/users', userId, 'achievements'] : ['/api/achievements'],
     enabled: open,
@@ -104,7 +118,7 @@ export function AchievementModal({ open, onClose, userId }: AchievementModalProp
                                   {earned.achievementName}
                                 </div>
                                 <div className="text-xs text-amber-700 dark:text-amber-300 mt-1 leading-tight">
-                                  {earned.description}
+                                  {getTranslatedDescription(earned.achievementType, earned.description)}
                                 </div>
                               </div>
                             </div>
@@ -127,7 +141,7 @@ export function AchievementModal({ open, onClose, userId }: AchievementModalProp
                                   {possible.name}
                                 </div>
                                 <div className="text-xs text-gray-500 dark:text-gray-500 mt-1 leading-tight">
-                                  {possible.description}
+                                  {getTranslatedDescription(possible.type, possible.description)}
                                 </div>
                               </div>
                             </div>

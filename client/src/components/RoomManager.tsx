@@ -135,7 +135,7 @@ export function RoomManager({
   return (
     <Card className="bg-slate-800 border-slate-700">
       <CardHeader>
-        <CardTitle className="text-lg">Room Management</CardTitle>
+        <CardTitle className="text-lg">{t('roomManagement')}</CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
         {!currentRoom ? (
@@ -143,7 +143,7 @@ export function RoomManager({
             {/* Join Room */}
             <div className="space-y-2">
               <Input
-                placeholder="Room code"
+                placeholder={t('roomCode')}
                 value={joinCode}
                 onChange={(e) => setJoinCode(e.target.value.toUpperCase())}
                 className="bg-slate-700 border-slate-600 text-white"
@@ -155,14 +155,14 @@ export function RoomManager({
                   disabled={!joinCode.trim() || joinRoomMutation.isPending}
                   className="flex-1 bg-green-600 hover:bg-green-700"
                 >
-                  Join as Player
+                  {t('joinAsPlayer')}
                 </Button>
                 <Button 
                   onClick={() => handleJoinRoom('spectator')}
                   disabled={!joinCode.trim() || joinRoomMutation.isPending}
                   className="flex-1 bg-blue-600 hover:bg-blue-700"
                 >
-                  Join as Spectator
+                  {t('joinAsSpectator')}
                 </Button>
               </div>
             </div>
@@ -174,7 +174,7 @@ export function RoomManager({
               disabled={joinRoomMutation.isPending}
             >
               <Plus className="w-4 h-4 mr-2" />
-              Create New Room
+              {t('createNewRoom')}
             </Button>
           </>
         ) : (
