@@ -690,6 +690,13 @@ export class DatabaseStorage implements IStorage {
         icon: '🌟',
         condition: gameResult === 'win' && userStats.wins >= 50,
       },
+      {
+        type: 'champion',
+        name: 'Champion',
+        description: 'Achieve 100 total wins to become an ultimate champion with cosmic border!',
+        icon: '👑',
+        condition: gameResult === 'win' && userStats.wins >= 100,
+      },
     ];
 
     // Check each achievement condition
