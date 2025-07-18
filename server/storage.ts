@@ -10,7 +10,6 @@ import {
   friendRequests,
   friendships,
   roomInvitations,
-  messages,
   type User,
   type UpsertUser,
   type Room,
@@ -23,7 +22,6 @@ import {
   type FriendRequest,
   type Friendship,
   type RoomInvitation,
-  type Message,
   type InsertRoom,
   type InsertGame,
   type InsertMove,
@@ -34,7 +32,6 @@ import {
   type InsertFriendRequest,
   type InsertFriendship,
   type InsertRoomInvitation,
-  type InsertMessage,
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, and, desc, count, or, ne, isNull, isNotNull, sql, exists } from "drizzle-orm";
@@ -116,15 +113,6 @@ export interface IStorage {
   getRoomInvitations(userId: string): Promise<(RoomInvitation & { room: Room; inviter: User; invited: User })[]>;
   respondToRoomInvitation(invitationId: string, response: 'accepted' | 'rejected'): Promise<void>;
   expireOldInvitations(): Promise<void>;
-
-  // Message operations
-  createMessagesTable(): Promise<void>;
-  sendMessage(senderId: string, receiverId: string, message: string): Promise<Message>;
-  getMessages(userId1: string, userId2: string, limit?: number): Promise<Message[]>;
-  getUndeliveredMessages(userId: string): Promise<Message[]>;
-  markMessageAsDelivered(messageId: string): Promise<void>;
-  markMessageAsRead(messageId: string): Promise<void>;
-  getUnreadMessageCount(userId: string): Promise<number>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -1178,112 +1166,6 @@ export class DatabaseStorage implements IStorage {
           sql`${roomInvitations.expiresAt} <= NOW()`
         )
       );
-  }
-
-  // Message operations
-  async createMessagesTable(): Promise<void> {
-    await db.execute(sql`
-      CREATE TABLE IF NOT EXISTS messages (
-        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-        sender_id VARCHAR NOT NULL,
-        receiver_id VARCHAR NOT NULL,
-        message TEXT NOT NULL,
-        sent_at TIMESTAMP DEFAULT NOW(),
-        delivered_at TIMESTAMP,
-        read_at TIMESTAMP,
-        is_delivered BOOLEAN DEFAULT FALSE,
-        is_read BOOLEAN DEFAULT FALSE
-      )
-    `);
-
-    // Create indexes
-    await db.execute(sql`
-      CREATE INDEX IF NOT EXISTS idx_messages_sender ON messages(sender_id)
-    `);
-    await db.execute(sql`
-      CREATE INDEX IF NOT EXISTS idx_messages_receiver ON messages(receiver_id)
-    `);
-    await db.execute(sql`
-      CREATE INDEX IF NOT EXISTS idx_messages_sent_at ON messages(sent_at)
-    `);
-  }
-
-  async sendMessage(senderId: string, receiverId: string, message: string): Promise<Message> {
-    const [newMessage] = await db
-      .insert(messages)
-      .values({
-        senderId,
-        receiverId,
-        message,
-      })
-      .returning();
-
-    return newMessage;
-  }
-
-  async getMessages(userId1: string, userId2: string, limit: number = 50): Promise<Message[]> {
-    const messageList = await db
-      .select()
-      .from(messages)
-      .where(
-        or(
-          and(eq(messages.senderId, userId1), eq(messages.receiverId, userId2)),
-          and(eq(messages.senderId, userId2), eq(messages.receiverId, userId1))
-        )
-      )
-      .orderBy(desc(messages.sentAt))
-      .limit(limit);
-
-    return messageList.reverse(); // Return in chronological order
-  }
-
-  async getUndeliveredMessages(userId: string): Promise<Message[]> {
-    const undeliveredMessages = await db
-      .select()
-      .from(messages)
-      .where(
-        and(
-          eq(messages.receiverId, userId),
-          eq(messages.isDelivered, false)
-        )
-      )
-      .orderBy(messages.sentAt);
-
-    return undeliveredMessages;
-  }
-
-  async markMessageAsDelivered(messageId: string): Promise<void> {
-    await db
-      .update(messages)
-      .set({
-        isDelivered: true,
-        deliveredAt: new Date(),
-      })
-      .where(sql`${messages.id}::text = ${messageId}`);
-  }
-
-  async markMessageAsRead(messageId: string): Promise<void> {
-    await db
-      .update(messages)
-      .set({
-        isRead: true,
-        readAt: new Date(),
-      })
-      .where(sql`${messages.id}::text = ${messageId}`);
-  }
-
-  async getUnreadMessageCount(userId: string): Promise<number> {
-    const result = await db
-      .select({ count: count() })
-      .from(messages)
-      .where(
-        and(
-          eq(messages.receiverId, userId),
-          eq(messages.isRead, false)
-        )
-      );
-
-    return result[0]?.count || 0;
   }
 }
 

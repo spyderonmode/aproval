@@ -42,11 +42,6 @@ export function Friends() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  // Get current user data
-  const { data: currentUser } = useQuery({
-    queryKey: ['/api/auth/user']
-  });
-
   // Fetch friends list
   const { data: friends = [], isLoading: friendsLoading } = useQuery<User[]>({
     queryKey: ['/api/friends'],
@@ -138,19 +133,17 @@ export function Friends() {
 
   // Chat functionality
   const sendMessageMutation = useMutation({
-    mutationFn: async ({ receiverId, message }: { receiverId: string; message: string }) => {
-      return await apiRequest('POST', '/api/messages/send', { receiverId, message });
+    mutationFn: async ({ targetUserId, message }: { targetUserId: string; message: string }) => {
+      return await apiRequest('POST', '/api/chat/send', { targetUserId, message });
     },
     onSuccess: (data, variables) => {
       if (selectedChatFriend) {
         // Add the sent message to chat history for this user
         const newMessage = {
-          id: data.id,
-          senderId: data.senderId,
-          receiverId: data.receiverId,
-          message: data.message,
-          sentAt: data.sentAt,
-          fromMe: true
+          fromMe: true,
+          message: chatMessage,
+          timestamp: new Date().toLocaleTimeString(),
+          userId: variables.targetUserId
         };
         
         setChatHistory(prev => {
@@ -172,68 +165,42 @@ export function Friends() {
     },
   });
 
-  // Load chat history for selected friend
-  const { data: chatMessages = [] } = useQuery({
-    queryKey: ['/api/messages', selectedChatFriend?.id],
-    enabled: !!selectedChatFriend,
-  });
-
-  // Update chat history when chatMessages data changes
-  useEffect(() => {
-    if (selectedChatFriend && chatMessages.length > 0 && currentUser) {
-      setChatHistory(prev => {
-        const newHistory = new Map(prev);
-        // Transform messages to the expected format
-        const transformedMessages = chatMessages.map((msg: any) => ({
-          ...msg,
-          fromMe: msg.senderId === currentUser.userId
-        }));
-        newHistory.set(selectedChatFriend.id, transformedMessages);
-        return newHistory;
-      });
-    }
-  }, [selectedChatFriend, chatMessages, currentUser]);
-
   // Handle incoming chat messages
   useEffect(() => {
     const handleChatMessage = (event: CustomEvent) => {
       const data = event.detail;
       
       if (data.type === 'chat_message_received') {
-        // Add to unread messages count if not viewing this friend's chat
-        if (!isOpen || !selectedChatFriend || selectedChatFriend.id !== data.senderId) {
+        // Only handle messages if Friends modal is open and we're actively chatting
+        if (!isOpen || !selectedChatFriend) {
+          // Add to unread messages count
           setUnreadMessages(prev => {
             const newUnread = new Map(prev);
-            const currentUnread = newUnread.get(data.senderId) || 0;
-            newUnread.set(data.senderId, currentUnread + 1);
+            const currentUnread = newUnread.get(data.message.senderId) || 0;
+            newUnread.set(data.message.senderId, currentUnread + 1);
             return newUnread;
           });
-          
-          // If we're not viewing this friend's chat, just return
-          if (!selectedChatFriend || selectedChatFriend.id !== data.senderId) {
-            return;
-          }
+          return;
         }
         
         // Only handle messages from the currently selected friend
-        if (selectedChatFriend && selectedChatFriend.id === data.senderId) {
-          const incomingMessage = {
-            id: data.messageId,
-            senderId: data.senderId,
-            receiverId: data.receiverId || currentUser?.userId,
-            message: data.message,
-            sentAt: data.timestamp,
-            fromMe: false
-          };
-          
-          // Add to chat history for this sender
-          setChatHistory(prev => {
-            const newHistory = new Map(prev);
-            const userMessages = newHistory.get(data.senderId) || [];
-            newHistory.set(data.senderId, [...userMessages, incomingMessage]);
-            return newHistory;
-          });
-        }
+        if (selectedChatFriend.id !== data.message.senderId) return;
+        
+        const incomingMessage = {
+          fromMe: false,
+          message: data.message.message,
+          timestamp: new Date(data.message.timestamp).toLocaleTimeString(),
+          userId: data.message.senderId,
+          senderName: data.message.senderName
+        };
+        
+        // Add to chat history for this sender
+        setChatHistory(prev => {
+          const newHistory = new Map(prev);
+          const userMessages = newHistory.get(data.message.senderId) || [];
+          newHistory.set(data.message.senderId, [...userMessages, incomingMessage]);
+          return newHistory;
+        });
       }
     };
 
@@ -245,13 +212,13 @@ export function Friends() {
         window.removeEventListener('chat_message_received', handleChatMessage as EventListener);
       };
     }
-  }, [isOpen, selectedChatFriend, currentUser]);
+  }, [isOpen, selectedChatFriend]);
 
   const handleSendMessage = () => {
     if (!chatMessage.trim() || !selectedChatFriend) return;
     
     sendMessageMutation.mutate({ 
-      receiverId: selectedChatFriend.id, 
+      targetUserId: selectedChatFriend.id, 
       message: chatMessage.trim() 
     });
   };
@@ -632,12 +599,10 @@ export function Friends() {
                   <div className="space-y-2">
                     {currentChatMessages.length > 0 ? (
                       currentChatMessages.map((msg, index) => (
-                        <div key={msg.id || index} className={`p-2 rounded-lg ${msg.fromMe ? 'bg-blue-100 dark:bg-blue-900 ml-4' : 'bg-gray-100 dark:bg-gray-800 mr-4'}`}>
+                        <div key={index} className={`p-2 rounded-lg ${msg.fromMe ? 'bg-blue-100 dark:bg-blue-900 ml-4' : 'bg-gray-100 dark:bg-gray-800 mr-4'}`}>
                           <div className="text-sm font-medium">{msg.fromMe ? 'You' : selectedChatFriend.displayName || selectedChatFriend.firstName || selectedChatFriend.username}</div>
                           <div className="text-sm">{msg.message}</div>
-                          <div className="text-xs text-muted-foreground mt-1">
-                            {new Date(msg.sentAt || msg.timestamp).toLocaleTimeString()}
-                          </div>
+                          <div className="text-xs text-muted-foreground mt-1">{msg.timestamp}</div>
                         </div>
                       ))
                     ) : (
