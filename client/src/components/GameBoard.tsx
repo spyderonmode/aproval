@@ -35,6 +35,11 @@ const QUICK_CHAT_MESSAGES = [
   { text: 'Ready to play!', duration: 3000 }
 ];
 
+// Helper function to check if player has Legend achievement
+const hasLegendAchievement = (achievements: any[]): boolean => {
+  return achievements?.some(achievement => achievement.achievementType === 'legend') || false;
+};
+
 // Function to get winning positions for highlighting
 const getWinningPositions = (board: Record<string, string>, player: string): number[] => {
   // Check horizontal wins
@@ -907,11 +912,36 @@ export function GameBoard({ game, onGameOver, gameMode, user, lastMessage, sendM
               </AnimatePresence>
               
               <div className="flex flex-col items-end">
-                <span className={`text-sm ${theme.textColor} max-w-24 truncate`}>
-                  {gameMode === 'online' 
-                    ? (game?.playerXInfo?.firstName || game?.playerXInfo?.displayName || game?.playerXInfo?.username || 'Player X')
-                    : 'Player X'}
-                </span>
+                {hasLegendAchievement(game?.playerXInfo?.achievements) ? (
+                  <motion.div
+                    animate={{
+                      boxShadow: [
+                        "0 0 5px #ffd700, 0 0 10px #ffd700, 0 0 15px #ffd700",
+                        "0 0 10px #ff6b6b, 0 0 20px #ff6b6b, 0 0 30px #ff6b6b",
+                        "0 0 5px #4ecdc4, 0 0 10px #4ecdc4, 0 0 15px #4ecdc4",
+                        "0 0 10px #ffd700, 0 0 20px #ffd700, 0 0 30px #ffd700"
+                      ]
+                    }}
+                    transition={{
+                      duration: 2,
+                      repeat: Infinity,
+                      ease: "easeInOut"
+                    }}
+                    className="px-2 py-1 rounded-md border-2 border-yellow-400"
+                  >
+                    <span className={`text-sm ${theme.textColor} max-w-24 truncate font-bold`}>
+                      {gameMode === 'online' 
+                        ? (game?.playerXInfo?.firstName || game?.playerXInfo?.displayName || game?.playerXInfo?.username || 'Player X')
+                        : 'Player X'}
+                    </span>
+                  </motion.div>
+                ) : (
+                  <span className={`text-sm ${theme.textColor} max-w-24 truncate`}>
+                    {gameMode === 'online' 
+                      ? (game?.playerXInfo?.firstName || game?.playerXInfo?.displayName || game?.playerXInfo?.username || 'Player X')
+                      : 'Player X'}
+                  </span>
+                )}
                 {gameMode === 'online' && game?.playerXInfo?.achievements && game.playerXInfo.achievements.length > 0 && (
                   <div className="flex items-center gap-1 mt-1">
                     {/* Show only the most recent achievement (latest badge replaces old one) */}
@@ -979,11 +1009,36 @@ export function GameBoard({ game, onGameOver, gameMode, user, lastMessage, sendM
               </AnimatePresence>
               
               <div className="flex flex-col items-end">
-                <span className={`text-sm ${theme.textColor} max-w-24 truncate`}>
-                  {gameMode === 'online' 
-                    ? (game?.playerOInfo?.firstName || game?.playerOInfo?.displayName || game?.playerOInfo?.username || 'Player O')
-                    : (gameMode === 'ai' ? 'AI' : 'Player O')}
-                </span>
+                {hasLegendAchievement(game?.playerOInfo?.achievements) ? (
+                  <motion.div
+                    animate={{
+                      boxShadow: [
+                        "0 0 5px #ffd700, 0 0 10px #ffd700, 0 0 15px #ffd700",
+                        "0 0 10px #ff6b6b, 0 0 20px #ff6b6b, 0 0 30px #ff6b6b",
+                        "0 0 5px #4ecdc4, 0 0 10px #4ecdc4, 0 0 15px #4ecdc4",
+                        "0 0 10px #ffd700, 0 0 20px #ffd700, 0 0 30px #ffd700"
+                      ]
+                    }}
+                    transition={{
+                      duration: 2,
+                      repeat: Infinity,
+                      ease: "easeInOut"
+                    }}
+                    className="px-2 py-1 rounded-md border-2 border-yellow-400"
+                  >
+                    <span className={`text-sm ${theme.textColor} max-w-24 truncate font-bold`}>
+                      {gameMode === 'online' 
+                        ? (game?.playerOInfo?.firstName || game?.playerOInfo?.displayName || game?.playerOInfo?.username || 'Player O')
+                        : (gameMode === 'ai' ? 'AI' : 'Player O')}
+                    </span>
+                  </motion.div>
+                ) : (
+                  <span className={`text-sm ${theme.textColor} max-w-24 truncate`}>
+                    {gameMode === 'online' 
+                      ? (game?.playerOInfo?.firstName || game?.playerOInfo?.displayName || game?.playerOInfo?.username || 'Player O')
+                      : (gameMode === 'ai' ? 'AI' : 'Player O')}
+                  </span>
+                )}
                 {gameMode === 'online' && game?.playerOInfo?.achievements && game.playerOInfo.achievements.length > 0 && (
                   <div className="flex items-center gap-1 mt-1">
                     {/* Show only the most recent achievement (latest badge replaces old one) */}

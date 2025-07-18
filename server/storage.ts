@@ -683,6 +683,13 @@ export class DatabaseStorage implements IStorage {
         icon: '👑',
         condition: gameResult === 'win' && await this.checkComebackCondition(userId),
       },
+      {
+        type: 'legend',
+        name: 'Legend',
+        description: 'Achieve 50 total wins to become a true legend with animated border!',
+        icon: '🌟',
+        condition: gameResult === 'win' && userStats.wins >= 50,
+      },
     ];
 
     // Check each achievement condition
