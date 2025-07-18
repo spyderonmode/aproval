@@ -1,5 +1,6 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Home, RefreshCw } from "lucide-react";
+import { useConfettiSound } from '@/hooks/useConfettiSound';
 
 interface GameOverModalProps {
   open: boolean;
@@ -11,6 +12,8 @@ interface GameOverModalProps {
 }
 
 export function GameOverModal({ open, onClose, result, onPlayAgain, isCreatingGame = false, onMainMenu }: GameOverModalProps) {
+  const { playExplosionSound } = useConfettiSound();
+  
   // Simple safety checks
   if (!open) return null;
   if (!result) {
@@ -23,6 +26,16 @@ export function GameOverModal({ open, onClose, result, onPlayAgain, isCreatingGa
   // Super simple logic - no complex conditionals
   const isDraw = result.condition === 'draw';
   const winner = result.winner;
+  
+  // Play explosion sound when modal opens and someone wins
+  useEffect(() => {
+    if (open && !isDraw && winner) {
+      // Small delay to sync with sparkle animation
+      setTimeout(() => {
+        playExplosionSound();
+      }, 100);
+    }
+  }, [open, isDraw, winner, playExplosionSound]);
   
   // Get proper player names and info - only for online games
   const isOnlineGame = result.game?.gameMode === 'online';
