@@ -433,6 +433,349 @@ export const translations = {
     hi: 'दोस्तों के साथ ऑनलाइन खेलें',
     es: 'Juega con amigos en línea',
     id: 'Bermain dengan teman secara online'
+  },
+  
+  // Profile and Dashboard
+  profile: {
+    en: 'Profile',
+    ar: 'الملف الشخصي',
+    bn: 'প্রোফাইল',
+    hi: 'प्रोफाइल',
+    es: 'Perfil',
+    id: 'Profil'
+  },
+  playerDashboard: {
+    en: 'Player Dashboard',
+    ar: 'لوحة تحكم اللاعب',
+    bn: 'প্লেয়ার ড্যাশবোর্ড',
+    hi: 'प्लेयर डैशबोर्ड',
+    es: 'Panel del Jugador',
+    id: 'Dashboard Pemain'
+  },
+  gameBoard: {
+    en: 'Game Board',
+    ar: 'لوحة اللعبة',
+    bn: 'গেম বোর্ড',
+    hi: 'गेम बोर्ड',
+    es: 'Tablero de Juego',
+    id: 'Papan Permainan'
+  },
+  playerTurnX: {
+    en: "Player X's Turn",
+    ar: 'دور اللاعب X',
+    bn: 'প্লেয়ার X এর পালা',
+    hi: 'प्लेयर X की बारी',
+    es: 'Turno del Jugador X',
+    id: 'Giliran Pemain X'
+  },
+  gameStats: {
+    en: 'Game Stats',
+    ar: 'إحصائيات اللعبة',
+    bn: 'গেমের পরিসংখ্যান',
+    hi: 'गेम आंकड़े',
+    es: 'Estadísticas del Juego',
+    id: 'Statistik Permainan'
+  },
+  wins: {
+    en: 'Wins',
+    ar: 'انتصارات',
+    bn: 'জয়',
+    hi: 'जीत',
+    es: 'Victorias',
+    id: 'Menang'
+  },
+  losses: {
+    en: 'Losses',
+    ar: 'هزائم',
+    bn: 'পরাজয়',
+    hi: 'हार',
+    es: 'Derrotas',
+    id: 'Kalah'
+  },
+  draws: {
+    en: 'Draws',
+    ar: 'تعادل',
+    bn: 'ড্র',
+    hi: 'ड्रॉ',
+    es: 'Empates',
+    id: 'Seri'
+  },
+  total: {
+    en: 'Total',
+    ar: 'المجموع',
+    bn: 'মোট',
+    hi: 'कुल',
+    es: 'Total',
+    id: 'Total'
+  },
+  
+  // Profile Management
+  editProfile: {
+    en: 'Edit Profile',
+    ar: 'تعديل الملف الشخصي',
+    bn: 'প্রোফাইল সম্পাদনা',
+    hi: 'प्रोफाइल संपादित करें',
+    es: 'Editar Perfil',
+    id: 'Edit Profil'
+  },
+  profilePicture: {
+    en: 'Profile Picture',
+    ar: 'صورة الملف الشخصي',
+    bn: 'প্রোফাইল ছবি',
+    hi: 'प्रोफाइल चित्र',
+    es: 'Foto de Perfil',
+    id: 'Foto Profil'
+  },
+  displayName: {
+    en: 'Display Name',
+    ar: 'الاسم المعروض',
+    bn: 'প্রদর্শন নাম',
+    hi: 'प्रदर्शन नाम',
+    es: 'Nombre de Visualización',
+    id: 'Nama Tampilan'
+  },
+  uploadPhoto: {
+    en: 'Upload Photo',
+    ar: 'رفع صورة',
+    bn: 'ছবি আপলোড',
+    hi: 'फोटो अपलोड करें',
+    es: 'Subir Foto',
+    id: 'Unggah Foto'
+  },
+  saveChanges: {
+    en: 'Save Changes',
+    ar: 'حفظ التغييرات',
+    bn: 'পরিবর্তন সংরক্ষণ',
+    hi: 'परिवर्तन सहेजें',
+    es: 'Guardar Cambios',
+    id: 'Simpan Perubahan'
+  },
+  cancel: {
+    en: 'Cancel',
+    ar: 'إلغاء',
+    bn: 'বাতিল',
+    hi: 'रद्द करें',
+    es: 'Cancelar',
+    id: 'Batal'
+  },
+  
+  // Friends and Social
+  friends: {
+    en: 'Friends',
+    ar: 'الأصدقاء',
+    bn: 'বন্ধুরা',
+    hi: 'मित्र',
+    es: 'Amigos',
+    id: 'Teman'
+  },
+  friendsOne: {
+    en: 'Friends (1)',
+    ar: 'الأصدقاء (1)',
+    bn: 'বন্ধুরা (1)',
+    hi: 'मित्र (1)',
+    es: 'Amigos (1)',
+    id: 'Teman (1)'
+  },
+  requests: {
+    en: 'Requests',
+    ar: 'الطلبات',
+    bn: 'অনুরোধ',
+    hi: 'अनुरोध',
+    es: 'Solicitudes',
+    id: 'Permintaan'
+  },
+  addFriend: {
+    en: 'Add Friend',
+    ar: 'إضافة صديق',
+    bn: 'বন্ধু যোগ করুন',
+    hi: 'मित्र जोड़ें',
+    es: 'Agregar Amigo',
+    id: 'Tambah Teman'
+  },
+  
+  // Achievements
+  achievements: {
+    en: 'Achievements',
+    ar: 'الإنجازات',
+    bn: 'অর্জন',
+    hi: 'उपलब्धियां',
+    es: 'Logros',
+    id: 'Pencapaian'
+  },
+  yourAchievements: {
+    en: 'Your Achievements',
+    ar: 'إنجازاتك',
+    bn: 'আপনার অর্জন',
+    hi: 'आपकी उपलब्धियां',
+    es: 'Tus Logros',
+    id: 'Pencapaian Anda'
+  },
+  victoryAchievements: {
+    en: 'Victory Achievements',
+    ar: 'إنجازات النصر',
+    bn: 'বিজয়ের অর্জন',
+    hi: 'विजय की उपलब्धियां',
+    es: 'Logros de Victoria',
+    id: 'Pencapaian Kemenangan'
+  },
+  firstVictory: {
+    en: 'First Victory',
+    ar: 'أول انتصار',
+    bn: 'প্রথম বিজয়',
+    hi: 'पहली विजय',
+    es: 'Primera Victoria',
+    id: 'Kemenangan Pertama'
+  },
+  winYourFirstGame: {
+    en: 'Win your first game',
+    ar: 'اربح لعبتك الأولى',
+    bn: 'আপনার প্রথম গেম জিতুন',
+    hi: 'अपना पहला गेम जीतें',
+    es: 'Gana tu primer juego',
+    id: 'Menangkan permainan pertama Anda'
+  },
+  
+  // Quick Actions
+  quickActions: {
+    en: 'Quick Actions',
+    ar: 'الإجراءات السريعة',
+    bn: 'দ্রুত কর্ম',
+    hi: 'त्वरित कार्य',
+    es: 'Acciones Rápidas',
+    id: 'Tindakan Cepat'
+  },
+  change: {
+    en: 'Change',
+    ar: 'تغيير',
+    bn: 'পরিবর্তন',
+    hi: 'बदलाव',
+    es: 'Cambiar',
+    id: 'Ubah'
+  },
+  view: {
+    en: 'View',
+    ar: 'عرض',
+    bn: 'দেখুন',
+    hi: 'देखें',
+    es: 'Ver',
+    id: 'Lihat'
+  },
+  menu: {
+    en: 'Menu',
+    ar: 'القائمة',
+    bn: 'মেনু',
+    hi: 'मेनू',
+    es: 'Menú',
+    id: 'Menu'
+  },
+  online: {
+    en: 'Online',
+    ar: 'متصل',
+    bn: 'অনলাইন',
+    hi: 'ऑनलाइन',
+    es: 'En línea',
+    id: 'Online'
+  },
+  players: {
+    en: 'Players',
+    ar: 'اللاعبون',
+    bn: 'খেলোয়াড়',
+    hi: 'खिलाड़ी',
+    es: 'Jugadores',
+    id: 'Pemain'
+  },
+  onePlayers: {
+    en: '1 Players',
+    ar: '1 لاعب',
+    bn: '১ জন খেলোয়াড়',
+    hi: '1 खिलाड़ी',
+    es: '1 Jugador',
+    id: '1 Pemain'
+  },
+  profileSettings: {
+    en: 'Profile Settings',
+    ar: 'إعدادات الملف الشخصي',
+    bn: 'প্রোফাইল সেটিংস',
+    hi: 'प्रोफाइल सेटिंग्स',
+    es: 'Configuración de Perfil',
+    id: 'Pengaturan Profil'
+  },
+  offline: {
+    en: 'Offline',
+    ar: 'غير متصل',
+    bn: 'অফলাইন',
+    hi: 'ऑफलाइन',
+    es: 'Desconectado',
+    id: 'Offline'
+  },
+  
+  // Game Board Elements
+  gameId: {
+    en: 'Game ID',
+    ar: 'معرف اللعبة',
+    bn: 'গেম আইডি',
+    hi: 'गेम आईडी',
+    es: 'ID del Juego',
+    id: 'ID Permainan'
+  },
+  room: {
+    en: 'Room',
+    ar: 'الغرفة',
+    bn: 'রুম',
+    hi: 'कमरा',
+    es: 'Habitación',
+    id: 'Ruang'
+  },
+  local: {
+    en: 'Local',
+    ar: 'محلي',
+    bn: 'স্থানীয়',
+    hi: 'स्थानीय',
+    es: 'Local',
+    id: 'Lokal'
+  },
+
+  
+  // Player Names
+  playerX: {
+    en: 'Player X',
+    ar: 'اللاعب X',
+    bn: 'প্লেয়ার X',
+    hi: 'प्लेयर X',
+    es: 'Jugador X',
+    id: 'Pemain X'
+  },
+  playerO: {
+    en: 'Player O',
+    ar: 'اللاعب O',
+    bn: 'প্লেয়ার O',
+    hi: 'प्लेयर O',
+    es: 'Jugador O',
+    id: 'Pemain O'
+  },
+  playerTurnO: {
+    en: "Player O's Turn",
+    ar: 'دور اللاعب O',
+    bn: 'প্লেয়ার O এর পালা',
+    hi: 'प्लेयर O की बारी',
+    es: 'Turno del Jugador O',
+    id: 'Giliran Pemain O'
+  },
+  aiTurn: {
+    en: "AI's Turn",
+    ar: 'دور الذكاء الاصطناعي',
+    bn: 'এআই এর পালা',
+    hi: 'AI की बारी',
+    es: 'Turno de la IA',
+    id: 'Giliran AI'
+  },
+  ai: {
+    en: 'AI',
+    ar: 'الذكاء الاصطناعي',
+    bn: 'এআই',
+    hi: 'AI',
+    es: 'IA',
+    id: 'AI'
   }
 } as const;
 

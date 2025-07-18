@@ -11,6 +11,7 @@ import { motion, AnimatePresence } from "framer-motion"; // Added back for winni
 import { useTheme } from "@/contexts/ThemeContext";
 import { User, MessageCircle } from "lucide-react";
 import { QuickChatPanel } from '@/components/QuickChatPanel';
+import { useTranslation } from "@/contexts/LanguageContext";
 
 const VALID_POSITIONS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15];
 
@@ -210,6 +211,7 @@ export function GameBoard({ game, onGameOver, gameMode, user, lastMessage, sendM
   }, [game?.winningPositions]);
   const { toast } = useToast();
   const { currentTheme, themes } = useTheme();
+  const { t } = useTranslation();
   // Sound effects removed as requested
   // WebSocket now handled by parent component
   const queryClient = useQueryClient();
@@ -877,7 +879,7 @@ export function GameBoard({ game, onGameOver, gameMode, user, lastMessage, sendM
     <Card className={`${theme.boardStyle}`}>
       <CardHeader>
         <div className="flex items-start justify-between">
-          <CardTitle className={`text-2xl ${theme.textColor}`}>Game Board</CardTitle>
+          <CardTitle className={`text-2xl ${theme.textColor}`}>{t('gameBoard')}</CardTitle>
           <div className="flex flex-col space-y-3 text-right">
             {/* Player X - Top */}
             <div className="flex items-center justify-end space-x-2">

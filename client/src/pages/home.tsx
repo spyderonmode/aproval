@@ -630,7 +630,7 @@ export default function Home() {
             <div className="w-8 h-8 md:w-10 md:h-10 bg-primary rounded-lg flex items-center justify-center">
               <GamepadIcon className="w-4 h-4 md:w-6 md:h-6 text-white" />
             </div>
-            <h1 className="text-lg md:text-xl font-bold">Player Dashboard</h1>
+            <h1 className="text-lg md:text-xl font-bold">{t('playerDashboard')}</h1>
           </div>
 
           {/* User Profile */}
@@ -654,7 +654,7 @@ export default function Home() {
             <div className="flex items-center space-x-1 md:space-x-2">
               <div className={`w-2 h-2 rounded-full ${isConnected ? 'bg-green-500' : 'bg-red-500'}`}></div>
               <span className="text-xs md:text-sm text-gray-400">
-                {isConnected ? 'Online' : 'Offline'}
+                {isConnected ? t('online') : t('offline')}
               </span>
             </div>
             <div className="relative" ref={headerSidebarRef}>
@@ -677,7 +677,7 @@ export default function Home() {
                 <div className="absolute right-0 top-full mt-2 w-64 bg-slate-800 border border-slate-700 rounded-lg shadow-lg z-50">
                   <div className="p-4 space-y-4">
                     <div className="text-sm font-medium text-gray-300 border-b border-slate-700 pb-2">
-                      Quick Actions
+                      {t('quickActions')}
                     </div>
                     
                     {/* Language Selector */}
