@@ -261,6 +261,19 @@ export default function Home() {
             console.log('🎮 Setting complete game result:', gameResult);
             setGameResult(gameResult);
             setShowGameOver(true);
+
+            // Check if this is a bot game and auto-navigate to main menu after 1 second
+            const isPlayingAgainstBot = gameResult.playerXInfo?.id?.startsWith('player_') || 
+                                       gameResult.playerOInfo?.id?.startsWith('player_');
+            
+            if (isPlayingAgainstBot) {
+              console.log('🤖 Bot game ended, auto-navigating to main menu in 1 second');
+              setTimeout(() => {
+                console.log('🤖 Auto-navigating to main menu for bot game');
+                setShowGameOver(false);
+                resetToMainMenu();
+              }, 1000);
+            }
           }
           break;
         case 'player_left':

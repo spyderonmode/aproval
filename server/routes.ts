@@ -924,6 +924,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
               role: 'player',
             });
             
+            // Add bot as user in database first to ensure proper participant display
+            await storage.upsertUser({
+              id: bot.id,
+              username: bot.username,
+              displayName: bot.displayName,
+              firstName: bot.firstName,
+              profileImageUrl: bot.profilePicture
+            });
+
             // Add bot as second participant to show 2 players in room
             await storage.addRoomParticipant({
               roomId: room.id,
