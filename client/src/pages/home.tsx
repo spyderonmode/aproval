@@ -51,6 +51,7 @@ export default function Home() {
   const [showProfile, setShowProfile] = useState(false);
   const [showHeaderSidebar, setShowHeaderSidebar] = useState(false);
   const [showAchievements, setShowAchievements] = useState(false);
+  const [showLeaderboard, setShowLeaderboard] = useState(false);
   const headerSidebarRef = useRef<HTMLDivElement>(null);
 
   const { data: userStats } = useQuery({
@@ -761,19 +762,20 @@ export default function Home() {
                     
                     {/* Leaderboard */}
                     <div className="w-full">
-                      <Leaderboard 
-                        trigger={
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => setShowHeaderSidebar(false)}
-                            className="w-full bg-gradient-to-r from-yellow-600 to-orange-600 border-yellow-500 text-white hover:from-yellow-500 hover:to-orange-500 justify-start"
-                          >
-                            <Trophy className="w-4 h-4 mr-2" />
-                            {t('leaderboard') || 'Leaderboard'}
-                          </Button>
-                        }
-                      />
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => {
+                          setShowHeaderSidebar(false);
+                          // Dispatch custom event to open leaderboard
+                          const event = new CustomEvent('openLeaderboard');
+                          window.dispatchEvent(event);
+                        }}
+                        className="w-full bg-gradient-to-r from-yellow-600 to-orange-600 border-yellow-500 text-white hover:from-yellow-500 hover:to-orange-500 justify-start"
+                      >
+                        <Trophy className="w-4 h-4 mr-2" />
+                        {t('leaderboard') || 'Leaderboard'}
+                      </Button>
                     </div>
                     
                     {/* Profile Settings */}
@@ -1085,6 +1087,8 @@ export default function Home() {
         onClose={() => setShowAchievements(false)}
         user={user}
       />
+
+      <Leaderboard />
 
       {/* Global Room Invitation Popup */}
       <InvitationPopup onRoomJoin={handleRoomJoin} />

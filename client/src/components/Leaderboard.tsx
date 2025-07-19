@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -33,6 +33,16 @@ export function Leaderboard({ trigger }: LeaderboardProps) {
     queryKey: ['/api/leaderboard'],
     enabled: isOpen, // Only fetch when modal is open
   });
+
+  // Listen for external trigger to open leaderboard
+  useEffect(() => {
+    const handleOpenLeaderboard = () => {
+      setIsOpen(true);
+    };
+
+    window.addEventListener('openLeaderboard', handleOpenLeaderboard);
+    return () => window.removeEventListener('openLeaderboard', handleOpenLeaderboard);
+  }, []);
 
   const getRankIcon = (position: number) => {
     switch (position) {
@@ -170,7 +180,12 @@ export function Leaderboard({ trigger }: LeaderboardProps) {
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
-        {trigger || defaultTrigger}
+        <div onClick={(e) => {
+          e.stopPropagation();
+          setIsOpen(true);
+        }}>
+          {trigger || defaultTrigger}
+        </div>
       </DialogTrigger>
       <DialogContent className="max-w-4xl max-h-[90vh] w-[95vw] sm:w-full mx-auto flex flex-col overflow-hidden">
         <DialogHeader className="flex-shrink-0 pb-4">
@@ -246,7 +261,7 @@ export function Leaderboard({ trigger }: LeaderboardProps) {
                                 <div className="flex items-center gap-1">
                                   <Trophy className="w-4 h-4 text-yellow-500" />
                                   <span className="font-semibold text-green-600 dark:text-green-400">{user.wins}</span>
-                                  <span>{t('wins') || 'wins'}</span>
+                                  <span>{t('winsCount') || 'wins'}</span>
                                 </div>
                                 <div className="flex items-center gap-1">
                                   <Target className="w-4 h-4 text-blue-500" />

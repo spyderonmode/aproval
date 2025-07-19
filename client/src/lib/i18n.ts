@@ -2326,7 +2326,7 @@ export const translations = {
     es: 'Error al cargar la tabla de posiciones. Por favor, inténtalo de nuevo.',
     id: 'Gagal memuat papan peringkat. Silakan coba lagi.'
   },
-  wins: {
+  winsCount: {
     en: 'wins',
     ar: 'انتصارات',
     bn: 'জয়',
