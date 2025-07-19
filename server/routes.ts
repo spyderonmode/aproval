@@ -89,31 +89,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Simple Arabic-only user rankings endpoint
-  app.get('/api/arabic-rankings', async (req, res) => {
-    try {
-      const limit = parseInt(req.query.limit as string) || 50;
-      const rankings = await storage.getLeaderboard(Math.min(limit, 50)); // Max 50 users for Arabic mobile
-      
-      // Return simplified data for Arabic mobile interface
-      const simplifiedRankings = rankings.map((user, index) => ({
-        id: user.id,
-        displayName: user.displayName,
-        username: user.username,
-        wins: user.wins,
-        winRate: Math.round(user.winRate * 100),
-        totalGames: user.totalGames,
-        rank: index + 1,
-        profileImageUrl: user.profileImageUrl
-      }));
-      
-      res.json(simplifiedRankings);
-    } catch (error) {
-      console.error("Error fetching Arabic rankings:", error);
-      res.status(500).json({ message: "Failed to fetch rankings" });
-    }
-  });
-
   // Get player profile by ID
   app.get('/api/players/:playerId', async (req, res) => {
     try {

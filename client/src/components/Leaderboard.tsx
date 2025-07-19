@@ -8,7 +8,6 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Trophy, Medal, Award, Crown, TrendingUp, Users, Target, Loader2 } from "lucide-react";
 import { useTranslation } from "@/contexts/LanguageContext";
 import { motion } from "framer-motion";
-import { ArabicUserList } from "./ArabicUserList";
 
 interface LeaderboardUser {
   id: string;
@@ -34,24 +33,6 @@ export function Leaderboard({ trigger }: LeaderboardProps) {
   const { t, language } = useTranslation();
   const queryClient = useQueryClient();
   const isArabic = language === 'ar';
-  
-  // Check if user is on mobile device
-  const [isMobile, setIsMobile] = useState(false);
-  
-  useEffect(() => {
-    const checkMobile = () => {
-      setIsMobile(window.innerWidth <= 768);
-    };
-    
-    checkMobile();
-    window.addEventListener('resize', checkMobile);
-    return () => window.removeEventListener('resize', checkMobile);
-  }, []);
-  
-  // For Arabic users on mobile, use the simplified Arabic user list
-  if (isArabic && isMobile) {
-    return <ArabicUserList trigger={trigger} isOpen={isOpen} setIsOpen={setIsOpen} />;
-  }
 
   const { data: leaderboard, isLoading, error, refetch } = useQuery<LeaderboardUser[]>({
     queryKey: ['/api/leaderboard', language], // Include language in key to prevent cache conflicts
