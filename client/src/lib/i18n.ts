@@ -2336,7 +2336,7 @@ export const translations = {
   },
   games: {
     en: 'games',
-    ar: 'ألعاب',
+    ar: 'games',
     bn: 'গেম',
     hi: 'गेम',
     es: 'juegos',
@@ -2344,7 +2344,7 @@ export const translations = {
   },
   wld: {
     en: 'W-L-D',
-    ar: 'ف-خ-ت',
+    ar: 'W-L-D',
     bn: 'জ-হ-ড',
     hi: 'जी-हा-ड्रा',
     es: 'V-D-E',
@@ -2445,7 +2445,7 @@ export const translations = {
   },
   winRate: {
     en: 'Win Rate',
-    ar: 'معدل الفوز',
+    ar: 'Win Rate',
     bn: 'জয়ের হার',
     hi: 'जीत की दर',
     es: 'Tasa de Victoria',
