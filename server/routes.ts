@@ -1042,6 +1042,40 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Sync all AI bots to database with profile pictures and stats
+  app.post('/api/sync-bots', async (req, res) => {
+    try {
+      console.log('🤖 Starting bot sync to database...');
+      let syncedCount = 0;
+      
+      for (const bot of AI_BOTS) {
+        await storage.upsertUser({
+          id: bot.id,
+          username: bot.username,
+          displayName: bot.displayName,
+          firstName: bot.firstName,
+          lastName: bot.lastName || 'Player',
+          email: `${bot.username}@bot.local`,
+          profileImageUrl: bot.profilePicture,
+          wins: Math.floor(Math.random() * 45) + 5, // 5-50 wins for bots
+          losses: Math.floor(Math.random() * 25) + 5, // 5-30 losses
+          draws: Math.floor(Math.random() * 8) + 2  // 2-10 draws
+        });
+        syncedCount++;
+      }
+      
+      console.log(`🤖 Successfully synced ${syncedCount} bots to database`);
+      res.json({ 
+        success: true, 
+        message: `Successfully synced ${syncedCount} AI bots to database`,
+        syncedCount 
+      });
+    } catch (error) {
+      console.error('❌ Error syncing bots:', error);
+      res.status(500).json({ error: 'Failed to sync bots to database' });
+    }
+  });
+
   // Recalculate user stats
   app.post('/api/users/recalculate-stats', requireAuth, async (req: any, res) => {
     try {
@@ -1190,13 +1224,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
             role: 'player',
           });
           
-          // Add bot as user in database first to ensure proper participant display
+          // Add bot as user in database with complete profile for leaderboard
           await storage.upsertUser({
             id: bot.id,
             username: bot.username,
             displayName: bot.displayName,
             firstName: bot.firstName,
-            profileImageUrl: bot.profilePicture
+            lastName: bot.lastName || 'Player',
+            email: `${bot.username}@bot.local`,
+            profileImageUrl: bot.profilePicture,
+            wins: Math.floor(Math.random() * 45) + 5, // 5-50 wins for bots
+            losses: Math.floor(Math.random() * 25) + 5, // 5-30 losses
+            draws: Math.floor(Math.random() * 8) + 2  // 2-10 draws
           });
 
           // Add bot as second participant to show 2 players in room

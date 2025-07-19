@@ -462,6 +462,11 @@ export function Leaderboard({ trigger, open, onClose }: LeaderboardProps) {
                             )}
                           
                           <div className="flex items-center gap-1 sm:gap-2 relative z-10">
+                            {/* Rank Icon/Number */}
+                            <div className="flex-shrink-0 flex items-center justify-center">
+                              {getRankIcon(position)}
+                            </div>
+
                             {/* Profile Picture with Achievement Border */}
                             <div className="flex-shrink-0 relative">
                               {(() => {
@@ -485,12 +490,6 @@ export function Leaderboard({ trigger, open, onClose }: LeaderboardProps) {
                                     ) : (
                                       <div className={`w-8 h-8 sm:w-10 sm:h-10 md:w-11 md:h-11 rounded-lg bg-gradient-to-br from-blue-400 via-purple-500 to-pink-500 flex items-center justify-center text-white font-bold text-xs sm:text-sm shadow-sm ${borderStyle.borderClass} ${borderStyle.glowEffect} transition-all duration-300`}>
                                         {user.displayName.charAt(0).toUpperCase()}
-                                      </div>
-                                    )}
-                                    {/* Position Badge - small overlay on profile */}
-                                    {position <= 3 && (
-                                      <div className={`absolute -top-0.5 -right-0.5 w-5 h-5 rounded-full bg-gradient-to-br ${getRankColor(position)} flex items-center justify-center shadow-sm border border-white dark:border-slate-800`}>
-                                        <span className="text-xs font-bold">#{position}</span>
                                       </div>
                                     )}
                                     {/* Online Status Indicator */}
