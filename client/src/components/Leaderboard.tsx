@@ -74,6 +74,75 @@ export function Leaderboard({ trigger }: LeaderboardProps) {
     }
   };
 
+  // Get achievement border styling for profile pictures
+  const getAchievementBorderStyle = (user: LeaderboardUser, position: number) => {
+    // Always show golden border for top 3 positions
+    if (position <= 3) {
+      switch (position) {
+        case 1:
+          return {
+            borderClass: "ring-4 ring-yellow-400",
+            glowEffect: "shadow-[0_0_20px_rgba(234,179,8,0.6)] shadow-yellow-400/60",
+            animation: "animate-pulse"
+          };
+        case 2:
+          return {
+            borderClass: "ring-4 ring-gray-400",
+            glowEffect: "shadow-[0_0_20px_rgba(156,163,175,0.6)] shadow-gray-400/60",
+            animation: "animate-pulse"
+          };
+        case 3:
+          return {
+            borderClass: "ring-4 ring-amber-400",
+            glowEffect: "shadow-[0_0_20px_rgba(245,158,11,0.6)] shadow-amber-400/60",
+            animation: "animate-pulse"
+          };
+      }
+    }
+
+    // Apply achievement-specific styling for users with achievement borders
+    if (!user.selectedAchievementBorder) {
+      return {
+        borderClass: "ring-2 ring-gray-200 dark:ring-gray-600",
+        glowEffect: "",
+        animation: ""
+      };
+    }
+
+    switch (user.selectedAchievementBorder) {
+      case 'ultimate_veteran':
+        return {
+          borderClass: "ring-4 ring-orange-500",
+          glowEffect: "shadow-[0_0_25px_rgba(255,99,71,0.8)] shadow-orange-500/80",
+          animation: "animate-pulse"
+        };
+      case 'grandmaster':
+        return {
+          borderClass: "ring-4 ring-indigo-400",
+          glowEffect: "shadow-[0_0_25px_rgba(165,180,252,0.8)] shadow-indigo-400/80",
+          animation: "animate-pulse"
+        };
+      case 'champion':
+        return {
+          borderClass: "ring-4 ring-purple-400",
+          glowEffect: "shadow-[0_0_25px_rgba(196,181,253,0.8)] shadow-purple-400/80",
+          animation: "animate-pulse"
+        };
+      case 'legend':
+        return {
+          borderClass: "ring-4 ring-orange-400",
+          glowEffect: "shadow-[0_0_25px_rgba(251,146,60,0.8)] shadow-orange-400/80",
+          animation: "animate-pulse"
+        };
+      default:
+        return {
+          borderClass: "ring-2 ring-gray-200 dark:ring-gray-600",
+          glowEffect: "",
+          animation: ""
+        };
+    }
+  };
+
   const renderAchievementBorder = (user: LeaderboardUser, position: number) => {
     if (!user.selectedAchievementBorder) {
       return (
@@ -259,31 +328,42 @@ export function Leaderboard({ trigger }: LeaderboardProps) {
                           )}
                           
                           <div className="flex items-center gap-3 sm:gap-5 relative z-10">
-                            {/* Rank */}
-                            <div className={`flex items-center justify-center w-12 h-12 sm:w-16 sm:h-16 rounded-2xl bg-gradient-to-br ${getRankColor(position)} flex-shrink-0 shadow-lg transform transition-transform duration-300 hover:scale-110 ${position <= 3 ? 'ring-4 ring-white dark:ring-slate-800 shadow-xl' : ''}`}>
-                              <div className="flex flex-col items-center">
-                                {getRankIcon(position)}
-                                {position <= 3 && (
-                                  <span className="text-xs font-bold mt-1 opacity-80">#{position}</span>
-                                )}
-                              </div>
-                            </div>
-
-                            {/* Profile Picture */}
+                            {/* Profile Picture with Achievement Border */}
                             <div className="flex-shrink-0 relative">
-                              {user.profileImageUrl ? (
-                                <img
-                                  src={user.profileImageUrl}
-                                  alt={`${user.displayName}'s profile`}
-                                  className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl object-cover border-3 border-white dark:border-slate-700 shadow-lg ring-2 ring-gray-200 dark:ring-gray-600"
-                                />
-                              ) : (
-                                <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-gradient-to-br from-blue-400 via-purple-500 to-pink-500 flex items-center justify-center text-white font-bold text-lg sm:text-xl shadow-lg ring-2 ring-gray-200 dark:ring-gray-600">
-                                  {user.displayName.charAt(0).toUpperCase()}
-                                </div>
-                              )}
-                              {/* Online Status Indicator */}
-                              <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-400 border-2 border-white dark:border-slate-800 rounded-full shadow-sm"></div>
+                              {(() => {
+                                const borderStyle = getAchievementBorderStyle(user, position);
+                                return (
+                                  <motion.div
+                                    className="relative"
+                                    animate={borderStyle.animation ? { scale: [1, 1.02, 1] } : {}}
+                                    transition={{
+                                      duration: 2,
+                                      repeat: Infinity,
+                                      ease: "easeInOut"
+                                    }}
+                                  >
+                                    {user.profileImageUrl ? (
+                                      <img
+                                        src={user.profileImageUrl}
+                                        alt={`${user.displayName}'s profile`}
+                                        className={`w-16 h-16 sm:w-20 sm:h-20 rounded-2xl object-cover border-3 border-white dark:border-slate-700 shadow-lg ${borderStyle.borderClass} ${borderStyle.glowEffect} transition-all duration-300`}
+                                      />
+                                    ) : (
+                                      <div className={`w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-gradient-to-br from-blue-400 via-purple-500 to-pink-500 flex items-center justify-center text-white font-bold text-lg sm:text-xl shadow-lg ${borderStyle.borderClass} ${borderStyle.glowEffect} transition-all duration-300`}>
+                                        {user.displayName.charAt(0).toUpperCase()}
+                                      </div>
+                                    )}
+                                    {/* Position Badge - small overlay on profile */}
+                                    {position <= 3 && (
+                                      <div className={`absolute -top-2 -right-2 w-8 h-8 rounded-full bg-gradient-to-br ${getRankColor(position)} flex items-center justify-center shadow-lg border-2 border-white dark:border-slate-800`}>
+                                        <span className="text-xs font-bold">#{position}</span>
+                                      </div>
+                                    )}
+                                    {/* Online Status Indicator */}
+                                    <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-400 border-2 border-white dark:border-slate-800 rounded-full shadow-sm z-10"></div>
+                                  </motion.div>
+                                );
+                              })()}
                             </div>
 
                             {/* User Info */}
