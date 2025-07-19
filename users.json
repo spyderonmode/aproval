@@ -92,5 +92,17 @@
     "createdAt": "2025-07-16T07:24:53.124Z",
     "passwordResetToken": "40774591-4483-4800-bfbd-285a3bd0e4d1",
     "passwordResetExpiry": "2025-07-18T15:10:13.851Z"
+  },
+  {
+    "id": "6cc302f6-2b46-407b-adcc-a5694da06f2f",
+    "username": "playertest",
+    "password": "7e6e0c3079a08c5cc6036789b57e951f65f82383913ba1a49ae992544f1b4b6e",
+    "email": "playertest@example.com",
+    "displayName": "playertest",
+    "profilePicture": null,
+    "isEmailVerified": false,
+    "emailVerificationToken": "e6101820-ee5f-461d-8311-73e0fbff808f",
+    "emailVerificationExpiry": "2025-07-20T04:04:51.319Z",
+    "createdAt": "2025-07-19T04:04:51.320Z"
   }
 ]

@@ -2424,6 +2424,96 @@ export const translations = {
     hi: 'अस्वीकार करें',
     es: 'Rechazar',
     id: 'Tolak'
+  },
+  
+  // Player Profile Modal
+  playerProfile: {
+    en: 'Player Profile',
+    ar: 'ملف اللاعب',
+    bn: 'প্লেয়ার প্রোফাইল',
+    hi: 'खिलाड़ी प्रोफाइल',
+    es: 'Perfil del Jugador',
+    id: 'Profil Pemain'
+  },
+  joined: {
+    en: 'Joined',
+    ar: 'انضم',
+    bn: 'যোগদান',
+    hi: 'शामिल हुए',
+    es: 'Se unió',
+    id: 'Bergabung'
+  },
+  winRate: {
+    en: 'Win Rate',
+    ar: 'معدل الفوز',
+    bn: 'জয়ের হার',
+    hi: 'जीत की दर',
+    es: 'Tasa de Victoria',
+    id: 'Tingkat Kemenangan'
+  },
+  headToHead: {
+    en: 'Head-to-Head vs You',
+    ar: 'المواجهة المباشرة ضدك',
+    bn: 'আপনার বিপরীতে সরাসরি',
+    hi: 'आपके खिलाफ आमने-सामने',
+    es: 'Cara a Cara contra Ti',
+    id: 'Head-to-Head vs Anda'
+  },
+  yourWins: {
+    en: 'Your Wins',
+    ar: 'انتصاراتك',
+    bn: 'আপনার জয়',
+    hi: 'आपकी जीत',
+    es: 'Tus Victorias',
+    id: 'Kemenangan Anda'
+  },
+  yourLosses: {
+    en: 'Your Losses',
+    ar: 'خسائرك',
+    bn: 'আপনার হার',
+    hi: 'आपकी হার',
+    es: 'Tus Derrotas',
+    id: 'Kekalahan Anda'
+  },
+  recentGames: {
+    en: 'Recent Games',
+    ar: 'الألعاب الأخيرة',
+    bn: 'সাম্প্রতিক গেম',
+    hi: 'हाल के गेम',
+    es: 'Juegos Recientes',
+    id: 'Permainan Terbaru'
+  },
+  win: {
+    en: 'Win',
+    ar: 'فوز',
+    bn: 'জয়',
+    hi: 'जीत',
+    es: 'Victoria',
+    id: 'Menang'
+  },
+  loss: {
+    en: 'Loss',
+    ar: 'خسارة',
+    bn: 'হার',
+    hi: 'हार',
+    es: 'Derrota',
+    id: 'Kalah'
+  },
+  noGamesPlayed: {
+    en: 'No games played against this player yet.',
+    ar: 'لم يتم لعب أي ألعاب ضد هذا اللاعب بعد.',
+    bn: 'এই খেলোয়াড়ের বিরুদ্ধে এখনো কোনো গেম খেলা হয়নি।',
+    hi: 'इस खिलाड़ी के खिलाफ अभी तक कोई गेम नहीं खेला गया।',
+    es: 'Aún no se han jugado juegos contra este jugador.',
+    id: 'Belum ada permainan yang dimainkan melawan pemain ini.'
+  },
+  playerNotFound: {
+    en: 'Player not found',
+    ar: 'اللاعب غير موجود',
+    bn: 'প্লেয়ার পাওয়া যায়নি',
+    hi: 'खिलाड़ी नहीं मिला',
+    es: 'Jugador no encontrado',
+    id: 'Pemain tidak ditemukan'
   }
 } as const;
 

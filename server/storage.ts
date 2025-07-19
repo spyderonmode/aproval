@@ -1655,6 +1655,150 @@ export class DatabaseStorage implements IStorage {
       throw error;
     }
   }
+
+  async getPlayerProfile(playerId: string): Promise<{
+    id: string;
+    username: string;
+    displayName: string;
+    profileImageUrl?: string;
+    wins: number;
+    losses: number;
+    draws: number;
+    totalGames: number;
+    createdAt: string;
+    achievements: Array<{
+      id: string;
+      name: string;
+      description: string;
+      icon: string;
+      unlockedAt: string;
+    }>;
+  } | null> {
+    try {
+      // Get user data
+      const user = await db
+        .select()
+        .from(users)
+        .where(eq(users.id, playerId))
+        .limit(1);
+
+      if (user.length === 0) {
+        return null;
+      }
+
+      const userData = user[0];
+      
+      // Get user achievements
+      const userAchievements = await db
+        .select()
+        .from(achievements)
+        .where(eq(achievements.userId, playerId))
+        .orderBy(desc(achievements.unlockedAt));
+
+      const totalGames = (userData.wins || 0) + (userData.losses || 0) + (userData.draws || 0);
+
+      return {
+        id: userData.id,
+        username: userData.username || 'Unknown',
+        displayName: userData.displayName || userData.username || 'Unknown',
+        profileImageUrl: userData.profileImageUrl || undefined,
+        wins: userData.wins || 0,
+        losses: userData.losses || 0,
+        draws: userData.draws || 0,
+        totalGames,
+        createdAt: userData.createdAt,
+        achievements: userAchievements.map(achievement => ({
+          id: achievement.id,
+          name: achievement.achievementName,
+          description: achievement.description,
+          icon: achievement.icon,
+          unlockedAt: achievement.unlockedAt
+        }))
+      };
+    } catch (error) {
+      console.error('Error fetching player profile:', error);
+      throw error;
+    }
+  }
+
+  async getHeadToHeadStats(currentUserId: string, targetUserId: string): Promise<{
+    totalGames: number;
+    wins: number;
+    losses: number;
+    draws: number;
+    winRate: number;
+    recentGames: Array<{
+      id: string;
+      result: 'win' | 'loss' | 'draw';
+      playedAt: string;
+    }>;
+  }> {
+    try {
+      // Get all games where both players participated
+      const gamesQuery = await db
+        .select({
+          gameId: games.id,
+          winner: games.winner,
+          status: games.status,
+          createdAt: games.createdAt,
+          playerXId: games.playerXId,
+          playerOId: games.playerOId,
+        })
+        .from(games)
+        .where(
+          and(
+            eq(games.status, 'finished'),
+            or(
+              and(eq(games.playerXId, currentUserId), eq(games.playerOId, targetUserId)),
+              and(eq(games.playerXId, targetUserId), eq(games.playerOId, currentUserId))
+            )
+          )
+        )
+        .orderBy(desc(games.createdAt))
+        .limit(50); // Get last 50 games for recent games section
+
+      let wins = 0;
+      let losses = 0;
+      let draws = 0;
+      const recentGames: Array<{ id: string; result: 'win' | 'loss' | 'draw'; playedAt: string }> = [];
+
+      for (const game of gamesQuery) {
+        let result: 'win' | 'loss' | 'draw';
+        
+        if (game.winner === 'draw') {
+          result = 'draw';
+          draws++;
+        } else if (game.winner === currentUserId) {
+          result = 'win';
+          wins++;
+        } else {
+          result = 'loss';
+          losses++;
+        }
+
+        recentGames.push({
+          id: game.gameId,
+          result,
+          playedAt: game.createdAt
+        });
+      }
+
+      const totalGames = wins + losses + draws;
+      const winRate = totalGames > 0 ? Math.round((wins / totalGames) * 100) : 0;
+
+      return {
+        totalGames,
+        wins,
+        losses,
+        draws,
+        winRate,
+        recentGames: recentGames.slice(0, 10) // Return only 10 most recent games
+      };
+    } catch (error) {
+      console.error('Error fetching head-to-head stats:', error);
+      throw error;
+    }
+  }
 }
 
 export const storage = new DatabaseStorage();

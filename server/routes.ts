@@ -89,6 +89,40 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Get player profile by ID
+  app.get('/api/players/:playerId', async (req, res) => {
+    try {
+      const { playerId } = req.params;
+      const profile = await storage.getPlayerProfile(playerId);
+      
+      if (!profile) {
+        return res.status(404).json({ error: 'Player not found' });
+      }
+      
+      res.json(profile);
+    } catch (error) {
+      console.error('❌ Error fetching player profile:', error);
+      res.status(500).json({ error: 'Failed to fetch player profile' });
+    }
+  });
+
+  // Get head-to-head statistics between two players
+  app.get('/api/head-to-head/:currentUserId/:targetUserId', async (req, res) => {
+    try {
+      const { currentUserId, targetUserId } = req.params;
+      
+      if (currentUserId === targetUserId) {
+        return res.status(400).json({ error: 'Cannot get head-to-head stats for same player' });
+      }
+      
+      const headToHead = await storage.getHeadToHeadStats(currentUserId, targetUserId);
+      res.json(headToHead);
+    } catch (error) {
+      console.error('❌ Error fetching head-to-head stats:', error);
+      res.status(500).json({ error: 'Failed to fetch head-to-head statistics' });
+    }
+  });
+
   // Online game stats route for specific user
   app.get('/api/users/:id/online-stats', requireAuth, async (req: any, res) => {
     try {

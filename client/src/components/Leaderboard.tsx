@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { PlayerProfileModal } from "./PlayerProfileModal";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -27,6 +28,8 @@ interface LeaderboardProps {
 
 export function Leaderboard({ trigger }: LeaderboardProps) {
   const [isOpen, setIsOpen] = useState(false);
+  const [selectedPlayerId, setSelectedPlayerId] = useState<string | null>(null);
+  const [showPlayerProfile, setShowPlayerProfile] = useState(false);
   const { t } = useTranslation();
 
   const { data: leaderboard, isLoading, error } = useQuery<LeaderboardUser[]>({
@@ -222,11 +225,16 @@ export function Leaderboard({ trigger }: LeaderboardProps) {
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: index * 0.05 }}
                     >
-                      <Card className={`transition-all hover:shadow-lg ${position <= 3 ? 'border-2' : ''} ${
+                      <Card 
+                        className={`cursor-pointer transition-all hover:shadow-lg hover:scale-[1.02] ${position <= 3 ? 'border-2' : ''} ${
                         position === 1 ? 'border-yellow-400 shadow-yellow-200/50' :
                         position === 2 ? 'border-gray-400 shadow-gray-200/50' :
                         position === 3 ? 'border-amber-400 shadow-amber-200/50' : ''
-                      }`}>
+                      }`}
+                        onClick={() => {
+                          setSelectedPlayerId(user.id);
+                          setShowPlayerProfile(true);
+                        }}>
                         <CardContent className="p-3 sm:p-4">
                           <div className="flex items-center gap-2 sm:gap-4">
                             {/* Rank */}
@@ -318,6 +326,17 @@ export function Leaderboard({ trigger }: LeaderboardProps) {
           </Button>
         </div>
       </DialogContent>
+
+      {/* Player Profile Modal */}
+      <PlayerProfileModal
+        playerId={selectedPlayerId}
+        open={showPlayerProfile}
+        onClose={() => {
+          setShowPlayerProfile(false);
+          setSelectedPlayerId(null);
+        }}
+        currentUserId={undefined} // TODO: Get current user ID from context
+      />
     </Dialog>
   );
 }
