@@ -44,37 +44,85 @@ export async function registerRoutes(app: Express): Promise<Server> {
   const matchmakingTimers = new Map<string, NodeJS.Timeout>(); // Track user timers for bot matches
   
   // AI Bot System - 100 AI opponents with varied difficulties and personalities
+  const REALISTIC_NAMES = [
+    // English names
+    "Alex Johnson", "Sarah Chen", "Michael Brown", "Emma Wilson", "David Lee", "Lisa Garcia", "Ryan Smith", "Maya Patel", "James Miller", "Sofia Rodriguez",
+    "Chris Taylor", "Amanda Thompson", "Kevin Wang", "Rachel Green", "Mark Davis", "Nicole Kim", "Tyler Anderson", "Jessica Martinez", "Brandon Jones", "Ashley White",
+    "Jordan Clark", "Samantha Lewis", "Austin Young", "Stephanie Hall", "Cameron Scott", "Natalie Adams", "Derek Baker", "Megan Turner", "Sean Murphy", "Lauren Cooper",
+    
+    // Arabic names
+    "Ahmed Hassan", "Fatima Al-Zahra", "Omar Khalil", "Aisha Rahman", "Youssef Mansour", "Layla Nasser", "Kareem Ibrahim", "Nour El-Din", "Salma Farouk", "Rashid Abadi",
+    "Mariam Qasemi", "Tariq Habib", "Zara Mahmoud", "Samir Hashim", "Dina Rasheed", "Jamal Khoury", "Lina Amin", "Khalil Badawi", "Rana Sharif", "Fadi Zidan",
+    
+    // Indian names
+    "Rahul Sharma", "Priya Gupta", "Aryan Singh", "Sneha Patel", "Vikram Kumar", "Ananya Reddy", "Rohit Agarwal", "Kavya Menon", "Arjun Iyer", "Riya Joshi",
+    "Siddharth Rao", "Meera Kapoor", "Aarav Malik", "Pooja Nair", "Karan Thakur", "Shreya Verma", "Nikhil Bansal", "Divya Sinha", "Varun Chandra", "Aditi Saxena",
+    
+    // Spanish names
+    "Carlos Mendoza", "Isabella Ruiz", "Diego Herrera", "Valentina Cruz", "Alejandro Torres", "Camila Flores", "Sebastian Morales", "Lucia Jimenez", "Adrian Castro", "Daniela Vargas",
+    "Fernando Silva", "Gabriela Ortiz", "Ricardo Delgado", "Valeria Peña", "Francisco Ramos", "Andrea Gutierrez", "Mateo Sandoval", "Elena Castillo", "Antonio Mejia", "Carmen Aguilar",
+    
+    // Indonesian names
+    "Andi Pratama", "Sari Wijaya", "Budi Santoso", "Maya Sari", "Rizki Permana", "Indira Putri", "Doni Kurniawan", "Lestari Dewi", "Fajar Hidayat", "Ratna Sari",
+    "Yoga Prasetya", "Tika Maharani", "Agus Setiawan", "Dian Puspita", "Eko Wardana", "Fitri Anggraeni", "Hadi Nugroho", "Sinta Lestari", "Joko Susanto", "Wulan Sari"
+  ];
+
+  const PROFILE_PICTURES = [
+    "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGNpcmNsZSBjeD0iMjAiIGN5PSIyMCIgcj0iMjAiIGZpbGw9IiM0Yjc2ODgiLz4KPGNpcmNsZSBjeD0iMjAiIGN5PSIxNiIgcj0iNiIgZmlsbD0id2hpdGUiLz4KPHBhdGggZD0iTTggMzJjMC02LjYyNyA1LjM3My0xMiAxMi0xMnMxMiA1LjM3MyAxMiAxMiIgZmlsbD0id2hpdGUiLz4KPC9zdmc+",
+    "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGNpcmNsZSBjeD0iMjAiIGN5PSIyMCIgcj0iMjAiIGZpbGw9IiNlMTQ5MzQiLz4KPGNpcmNsZSBjeD0iMjAiIGN5PSIxNiIgcj0iNiIgZmlsbD0id2hpdGUiLz4KPHBhdGggZD0iTTggMzJjMC02LjYyNyA1LjM3My0xMiAxMi0xMnMxMiA1LjM3MyAxMiAxMiIgZmlsbD0id2hpdGUiLz4KPC9zdmc+",
+    "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGNpcmNsZSBjeD0iMjAiIGN5PSIyMCIgcj0iMjAiIGZpbGw9IiMxMDk5ZTciLz4KPGNpcmNsZSBjeD0iMjAiIGN5PSIxNiIgcj0iNiIgZmlsbD0id2hpdGUiLz4KPHBhdGggZD0iTTggMzJjMC02LjYyNyA1LjM3My0xMiAxMi0xMnMxMiA1LjM3MyAxMiAxMiIgZmlsbD0id2hpdGUiLz4KPC9zdmc+",
+    "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGNpcmNsZSBjeD0iMjAiIGN5PSIyMCIgcj0iMjAiIGZpbGw9IiNmOTY0NGEiLz4KPGNpcmNsZSBjeD0iMjAiIGN5PSIxNiIgcj0iNiIgZmlsbD0id2hpdGUiLz4KPHBhdGggZD0iTTggMzJjMC02LjYyNyA1LjM3My0xMiAxMi0xMnMxMiA1LjM3MyAxMiAxMiIgZmlsbD0id2hpdGUiLz4KPC9zdmc+",
+    "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGNpcmNsZSBjeD0iMjAiIGN5PSIyMCIgcj0iMjAiIGZpbGw9IiM4YjVjZjYiLz4KPGNpcmNsZSBjeD0iMjAiIGN5PSIxNiIgcj0iNiIgZmlsbD0id2hpdGUiLz4KPHBhdGggZD0iTTggMzJjMC02LjYyNyA1LjM3My0xMiAxMi0xMnMxMiA1LjM3MyAxMiAxMiIgZmlsbD0id2hpdGUiLz4KPC9zdmc+",
+    "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGNpcmNsZSBjeD0iMjAiIGN5PSIyMCIgcj0iMjAiIGZpbGw9IiNlZjQ0NDQiLz4KPGNpcmNsZSBjeD0iMjAiIGN5PSIxNiIgcj0iNiIgZmlsbD0id2hpdGUiLz4KPHBhdGggZD0iTTggMzJjMC02LjYyNyA1LjM3My0xMiAxMi0xMnMxMiA1LjM3MyAxMiAxMiIgZmlsbD0id2hpdGUiLz4KPC9zdmc+",
+    "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGNpcmNsZSBjeD0iMjAiIGN5PSIyMCIgcj0iMjAiIGZpbGw9IiMwNmI2ZDQiLz4KPGNpcmNsZSBjeD0iMjAiIGN5PSIxNiIgcj0iNiIgZmlsbD0id2hpdGUiLz4KPHBhdGggZD0iTTggMzJjMC02LjYyNyA1LjM3My0xMiAxMi0xMnMxMiA1LjM3MyAxMiAxMiIgZmlsbD0id2hpdGUiLz4KPC9zdmc+",
+    "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGNpcmNsZSBjeD0iMjAiIGN5PSIyMCIgcj0iMjAiIGZpbGw9IiM5NGE2YjgiLz4KPGNpcmNsZSBjeD0iMjAiIGN5PSIxNiIgcj0iNiIgZmlsbD0id2hpdGUiLz4KPHBhdGggZD0iTTggMzJjMC02LjYyNyA1LjM3My0xMiAxMi0xMnMxMiA1LjM3MyAxMiAxMiIgZmlsbD0id2hpdGUiLz4KPC9zdmc+",
+    "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGNpcmNsZSBjeD0iMjAiIGN5PSIyMCIgcj0iMjAiIGZpbGw9IiNmZWY0ZTIiLz4KPGNpcmNsZSBjeD0iMjAiIGN5PSIxNiIgcj0iNiIgZmlsbD0iIzM3NDE0YiIvPgo8cGF0aCBkPSJNOCAzMmMwLTYuNjI3IDUuMzczLTEyIDEyLTEyczEyIDUuMzczIDEyIDEyIiBmaWxsPSIjMzc0MTRiIi8+Cjwvc3ZnPg==",
+    "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGNpcmNsZSBjeD0iMjAiIGN5PSIyMCIgcj0iMjAiIGZpbGw9IiNhN2YzZDAiLz4KPGNpcmNsZSBjeD0iMjAiIGN5PSIxNiIgcj0iNiIgZmlsbD0id2hpdGUiLz4KPHBhdGggZD0iTTggMzJjMC02LjYyNyA1LjM3My0xMiAxMi0xMnMxMiA1LjM3MyAxMiAxMiIgZmlsbD0id2hpdGUiLz4KPC9zdmc+"
+  ];
+
   const AI_BOTS = [
-    // Easy Bots (30 bots)
-    ...Array.from({ length: 30 }, (_, i) => ({
-      id: `bot_easy_${i + 1}`,
-      username: `EasyBot${i + 1}`,
-      displayName: `EasyBot ${i + 1}`,
-      difficulty: 'easy' as const,
-      profilePicture: null,
-      firstName: `EasyBot ${i + 1}`,
-      isBot: true
-    })),
-    // Medium Bots (40 bots)
-    ...Array.from({ length: 40 }, (_, i) => ({
-      id: `bot_medium_${i + 1}`,
-      username: `MediumBot${i + 1}`,
-      displayName: `MediumBot ${i + 1}`,
-      difficulty: 'medium' as const,
-      profilePicture: null,
-      firstName: `MediumBot ${i + 1}`,
-      isBot: true
-    })),
-    // Hard Bots (30 bots)
-    ...Array.from({ length: 30 }, (_, i) => ({
-      id: `bot_hard_${i + 1}`,
-      username: `HardBot${i + 1}`,
-      displayName: `HardBot ${i + 1}`,
-      difficulty: 'hard' as const,
-      profilePicture: null,
-      firstName: `HardBot ${i + 1}`,
-      isBot: true
-    }))
+    // Easy players (30 bots)
+    ...Array.from({ length: 30 }, (_, i) => {
+      const name = REALISTIC_NAMES[i % REALISTIC_NAMES.length];
+      const profilePic = PROFILE_PICTURES[i % PROFILE_PICTURES.length];
+      return {
+        id: `player_${i + 1}`,
+        username: name.replace(' ', '').toLowerCase(),
+        displayName: name,
+        difficulty: 'easy' as const,
+        profilePicture: profilePic,
+        firstName: name.split(' ')[0],
+        isBot: false // Hide bot status completely
+      };
+    }),
+    // Medium players (40 bots)
+    ...Array.from({ length: 40 }, (_, i) => {
+      const name = REALISTIC_NAMES[(i + 30) % REALISTIC_NAMES.length];
+      const profilePic = PROFILE_PICTURES[(i + 30) % PROFILE_PICTURES.length];
+      return {
+        id: `player_${i + 31}`,
+        username: name.replace(' ', '').toLowerCase(),
+        displayName: name,
+        difficulty: 'medium' as const,
+        profilePicture: profilePic,
+        firstName: name.split(' ')[0],
+        isBot: false // Hide bot status completely
+      };
+    }),
+    // Hard players (30 bots)
+    ...Array.from({ length: 30 }, (_, i) => {
+      const name = REALISTIC_NAMES[(i + 70) % REALISTIC_NAMES.length];
+      const profilePic = PROFILE_PICTURES[(i + 70) % PROFILE_PICTURES.length];
+      return {
+        id: `player_${i + 71}`,
+        username: name.replace(' ', '').toLowerCase(),
+        displayName: name,
+        difficulty: 'hard' as const,
+        profilePicture: profilePic,
+        firstName: name.split(' ')[0],
+        isBot: false // Hide bot status completely
+      };
+    })
   ];
   
   // Function to get a random available bot
@@ -896,13 +944,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
                 role: 'player'
               });
               
-              // Send match found notification with bot
+              // Send match found notification 
               connection.ws.send(JSON.stringify({
                 type: 'match_found',
                 room: room,
                 message: `Matched with ${bot.displayName}!`,
-                isBot: true,
-                botInfo: bot
+                isBot: false, // Hide bot status
+                playerInfo: bot
               }));
               
               console.log(`🤖 User ${userId} matched with bot in room ${room.id}`);
@@ -1887,7 +1935,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         await new Promise(resolve => setTimeout(resolve, 100));
         
         // Verify the update was successful by fetching fresh game state
-        const updatedGame = await storage.getGame(gameId);
+        const updatedGame = await storage.getGameById(gameId);
         console.log(`✅ MOVE SUCCESSFUL: ${playerSymbol} at position ${position}`);
         console.log(`- Next player: ${nextPlayer}`);
         console.log(`- Database current player: ${updatedGame?.currentPlayer}`);
@@ -1900,13 +1948,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
           // Get player information with achievements for the move broadcast (parallel fetch for speed)
           const [playerXInfo, playerOInfo] = await Promise.all([
             storage.getUser(game.playerXId),
-            game.playerOId !== 'AI' ? storage.getUser(game.playerOId) : Promise.resolve(null)
+            game.playerOId !== 'AI' && !AI_BOTS.some(bot => bot.id === game.playerOId) ? 
+              storage.getUser(game.playerOId) : 
+              Promise.resolve(AI_BOTS.find(bot => bot.id === game.playerOId) || null)
           ]);
           
           // Get achievements for both players
           const [playerXAchievements, playerOAchievements] = await Promise.all([
             playerXInfo ? storage.getUserAchievements(game.playerXId) : Promise.resolve([]),
-            playerOInfo ? storage.getUserAchievements(game.playerOId) : Promise.resolve([])
+            playerOInfo && !AI_BOTS.some(bot => bot.id === game.playerOId) ? storage.getUserAchievements(game.playerOId) : Promise.resolve([])
           ]);
           
           // Use the verified current player from database

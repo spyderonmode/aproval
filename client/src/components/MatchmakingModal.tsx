@@ -214,9 +214,9 @@ export function MatchmakingModal({ open, onClose, onMatchFound, user }: Matchmak
                       ) : searchTime < 20 ? (
                         <span className="text-gray-500">{t('expandingSearch')}</span>
                       ) : searchTime < 25 ? (
-                        <span className="text-orange-500 font-medium">🤖 {t('willMatchWithBot')} {25 - searchTime}s</span>
+                        <span className="text-gray-500">{t('expandingSearch')}</span>
                       ) : (
-                        <span className="text-green-500 font-medium">🤖 {t('matchingWithBot')}</span>
+                        <span className="text-blue-500 font-medium">{t('findingPerfectOpponent')}</span>
                       )}
                     </div>
                   </div>
