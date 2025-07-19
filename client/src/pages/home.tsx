@@ -452,6 +452,11 @@ export default function Home() {
             setShowGameOver(false);
             setGameResult(null);
             setIsCreatingGame(false);
+            
+            // Force a fresh local game initialization after cleanup
+            setTimeout(() => {
+              initializeLocalGame();
+            }, 200);
           };
           
           // Use a single setTimeout to batch all state changes and prevent flickering
@@ -538,6 +543,11 @@ export default function Home() {
         setGameResult(null);
         setIsCreatingGame(false);
         setSelectedMode('ai');
+        
+        // Force a fresh local game initialization after cleanup
+        setTimeout(() => {
+          initializeLocalGame();
+        }, 200);
       }, 100);
     } else {
       console.log('🏠 No current room, just resetting state');
@@ -552,7 +562,13 @@ export default function Home() {
       };
       
       // Use a small timeout to batch state changes and prevent flickering
-      setTimeout(resetState, 50);
+      setTimeout(() => {
+        resetState();
+        // Force a fresh local game initialization after cleanup
+        setTimeout(() => {
+          initializeLocalGame();
+        }, 200);
+      }, 50);
     }
   };
 
@@ -611,9 +627,25 @@ export default function Home() {
 
   // Auto-initialize game when switching to AI or pass-play mode
   useEffect(() => {
-    if (!currentGame && (selectedMode === 'ai' || selectedMode === 'pass-play')) {
-      console.log('🎮 Auto-initializing game for mode:', selectedMode);
-      initializeLocalGame();
+    if (selectedMode === 'ai' || selectedMode === 'pass-play') {
+      console.log('🎮 Mode changed to:', selectedMode);
+      // Clear any online game state first
+      if (currentGame && currentGame.gameMode === 'online') {
+        console.log('🎮 Clearing online game state for local mode');
+        setCurrentGame(null);
+        setCurrentRoom(null);
+        setShowGameOver(false);
+        setGameResult(null);
+        setIsCreatingGame(false);
+      }
+      
+      // Initialize local game if no game exists or if switching from online
+      if (!currentGame || currentGame.gameMode === 'online') {
+        console.log('🎮 Auto-initializing game for mode:', selectedMode);
+        setTimeout(() => {
+          initializeLocalGame();
+        }, 100);
+      }
     }
   }, [selectedMode, currentGame, user]);
 
