@@ -99,7 +99,7 @@ export function Leaderboard({ trigger }: LeaderboardProps) {
               repeat: Infinity,
               ease: "easeInOut"
             }}
-            className="font-black text-sm truncate text-orange-500"
+            className="font-black text-sm sm:text-base truncate text-orange-500"
           >
             🔥 {user.displayName}
           </motion.span>
@@ -119,7 +119,7 @@ export function Leaderboard({ trigger }: LeaderboardProps) {
               repeat: Infinity,
               ease: "easeInOut"
             }}
-            className="font-bold text-sm truncate text-indigo-400"
+            className="font-bold text-sm sm:text-base truncate text-indigo-400"
           >
             💎 {user.displayName}
           </motion.span>
@@ -139,7 +139,7 @@ export function Leaderboard({ trigger }: LeaderboardProps) {
               repeat: Infinity,
               ease: "easeInOut"
             }}
-            className="font-bold text-sm truncate text-purple-400"
+            className="font-bold text-sm sm:text-base truncate text-purple-400"
           >
             👑 {user.displayName}
           </motion.span>
@@ -159,14 +159,14 @@ export function Leaderboard({ trigger }: LeaderboardProps) {
               repeat: Infinity,
               ease: "easeInOut"
             }}
-            className="font-bold text-sm truncate text-orange-400"
+            className="font-bold text-sm sm:text-base truncate text-orange-400"
           >
             🌟 {user.displayName}
           </motion.span>
         );
       default:
         return (
-          <span className="font-semibold text-sm truncate">
+          <span className="font-semibold text-sm sm:text-base truncate">
             {user.displayName}
           </span>
         );
@@ -190,15 +190,20 @@ export function Leaderboard({ trigger }: LeaderboardProps) {
           {trigger || defaultTrigger}
         </div>
       </DialogTrigger>
-      <DialogContent className="max-w-4xl max-h-[90vh] w-[95vw] sm:w-full mx-auto flex flex-col overflow-hidden">
-        <DialogHeader className="flex-shrink-0 pb-4">
-          <DialogTitle className="flex items-center gap-2 text-xl">
-            <Trophy className="w-6 h-6 text-yellow-500" />
-            {t('leaderboard') || 'Leaderboard'} - {t('top100Players') || 'Top 100 Players'}
-          </DialogTitle>
-          <p className="text-sm text-gray-600 dark:text-gray-400">
-            {t('leaderboardDescription') || 'The best players ranked by total wins. Achievement borders show player status!'}
-          </p>
+      <DialogContent className="max-w-5xl max-h-[95vh] w-[95vw] sm:w-full mx-auto flex flex-col overflow-hidden bg-gradient-to-br from-slate-50 via-white to-blue-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
+        <DialogHeader className="flex-shrink-0 pb-6 border-b border-gradient-to-r from-transparent via-gray-200 to-transparent dark:via-gray-700">
+          <div className="text-center space-y-2">
+            <DialogTitle className="flex items-center justify-center gap-3 text-2xl font-bold bg-gradient-to-r from-yellow-500 via-orange-500 to-red-500 bg-clip-text text-transparent">
+              <Trophy className="w-8 h-8 text-yellow-500 drop-shadow-lg" />
+              {t('leaderboard') || 'Leaderboard'}
+            </DialogTitle>
+            <p className="text-lg font-semibold text-gray-700 dark:text-gray-300">
+              {t('top100Players') || 'Top 100 Players'}
+            </p>
+            <p className="text-sm text-gray-600 dark:text-gray-400 max-w-md mx-auto">
+              {t('leaderboardDescription') || 'The best players ranked by total wins. Achievement borders show player status!'}
+            </p>
+          </div>
         </DialogHeader>
 
         {isLoading ? (
@@ -212,7 +217,7 @@ export function Leaderboard({ trigger }: LeaderboardProps) {
           </div>
         ) : (
           <div className="flex-1 min-h-0 overflow-y-auto" style={{ WebkitOverflowScrolling: 'touch' }}>
-            <div className="space-y-2 pb-6 pr-4">
+            <div className="space-y-3 pb-6 pr-4 pt-4">
               {leaderboard && leaderboard.length > 0 ? (
                 leaderboard.map((user, index) => {
                   const position = index + 1;
@@ -226,76 +231,125 @@ export function Leaderboard({ trigger }: LeaderboardProps) {
                       transition={{ delay: index * 0.05 }}
                     >
                       <Card 
-                        className={`cursor-pointer transition-all hover:shadow-lg hover:scale-[1.02] ${position <= 3 ? 'border-2' : ''} ${
-                        position === 1 ? 'border-yellow-400 shadow-yellow-200/50' :
-                        position === 2 ? 'border-gray-400 shadow-gray-200/50' :
-                        position === 3 ? 'border-amber-400 shadow-amber-200/50' : ''
-                      }`}
+                        className={`relative cursor-pointer transition-all duration-300 hover:shadow-2xl hover:scale-[1.02] hover:-translate-y-1 ${
+                        position <= 3 ? 'border-2 shadow-xl' : 'border shadow-lg'} ${
+                        position === 1 ? 'border-yellow-400 shadow-yellow-200/30 bg-gradient-to-r from-yellow-50 via-white to-yellow-50 dark:from-yellow-900/20 dark:via-slate-800 dark:to-yellow-900/20' :
+                        position === 2 ? 'border-gray-400 shadow-gray-200/30 bg-gradient-to-r from-gray-50 via-white to-gray-50 dark:from-gray-700/20 dark:via-slate-800 dark:to-gray-700/20' :
+                        position === 3 ? 'border-amber-400 shadow-amber-200/30 bg-gradient-to-r from-amber-50 via-white to-amber-50 dark:from-amber-900/20 dark:via-slate-800 dark:to-amber-900/20' : 
+                        'bg-gradient-to-r from-slate-50 via-white to-slate-50 dark:from-slate-800 dark:via-slate-750 dark:to-slate-800 border-gray-200 dark:border-gray-700'
+                      } ${position <= 3 ? 'ring-2 ring-opacity-20 ' + (position === 1 ? 'ring-yellow-400' : position === 2 ? 'ring-gray-400' : 'ring-amber-400') : ''}`}
                         onClick={() => {
                           setSelectedPlayerId(user.id);
                           setShowPlayerProfile(true);
                         }}>
-                        <CardContent className="p-3 sm:p-4">
-                          <div className="flex items-center gap-2 sm:gap-4">
+                        <CardContent className="p-4 sm:p-6 relative">
+                          {/* Top 3 Background Decoration */}
+                          {position <= 3 && (
+                            <div className={`absolute top-0 right-0 w-16 h-16 opacity-10 ${
+                              position === 1 ? 'text-yellow-400' : position === 2 ? 'text-gray-400' : 'text-amber-400'
+                            }`}>
+                              {position === 1 ? (
+                                <Crown className="w-full h-full" />
+                              ) : position === 2 ? (
+                                <Medal className="w-full h-full" />
+                              ) : (
+                                <Award className="w-full h-full" />
+                              )}
+                            </div>
+                          )}
+                          
+                          <div className="flex items-center gap-3 sm:gap-5 relative z-10">
                             {/* Rank */}
-                            <div className={`flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-gradient-to-br ${getRankColor(position)} flex-shrink-0`}>
-                              {getRankIcon(position)}
+                            <div className={`flex items-center justify-center w-12 h-12 sm:w-16 sm:h-16 rounded-2xl bg-gradient-to-br ${getRankColor(position)} flex-shrink-0 shadow-lg transform transition-transform duration-300 hover:scale-110 ${position <= 3 ? 'ring-4 ring-white dark:ring-slate-800 shadow-xl' : ''}`}>
+                              <div className="flex flex-col items-center">
+                                {getRankIcon(position)}
+                                {position <= 3 && (
+                                  <span className="text-xs font-bold mt-1 opacity-80">#{position}</span>
+                                )}
+                              </div>
                             </div>
 
                             {/* Profile Picture */}
-                            <div className="flex-shrink-0">
+                            <div className="flex-shrink-0 relative">
                               {user.profileImageUrl ? (
                                 <img
                                   src={user.profileImageUrl}
                                   alt={`${user.displayName}'s profile`}
-                                  className="w-10 h-10 sm:w-12 sm:h-12 rounded-full object-cover border-2 border-gray-200 dark:border-gray-700"
+                                  className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl object-cover border-3 border-white dark:border-slate-700 shadow-lg ring-2 ring-gray-200 dark:ring-gray-600"
                                 />
                               ) : (
-                                <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-gradient-to-br from-blue-400 to-purple-500 flex items-center justify-center text-white font-bold text-sm sm:text-lg">
+                                <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-gradient-to-br from-blue-400 via-purple-500 to-pink-500 flex items-center justify-center text-white font-bold text-lg sm:text-xl shadow-lg ring-2 ring-gray-200 dark:ring-gray-600">
                                   {user.displayName.charAt(0).toUpperCase()}
                                 </div>
                               )}
+                              {/* Online Status Indicator */}
+                              <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-400 border-2 border-white dark:border-slate-800 rounded-full shadow-sm"></div>
                             </div>
 
                             {/* User Info */}
                             <div className="flex-1 min-w-0 overflow-hidden">
-                              <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2 mb-1">
+                              <div className="flex flex-col sm:flex-row sm:items-start gap-2 sm:gap-3 mb-3">
                                 <div className="min-w-0 flex-1">
-                                  {renderAchievementBorder(user, position)}
+                                  <div className="text-base sm:text-lg font-bold text-gray-900 dark:text-white mb-1">
+                                    {renderAchievementBorder(user, position)}
+                                  </div>
+                                  <Badge variant="outline" className="text-xs bg-gray-100 dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-600 dark:text-gray-300 font-medium">
+                                    @{user.username}
+                                  </Badge>
                                 </div>
-                                <Badge variant="secondary" className="text-xs w-fit flex-shrink-0 max-w-[80px] truncate">
-                                  @{user.username}
-                                </Badge>
                               </div>
-                              <div className="flex flex-wrap items-center gap-2 sm:gap-4 text-xs sm:text-sm text-gray-600 dark:text-gray-400">
-                                <div className="flex items-center gap-1">
-                                  <Trophy className="w-3 h-3 sm:w-4 sm:h-4 text-yellow-500" />
-                                  <span className="font-semibold text-green-600 dark:text-green-400">{user.wins}</span>
-                                  <span className="hidden sm:inline">{t('winsCount') || 'wins'}</span>
+                              
+                              {/* Stats Grid */}
+                              <div className="grid grid-cols-3 gap-3 text-center">
+                                <div className="bg-green-50 dark:bg-green-900/20 rounded-lg p-2 border border-green-200 dark:border-green-800">
+                                  <div className="flex items-center justify-center gap-1 mb-1">
+                                    <Trophy className="w-3 h-3 text-green-600" />
+                                    <span className="text-xs font-medium text-green-600 dark:text-green-400">{t('wins') || 'Wins'}</span>
+                                  </div>
+                                  <div className="text-lg font-bold text-green-700 dark:text-green-300">{user.wins}</div>
                                 </div>
-                                <div className="flex items-center gap-1">
-                                  <Target className="w-3 h-3 sm:w-4 sm:h-4 text-blue-500" />
-                                  <span>{winRatePercentage}%</span>
+                                
+                                <div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-2 border border-blue-200 dark:border-blue-800">
+                                  <div className="flex items-center justify-center gap-1 mb-1">
+                                    <Target className="w-3 h-3 text-blue-600" />
+                                    <span className="text-xs font-medium text-blue-600 dark:text-blue-400">{t('winRate') || 'Win Rate'}</span>
+                                  </div>
+                                  <div className="text-lg font-bold text-blue-700 dark:text-blue-300">{winRatePercentage}%</div>
                                 </div>
-                                <div className="flex items-center gap-1">
-                                  <Users className="w-3 h-3 sm:w-4 sm:h-4 text-gray-500" />
-                                  <span className="truncate">{user.totalGames}</span>
-                                  <span className="hidden sm:inline">{t('games') || 'games'}</span>
+                                
+                                <div className="bg-purple-50 dark:bg-purple-900/20 rounded-lg p-2 border border-purple-200 dark:border-purple-800">
+                                  <div className="flex items-center justify-center gap-1 mb-1">
+                                    <Users className="w-3 h-3 text-purple-600" />
+                                    <span className="text-xs font-medium text-purple-600 dark:text-purple-400">{t('games') || 'Games'}</span>
+                                  </div>
+                                  <div className="text-lg font-bold text-purple-700 dark:text-purple-300">{user.totalGames}</div>
                                 </div>
                               </div>
                             </div>
 
-                            {/* Stats Summary */}
-                            <div className="hidden md:flex flex-col items-end text-right flex-shrink-0">
+                            {/* Performance Badge */}
+                            <div className="hidden lg:flex flex-col items-center text-center flex-shrink-0 min-w-[100px]">
+                              <div className="mb-2">
+                                <div className={`text-xs font-medium px-2 py-1 rounded-full ${
+                                  winRatePercentage >= 80 ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300' :
+                                  winRatePercentage >= 60 ? 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300' :
+                                  winRatePercentage >= 40 ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300' :
+                                  'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300'
+                                }`}>
+                                  {winRatePercentage >= 80 ? 'Elite' :
+                                   winRatePercentage >= 60 ? 'Expert' :
+                                   winRatePercentage >= 40 ? 'Good' : 'Improving'}
+                                </div>
+                              </div>
                               <div className="text-xs text-gray-500 dark:text-gray-400 mb-1">
                                 {t('wld') || 'W-L-D'}
                               </div>
-                              <div className="text-xs font-mono whitespace-nowrap">
-                                <span className="text-green-600 dark:text-green-400">{user.wins}</span>
+                              <div className="text-xs font-mono whitespace-nowrap bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded">
+                                <span className="text-green-600 dark:text-green-400 font-bold">{user.wins}</span>
                                 <span className="text-gray-400 mx-1">-</span>
-                                <span className="text-red-600 dark:text-red-400">{user.losses}</span>
+                                <span className="text-red-600 dark:text-red-400 font-bold">{user.losses}</span>
                                 <span className="text-gray-400 mx-1">-</span>
-                                <span className="text-yellow-600 dark:text-yellow-400">{user.draws}</span>
+                                <span className="text-yellow-600 dark:text-yellow-400 font-bold">{user.draws}</span>
                               </div>
                             </div>
                           </div>
@@ -314,14 +368,17 @@ export function Leaderboard({ trigger }: LeaderboardProps) {
           </div>
         )}
 
-        <div className="flex justify-between items-center pt-4 border-t border-gray-200 dark:border-gray-700 flex-shrink-0">
-          <div className="text-sm text-gray-500 dark:text-gray-400">
-            {leaderboard?.length ? 
-              `${t('showing') || 'Showing'} ${leaderboard.length} ${t('players') || 'players'}` :
-              ''
-            }
+        <div className="flex justify-between items-center pt-6 border-t border-gradient-to-r from-transparent via-gray-200 to-transparent dark:via-gray-700 flex-shrink-0 bg-gradient-to-r from-slate-50 via-white to-slate-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
+          <div className="flex items-center gap-2">
+            <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+            <span className="text-sm font-medium text-gray-600 dark:text-gray-400">
+              {leaderboard?.length ? 
+                `${t('showing') || 'Showing'} ${leaderboard.length} ${t('players') || 'players'}` :
+                ''
+              }
+            </span>
           </div>
-          <Button onClick={() => setIsOpen(false)} variant="default">
+          <Button onClick={() => setIsOpen(false)} variant="default" className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white border-0 shadow-lg px-6">
             {t('close') || 'Close'}
           </Button>
         </div>
