@@ -273,7 +273,9 @@ export class DatabaseStorage implements IStorage {
 
   // Game operations
   async createGame(gameData: InsertGame): Promise<Game> {
-    const [game] = await db.insert(games).values(gameData).returning();
+    // Remove lastMoveAt from gameData if it exists since column doesn't exist yet
+    const { lastMoveAt, ...safeGameData } = gameData as any;
+    const [game] = await db.insert(games).values(safeGameData).returning();
     return game;
   }
 
@@ -292,7 +294,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   async updateGameBoard(gameId: string, board: Record<string, string>): Promise<void> {
-    await db.update(games).set({ board, lastMoveAt: new Date() }).where(eq(games.id, gameId));
+    await db.update(games).set({ board }).where(eq(games.id, gameId));
   }
 
   async updateGameStatus(gameId: string, status: string, winnerId?: string, winCondition?: string): Promise<void> {
@@ -327,7 +329,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   async updateCurrentPlayer(gameId: string, currentPlayer: string): Promise<void> {
-    await db.update(games).set({ currentPlayer, lastMoveAt: new Date() }).where(eq(games.id, gameId));
+    await db.update(games).set({ currentPlayer }).where(eq(games.id, gameId));
   }
 
   async getActiveGameForUser(userId: string): Promise<Game | undefined> {
@@ -341,13 +343,14 @@ export class DatabaseStorage implements IStorage {
           eq(games.playerOId, userId)
         )
       ))
-      .orderBy(desc(games.lastMoveAt))
+      .orderBy(desc(games.createdAt))
       .limit(1);
     return game;
   }
 
   async updateLastMoveTime(gameId: string): Promise<void> {
-    await db.update(games).set({ lastMoveAt: new Date() }).where(eq(games.id, gameId));
+    // Temporarily disabled - will be re-enabled once database column is added
+    // await db.update(games).set({ lastMoveAt: new Date() }).where(eq(games.id, gameId));
   }
 
   // Move operations
