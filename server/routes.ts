@@ -68,17 +68,79 @@ export async function registerRoutes(app: Express): Promise<Server> {
   ];
 
   const PROFILE_PICTURES = [
-    "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGNpcmNsZSBjeD0iMjAiIGN5PSIyMCIgcj0iMjAiIGZpbGw9IiM0Yjc2ODgiLz4KPGNpcmNsZSBjeD0iMjAiIGN5PSIxNiIgcj0iNiIgZmlsbD0id2hpdGUiLz4KPHBhdGggZD0iTTggMzJjMC02LjYyNyA1LjM3My0xMiAxMi0xMnMxMiA1LjM3MyAxMiAxMiIgZmlsbD0id2hpdGUiLz4KPC9zdmc+",
-    "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGNpcmNsZSBjeD0iMjAiIGN5PSIyMCIgcj0iMjAiIGZpbGw9IiNlMTQ5MzQiLz4KPGNpcmNsZSBjeD0iMjAiIGN5PSIxNiIgcj0iNiIgZmlsbD0id2hpdGUiLz4KPHBhdGggZD0iTTggMzJjMC02LjYyNyA1LjM3My0xMiAxMi0xMnMxMiA1LjM3MyAxMiAxMiIgZmlsbD0id2hpdGUiLz4KPC9zdmc+",
-    "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGNpcmNsZSBjeD0iMjAiIGN5PSIyMCIgcj0iMjAiIGZpbGw9IiMxMDk5ZTciLz4KPGNpcmNsZSBjeD0iMjAiIGN5PSIxNiIgcj0iNiIgZmlsbD0id2hpdGUiLz4KPHBhdGggZD0iTTggMzJjMC02LjYyNyA1LjM3My0xMiAxMi0xMnMxMiA1LjM3MyAxMiAxMiIgZmlsbD0id2hpdGUiLz4KPC9zdmc+",
-    "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGNpcmNsZSBjeD0iMjAiIGN5PSIyMCIgcj0iMjAiIGZpbGw9IiNmOTY0NGEiLz4KPGNpcmNsZSBjeD0iMjAiIGN5PSIxNiIgcj0iNiIgZmlsbD0id2hpdGUiLz4KPHBhdGggZD0iTTggMzJjMC02LjYyNyA1LjM3My0xMiAxMi0xMnMxMiA1LjM3MyAxMiAxMiIgZmlsbD0id2hpdGUiLz4KPC9zdmc+",
-    "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGNpcmNsZSBjeD0iMjAiIGN5PSIyMCIgcj0iMjAiIGZpbGw9IiM4YjVjZjYiLz4KPGNpcmNsZSBjeD0iMjAiIGN5PSIxNiIgcj0iNiIgZmlsbD0id2hpdGUiLz4KPHBhdGggZD0iTTggMzJjMC02LjYyNyA1LjM3My0xMiAxMi0xMnMxMiA1LjM3MyAxMiAxMiIgZmlsbD0id2hpdGUiLz4KPC9zdmc+",
-    "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGNpcmNsZSBjeD0iMjAiIGN5PSIyMCIgcj0iMjAiIGZpbGw9IiNlZjQ0NDQiLz4KPGNpcmNsZSBjeD0iMjAiIGN5PSIxNiIgcj0iNiIgZmlsbD0id2hpdGUiLz4KPHBhdGggZD0iTTggMzJjMC02LjYyNyA1LjM3My0xMiAxMi0xMnMxMiA1LjM3MyAxMiAxMiIgZmlsbD0id2hpdGUiLz4KPC9zdmc+",
-    "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGNpcmNsZSBjeD0iMjAiIGN5PSIyMCIgcj0iMjAiIGZpbGw9IiMwNmI2ZDQiLz4KPGNpcmNsZSBjeD0iMjAiIGN5PSIxNiIgcj0iNiIgZmlsbD0id2hpdGUiLz4KPHBhdGggZD0iTTggMzJjMC02LjYyNyA1LjM3My0xMiAxMi0xMnMxMiA1LjM3MyAxMiAxMiIgZmlsbD0id2hpdGUiLz4KPC9zdmc+",
-    "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGNpcmNsZSBjeD0iMjAiIGN5PSIyMCIgcj0iMjAiIGZpbGw9IiM5NGE2YjgiLz4KPGNpcmNsZSBjeD0iMjAiIGN5PSIxNiIgcj0iNiIgZmlsbD0id2hpdGUiLz4KPHBhdGggZD0iTTggMzJjMC02LjYyNyA1LjM3My0xMiAxMi0xMnMxMiA1LjM3MyAxMiAxMiIgZmlsbD0id2hpdGUiLz4KPC9zdmc+",
-    "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGNpcmNsZSBjeD0iMjAiIGN5PSIyMCIgcj0iMjAiIGZpbGw9IiNmZWY0ZTIiLz4KPGNpcmNsZSBjeD0iMjAiIGN5PSIxNiIgcj0iNiIgZmlsbD0iIzM3NDE0YiIvPgo8cGF0aCBkPSJNOCAzMmMwLTYuNjI3IDUuMzczLTEyIDEyLTEyczEyIDUuMzczIDEyIDEyIiBmaWxsPSIjMzc0MTRiIi8+Cjwvc3ZnPg==",
-    "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGNpcmNsZSBjeD0iMjAiIGN5PSIyMCIgcj0iMjAiIGZpbGw9IiNhN2YzZDAiLz4KPGNpcmNsZSBjeD0iMjAiIGN5PSIxNiIgcj0iNiIgZmlsbD0id2hpdGUiLz4KPHBhdGggZD0iTTggMzJjMC02LjYyNyA1LjM3My0xMiAxMi0xMnMxMiA1LjM3MyAxMiAxMiIgZmlsbD0id2hpdGUiLz4KPC9zdmc+"
+    // Animals
+    "https://images.unsplash.com/photo-1474511320723-9a56873867b5?w=80&h=80&fit=crop&crop=face",  // Fox
+    "https://images.unsplash.com/photo-1425082661705-1834bfd09dca?w=80&h=80&fit=crop&crop=face",  // Elephant
+    "https://images.unsplash.com/photo-1549366021-9f761d040a94?w=80&h=80&fit=crop&crop=face",  // Panda
+    "https://images.unsplash.com/photo-1537151625747-768eb6cf92b2?w=80&h=80&fit=crop&crop=face",  // Dog
+    "https://images.unsplash.com/photo-1518717758536-85ae29035b6d?w=80&h=80&fit=crop&crop=face",  // Cat
+    "https://images.unsplash.com/photo-1544966503-7cc5ac882d5e?w=80&h=80&fit=crop&crop=face",  // Lion
+    "https://images.unsplash.com/photo-1551069613-1904dbdcda11?w=80&h=80&fit=crop&crop=face",  // Tiger
+    "https://images.unsplash.com/photo-1583337130417-3346a1be7dee?w=80&h=80&fit=crop&crop=face",  // Giraffe
+    "https://images.unsplash.com/photo-1564349683136-77e08dba1ef7?w=80&h=80&fit=crop&crop=face",  // Zebra
+    "https://images.unsplash.com/photo-1551079278-e3da618072aa?w=80&h=80&fit=crop&crop=face",  // Bear
+    
+    // Birds
+    "https://images.unsplash.com/photo-1444464666168-49d633b86797?w=80&h=80&fit=crop&crop=face",  // Parrot
+    "https://images.unsplash.com/photo-1518467166778-b88f373ffec7?w=80&h=80&fit=crop&crop=face",  // Eagle
+    "https://images.unsplash.com/photo-1552728089-57bdde30beb3?w=80&h=80&fit=crop&crop=face",  // Owl
+    "https://images.unsplash.com/photo-1521651201144-634f700b36ef?w=80&h=80&fit=crop&crop=face",  // Flamingo
+    "https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=80&h=80&fit=crop&crop=face",  // Peacock
+    "https://images.unsplash.com/photo-1518717758536-85ae29035b6d?w=80&h=80&fit=crop&crop=face",  // Robin
+    "https://images.unsplash.com/photo-1583212292454-1fe6229603b7?w=80&h=80&fit=crop&crop=face",  // Penguin
+    "https://images.unsplash.com/photo-1552728089-57bdde30beb3?w=80&h=80&fit=crop&crop=face",  // Toucan
+    "https://images.unsplash.com/photo-1598300042247-d088f8ab3a91?w=80&h=80&fit=crop&crop=face",  // Hummingbird
+    "https://images.unsplash.com/photo-1551435088-5db5d8c0ad53?w=80&h=80&fit=crop&crop=face",  // Swan
+    
+    // Nature/Wildlife
+    "https://images.unsplash.com/photo-1564460576398-ef55d99548b2?w=80&h=80&fit=crop&crop=face",  // Rabbit
+    "https://images.unsplash.com/photo-1603400521630-9f2de124b33b?w=80&h=80&fit=crop&crop=face",  // Deer
+    "https://images.unsplash.com/photo-1564349683136-77e08dba1ef7?w=80&h=80&fit=crop&crop=face",  // Wolf
+    "https://images.unsplash.com/photo-1527118732049-c88155f2107c?w=80&h=80&fit=crop&crop=face",  // Monkey
+    "https://images.unsplash.com/photo-1575550959106-5a7defe28b56?w=80&h=80&fit=crop&crop=face",  // Squirrel
+    "https://images.unsplash.com/photo-1564349683136-77e08dba1ef7?w=80&h=80&fit=crop&crop=face",  // Koala
+    "https://images.unsplash.com/photo-1544966503-7cc5ac882d5e?w=80&h=80&fit=crop&crop=face",  // Turtle
+    "https://images.unsplash.com/photo-1566002797842-80dc7b5c2e4f?w=80&h=80&fit=crop&crop=face",  // Dolphin
+    "https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=80&h=80&fit=crop&crop=face",  // Seal
+    "https://images.unsplash.com/photo-1544966503-7cc5ac882d5e?w=80&h=80&fit=crop&crop=face",  // Horse
+    
+    // Sea creatures
+    "https://images.unsplash.com/photo-1583212292454-1fe6229603b7?w=80&h=80&fit=crop&crop=face",  // Fish
+    "https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=80&h=80&fit=crop&crop=face",  // Whale
+    "https://images.unsplash.com/photo-1527118732049-c88155f2107c?w=80&h=80&fit=crop&crop=face",  // Octopus
+    "https://images.unsplash.com/photo-1566002797842-80dc7b5c2e4f?w=80&h=80&fit=crop&crop=face",  // Starfish
+    "https://images.unsplash.com/photo-1564349683136-77e08dba1ef7?w=80&h=80&fit=crop&crop=face",  // Jellyfish
+    
+    // Forest animals
+    "https://images.unsplash.com/photo-1474511320723-9a56873867b5?w=80&h=80&fit=crop&crop=face",  // Raccoon
+    "https://images.unsplash.com/photo-1425082661705-1834bfd09dca?w=80&h=80&fit=crop&crop=face",  // Hedgehog
+    "https://images.unsplash.com/photo-1549366021-9f761d040a94?w=80&h=80&fit=crop&crop=face",  // Badger
+    "https://images.unsplash.com/photo-1537151625747-768eb6cf92b2?w=80&h=80&fit=crop&crop=face",  // Otter
+    "https://images.unsplash.com/photo-1518717758536-85ae29035b6d?w=80&h=80&fit=crop&crop=face",  // Beaver
+    
+    // Mountain animals
+    "https://images.unsplash.com/photo-1564349683136-77e08dba1ef7?w=80&h=80&fit=crop&crop=face",  // Mountain Goat
+    "https://images.unsplash.com/photo-1544966503-7cc5ac882d5e?w=80&h=80&fit=crop&crop=face",  // Snow Leopard
+    "https://images.unsplash.com/photo-1551079278-e3da618072aa?w=80&h=80&fit=crop&crop=face",  // Lynx
+    "https://images.unsplash.com/photo-1583337130417-3346a1be7dee?w=80&h=80&fit=crop&crop=face",  // Elk
+    "https://images.unsplash.com/photo-1564460576398-ef55d99548b2?w=80&h=80&fit=crop&crop=face",  // Moose
+    
+    // Tropical animals
+    "https://images.unsplash.com/photo-1603400521630-9f2de124b33b?w=80&h=80&fit=crop&crop=face",  // Sloth
+    "https://images.unsplash.com/photo-1527118732049-c88155f2107c?w=80&h=80&fit=crop&crop=face",  // Jaguar
+    "https://images.unsplash.com/photo-1575550959106-5a7defe28b56?w=80&h=80&fit=crop&crop=face",  // Iguana
+    "https://images.unsplash.com/photo-1564349683136-77e08dba1ef7?w=80&h=80&fit=crop&crop=face",  // Chameleon
+    "https://images.unsplash.com/photo-1544966503-7cc5ac882d5e?w=80&h=80&fit=crop&crop=face",  // Lemur
+    
+    // Arctic animals
+    "https://images.unsplash.com/photo-1551079278-e3da618072aa?w=80&h=80&fit=crop&crop=face",  // Polar Bear
+    "https://images.unsplash.com/photo-1583212292454-1fe6229603b7?w=80&h=80&fit=crop&crop=face",  // Arctic Fox
+    "https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=80&h=80&fit=crop&crop=face",  // Walrus
+    "https://images.unsplash.com/photo-1566002797842-80dc7b5c2e4f?w=80&h=80&fit=crop&crop=face",  // Husky
+    "https://images.unsplash.com/photo-1527118732049-c88155f2107c?w=80&h=80&fit=crop&crop=face"   // Reindeer
   ];
+
+
 
   const AI_BOTS = [
     // Easy players (30 bots)
