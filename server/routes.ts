@@ -2988,9 +2988,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
               // Check if user is in an active game
               const userState = userRoomStates.get(userId);
               const activeGame = await storage.getActiveGameByRoomId(roomId);
+              const room = await storage.getRoomById(roomId);
               
-              if (activeGame && activeGame.status === 'active' && 
-                  (activeGame.playerXId === userId || activeGame.playerOId === userId)) {
+              console.log(`🏠 Checking active game for room ${roomId}:`, {
+                activeGame: activeGame ? { id: activeGame.id, status: activeGame.status, playerX: activeGame.playerXId, playerO: activeGame.playerOId } : null,
+                roomStatus: room?.status,
+                userId: userId,
+                isPlayerInGame: activeGame ? (activeGame.playerXId === userId || activeGame.playerOId === userId) : false
+              });
+              
+              // Check both game status AND room status to catch "Play Again" scenarios
+              const isInActiveGame = activeGame && activeGame.status === 'active' && 
+                  (activeGame.playerXId === userId || activeGame.playerOId === userId);
+              const isRoomInPlayingState = room && room.status === 'playing';
+              
+              if (isInActiveGame || (isRoomInPlayingState && activeGame && 
+                  (activeGame.playerXId === userId || activeGame.playerOId === userId))) {
                 console.log(`🏠 Player ${playerName} leaving active game - terminating game and redirecting all users`);
                 
                 // Mark game as finished due to player leaving - this persists in database
@@ -3257,79 +3270,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
           if (roomUsers.has(connectionId)) {
             roomUsers.delete(connectionId);
             
-            // Check if user is in active game
+            // Check if user is in active game before notifying room end
             const userState = userRoomStates.get(connection.userId);
             const activeGame = await storage.getActiveGameByRoomId(roomId);
             
-            if (activeGame && activeGame.status === 'active' && 
-                (activeGame.playerXId === connection.userId || activeGame.playerOId === connection.userId)) {
-              // User is in active game - trigger game abandonment
-              const userInfo = await storage.getUser(connection.userId);
-              const playerName = userInfo?.displayName || userInfo?.firstName || userInfo?.username || 'A player';
-              
-              console.log(`🔌 Player ${playerName} disconnected from active game - terminating game and redirecting all users`);
-              
-              // Mark game as finished due to player disconnecting
-              await storage.finishGame(activeGame.id, {
-                status: 'abandoned',
-                winningPlayer: null,
-                winningPositions: [],
-                updatedAt: new Date()
-              });
-              
-              console.log(`🔌 Game ${activeGame.id} permanently ended in database due to player disconnect`);
-              
-              // Get all users in the room (players and spectators)
-              const roomUsers = roomConnections.get(roomId);
-              if (roomUsers && roomUsers.size > 0) {
-                const gameEndMessage = JSON.stringify({
-                  type: 'game_abandoned',
-                  roomId,
-                  gameId: activeGame.id,
-                  leavingPlayer: playerName,
-                  message: `Game ended - ${playerName} disconnected`,
-                  redirectToHome: true
-                });
-                
-                // Track unique users to prevent duplicate messages
-                const notifiedUsers = new Set<string>();
-                const connectionsToSend: string[] = [];
-                
-                // Filter to send only one message per unique user
-                roomUsers.forEach(connectionId => {
-                  const conn = connections.get(connectionId);
-                  if (conn && conn.ws.readyState === WebSocket.OPEN && conn.userId) {
-                    if (!notifiedUsers.has(conn.userId)) {
-                      notifiedUsers.add(conn.userId);
-                      connectionsToSend.push(connectionId);
-                    }
-                  }
-                });
-                
-                console.log(`🔌 Broadcasting game abandonment to ${connectionsToSend.length} unique users in room ${roomId}`);
-                
-                // Send to unique users only
-                connectionsToSend.forEach(connectionId => {
-                  const conn = connections.get(connectionId);
-                  if (conn && conn.ws.readyState === WebSocket.OPEN) {
-                    conn.ws.send(gameEndMessage);
-                  }
-                });
-              }
-              
-              // Clean up all users from room after game abandonment
-              roomConnections.delete(roomId);
-              console.log(`🔌 Room ${roomId} cleared due to game abandonment`);
-              
-              // Clear room states for all users in the room
-              for (const [userId] of userRoomStates.entries()) {
-                const state = userRoomStates.get(userId);
-                if (state && state.roomId === roomId) {
-                  userRoomStates.delete(userId);
-                }
-              }
-            } else {
-              // User is not in active game - normal room end logic
+            if (!(activeGame && activeGame.status === 'active' && 
+                  (activeGame.playerXId === connection.userId || activeGame.playerOId === connection.userId))) {
+              // Only notify room end if user is not in active game
               const userInfo = await storage.getUser(connection.userId);
               const playerName = userInfo?.displayName || userInfo?.firstName || userInfo?.username || 'A player';
               
