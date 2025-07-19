@@ -8,6 +8,7 @@ import { useToast } from "@/hooks/use-toast";
 import { isUnauthorizedError } from "@/lib/authUtils";
 import { Loader2, Users, X, Zap } from "lucide-react";
 import { useTranslation } from "@/contexts/LanguageContext";
+import { useWebSocket } from "@/hooks/useWebSocket";
 
 interface MatchmakingModalProps {
   open: boolean;
@@ -22,6 +23,7 @@ export function MatchmakingModal({ open, onClose, onMatchFound, user }: Matchmak
   const [searchTime, setSearchTime] = useState(0);
   const [queuePosition, setQueuePosition] = useState(0);
   const { toast } = useToast();
+  const { lastMessage } = useWebSocket();
 
   useEffect(() => {
     let interval: NodeJS.Timeout;
@@ -32,6 +34,36 @@ export function MatchmakingModal({ open, onClose, onMatchFound, user }: Matchmak
     }
     return () => clearInterval(interval);
   }, [isSearching]);
+
+  // Handle WebSocket messages for matchmaking
+  useEffect(() => {
+    if (lastMessage && open && isSearching) {
+      console.log('🎯 MatchmakingModal received WebSocket message:', lastMessage);
+      
+      switch (lastMessage.type) {
+        case 'matchmaking_success':
+          console.log('🎯 Received matchmaking success:', lastMessage);
+          setIsSearching(false);
+          onMatchFound(lastMessage.room);
+          onClose();
+          toast({
+            title: t('matchFound'),
+            description: t('matchedWithOpponent'),
+          });
+          break;
+        case 'match_found':
+          console.log('🎯 Received match found:', lastMessage);
+          setIsSearching(false);
+          onMatchFound(lastMessage.room);
+          onClose();
+          toast({
+            title: t('matchFound'),
+            description: lastMessage.message || t('matchedWithOpponent'),
+          });
+          break;
+      }
+    }
+  }, [lastMessage, open, isSearching, onMatchFound, onClose, toast, t]);
 
   const joinMatchmakingMutation = useMutation({
     mutationFn: async () => {

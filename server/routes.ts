@@ -957,57 +957,61 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Set 25-second timer for AI bot matchmaking
       const botTimer = setTimeout(async () => {
         try {
-          // Check if user is still in queue (hasn't been matched with real player)
-          if (matchmakingQueue.includes(userId)) {
-            console.log(`🤖 25 seconds passed - matching ${userId} with AI bot`);
-            
-            // Remove user from queue
-            const userIndex = matchmakingQueue.indexOf(userId);
-            if (userIndex > -1) {
-              matchmakingQueue.splice(userIndex, 1);
-            }
-            
-            // Get a random bot
-            const bot = getRandomAvailableBot();
-            console.log(`🤖 Selected bot: ${bot.displayName} (${bot.difficulty} difficulty)`);
-            
-            // Create room for user vs bot
-            const room = await storage.createRoom({
-              name: `${bot.displayName} Match`,
-              isPrivate: false,
-              maxPlayers: 2,
-              ownerId: userId,
-            });
-            
-            // Add user as participant
-            await storage.addRoomParticipant({
-              roomId: room.id,
-              userId: userId,
-              role: 'player',
-            });
-            
-            // Add bot as user in database first to ensure proper participant display
-            await storage.upsertUser({
-              id: bot.id,
-              username: bot.username,
-              displayName: bot.displayName,
-              firstName: bot.firstName,
-              profileImageUrl: bot.profilePicture
-            });
+          // Double-check if user is still in queue and hasn't been matched with real player
+          const currentQueueIndex = matchmakingQueue.indexOf(userId);
+          if (currentQueueIndex === -1) {
+            console.log(`🤖 User ${userId} no longer in queue - likely matched with real player. Skipping bot match.`);
+            matchmakingTimers.delete(userId);
+            return;
+          }
+          
+          console.log(`🤖 25 seconds passed - matching ${userId} with AI bot`);
+          
+          // Remove user from queue and clear timer
+          matchmakingQueue.splice(currentQueueIndex, 1);
+          matchmakingTimers.delete(userId);
+          
+          // Get a random bot
+          const bot = getRandomAvailableBot();
+          console.log(`🤖 Selected bot: ${bot.displayName} (${bot.difficulty} difficulty)`);
+          
+          // Create room for user vs bot
+          const room = await storage.createRoom({
+            name: `${bot.displayName} Match`,
+            isPrivate: false,
+            maxPlayers: 2,
+            ownerId: userId,
+          });
+          
+          // Add user as participant
+          await storage.addRoomParticipant({
+            roomId: room.id,
+            userId: userId,
+            role: 'player',
+          });
+          
+          // Add bot as user in database first to ensure proper participant display
+          await storage.upsertUser({
+            id: bot.id,
+            username: bot.username,
+            displayName: bot.displayName,
+            firstName: bot.firstName,
+            profileImageUrl: bot.profilePicture
+          });
 
-            // Add bot as second participant to show 2 players in room
-            await storage.addRoomParticipant({
-              roomId: room.id,
-              userId: bot.id,
-              role: 'player',
-            });
-            
-            // Notify user about bot match
-            const userConnections = Array.from(connections.entries())
-              .filter(([_, connection]) => connection.userId === userId && connection.ws.readyState === WebSocket.OPEN);
-            
-            if (userConnections.length > 0) {
-              const [connId, connection] = userConnections[0];
+          // Add bot as second participant to show 2 players in room
+          await storage.addRoomParticipant({
+            roomId: room.id,
+            userId: bot.id,
+            role: 'player',
+          });
+          
+          // Notify user about bot match
+          const userConnections = Array.from(connections.entries())
+            .filter(([_, connection]) => connection.userId === userId && connection.ws.readyState === WebSocket.OPEN);
+          
+          if (userConnections.length > 0) {
+            const [connId, connection] = userConnections[0];
               
               // Add to room connections
               if (!roomConnections.has(room.id)) {
@@ -1086,11 +1090,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
                   console.error('🤖 Error starting bot game:', error);
                 }
               }, 2000);
-            }
-            
-            // Clean up timer
-            matchmakingTimers.delete(userId);
           }
+          
+          // Clean up timer
+          matchmakingTimers.delete(userId);
         } catch (error) {
           console.error('🤖 Error in bot matchmaking:', error);
           matchmakingTimers.delete(userId);
@@ -1184,6 +1187,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
         
         console.log(`🎯 Match notifications sent and both players joined room ${room.id}`);
         
+        // Notify BOTH players about the successful match via WebSocket before responding to the API call
+        // This ensures the first player (who was waiting) also gets immediate notification
+        const matchNotification = {
+          type: 'matchmaking_success',
+          status: 'matched',
+          room: room,
+          message: 'Match found! Preparing game...'
+        };
+        
+        // Send notification to both players
+        [player1Id, player2Id].forEach(playerId => {
+          const userConnections = Array.from(connections.entries())
+            .filter(([_, connection]) => connection.userId === playerId && connection.ws.readyState === WebSocket.OPEN);
+          
+          userConnections.forEach(([_, connection]) => {
+            connection.ws.send(JSON.stringify(matchNotification));
+          });
+          
+          console.log(`🎯 Sent match success notification to player ${playerId}`);
+        });
+        
         // Auto-start the game after a longer delay to ensure both players are fully connected
         setTimeout(async () => {
           try {
@@ -1267,7 +1291,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           }
         }, 2000); // 2 second delay to ensure both players are connected
         
-        // Return matched status to the player who just joined
+        // Return matched status to the player who just joined (this is the API response)
         res.json({ status: 'matched', room: room });
       } else {
         res.json({ status: 'waiting', message: 'Waiting for another player...' });

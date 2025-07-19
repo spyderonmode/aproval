@@ -329,6 +329,20 @@ export default function Home() {
             });
           }
           break;
+        case 'matchmaking_success':
+          console.log('🎮 Matchmaking success:', lastMessage);
+          if (!isMatchmaking) {
+            console.log('🎮 Ignoring duplicate matchmaking_success - not in matchmaking');
+            break;
+          }
+          setIsMatchmaking(false);
+          setShowMatchmaking(false);
+          handleRoomJoin(lastMessage.room);
+          toast({
+            title: "Match Found!",
+            description: lastMessage.message || "You've been matched with a real player!",
+          });
+          break;
         case 'player_reaction':
           // Handle player reaction - this will be broadcast to all players and spectators
           if (currentGame && (lastMessage.gameId === currentGame.id || lastMessage.roomId === currentRoom?.id)) {
