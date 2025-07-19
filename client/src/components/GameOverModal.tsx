@@ -9,9 +9,10 @@ interface GameOverModalProps {
   onPlayAgain: () => void;
   isCreatingGame?: boolean;
   onMainMenu?: () => void;
+  isSpectator?: boolean;
 }
 
-export function GameOverModal({ open, onClose, result, onPlayAgain, isCreatingGame = false, onMainMenu }: GameOverModalProps) {
+export function GameOverModal({ open, onClose, result, onPlayAgain, isCreatingGame = false, onMainMenu, isSpectator = false }: GameOverModalProps) {
   const { t } = useTranslation();
   
   // Simple safety checks
@@ -246,29 +247,33 @@ export function GameOverModal({ open, onClose, result, onPlayAgain, isCreatingGa
             <Home style={{ width: '16px', height: '16px' }} />
             {t('mainMenu')}
           </button>
-          <button
-            onClick={() => {
-              if (!isCreatingGame) {
-                onPlayAgain();
-              }
-            }}
-            disabled={isCreatingGame}
-            style={{
-              padding: '8px 16px',
-              borderRadius: '8px',
-              backgroundColor: isCreatingGame ? '#6b7280' : '#3b82f6',
-              color: 'white',
-              border: isCreatingGame ? '1px solid #6b7280' : '1px solid #2563eb',
-              cursor: isCreatingGame ? 'not-allowed' : 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '8px',
-              opacity: isCreatingGame ? 0.6 : 1
-            }}
-          >
-            <RefreshCw style={{ width: '16px', height: '16px' }} />
-            {t('playAgain')}
-          </button>
+          
+          {/* Only show Play Again button if user is not a spectator */}
+          {!isSpectator && (
+            <button
+              onClick={() => {
+                if (!isCreatingGame) {
+                  onPlayAgain();
+                }
+              }}
+              disabled={isCreatingGame}
+              style={{
+                padding: '8px 16px',
+                borderRadius: '8px',
+                backgroundColor: isCreatingGame ? '#6b7280' : '#3b82f6',
+                color: 'white',
+                border: isCreatingGame ? '1px solid #6b7280' : '1px solid #2563eb',
+                cursor: isCreatingGame ? 'not-allowed' : 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+                opacity: isCreatingGame ? 0.6 : 1
+              }}
+            >
+              <RefreshCw style={{ width: '16px', height: '16px' }} />
+              {t('playAgain')}
+            </button>
+          )}
         </div>
       </div>
     </div>

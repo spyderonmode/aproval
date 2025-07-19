@@ -61,6 +61,18 @@ export default function Home() {
     enabled: !!user,
   });
 
+  // Get current user's role in the room (to check if they're a spectator)
+  const { data: roomParticipants = [] } = useQuery({
+    queryKey: ["/api/rooms", currentRoom?.id, "participants"],
+    enabled: !!currentRoom?.id && !!user,
+    refetchInterval: 10000,
+    staleTime: 8000,
+  });
+
+  // Check if current user is a spectator
+  const currentUserParticipant = roomParticipants.find(p => p.userId === (user?.userId || user?.id));
+  const isSpectator = currentUserParticipant?.role === 'spectator';
+
   // Check if email verification is required
   useEffect(() => {
     if (user && user.email && !user.isEmailVerified) {
@@ -1305,6 +1317,7 @@ export default function Home() {
         onPlayAgain={handlePlayAgain}
         isCreatingGame={isCreatingGame}
         onMainMenu={resetToMainMenu}
+        isSpectator={isSpectator}
       />
 
       {showEmailVerification && user?.email && (
