@@ -22,10 +22,12 @@ export function InvitationPopup({ onRoomJoin }: InvitationPopupProps) {
   const { isAuthenticated } = useAuth();
 
   // Fetch room invitations only when authenticated
+  // Use longer polling interval to reduce unnecessary API calls
   const { data: invitations = [] } = useQuery({
     queryKey: ['/api/room-invitations'],
-    refetchInterval: isAuthenticated ? 3000 : false,
+    refetchInterval: isAuthenticated ? 10000 : false, // Reduced from 3s to 10s
     enabled: isAuthenticated,
+    staleTime: 8000, // Consider data fresh for 8 seconds
   });
 
   // Show the first pending invitation as a popup
