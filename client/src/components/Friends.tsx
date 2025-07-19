@@ -58,9 +58,10 @@ export function Friends() {
   });
 
   // Fetch head-to-head stats for selected friend
-  const { data: headToHeadStats } = useQuery<HeadToHeadStats>({
+  const { data: headToHeadStats, isLoading: headToHeadLoading, error: headToHeadError } = useQuery<HeadToHeadStats>({
     queryKey: ['/api/friends', selectedFriend?.id, 'stats'],
-    enabled: !!selectedFriend,
+    enabled: !!selectedFriend && !!selectedFriend?.id,
+    retry: 1,
   });
 
   // Send friend request mutation
@@ -500,7 +501,19 @@ export function Friends() {
                 </DialogTitle>
               </DialogHeader>
               
-              {headToHeadStats ? (
+              {headToHeadLoading ? (
+                <div className="flex items-center justify-center py-8">
+                  <Loader2 className="w-6 h-6 animate-spin mr-2" />
+                  <span>{t('loadingStats')}</span>
+                </div>
+              ) : headToHeadError ? (
+                <div className="text-center py-8">
+                  <p className="text-red-500 mb-2">Failed to load head-to-head stats</p>
+                  <p className="text-sm text-muted-foreground">
+                    {headToHeadError.message}
+                  </p>
+                </div>
+              ) : headToHeadStats ? (
                 <div className="space-y-4">
                   <div className="grid grid-cols-2 gap-4">
                     <div className="text-center p-4 border rounded-lg">
@@ -539,7 +552,7 @@ export function Friends() {
                   </div>
                 </div>
               ) : (
-                <div className="text-center py-8">{t('loadingStats')}</div>
+                <div className="text-center py-8">{t('noStatsAvailable')}</div>
               )}
             </DialogContent>
           </Dialog>

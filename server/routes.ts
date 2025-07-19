@@ -843,15 +843,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const { friendId } = req.params;
       const userId = req.session.user.userId;
       
+      console.log(`📊 Head-to-head stats request: userId=${userId}, friendId=${friendId}`);
+      
       if (!friendId) {
         return res.status(400).json({ error: 'Friend ID is required' });
       }
       
       const stats = await storage.getHeadToHeadStats(userId, friendId);
+      console.log(`📊 Head-to-head stats result:`, stats);
       res.json(stats);
     } catch (error) {
-      console.error("Error getting head-to-head stats:", error);
-      res.status(500).json({ message: "Failed to get head-to-head stats" });
+      console.error("📊 Error getting head-to-head stats:", error);
+      res.status(500).json({ message: "Failed to get head-to-head stats", details: error.message });
     }
   });
 
