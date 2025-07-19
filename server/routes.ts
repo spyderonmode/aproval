@@ -1042,6 +1042,39 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Fix bot stats - reset unrealistic game counts
+  app.post('/api/fix-bot-stats', async (req, res) => {
+    try {
+      console.log('🔧 Fixing bot game statistics...');
+      let fixedCount = 0;
+      
+      // Reset all bot users to reasonable game counts
+      for (const bot of AI_BOTS) {
+        const existingBot = await storage.getUser(bot.id);
+        if (existingBot && existingBot.totalGames && existingBot.totalGames > 25) {
+          // Reset to reasonable numbers
+          const newWins = Math.floor(Math.random() * 12) + 1; // 1-12 wins
+          const newLosses = Math.floor(Math.random() * 8) + 1; // 1-8 losses  
+          const newDraws = Math.floor(Math.random() * 2); // 0-1 draws
+          
+          await storage.upsertUser({
+            ...existingBot,
+            wins: newWins,
+            losses: newLosses,
+            draws: newDraws
+          });
+          fixedCount++;
+        }
+      }
+      
+      console.log(`🔧 Fixed stats for ${fixedCount} bots`);
+      res.json({ success: true, message: `Fixed game stats for ${fixedCount} bots`, fixedCount });
+    } catch (error) {
+      console.error('❌ Error fixing bot stats:', error);
+      res.status(500).json({ error: 'Failed to fix bot stats' });
+    }
+  });
+
   // Sync all AI bots to database with profile pictures and stats
   app.post('/api/sync-bots', async (req, res) => {
     try {
@@ -1058,31 +1091,43 @@ export async function registerRoutes(app: Express): Promise<Server> {
           console.log(`🖼️ Fixing profile picture for ${bot.displayName} (${bot.id})`);
         }
         
-        // Force upsert with profile picture (will override NULL values)
-        await storage.upsertUser({
-          id: bot.id,
-          username: bot.username,
-          displayName: bot.displayName,
-          firstName: bot.firstName,
-          lastName: bot.lastName || 'Player',
-          email: `${bot.username}@bot.local`,
-          profileImageUrl: bot.profilePicture, // This will override NULL values
-          wins: existingBot?.wins || Math.floor(Math.random() * 45) + 5,
-          losses: existingBot?.losses || Math.floor(Math.random() * 25) + 5,
-          draws: existingBot?.draws || Math.floor(Math.random() * 8) + 2
-        });
+        // Only update profile picture if missing, keep existing stats
+        if (existingBot) {
+          // Bot exists - only update profile picture if missing
+          if (!existingBot.profileImageUrl) {
+            await storage.upsertUser({
+              ...existingBot,
+              profileImageUrl: bot.profilePicture
+            });
+          }
+        } else {
+          // New bot - create with reasonable stats
+          await storage.upsertUser({
+            id: bot.id,
+            username: bot.username,
+            displayName: bot.displayName,
+            firstName: bot.firstName,
+            lastName: bot.lastName || 'Player',
+            email: `${bot.username}@bot.local`,
+            profileImageUrl: bot.profilePicture,
+            wins: Math.floor(Math.random() * 15) + 1, // 1-15 wins (reasonable)
+            losses: Math.floor(Math.random() * 10) + 1, // 1-10 losses
+            draws: Math.floor(Math.random() * 3) + 0  // 0-3 draws
+          });
+        }
         syncedCount++;
       }
       
-      // Additional direct database update for any remaining NULL profile images
+      // Quick fix for specific missing profile pictures
       await db.execute(sql`
         UPDATE users 
         SET profile_image_url = CASE 
           WHEN display_name = 'Nour El-Din' THEN ${PROFILE_PICTURES[37 % PROFILE_PICTURES.length]}
           WHEN display_name = 'Fadi Zidan' THEN ${PROFILE_PICTURES[39 % PROFILE_PICTURES.length]}
+          WHEN display_name = 'Derek Baker' THEN ${PROFILE_PICTURES[22 % PROFILE_PICTURES.length]}
           ELSE profile_image_url
         END
-        WHERE (display_name = 'Nour El-Din' OR display_name = 'Fadi Zidan') 
+        WHERE (display_name IN ('Nour El-Din', 'Fadi Zidan', 'Derek Baker')) 
         AND (profile_image_url IS NULL OR profile_image_url = '')
       `);
 
@@ -1097,6 +1142,32 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error('❌ Error syncing bots:', error);
       res.status(500).json({ error: 'Failed to sync bots to database' });
+    }
+  });
+
+  // Quick profile picture fix for specific bots
+  app.post('/api/fix-profile-pics', async (req, res) => {
+    try {
+      console.log('🖼️ Quick fixing missing profile pictures...');
+      
+      // Direct SQL update for specific missing profile pictures
+      await db.execute(sql`
+        UPDATE users 
+        SET profile_image_url = CASE 
+          WHEN display_name = 'Nour El-Din' THEN ${PROFILE_PICTURES[37 % PROFILE_PICTURES.length]}
+          WHEN display_name = 'Fadi Zidan' THEN ${PROFILE_PICTURES[39 % PROFILE_PICTURES.length]}
+          WHEN display_name = 'Derek Baker' THEN ${PROFILE_PICTURES[22 % PROFILE_PICTURES.length]}
+          ELSE profile_image_url
+        END
+        WHERE (display_name IN ('Nour El-Din', 'Fadi Zidan', 'Derek Baker')) 
+        AND (profile_image_url IS NULL OR profile_image_url = '')
+      `);
+      
+      console.log('🖼️ Fixed missing profile pictures');
+      res.json({ success: true, message: 'Fixed missing profile pictures' });
+    } catch (error) {
+      console.error('❌ Error fixing profile pictures:', error);
+      res.status(500).json({ error: 'Failed to fix profile pictures' });
     }
   });
 
