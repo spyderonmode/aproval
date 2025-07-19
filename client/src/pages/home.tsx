@@ -423,29 +423,9 @@ export default function Home() {
           break;
         case 'game_expired':
           console.log('⏰ Game expired:', lastMessage);
-          // Batch state changes to prevent screen blinking
-          const resetExpiredGameState = () => {
-            setCurrentGame(null);
-            setCurrentRoom(null);
-            setSelectedMode('ai');
-            setShowGameOver(false);
-            setGameResult(null);
-          };
-          
-          // Use a single setTimeout to batch all state changes and prevent flickering
+          // Batch all state changes together to prevent screen blinking
           setTimeout(() => {
-            resetExpiredGameState();
-            toast({
-              title: "Game Expired",
-              description: lastMessage.message || "Game expired due to inactivity. Returning to lobby.",
-              variant: "destructive",
-            });
-          }, 100); // Small delay to prevent rapid state changes
-          break;
-        case 'game_abandoned':
-          console.log('🏠 Game abandoned - player left:', lastMessage);
-          // Batch state changes to prevent screen blinking
-          const resetGameState = () => {
+            // Single batched state update
             setCurrentGame(null);
             setCurrentRoom(null);
             setSelectedMode('ai');
@@ -453,21 +433,41 @@ export default function Home() {
             setGameResult(null);
             setIsCreatingGame(false);
             
-            // Force a fresh local game initialization after cleanup
+            toast({
+              title: "Game Expired",
+              description: lastMessage.message || "Game expired due to inactivity. Returning to lobby.",
+              variant: "destructive",
+            });
+            
+            // Initialize new local game after all state is cleared
             setTimeout(() => {
               initializeLocalGame();
-            }, 200);
-          };
-          
-          // Use a single setTimeout to batch all state changes and prevent flickering
+            }, 150);
+          }, 200); // Longer delay to ensure all rendering settles
+          break;
+        case 'game_abandoned':
+          console.log('🏠 Game abandoned - player left:', lastMessage);
+          // Batch all state changes together to prevent screen blinking
           setTimeout(() => {
-            resetGameState();
+            // Single batched state update
+            setCurrentGame(null);
+            setCurrentRoom(null);
+            setSelectedMode('ai');
+            setShowGameOver(false);
+            setGameResult(null);
+            setIsCreatingGame(false);
+            
             toast({
               title: "Game Ended",
               description: lastMessage.message || "Game ended because a player left the room.",
               variant: "destructive",
             });
-          }, 100); // Small delay to prevent rapid state changes
+            
+            // Initialize new local game after all state is cleared
+            setTimeout(() => {
+              initializeLocalGame();
+            }, 150);
+          }, 200); // Longer delay to ensure all rendering settles
           break;
         case 'player_reaction':
           // Handle player reaction - this will be broadcast to all players and spectators
@@ -534,9 +534,10 @@ export default function Home() {
       console.log('🏠 Sending leave message:', leaveMessage);
       sendMessage(leaveMessage);
 
-      // Small delay to ensure message is sent before cleanup
+      // Longer delay to ensure message is sent and prevent blinking
       setTimeout(() => {
         console.log('🏠 Cleaning up after leave message sent');
+        // Single batched state update to prevent multiple renders
         setCurrentRoom(null);
         setCurrentGame(null);
         setShowGameOver(false);
@@ -544,11 +545,11 @@ export default function Home() {
         setIsCreatingGame(false);
         setSelectedMode('ai');
         
-        // Force a fresh local game initialization after cleanup
+        // Initialize new local game after all state is cleared
         setTimeout(() => {
           initializeLocalGame();
-        }, 200);
-      }, 100);
+        }, 150);
+      }, 250); // Longer delay to prevent rapid state changes
     } else {
       console.log('🏠 No current room, just resetting state');
       // Batch state changes to prevent screen blinking
@@ -561,14 +562,14 @@ export default function Home() {
         setSelectedMode('ai');
       };
       
-      // Use a small timeout to batch state changes and prevent flickering
+      // Use a longer timeout to batch state changes and prevent flickering
       setTimeout(() => {
         resetState();
-        // Force a fresh local game initialization after cleanup
+        // Initialize new local game after all state is cleared
         setTimeout(() => {
           initializeLocalGame();
-        }, 200);
-      }, 50);
+        }, 150);
+      }, 200); // Longer delay to prevent rapid state changes
     }
   };
 
