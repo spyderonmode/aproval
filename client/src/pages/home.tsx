@@ -1168,8 +1168,6 @@ export default function Home() {
         user={user}
       />
 
-      <Leaderboard />
-
       {/* Global Room Invitation Popup */}
       <InvitationPopup onRoomJoin={handleRoomJoin} />
 
