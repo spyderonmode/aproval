@@ -291,7 +291,7 @@ export function Leaderboard({ trigger }: LeaderboardProps) {
           {trigger || defaultTrigger}
         </div>
       </DialogTrigger>
-      <DialogContent className="max-w-5xl max-h-[95vh] w-[95vw] sm:w-full mx-auto flex flex-col overflow-hidden bg-gradient-to-br from-slate-50/95 via-white/98 to-blue-50/90 dark:from-slate-900/95 dark:via-slate-800/98 dark:to-slate-900/95 backdrop-blur-md border border-white/20 dark:border-gray-700/30 shadow-2xl">
+      <DialogContent className="max-w-[95vw] sm:max-w-2xl md:max-w-4xl lg:max-w-5xl max-h-[90vh] w-full mx-auto flex flex-col overflow-hidden bg-gradient-to-br from-slate-50/95 via-white/98 to-blue-50/90 dark:from-slate-900/95 dark:via-slate-800/98 dark:to-slate-900/95 backdrop-blur-md border border-white/20 dark:border-gray-700/30 shadow-2xl">
         <DialogHeader className="flex-shrink-0 pb-6 border-b bg-gradient-to-r from-transparent via-gray-200/50 to-transparent dark:via-gray-600/30 relative overflow-hidden">
           {/* Enhanced Background Effects */}
           <div className="absolute inset-0 bg-gradient-to-br from-yellow-50/30 via-orange-50/20 to-red-50/30 dark:from-yellow-900/10 dark:via-orange-900/5 dark:to-red-900/10"></div>
@@ -303,7 +303,7 @@ export function Leaderboard({ trigger }: LeaderboardProps) {
               animate={{ scale: 1, opacity: 1 }}
               transition={{ duration: 0.5, ease: "easeOut" }}
             >
-              <DialogTitle className="flex items-center justify-center gap-4 text-3xl font-extrabold">
+              <DialogTitle className="flex items-center justify-center gap-2 sm:gap-4 text-xl sm:text-2xl md:text-3xl font-extrabold">
                 <motion.div
                   animate={{ 
                     rotate: [0, 5, -5, 0],
@@ -315,7 +315,7 @@ export function Leaderboard({ trigger }: LeaderboardProps) {
                     ease: "easeInOut"
                   }}
                 >
-                  <Trophy className="w-10 h-10 text-yellow-500 drop-shadow-2xl filter brightness-110" />
+                  <Trophy className="w-6 h-6 sm:w-8 sm:h-8 md:w-10 md:h-10 text-yellow-500 drop-shadow-2xl filter brightness-110" />
                 </motion.div>
                 <span className="bg-gradient-to-r from-yellow-600 via-orange-500 to-red-500 bg-clip-text text-transparent drop-shadow-sm">
                   {t('leaderboard') || 'Leaderboard'}
@@ -329,14 +329,14 @@ export function Leaderboard({ trigger }: LeaderboardProps) {
               transition={{ delay: 0.2, duration: 0.5 }}
               className="space-y-2"
             >
-              <div className="inline-flex items-center gap-2 bg-gradient-to-r from-yellow-100 to-orange-100 dark:from-yellow-900/30 dark:to-orange-900/30 px-4 py-2 rounded-full border border-yellow-200/50 dark:border-yellow-700/30 shadow-lg backdrop-blur-sm">
-                <Crown className="w-4 h-4 text-yellow-600" />
-                <p className="text-gray-700 dark:text-gray-200 text-sm font-semibold">
+              <div className="inline-flex items-center gap-1 sm:gap-2 bg-gradient-to-r from-yellow-100 to-orange-100 dark:from-yellow-900/30 dark:to-orange-900/30 px-2 sm:px-4 py-1 sm:py-2 rounded-full border border-yellow-200/50 dark:border-yellow-700/30 shadow-lg backdrop-blur-sm">
+                <Crown className="w-3 h-3 sm:w-4 sm:h-4 text-yellow-600" />
+                <p className="text-gray-700 dark:text-gray-200 text-xs sm:text-sm font-semibold">
                   {t('top100Players') || 'Top 100 Players'}
                 </p>
               </div>
               
-              <p className="text-gray-600 dark:text-gray-300 text-xs max-w-md mx-auto leading-relaxed">
+              <p className="text-gray-600 dark:text-gray-300 text-xs sm:text-sm max-w-xs sm:max-w-md mx-auto leading-relaxed px-2">
                 {t('leaderboardDescription') || 'The best players ranked by total wins. Achievement borders show player status!'}
               </p>
             </motion.div>
@@ -360,7 +360,7 @@ export function Leaderboard({ trigger }: LeaderboardProps) {
           </div>
         ) : (
           <div className="flex-1 min-h-0 overflow-y-auto" style={{ WebkitOverflowScrolling: 'touch' }}>
-            <div className="space-y-1.5 pb-3 pr-2 pt-2">
+            <div className="space-y-1 sm:space-y-1.5 pb-2 sm:pb-3 pr-1 sm:pr-2 pt-1 sm:pt-2">
               {/* Debug info always visible when no data */}
               {!isLoading && !leaderboard && (
                 <div className="p-4 bg-yellow-50 dark:bg-yellow-900/20 rounded-lg text-yellow-800 dark:text-yellow-200 text-sm">
@@ -409,7 +409,7 @@ export function Leaderboard({ trigger }: LeaderboardProps) {
                           setSelectedPlayerId(user.id);
                           setShowPlayerProfile(true);
                         }}>
-                          <CardContent className="p-2 sm:p-2.5 relative">
+                          <CardContent className="p-1.5 sm:p-2.5 relative">
                             {/* Animated Background Gradient */}
                             <div className={`absolute inset-0 opacity-5 ${
                               position === 1 ? 'bg-gradient-to-r from-yellow-300 via-yellow-200 to-yellow-400' :
@@ -443,7 +443,7 @@ export function Leaderboard({ trigger }: LeaderboardProps) {
                               </motion.div>
                             )}
                           
-                          <div className="flex items-center gap-1.5 sm:gap-2 relative z-10">
+                          <div className="flex items-center gap-1 sm:gap-2 relative z-10">
                             {/* Profile Picture with Achievement Border */}
                             <div className="flex-shrink-0 relative">
                               {(() => {
@@ -462,10 +462,10 @@ export function Leaderboard({ trigger }: LeaderboardProps) {
                                       <img
                                         src={user.profileImageUrl}
                                         alt={`${user.displayName}'s profile`}
-                                        className={`w-10 h-10 sm:w-11 sm:h-11 rounded-lg object-cover border-2 border-white dark:border-slate-700 shadow-sm ${borderStyle.borderClass} ${borderStyle.glowEffect} transition-all duration-300`}
+                                        className={`w-8 h-8 sm:w-10 sm:h-10 md:w-11 md:h-11 rounded-lg object-cover border-2 border-white dark:border-slate-700 shadow-sm ${borderStyle.borderClass} ${borderStyle.glowEffect} transition-all duration-300`}
                                       />
                                     ) : (
-                                      <div className={`w-10 h-10 sm:w-11 sm:h-11 rounded-lg bg-gradient-to-br from-blue-400 via-purple-500 to-pink-500 flex items-center justify-center text-white font-bold text-xs sm:text-sm shadow-sm ${borderStyle.borderClass} ${borderStyle.glowEffect} transition-all duration-300`}>
+                                      <div className={`w-8 h-8 sm:w-10 sm:h-10 md:w-11 md:h-11 rounded-lg bg-gradient-to-br from-blue-400 via-purple-500 to-pink-500 flex items-center justify-center text-white font-bold text-xs sm:text-sm shadow-sm ${borderStyle.borderClass} ${borderStyle.glowEffect} transition-all duration-300`}>
                                         {user.displayName.charAt(0).toUpperCase()}
                                       </div>
                                     )}
@@ -484,7 +484,7 @@ export function Leaderboard({ trigger }: LeaderboardProps) {
 
                             {/* User Info */}
                             <div className="flex-1 min-w-0 overflow-hidden">
-                              <div className="flex flex-col sm:flex-row sm:items-start gap-0.5 sm:gap-1 mb-1.5">
+                              <div className="flex flex-col sm:flex-row sm:items-start gap-0.5 sm:gap-1 mb-1">
                                 <div className="min-w-0 flex-1">
                                   <div className="text-xs sm:text-sm font-bold text-gray-900 dark:text-white mb-0.5">
                                     {renderAchievementBorder(user, position)}
@@ -496,7 +496,7 @@ export function Leaderboard({ trigger }: LeaderboardProps) {
                               </div>
                               
                               {/* Stats Grid */}
-                              <div className="grid grid-cols-3 gap-1.5 text-center">
+                              <div className="grid grid-cols-3 gap-1 sm:gap-1.5 text-center">
                                 <motion.div 
                                   className="bg-gradient-to-br from-green-50 to-emerald-100 dark:from-green-900/30 dark:to-emerald-800/20 rounded-lg p-1 border border-green-200/60 dark:border-green-700/40 shadow-sm hover:shadow-md transition-shadow backdrop-blur-sm"
                                   whileHover={{ scale: 1.05 }}
