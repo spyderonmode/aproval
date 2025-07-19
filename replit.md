@@ -8,6 +8,8 @@ This is a full-stack web application for a strategic Tic-Tac-Toe game played on 
 
 Preferred communication style: Simple, everyday language.
 
+**Game Abandonment Preference**: Only abandon games when users explicitly exit rooms (Leave Room/Main Menu buttons), NOT when browser is closed or connection lost.
+
 ## Recent Changes
 
 - **Game Abandonment on Disconnect Fix** (July 19, 2025): Fixed critical gap in game abandonment logic where games weren't abandoned when players exited without making moves. Root cause was WebSocket 'close' event handler only triggering room cleanup for non-active games, while active games were left hanging when players disconnected unexpectedly (browser close, network issues, etc.). Added comprehensive game abandonment logic to WebSocket disconnect handling that mirrors the explicit leave_room behavior - marks game as 'abandoned' in database, broadcasts game_abandoned message to all remaining players/spectators with unique user deduplication, redirects all users to homepage, and cleans up all room states. Now works consistently whether players explicitly leave rooms or disconnect unexpectedly, ensuring no games are left in limbo.
