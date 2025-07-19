@@ -936,6 +936,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
                     }
                   };
                   
+                  // Update room status to playing
+                  await storage.updateRoomStatus(room.id, 'playing');
+                  
                   // Notify user about game start
                   if (connection.ws.readyState === WebSocket.OPEN) {
                     connection.ws.send(JSON.stringify({
@@ -1279,9 +1282,38 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Check if there's already an active game in this room
       const existingGame = await storage.getActiveGameByRoomId(roomId);
       if (existingGame && existingGame.status === 'active') {
-        console.log('🎮 Active game already exists, ending it first');
-        // End the existing game
-        await storage.updateGameStatus(existingGame.id, 'finished');
+        // If it's a bot game that was just created, return the existing game instead of ending it
+        const isGameAgainstBot = existingGame.playerOId && AI_BOTS.some(bot => bot.id === existingGame.playerOId);
+        if (isGameAgainstBot) {
+          console.log('🎮 Active bot game already exists, returning it instead of creating new one');
+          
+          // Get player information for the existing bot game
+          const [playerXInfo, botInfo] = await Promise.all([
+            storage.getUser(existingGame.playerXId),
+            Promise.resolve(AI_BOTS.find(bot => bot.id === existingGame.playerOId))
+          ]);
+          
+          // Get achievements for the human player
+          const playerXAchievements = playerXInfo ? await storage.getUserAchievements(existingGame.playerXId) : [];
+          
+          const gameWithPlayers = {
+            ...existingGame,
+            playerXInfo: playerXInfo ? {
+              ...playerXInfo,
+              achievements: playerXAchievements.slice(0, 3)
+            } : null,
+            playerOInfo: botInfo ? {
+              ...botInfo,
+              achievements: []
+            } : null
+          };
+          
+          return res.json(gameWithPlayers);
+        } else {
+          console.log('🎮 Active human game already exists, ending it first');
+          // End the existing human game
+          await storage.updateGameStatus(existingGame.id, 'finished');
+        }
       }
       
       // Get room participants (reuse from above)
