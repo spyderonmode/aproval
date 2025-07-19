@@ -107,6 +107,38 @@ export default function Home() {
     return () => window.removeEventListener('openLeaderboard', handleOpenLeaderboard);
   }, []);
 
+  // Listen for game abandonment custom events
+  useEffect(() => {
+    const handleGameAbandoned = (event: any) => {
+      console.log('🏠 Game abandoned custom event received:', event.detail);
+      // Immediate transition to prevent blinking - no delays
+      setIsResettingState(true);
+      
+      // Batch all state changes in a single synchronous update to prevent flickering
+      setCurrentGame(null);
+      setCurrentRoom(null);
+      setSelectedMode('ai');
+      setShowGameOver(false);
+      setGameResult(null);
+      setIsCreatingGame(false);
+      
+      toast({
+        title: "Game Ended",
+        description: event.detail.message || "Game ended because a player left the room.",
+        variant: "destructive",
+      });
+      
+      // Quick reset without delay to prevent visual artifacts
+      setTimeout(() => {
+        setIsResettingState(false);
+        initializeLocalGame();
+      }, 50);
+    };
+
+    window.addEventListener('game_abandoned', handleGameAbandoned);
+    return () => window.removeEventListener('game_abandoned', handleGameAbandoned);
+  }, [toast]);
+
   useEffect(() => {
     if (lastMessage) {
       console.log('🎮 Home received WebSocket message:', lastMessage);
@@ -450,7 +482,11 @@ export default function Home() {
           }, 350);
           break;
         case 'game_abandoned':
-          console.log('🏠 Game abandoned - player left:', lastMessage);
+          console.log('🏠 HOME USEEFFECT: Game abandoned - player left:', lastMessage);
+          console.log('🏠 HOME USEEFFECT: Current game state:', currentGame);
+          console.log('🏠 HOME USEEFFECT: Current room state:', currentRoom);
+          console.log('🏠 HOME USEEFFECT: Processing game abandonment via lastMessage');
+          
           // Immediate transition to prevent blinking - no delays
           setIsResettingState(true);
           

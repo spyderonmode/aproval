@@ -74,11 +74,13 @@ export function useWebSocket() {
 
         // Handle game abandonment due to player leaving
         if (message.type === 'game_abandoned') {
-          console.log('🏠 Game abandoned - redirecting to home:', message.message);
+          console.log('🏠 WebSocket: Game abandoned message received:', message);
+          console.log('🏠 WebSocket: Dispatching game_abandoned custom event');
           const gameAbandonedEvent = new CustomEvent('game_abandoned', {
             detail: message
           });
           window.dispatchEvent(gameAbandonedEvent);
+          console.log('🏠 WebSocket: game_abandoned custom event dispatched');
         }
         
         setLastMessage(message);
