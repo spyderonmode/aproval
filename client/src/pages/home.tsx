@@ -478,10 +478,10 @@ export default function Home() {
           setIsResettingState(true);
           
           setTimeout(() => {
-            // Batch all state changes in a single update
+            // Batch all state changes in a single update - preserve selectedMode
             setCurrentGame(null);
             setCurrentRoom(null);
-            setSelectedMode('ai');
+            // Don't reset selectedMode - keep user's preference
             setShowGameOver(false);
             setGameResult(null);
             setIsCreatingGame(false);
@@ -492,10 +492,12 @@ export default function Home() {
               variant: "destructive",
             });
             
-            // Complete reset and initialize game
+            // Complete reset and initialize game only if in AI mode
             setTimeout(() => {
               setIsResettingState(false);
-              initializeLocalGame();
+              if (selectedMode === 'ai') {
+                initializeLocalGame();
+              }
             }, 200);
           }, 350);
           break;
@@ -512,7 +514,7 @@ export default function Home() {
             // Batch all state changes in a single synchronous update to prevent flickering
             setCurrentGame(null);
             setCurrentRoom(null);
-            setSelectedMode('ai');
+            // Don't reset selectedMode - keep user's preference for online mode
             setShowGameOver(false);
             setGameResult(null);
             setIsCreatingGame(false);
@@ -527,7 +529,10 @@ export default function Home() {
             setTimeout(() => {
               try {
                 setIsResettingState(false);
-                initializeLocalGame();
+                // Only initialize local game if user was in AI mode
+                if (selectedMode === 'ai') {
+                  initializeLocalGame();
+                }
               } catch (innerError) {
                 console.error('🏠 Error in initializeLocalGame:', innerError);
                 // Force page reload if local game initialization fails
@@ -610,18 +615,20 @@ export default function Home() {
       
       setTimeout(() => {
         console.log('🏠 Cleaning up after leave message sent');
-        // Batch all state changes in a single update
+        // Batch all state changes in a single update - preserve selectedMode
         setCurrentRoom(null);
         setCurrentGame(null);
         setShowGameOver(false);
         setGameResult(null);
         setIsCreatingGame(false);
-        setSelectedMode('ai');
+        // Don't reset selectedMode - keep user's preference
         
-        // Complete reset and initialize game
+        // Complete reset and initialize game only if in AI mode
         setTimeout(() => {
           setIsResettingState(false);
-          initializeLocalGame();
+          if (selectedMode === 'ai') {
+            initializeLocalGame();
+          }
         }, 200);
       }, 400);
     } else {
@@ -633,7 +640,7 @@ export default function Home() {
         setShowGameOver(false);
         setGameResult(null);
         setIsCreatingGame(false);
-        setSelectedMode('ai');
+        // Don't reset selectedMode - preserve user's preference
       };
       
       // Prevent multiple resets and effects from triggering
@@ -641,10 +648,12 @@ export default function Home() {
       
       setTimeout(() => {
         resetState();
-        // Complete reset and initialize game
+        // Complete reset and initialize game only if in AI mode
         setTimeout(() => {
           setIsResettingState(false);
-          initializeLocalGame();
+          if (selectedMode === 'ai') {
+            initializeLocalGame();
+          }
         }, 200);
       }, 350);
     }
