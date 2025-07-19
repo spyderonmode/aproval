@@ -2269,8 +2269,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
                       displayName: botInfo.displayName,
                       firstName: botInfo.firstName,
                       username: botInfo.username,
-                      profilePicture: null,
-                      profileImageUrl: null,
+                      profilePicture: botInfo.profilePicture,
+                      profileImageUrl: botInfo.profilePicture,
                       achievements: []
                     }
                   });
