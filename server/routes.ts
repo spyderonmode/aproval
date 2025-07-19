@@ -1042,13 +1042,37 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Sync all AI bots to database with profile pictures and stats
+  // Clean up duplicate bots and sync all AI bots with deterministic stats  
   app.post('/api/sync-bots', async (req, res) => {
     try {
-      console.log('🤖 Starting bot sync to database...');
+      console.log('🤖 Starting bot cleanup and sync...');
+      
+      // First, remove all existing bot entries to clean up duplicates
+      console.log('🧹 Cleaning up existing bot entries...');
+      const botIds = AI_BOTS.map(bot => bot.id);
+      for (const botId of botIds) {
+        try {
+          await storage.deleteUser(botId);
+          console.log(`🗑️ Removed existing bot: ${botId}`);
+        } catch (error) {
+          // Bot might not exist, which is fine
+          console.log(`ℹ️ Bot ${botId} not found for cleanup (expected)`);
+        }
+      }
+      
+      // Now create fresh bots with deterministic stats
+      console.log('🤖 Creating fresh bot entries...');
       let syncedCount = 0;
       
-      for (const bot of AI_BOTS) {
+      for (let i = 0; i < AI_BOTS.length; i++) {
+        const bot = AI_BOTS[i];
+        
+        // Use deterministic stats based on bot index for consistency
+        const seed = i + 1;
+        const wins = Math.floor((seed * 7) % 45) + 5; // Deterministic wins 5-50
+        const losses = Math.floor((seed * 5) % 25) + 5; // Deterministic losses 5-30  
+        const draws = Math.floor((seed * 3) % 8) + 2; // Deterministic draws 2-10
+        
         await storage.upsertUser({
           id: bot.id,
           username: bot.username,
@@ -1057,17 +1081,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
           lastName: bot.lastName || 'Player',
           email: `${bot.username}@bot.local`,
           profileImageUrl: bot.profilePicture,
-          wins: Math.floor(Math.random() * 45) + 5, // 5-50 wins for bots
-          losses: Math.floor(Math.random() * 25) + 5, // 5-30 losses
-          draws: Math.floor(Math.random() * 8) + 2  // 2-10 draws
+          wins,
+          losses,
+          draws
         });
         syncedCount++;
+        console.log(`🤖 Created bot: ${bot.displayName} with ${wins} wins, ${losses} losses, ${draws} draws`);
       }
       
-      console.log(`🤖 Successfully synced ${syncedCount} bots to database`);
+      console.log(`🤖 Successfully synced ${syncedCount} clean bot entries to database`);
       res.json({ 
         success: true, 
-        message: `Successfully synced ${syncedCount} AI bots to database`,
+        message: `Successfully cleaned and synced ${syncedCount} AI bots to database`,
         syncedCount 
       });
     } catch (error) {
@@ -1224,19 +1249,30 @@ export async function registerRoutes(app: Express): Promise<Server> {
             role: 'player',
           });
           
-          // Add bot as user in database with complete profile for leaderboard
-          await storage.upsertUser({
-            id: bot.id,
-            username: bot.username,
-            displayName: bot.displayName,
-            firstName: bot.firstName,
-            lastName: bot.lastName || 'Player',
-            email: `${bot.username}@bot.local`,
-            profileImageUrl: bot.profilePicture,
-            wins: Math.floor(Math.random() * 45) + 5, // 5-50 wins for bots
-            losses: Math.floor(Math.random() * 25) + 5, // 5-30 losses
-            draws: Math.floor(Math.random() * 8) + 2  // 2-10 draws
-          });
+          // Check if bot already exists to avoid overwriting stats
+          const existingBot = await storage.getUser(bot.id);
+          
+          if (!existingBot) {
+            // Use deterministic stats for consistency
+            const botIndex = AI_BOTS.findIndex(b => b.id === bot.id);
+            const seed = botIndex + 1;
+            const wins = Math.floor((seed * 7) % 45) + 5;
+            const losses = Math.floor((seed * 5) % 25) + 5;
+            const draws = Math.floor((seed * 3) % 8) + 2;
+            
+            await storage.upsertUser({
+              id: bot.id,
+              username: bot.username,
+              displayName: bot.displayName,
+              firstName: bot.firstName,
+              lastName: bot.lastName || 'Player',
+              email: `${bot.username}@bot.local`,
+              profileImageUrl: bot.profilePicture,
+              wins,
+              losses,
+              draws
+            });
+          }
 
           // Add bot as second participant to show 2 players in room
           await storage.addRoomParticipant({

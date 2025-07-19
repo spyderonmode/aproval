@@ -244,6 +244,10 @@ export class DatabaseStorage implements IStorage {
     }
   }
 
+  async deleteUser(id: string): Promise<void> {
+    await db.delete(users).where(eq(users.id, id));
+  }
+
   // Room operations
   async createRoom(roomData: InsertRoom & { ownerId: string }): Promise<Room> {
     const code = Math.random().toString(36).substring(2, 10).toUpperCase();
