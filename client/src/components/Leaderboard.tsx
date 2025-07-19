@@ -594,7 +594,7 @@ export function Leaderboard({ trigger, open, onClose }: LeaderboardProps) {
               }
             </span>
           </div>
-          <Button onClick={() => setIsOpen(false)} variant="default" className={`bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white border-0 shadow-lg px-3 sm:px-6 text-xs sm:text-sm ${isArabic ? 'font-arabic' : ''}`}>
+          <Button onClick={handleClose} variant="default" className={`bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white border-0 shadow-lg px-3 sm:px-6 text-xs sm:text-sm ${isArabic ? 'font-arabic' : ''}`}>
             {t('close') || 'Close'}
           </Button>
         </div>
