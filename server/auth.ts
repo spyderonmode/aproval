@@ -127,8 +127,9 @@ function updateUser(userId: string, updates: Partial<User>): User | null {
     storage.upsertUser({
       id: userId,
       email: users[userIndex].email || null,
-      firstName: users[userIndex].displayName || users[userIndex].username,
-      lastName: null,
+      firstName: users[userIndex].firstName || null,
+      displayName: users[userIndex].displayName || null,
+      username: users[userIndex].username || null,
       profileImageUrl: users[userIndex].profilePicture || null,
     });
   } catch (error) {
@@ -296,8 +297,9 @@ export function setupAuth(app: Express) {
         await storage.upsertUser({
           id: user.id,
           email: user.email || null,
-          firstName: user.displayName || user.username || 'Anonymous',
-          lastName: null,
+          firstName: user.firstName || null,
+          displayName: user.displayName || null,
+          username: user.username || null,
           profileImageUrl: user.profilePicture || null,
         });
       } catch (error) {
