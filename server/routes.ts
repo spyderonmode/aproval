@@ -1060,19 +1060,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       }
       
-      // Now create fresh bots with deterministic stats
-      console.log('🤖 Creating fresh bot entries...');
+      // Now create fresh bots with ZERO stats (authentic data only)
+      console.log('🤖 Creating fresh bot entries with zero stats...');
       let syncedCount = 0;
       
       for (let i = 0; i < AI_BOTS.length; i++) {
         const bot = AI_BOTS[i];
         
-        // Use deterministic stats based on bot index for consistency
-        const seed = i + 1;
-        const wins = Math.floor((seed * 7) % 45) + 5; // Deterministic wins 5-50
-        const losses = Math.floor((seed * 5) % 25) + 5; // Deterministic losses 5-30  
-        const draws = Math.floor((seed * 3) % 8) + 2; // Deterministic draws 2-10
-        
+        // Bots start with zero stats - only real gameplay will increment them
         await storage.upsertUser({
           id: bot.id,
           username: bot.username,
@@ -1081,12 +1076,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
           lastName: bot.lastName || 'Player',
           email: `${bot.username}@bot.local`,
           profileImageUrl: bot.profilePicture,
-          wins,
-          losses,
-          draws
+          wins: 0,
+          losses: 0,
+          draws: 0
         });
         syncedCount++;
-        console.log(`🤖 Created bot: ${bot.displayName} with ${wins} wins, ${losses} losses, ${draws} draws`);
+        console.log(`🤖 Created bot: ${bot.displayName} with authentic zero stats`);
       }
       
       console.log(`🤖 Successfully synced ${syncedCount} clean bot entries to database`);
@@ -1098,6 +1093,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error('❌ Error syncing bots:', error);
       res.status(500).json({ error: 'Failed to sync bots to database' });
+    }
+  });
+
+  // Reset all bot statistics to authentic data only
+  app.post('/api/reset-bot-stats', async (req, res) => {
+    try {
+      console.log('🧹 Starting bot statistics reset...');
+      await storage.resetAllBotStats();
+      res.json({ 
+        success: true, 
+        message: 'Successfully reset bot statistics to authentic data only'
+      });
+    } catch (error) {
+      console.error('❌ Error resetting bot stats:', error);
+      res.status(500).json({ error: 'Failed to reset bot statistics' });
     }
   });
 

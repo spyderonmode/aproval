@@ -34,7 +34,7 @@ import {
   type InsertRoomInvitation,
 } from "@shared/schema";
 import { db } from "./db";
-import { eq, and, desc, count, or, ne, isNull, isNotNull, sql, exists, inArray, lt } from "drizzle-orm";
+import { eq, and, desc, count, or, ne, isNull, isNotNull, sql, exists, inArray, lt, like } from "drizzle-orm";
 
 export interface IStorage {
   // User operations - mandatory for Replit Auth
@@ -485,6 +485,49 @@ export class DatabaseStorage implements IStorage {
     }
 
     console.log('🎉 User stats recalculation completed!');
+  }
+
+  async resetAllBotStats(): Promise<void> {
+    // Reset all bot statistics to zero - only actual gameplay should count
+    console.log('🤖 Resetting all bot statistics to zero...');
+    
+    const result = await db
+      .update(users)
+      .set({
+        wins: 0,
+        losses: 0,
+        draws: 0
+      })
+      .where(like(users.id, 'player_%'));
+    
+    console.log('🤖 All bot statistics reset to zero - only authentic gameplay will count now');
+    
+    // Now recalculate stats based on actual games played
+    const botUsers = await db
+      .select({ id: users.id })
+      .from(users)
+      .where(
+        and(
+          like(users.id, 'player_%'),
+          exists(
+            db.select().from(games).where(
+              or(
+                eq(games.playerXId, users.id),
+                eq(games.playerOId, users.id)
+              )
+            )
+          )
+        )
+      );
+
+    console.log(`🔄 Recalculating authentic stats for ${botUsers.length} bots who have played games...`);
+    
+    for (const bot of botUsers) {
+      await this.recalculateUserStats(bot.id);
+      console.log(`✅ Updated authentic stats for bot: ${bot.id}`);
+    }
+    
+    console.log('🎉 Bot stats now reflect only authentic gameplay!');
   }
 
   async getUserStats(userId: string): Promise<{ wins: number; losses: number; draws: number }> {
