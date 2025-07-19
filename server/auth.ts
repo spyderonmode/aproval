@@ -193,6 +193,7 @@ async function syncAllUsersToDatabase() {
           firstName: user.displayName || user.username || 'Anonymous',
           lastName: null,
           displayName: user.displayName || user.username || 'Anonymous',
+          username: user.username || null,
           profileImageUrl: user.profilePicture || null,
         });
         console.log(`✅ Synced user: ${user.username} (${user.id})`);
@@ -371,6 +372,8 @@ export function setupAuth(app: Express) {
         email: user.email || null,
         firstName: user.displayName || user.username || 'Anonymous',
         lastName: null,
+        displayName: user.displayName || user.username || 'Anonymous',
+        username: user.username || null,
         profileImageUrl: user.profilePicture || null,
       });
       console.log('User synced to database:', user.id);
@@ -473,6 +476,8 @@ export function setupAuth(app: Express) {
         email: updatedUser.email || null,
         firstName: updatedUser.displayName || updatedUser.username || 'Anonymous',
         lastName: null,
+        displayName: updatedUser.displayName || updatedUser.username || 'Anonymous',
+        username: updatedUser.username || null,
         profileImageUrl: updatedUser.profilePicture || null,
       });
       console.log('User synced to database:', updatedUser.id);
@@ -520,6 +525,8 @@ export function setupAuth(app: Express) {
         email: updatedUser.email || null,
         firstName: updatedUser.displayName || updatedUser.username || 'Anonymous',
         lastName: null,
+        displayName: updatedUser.displayName || updatedUser.username || 'Anonymous',
+        username: updatedUser.username || null,
         profileImageUrl: updatedUser.profilePicture || null,
       });
       console.log('User resend verification synced to database:', updatedUser.id);
@@ -564,6 +571,8 @@ export function setupAuth(app: Express) {
           email: updatedUser.email || null,
           firstName: updatedUser.displayName || updatedUser.username || 'Anonymous',
           lastName: null,
+          displayName: updatedUser.displayName || updatedUser.username || 'Anonymous',
+          username: updatedUser.username || null,
           profileImageUrl: updatedUser.profilePicture || null,
         });
         console.log('User profile synced to database:', updatedUser.id);
@@ -659,6 +668,8 @@ export function setupAuth(app: Express) {
             email: updatedUser.email || null,
             firstName: updatedUser.displayName || updatedUser.username || 'Anonymous',
             lastName: null,
+            displayName: updatedUser.displayName || updatedUser.username || 'Anonymous',
+            username: updatedUser.username || null,
             profileImageUrl: updatedUser.profilePicture || null,
           });
           console.log('User forgot password synced to database:', updatedUser.id);
@@ -742,6 +753,8 @@ export function setupAuth(app: Express) {
           email: updatedUser.email || null,
           firstName: updatedUser.displayName || updatedUser.username || 'Anonymous',
           lastName: null,
+          displayName: updatedUser.displayName || updatedUser.username || 'Anonymous',
+          username: updatedUser.username || null,
           profileImageUrl: updatedUser.profilePicture || null,
         });
         console.log('User password reset synced to database:', updatedUser.id);
