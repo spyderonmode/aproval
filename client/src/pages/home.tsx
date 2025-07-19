@@ -740,6 +740,20 @@ export default function Home() {
               </span>
             </div>
             
+            {/* Leaderboard Button - Mobile Optimized */}
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => {
+                // Dispatch custom event to open leaderboard
+                const event = new CustomEvent('openLeaderboard');
+                window.dispatchEvent(event);
+              }}
+              className="bg-gradient-to-r from-yellow-600 to-orange-600 border-yellow-500 text-white hover:from-yellow-500 hover:to-orange-500 px-2 md:px-3 py-1 md:py-2"
+            >
+              <Trophy className="w-3 h-3 md:w-4 md:h-4" />
+              <span className="hidden sm:inline ml-1 md:ml-2">{t('leaderboard') || 'Leaderboard'}</span>
+            </Button>
             
             <div className="relative" ref={headerSidebarRef}>
               <Button 
