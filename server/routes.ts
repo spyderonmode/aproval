@@ -2892,18 +2892,64 @@ export async function registerRoutes(app: Express): Promise<Server> {
               
               console.log(`🏠 Processing leave_room message for ${playerName} in room ${roomId}`);
               
-              // Check if user is in an active game - if so, don't remove them yet
+              // Check if user is in an active game
               const userState = userRoomStates.get(userId);
               const activeGame = await storage.getActiveGameByRoomId(roomId);
               
               if (activeGame && activeGame.status === 'active' && 
                   (activeGame.playerXId === userId || activeGame.playerOId === userId)) {
-                console.log(`🏠 User ${playerName} is in active game - not removing from room yet`);
-                // Don't remove from room, just mark as temporarily disconnected
-                const onlineUser = onlineUsers.get(userId);
-                if (onlineUser) {
-                  onlineUser.lastSeen = new Date();
+                console.log(`🏠 Player ${playerName} leaving active game - terminating game and redirecting all users`);
+                
+                // Mark game as finished due to player leaving
+                await storage.finishGame(activeGame.id, {
+                  status: 'abandoned',
+                  winningPlayer: null,
+                  winningPositions: [],
+                  updatedAt: new Date()
+                });
+                
+                console.log(`🏠 Game ${activeGame.id} marked as abandoned due to player exit`);
+                
+                // Get all users in the room (players and spectators)
+                const roomUsers = roomConnections.get(roomId);
+                if (roomUsers && roomUsers.size > 0) {
+                  const gameEndMessage = JSON.stringify({
+                    type: 'game_abandoned',
+                    roomId,
+                    gameId: activeGame.id,
+                    leavingPlayer: playerName,
+                    message: `Game ended - ${playerName} left the room`,
+                    redirectToHome: true
+                  });
+                  
+                  console.log(`🏠 Broadcasting game abandonment to ${roomUsers.size} users in room ${roomId}`);
+                  
+                  // Send to all room participants
+                  roomUsers.forEach(connectionId => {
+                    const connection = connections.get(connectionId);
+                    if (connection && connection.ws.readyState === WebSocket.OPEN) {
+                      connection.ws.send(gameEndMessage);
+                      
+                      // Clear their room state immediately
+                      const connUserId = connection.userId;
+                      if (connUserId) {
+                        userRoomStates.delete(connUserId);
+                        const onlineUser = onlineUsers.get(connUserId);
+                        if (onlineUser) {
+                          onlineUser.roomId = undefined;
+                        }
+                      }
+                      
+                      // Clear their connection room info
+                      connection.roomId = undefined;
+                    }
+                  });
+                  
+                  // Clear the entire room
+                  roomConnections.delete(roomId);
+                  console.log(`🏠 Room ${roomId} completely cleared due to game abandonment`);
                 }
+                
                 return;
               }
               

@@ -406,6 +406,21 @@ export default function Home() {
             variant: "destructive",
           });
           break;
+        case 'game_abandoned':
+          console.log('🏠 Game abandoned - player left:', lastMessage);
+          // Clear all game state and return to lobby
+          setCurrentGame(null);
+          setCurrentRoom(null);
+          setSelectedMode('ai');
+          setShowGameOver(false);
+          setGameResult(null);
+          setIsCreatingGame(false);
+          toast({
+            title: "Game Ended",
+            description: lastMessage.message || "Game ended because a player left the room.",
+            variant: "destructive",
+          });
+          break;
         case 'player_reaction':
           // Handle player reaction - this will be broadcast to all players and spectators
           if (currentGame && (lastMessage.gameId === currentGame.id || lastMessage.roomId === currentRoom?.id)) {

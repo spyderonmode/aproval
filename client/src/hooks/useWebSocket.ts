@@ -64,6 +64,15 @@ export function useWebSocket() {
           });
           window.dispatchEvent(invitationEvent);
         }
+
+        // Handle game abandonment due to player leaving
+        if (message.type === 'game_abandoned') {
+          console.log('🏠 Game abandoned - redirecting to home:', message.message);
+          const gameAbandonedEvent = new CustomEvent('game_abandoned', {
+            detail: message
+          });
+          window.dispatchEvent(gameAbandonedEvent);
+        }
         
         setLastMessage(message);
       } catch (error) {

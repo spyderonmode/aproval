@@ -58,6 +58,7 @@ export interface IStorage {
   updateCurrentPlayer(gameId: string, currentPlayer: string): Promise<void>;
   getActiveGameForUser(userId: string): Promise<Game | undefined>;
   updateLastMoveTime(gameId: string): Promise<void>;
+  finishGame(gameId: string, finishData: { status: string; winningPlayer?: string | null; winningPositions?: number[]; updatedAt: Date }): Promise<void>;
   
   // Move operations
   createMove(move: InsertMove): Promise<Move>;
@@ -370,6 +371,19 @@ export class DatabaseStorage implements IStorage {
       status: 'expired',
       finishedAt: new Date()
     }).where(eq(games.id, gameId));
+  }
+
+  async finishGame(gameId: string, finishData: { status: string; winningPlayer?: string | null; winningPositions?: number[]; updatedAt: Date }): Promise<void> {
+    const updateData: any = { 
+      status: finishData.status,
+      finishedAt: finishData.updatedAt
+    };
+    
+    if (finishData.winningPlayer) {
+      updateData.winnerId = finishData.winningPlayer;
+    }
+    
+    await db.update(games).set(updateData).where(eq(games.id, gameId));
   }
 
   // Move operations
