@@ -924,6 +924,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
               role: 'player',
             });
             
+            // Add bot as second participant to show 2 players in room
+            await storage.addRoomParticipant({
+              roomId: room.id,
+              userId: bot.id,
+              role: 'player',
+            });
+            
             // Notify user about bot match
             const userConnections = Array.from(connections.entries())
               .filter(([_, connection]) => connection.userId === userId && connection.ws.readyState === WebSocket.OPEN);
@@ -954,6 +961,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
               }));
               
               console.log(`🤖 User ${userId} matched with bot in room ${room.id}`);
+              
+              // Clear matchmaking timer since user is now matched
+              if (matchmakingTimers.has(userId)) {
+                clearTimeout(matchmakingTimers.get(userId)!);
+                matchmakingTimers.delete(userId);
+                console.log(`⏰ Cleared matchmaking timer for user ${userId}`);
+              }
               
               // Auto-start game with bot after 2 seconds
               setTimeout(async () => {
