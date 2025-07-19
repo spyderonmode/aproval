@@ -1588,12 +1588,12 @@ export const translations = {
     id: 'Permainan Selesai!'
   },
   playerWins: {
-    en: 'Player {player} Wins!',
-    ar: 'اللاعب {player} يفوز!',
-    bn: 'খেলোয়াড় {player} জিতেছে!',
-    hi: 'खिलाड़ी {player} जीता!',
-    es: '¡Jugador {player} Gana!',
-    id: 'Pemain {player} Menang!'
+    en: '{player} Wins!',
+    ar: '{player} يفوز!',
+    bn: '{player} জিতেছে!',
+    hi: '{player} जीता!',
+    es: '¡{player} Gana!',
+    id: '{player} Menang!'
   },
   diagonalLine: {
     en: 'Diagonal line',
