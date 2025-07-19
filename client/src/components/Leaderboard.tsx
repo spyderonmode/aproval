@@ -81,20 +81,20 @@ export function Leaderboard({ trigger }: LeaderboardProps) {
       switch (position) {
         case 1:
           return {
-            borderClass: "ring-4 ring-yellow-400",
-            glowEffect: "shadow-[0_0_20px_rgba(234,179,8,0.6)] shadow-yellow-400/60",
+            borderClass: "ring-2 ring-yellow-400",
+            glowEffect: "shadow-[0_0_12px_rgba(234,179,8,0.4)]",
             animation: "animate-pulse"
           };
         case 2:
           return {
-            borderClass: "ring-4 ring-gray-400",
-            glowEffect: "shadow-[0_0_20px_rgba(156,163,175,0.6)] shadow-gray-400/60",
+            borderClass: "ring-2 ring-gray-400",
+            glowEffect: "shadow-[0_0_12px_rgba(156,163,175,0.4)]",
             animation: "animate-pulse"
           };
         case 3:
           return {
-            borderClass: "ring-4 ring-amber-400",
-            glowEffect: "shadow-[0_0_20px_rgba(245,158,11,0.6)] shadow-amber-400/60",
+            borderClass: "ring-2 ring-amber-400",
+            glowEffect: "shadow-[0_0_12px_rgba(245,158,11,0.4)]",
             animation: "animate-pulse"
           };
       }
@@ -103,7 +103,7 @@ export function Leaderboard({ trigger }: LeaderboardProps) {
     // Apply achievement-specific styling for users with achievement borders
     if (!user.selectedAchievementBorder) {
       return {
-        borderClass: "ring-2 ring-gray-200 dark:ring-gray-600",
+        borderClass: "ring-1 ring-gray-200 dark:ring-gray-600",
         glowEffect: "",
         animation: ""
       };
@@ -112,31 +112,31 @@ export function Leaderboard({ trigger }: LeaderboardProps) {
     switch (user.selectedAchievementBorder) {
       case 'ultimate_veteran':
         return {
-          borderClass: "ring-4 ring-orange-500",
-          glowEffect: "shadow-[0_0_25px_rgba(255,99,71,0.8)] shadow-orange-500/80",
+          borderClass: "ring-2 ring-orange-500",
+          glowEffect: "shadow-[0_0_15px_rgba(255,99,71,0.5)]",
           animation: "animate-pulse"
         };
       case 'grandmaster':
         return {
-          borderClass: "ring-4 ring-indigo-400",
-          glowEffect: "shadow-[0_0_25px_rgba(165,180,252,0.8)] shadow-indigo-400/80",
+          borderClass: "ring-2 ring-indigo-400",
+          glowEffect: "shadow-[0_0_15px_rgba(165,180,252,0.5)]",
           animation: "animate-pulse"
         };
       case 'champion':
         return {
-          borderClass: "ring-4 ring-purple-400",
-          glowEffect: "shadow-[0_0_25px_rgba(196,181,253,0.8)] shadow-purple-400/80",
+          borderClass: "ring-2 ring-purple-400",
+          glowEffect: "shadow-[0_0_15px_rgba(196,181,253,0.5)]",
           animation: "animate-pulse"
         };
       case 'legend':
         return {
-          borderClass: "ring-4 ring-orange-400",
-          glowEffect: "shadow-[0_0_25px_rgba(251,146,60,0.8)] shadow-orange-400/80",
+          borderClass: "ring-2 ring-orange-400",
+          glowEffect: "shadow-[0_0_15px_rgba(251,146,60,0.5)]",
           animation: "animate-pulse"
         };
       default:
         return {
-          borderClass: "ring-2 ring-gray-200 dark:ring-gray-600",
+          borderClass: "ring-1 ring-gray-200 dark:ring-gray-600",
           glowEffect: "",
           animation: ""
         };
@@ -335,9 +335,9 @@ export function Leaderboard({ trigger }: LeaderboardProps) {
                                 return (
                                   <motion.div
                                     className="relative"
-                                    animate={borderStyle.animation ? { scale: [1, 1.02, 1] } : {}}
+                                    animate={borderStyle.animation ? { scale: [1, 1.01, 1] } : {}}
                                     transition={{
-                                      duration: 2,
+                                      duration: 3,
                                       repeat: Infinity,
                                       ease: "easeInOut"
                                     }}
@@ -346,16 +346,16 @@ export function Leaderboard({ trigger }: LeaderboardProps) {
                                       <img
                                         src={user.profileImageUrl}
                                         alt={`${user.displayName}'s profile`}
-                                        className={`w-16 h-16 sm:w-20 sm:h-20 rounded-2xl object-cover border-3 border-white dark:border-slate-700 shadow-lg ${borderStyle.borderClass} ${borderStyle.glowEffect} transition-all duration-300`}
+                                        className={`w-12 h-12 sm:w-14 sm:h-14 rounded-xl object-cover border-2 border-white dark:border-slate-700 shadow-md ${borderStyle.borderClass} ${borderStyle.glowEffect} transition-all duration-300`}
                                       />
                                     ) : (
-                                      <div className={`w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-gradient-to-br from-blue-400 via-purple-500 to-pink-500 flex items-center justify-center text-white font-bold text-lg sm:text-xl shadow-lg ${borderStyle.borderClass} ${borderStyle.glowEffect} transition-all duration-300`}>
+                                      <div className={`w-12 h-12 sm:w-14 sm:h-14 rounded-xl bg-gradient-to-br from-blue-400 via-purple-500 to-pink-500 flex items-center justify-center text-white font-bold text-sm sm:text-base shadow-md ${borderStyle.borderClass} ${borderStyle.glowEffect} transition-all duration-300`}>
                                         {user.displayName.charAt(0).toUpperCase()}
                                       </div>
                                     )}
                                     {/* Position Badge - small overlay on profile */}
                                     {position <= 3 && (
-                                      <div className={`absolute -top-2 -right-2 w-8 h-8 rounded-full bg-gradient-to-br ${getRankColor(position)} flex items-center justify-center shadow-lg border-2 border-white dark:border-slate-800`}>
+                                      <div className={`absolute -top-1 -right-1 w-6 h-6 rounded-full bg-gradient-to-br ${getRankColor(position)} flex items-center justify-center shadow-md border border-white dark:border-slate-800`}>
                                         <span className="text-xs font-bold">#{position}</span>
                                       </div>
                                     )}
