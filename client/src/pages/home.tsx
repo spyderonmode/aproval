@@ -2,7 +2,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { useWebSocket } from "@/hooks/useWebSocket";
 import { useToast } from "@/hooks/use-toast";
 // useAudio hook removed as sound effects are removed
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState, useEffect, useRef } from "react";
 import { GameBoard } from "@/components/GameBoard";
 import { GameModeSelector } from "@/components/GameModeSelector";
@@ -34,6 +34,7 @@ export default function Home() {
   const { isConnected, lastMessage, joinRoom, leaveRoom, sendMessage } = useWebSocket();
   const { toast } = useToast();
   const { t } = useTranslation();
+  const queryClient = useQueryClient();
   // Sound effects removed as requested
   const [selectedMode, setSelectedMode] = useState<'ai' | 'pass-play' | 'online'>('ai');
   const [aiDifficulty, setAiDifficulty] = useState<'easy' | 'medium' | 'hard'>('medium');
@@ -141,6 +142,16 @@ export default function Home() {
             // Ensure game mode is set to online when receiving game_started
             console.log('🎮 Setting selectedMode to online for game_started');
             setSelectedMode('online');
+            
+            // Update room status to playing to sync with backend
+            if (currentRoom) {
+              setCurrentRoom(prevRoom => ({
+                ...prevRoom,
+                status: 'playing'
+              }));
+              console.log('🎮 Updated room status to playing');
+            }
+            
             // Force complete state update to ensure game appears
             setCurrentGame(prevGame => {
               console.log('🎮 Game state update - prev:', prevGame, 'new:', lastMessage.game);
@@ -167,6 +178,9 @@ export default function Home() {
             // Also reset game over state if it was showing
             setShowGameOver(false);
             setGameResult(null);
+            
+            // Invalidate room participants query to refresh room data
+            queryClient.invalidateQueries({ queryKey: ['room-participants', currentRoom?.id] });
           }
           break;
         case 'move':
