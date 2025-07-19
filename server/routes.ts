@@ -2038,14 +2038,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
               Promise.resolve(AI_BOTS.find(bot => bot.id === game.playerOId) || null)
           ]);
           
-          // Debug bot profile information
-          if (playerOInfo && AI_BOTS.some(bot => bot.id === game.playerOId)) {
-            console.log(`🤖 Bot profile debug for ${game.playerOId}:`, {
-              displayName: playerOInfo.displayName,
-              profilePicture: playerOInfo.profilePicture,
-              profilePictureLength: playerOInfo.profilePicture?.length
-            });
-          }
+
           
           // Get achievements for both players
           const [playerXAchievements, playerOAchievements] = await Promise.all([
@@ -2193,8 +2186,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
                             displayName: botInfo.displayName,
                             firstName: botInfo.firstName,
                             username: botInfo.username,
-                            profilePicture: null,
-                            profileImageUrl: null
+                            profilePicture: botInfo.profilePicture,
+                            profileImageUrl: botInfo.profilePicture
                           },
                           playerXInfo: playerXInfo ? {
                             displayName: playerXInfo.displayName,
@@ -2207,8 +2200,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
                             displayName: botInfo.displayName,
                             firstName: botInfo.firstName,
                             username: botInfo.username,
-                            profilePicture: null,
-                            profileImageUrl: null
+                            profilePicture: botInfo.profilePicture,
+                            profileImageUrl: botInfo.profilePicture
                           }
                         }));
                       }
@@ -2258,11 +2251,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
                   const playerXInfo = await storage.getUser(game.playerXId);
                   const playerXAchievements = playerXInfo ? await storage.getUserAchievements(game.playerXId) : [];
                   
-                  console.log(`🤖 Bot move debug - botInfo:`, {
-                    displayName: botInfo.displayName,
-                    profilePicture: botInfo.profilePicture,
-                    profilePictureLength: botInfo.profilePicture?.length
-                  });
+
                   
                   const botMoveMessage = JSON.stringify({
                     type: 'move',
