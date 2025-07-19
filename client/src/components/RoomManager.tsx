@@ -36,15 +36,14 @@ export function RoomManager({
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  // Fetch participants for the current room
+  // Fetch participants for the current room - reuse the same query key to share cache
   const { data: participants = [] } = useQuery({
-    queryKey: ['room-participants', currentRoom?.id],
-    queryFn: async () => {
-      if (!currentRoom) return [];
-      const response = await apiRequest(`/api/rooms/${currentRoom.id}/participants`);
-      return response.json();
-    },
+    queryKey: ["/api/rooms", currentRoom?.id, "participants"], // Use same key as PlayerList
     enabled: !!currentRoom,
+    staleTime: 8000, // Consider data fresh for 8 seconds
+    refetchOnWindowFocus: false, // Prevent refetch on window focus
+    refetchOnMount: false, // Only refetch if data is stale
+    refetchInterval: false, // Don't poll here, let PlayerList handle it
   });
 
   const joinRoomMutation = useMutation({

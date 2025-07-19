@@ -2929,9 +2929,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
             const conn = connections.get(connectionId);
             if (conn && conn.roomId) {
               const roomId = conn.roomId;
-              const { userId, playerName } = data;
+              // Use userId from connection object instead of message data for security
+              const userId = conn.userId;
+              const playerName = conn.displayName || conn.username || 'Unknown Player';
               
-              console.log(`🏠 Processing leave_room message for ${playerName} in room ${roomId}`);
+              console.log(`🏠 Processing leave_room message for ${playerName} (${userId}) in room ${roomId}`);
               
               // Check if user is in an active game
               const userState = userRoomStates.get(userId);

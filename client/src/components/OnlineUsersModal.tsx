@@ -30,8 +30,11 @@ export function OnlineUsersModal({ open, onClose, currentRoom, user }: OnlineUse
 
   const { data: onlineUsers, isLoading } = useQuery({
     queryKey: ["/api/users/online"],
-    refetchInterval: 5000, // Refresh every 5 seconds
+    refetchInterval: open ? 15000 : false, // Increased to 15s and only when modal is open
     enabled: open,
+    staleTime: 12000, // Consider data fresh for 12 seconds
+    refetchOnWindowFocus: false,
+    refetchOnMount: false,
   });
 
   // Fetch blocked users
