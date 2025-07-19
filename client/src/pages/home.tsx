@@ -111,33 +111,39 @@ export default function Home() {
   useEffect(() => {
     const handleGameAbandoned = (event: any) => {
       console.log('🏠 Game abandoned custom event received:', event.detail);
-      // Immediate transition to prevent blinking - no delays
-      setIsResettingState(true);
-      
-      // Batch all state changes in a single synchronous update to prevent flickering
-      setCurrentGame(null);
-      setCurrentRoom(null);
-      setSelectedMode('ai');
-      setShowGameOver(false);
-      setGameResult(null);
-      setIsCreatingGame(false);
-      
-      toast({
-        title: "Game Ended",
-        description: event.detail.message || "Game ended because a player left the room.",
-        variant: "destructive",
-      });
-      
-      // Quick reset without delay to prevent visual artifacts
-      setTimeout(() => {
-        setIsResettingState(false);
-        initializeLocalGame();
-      }, 50);
+      try {
+        // Immediate transition to prevent blinking - no delays
+        setIsResettingState(true);
+        
+        // Batch all state changes in a single synchronous update to prevent flickering
+        setCurrentGame(null);
+        setCurrentRoom(null);
+        setSelectedMode('ai');
+        setShowGameOver(false);
+        setGameResult(null);
+        setIsCreatingGame(false);
+        
+        toast({
+          title: "Game Ended",
+          description: event.detail.message || "Game ended because a player left the room.",
+          variant: "destructive",
+        });
+        
+        // Quick reset without delay to prevent visual artifacts
+        setTimeout(() => {
+          setIsResettingState(false);
+          initializeLocalGame();
+        }, 50);
+      } catch (error) {
+        console.error('🏠 Error handling game abandonment:', error);
+        // Force page reload as fallback
+        window.location.reload();
+      }
     };
 
     window.addEventListener('game_abandoned', handleGameAbandoned);
     return () => window.removeEventListener('game_abandoned', handleGameAbandoned);
-  }, [toast]);
+  }, []); // Remove toast dependency to prevent effect recreation
 
   useEffect(() => {
     if (lastMessage) {
@@ -487,28 +493,40 @@ export default function Home() {
           console.log('🏠 HOME USEEFFECT: Current room state:', currentRoom);
           console.log('🏠 HOME USEEFFECT: Processing game abandonment via lastMessage');
           
-          // Immediate transition to prevent blinking - no delays
-          setIsResettingState(true);
-          
-          // Batch all state changes in a single synchronous update to prevent flickering
-          setCurrentGame(null);
-          setCurrentRoom(null);
-          setSelectedMode('ai');
-          setShowGameOver(false);
-          setGameResult(null);
-          setIsCreatingGame(false);
-          
-          toast({
-            title: "Game Ended",
-            description: lastMessage.message || "Game ended because a player left the room.",
-            variant: "destructive",
-          });
-          
-          // Quick reset without delay to prevent visual artifacts
-          setTimeout(() => {
-            setIsResettingState(false);
-            initializeLocalGame();
-          }, 50); // Minimal delay just for state synchronization
+          try {
+            // Immediate transition to prevent blinking - no delays
+            setIsResettingState(true);
+            
+            // Batch all state changes in a single synchronous update to prevent flickering
+            setCurrentGame(null);
+            setCurrentRoom(null);
+            setSelectedMode('ai');
+            setShowGameOver(false);
+            setGameResult(null);
+            setIsCreatingGame(false);
+            
+            toast({
+              title: "Game Ended",
+              description: lastMessage.message || "Game ended because a player left the room.",
+              variant: "destructive",
+            });
+            
+            // Quick reset without delay to prevent visual artifacts
+            setTimeout(() => {
+              try {
+                setIsResettingState(false);
+                initializeLocalGame();
+              } catch (innerError) {
+                console.error('🏠 Error in initializeLocalGame:', innerError);
+                // Force page reload if local game initialization fails
+                window.location.reload();
+              }
+            }, 50); // Minimal delay just for state synchronization
+          } catch (error) {
+            console.error('🏠 Error handling game abandonment in useEffect:', error);
+            // Force page reload as fallback
+            window.location.reload();
+          }
           break;
         case 'player_reaction':
           // Handle player reaction - this will be broadcast to all players and spectators
