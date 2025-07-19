@@ -1599,6 +1599,62 @@ export class DatabaseStorage implements IStorage {
       throw error;
     }
   }
+
+  async getLeaderboard(limit: number = 100): Promise<Array<{
+    id: string;
+    username: string;
+    displayName: string;
+    profileImageUrl: string;
+    wins: number;
+    losses: number;
+    draws: number;
+    totalGames: number;
+    winRate: number;
+    selectedAchievementBorder: string;
+  }>> {
+    try {
+      const leaderboardUsers = await db
+        .select({
+          id: users.id,
+          username: users.username,
+          displayName: users.displayName,
+          profileImageUrl: users.profileImageUrl,
+          wins: users.wins,
+          losses: users.losses,
+          draws: users.draws,
+          selectedAchievementBorder: users.selectedAchievementBorder,
+        })
+        .from(users)
+        .where(sql`${users.wins} > 0`) // Only include users with at least 1 win
+        .orderBy(
+          desc(users.wins), // Primary sort: most wins first
+          desc(sql`CAST(${users.wins} AS DECIMAL) / NULLIF(CAST(${users.wins} + ${users.losses} + ${users.draws} AS DECIMAL), 0)`), // Secondary sort: highest win rate
+          desc(sql`${users.wins} + ${users.losses} + ${users.draws}`) // Tertiary sort: most games played
+        )
+        .limit(limit);
+
+      return leaderboardUsers.map((user, index) => {
+        const totalGames = (user.wins || 0) + (user.losses || 0) + (user.draws || 0);
+        const winRate = totalGames > 0 ? (user.wins || 0) / totalGames : 0;
+        
+        return {
+          id: user.id,
+          username: user.username || 'Unknown',
+          displayName: user.displayName || user.username || 'Unknown',
+          profileImageUrl: user.profileImageUrl || null,
+          wins: user.wins || 0,
+          losses: user.losses || 0,
+          draws: user.draws || 0,
+          totalGames,
+          winRate: Math.round(winRate * 100) / 100, // Round to 2 decimal places
+          selectedAchievementBorder: user.selectedAchievementBorder || null,
+        };
+      });
+    } catch (error) {
+      console.error('Error fetching leaderboard:', error);
+      throw error;
+    }
+  }
 }
 
 export const storage = new DatabaseStorage();

@@ -2285,6 +2285,96 @@ export const translations = {
     id: 'Undangan Diterima'
   },
 
+  // Leaderboard
+  leaderboard: {
+    en: 'Leaderboard',
+    ar: 'لوحة المتصدرين',
+    bn: 'লিডারবোর্ড',
+    hi: 'लीडरबोर्ड',
+    es: 'Tabla de Posiciones',
+    id: 'Papan Peringkat'
+  },
+  top100Players: {
+    en: 'Top 100 Players',
+    ar: 'أفضل 100 لاعب',
+    bn: 'শীর্ষ 100 খেলোয়াড়',
+    hi: 'शीर्ष 100 खिलाड़ी',
+    es: 'Top 100 Jugadores',
+    id: 'Top 100 Pemain'
+  },
+  leaderboardDescription: {
+    en: 'The best players ranked by total wins. Achievement borders show player status!',
+    ar: 'أفضل اللاعبين مرتبين حسب إجمالي الانتصارات. حدود الإنجازات تظهر حالة اللاعب!',
+    bn: 'মোট জয়ের ভিত্তিতে র‍্যাঙ্ক করা সেরা খেলোয়াড়। অর্জনের সীমানা খেলোয়াড়ের অবস্থা দেখায়!',
+    hi: 'कुल जीत के आधार पर रैंक किए गए सर्वश्रेष्ठ खिलाड़ी। उपलब्धि सीमाएं खिलाड़ी की स्थिति दिखाती हैं!',
+    es: 'Los mejores jugadores clasificados por victorias totales. ¡Los bordes de logros muestran el estado del jugador!',
+    id: 'Pemain terbaik berdasarkan total kemenangan. Batas pencapaian menunjukkan status pemain!'
+  },
+  loadingLeaderboard: {
+    en: 'Loading leaderboard...',
+    ar: 'جارٍ تحميل لوحة المتصدرين...',
+    bn: 'লিডারবোর্ড লোড হচ্ছে...',
+    hi: 'लीडरबोर्ड लोड हो रहा है...',
+    es: 'Cargando tabla de posiciones...',
+    id: 'Memuat papan peringkat...'
+  },
+  errorLoadingLeaderboard: {
+    en: 'Error loading leaderboard. Please try again.',
+    ar: 'خطأ في تحميل لوحة المتصدرين. يرجى المحاولة مرة أخرى.',
+    bn: 'লিডারবোর্ড লোড করতে ত্রুটি। অনুগ্রহ করে আবার চেষ্টা করুন।',
+    hi: 'लीडरबोर्ड लोड करने में त्रुटि। कृपया पुनः प्रयास करें।',
+    es: 'Error al cargar la tabla de posiciones. Por favor, inténtalo de nuevo.',
+    id: 'Gagal memuat papan peringkat. Silakan coba lagi.'
+  },
+  wins: {
+    en: 'wins',
+    ar: 'انتصارات',
+    bn: 'জয়',
+    hi: 'जीत',
+    es: 'victorias',
+    id: 'kemenangan'
+  },
+  games: {
+    en: 'games',
+    ar: 'ألعاب',
+    bn: 'গেম',
+    hi: 'गेम',
+    es: 'juegos',
+    id: 'permainan'
+  },
+  wld: {
+    en: 'W-L-D',
+    ar: 'ف-خ-ت',
+    bn: 'জ-হ-ড',
+    hi: 'जी-हा-ड्रा',
+    es: 'V-D-E',
+    id: 'M-K-S'
+  },
+  showing: {
+    en: 'Showing',
+    ar: 'عرض',
+    bn: 'দেখানো হচ্ছে',
+    hi: 'दिखाया जा रहा',
+    es: 'Mostrando',
+    id: 'Menampilkan'
+  },
+  players: {
+    en: 'players',
+    ar: 'لاعبين',
+    bn: 'খেলোয়াড়',
+    hi: 'खिलाड़ी',
+    es: 'jugadores',
+    id: 'pemain'
+  },
+  noPlayersFound: {
+    en: 'No players found. Start playing to appear on the leaderboard!',
+    ar: 'لم يتم العثور على لاعبين. ابدأ اللعب للظهور في لوحة المتصدرين!',
+    bn: 'কোনো খেলোয়াড় পাওয়া যায়নি। লিডারবোর্ডে আসতে খেলা শুরু করুন!',
+    hi: 'कोई खिलाड़ी नहीं मिला। लीडरबोर्ड पर आने के लिए खेलना शुरू करें!',
+    es: '¡No se encontraron jugadores. Comienza a jugar para aparecer en la tabla de posiciones!',
+    id: 'Tidak ada pemain ditemukan. Mulai bermain untuk muncul di papan peringkat!'
+  },
+
   invitationDeclined: {
     en: 'Invitation Declined',
     ar: 'تم رفض الدعوة',

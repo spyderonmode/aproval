@@ -77,6 +77,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Leaderboard endpoint - top 100 users by wins
+  app.get('/api/leaderboard', async (req, res) => {
+    try {
+      const limit = parseInt(req.query.limit as string) || 100;
+      const leaderboard = await storage.getLeaderboard(Math.min(limit, 100)); // Max 100 users
+      res.json(leaderboard);
+    } catch (error) {
+      console.error("Error fetching leaderboard:", error);
+      res.status(500).json({ message: "Failed to fetch leaderboard" });
+    }
+  });
+
   // Online game stats route for specific user
   app.get('/api/users/:id/online-stats', requireAuth, async (req: any, res) => {
     try {

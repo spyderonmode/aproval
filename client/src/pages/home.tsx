@@ -19,6 +19,7 @@ import { ThemeSelector } from "@/components/ThemeSelector";
 import { AchievementModal } from "@/components/AchievementModal";
 import { Friends } from "@/components/Friends";
 import { InvitationPopup } from "@/components/InvitationPopup";
+import { Leaderboard } from "@/components/Leaderboard";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -756,6 +757,23 @@ export default function Home() {
                         <Trophy className="h-3 w-3 mr-1" />
                         {t('view')}
                       </Button>
+                    </div>
+                    
+                    {/* Leaderboard */}
+                    <div className="w-full">
+                      <Leaderboard 
+                        trigger={
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => setShowHeaderSidebar(false)}
+                            className="w-full bg-gradient-to-r from-yellow-600 to-orange-600 border-yellow-500 text-white hover:from-yellow-500 hover:to-orange-500 justify-start"
+                          >
+                            <Trophy className="w-4 h-4 mr-2" />
+                            {t('leaderboard') || 'Leaderboard'}
+                          </Button>
+                        }
+                      />
                     </div>
                     
                     {/* Profile Settings */}
