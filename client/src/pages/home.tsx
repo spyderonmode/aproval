@@ -408,32 +408,46 @@ export default function Home() {
           break;
         case 'game_expired':
           console.log('⏰ Game expired:', lastMessage);
-          // Return user to lobby when game expires
-          setCurrentGame(null);
-          setCurrentRoom(null);
-          setSelectedMode('ai');
-          setShowGameOver(false);
-          setGameResult(null);
-          toast({
-            title: "Game Expired",
-            description: lastMessage.message || "Game expired due to inactivity. Returning to lobby.",
-            variant: "destructive",
-          });
+          // Batch state changes to prevent screen blinking
+          const resetExpiredGameState = () => {
+            setCurrentGame(null);
+            setCurrentRoom(null);
+            setSelectedMode('ai');
+            setShowGameOver(false);
+            setGameResult(null);
+          };
+          
+          // Use a single setTimeout to batch all state changes and prevent flickering
+          setTimeout(() => {
+            resetExpiredGameState();
+            toast({
+              title: "Game Expired",
+              description: lastMessage.message || "Game expired due to inactivity. Returning to lobby.",
+              variant: "destructive",
+            });
+          }, 100); // Small delay to prevent rapid state changes
           break;
         case 'game_abandoned':
           console.log('🏠 Game abandoned - player left:', lastMessage);
-          // Clear all game state and return to lobby
-          setCurrentGame(null);
-          setCurrentRoom(null);
-          setSelectedMode('ai');
-          setShowGameOver(false);
-          setGameResult(null);
-          setIsCreatingGame(false);
-          toast({
-            title: "Game Ended",
-            description: lastMessage.message || "Game ended because a player left the room.",
-            variant: "destructive",
-          });
+          // Batch state changes to prevent screen blinking
+          const resetGameState = () => {
+            setCurrentGame(null);
+            setCurrentRoom(null);
+            setSelectedMode('ai');
+            setShowGameOver(false);
+            setGameResult(null);
+            setIsCreatingGame(false);
+          };
+          
+          // Use a single setTimeout to batch all state changes and prevent flickering
+          setTimeout(() => {
+            resetGameState();
+            toast({
+              title: "Game Ended",
+              description: lastMessage.message || "Game ended because a player left the room.",
+              variant: "destructive",
+            });
+          }, 100); // Small delay to prevent rapid state changes
           break;
         case 'player_reaction':
           // Handle player reaction - this will be broadcast to all players and spectators
@@ -512,12 +526,18 @@ export default function Home() {
       }, 100);
     } else {
       console.log('🏠 No current room, just resetting state');
-      setCurrentRoom(null);
-      setCurrentGame(null);
-      setShowGameOver(false);
-      setGameResult(null);
-      setIsCreatingGame(false);
-      setSelectedMode('ai');
+      // Batch state changes to prevent screen blinking
+      const resetState = () => {
+        setCurrentRoom(null);
+        setCurrentGame(null);
+        setShowGameOver(false);
+        setGameResult(null);
+        setIsCreatingGame(false);
+        setSelectedMode('ai');
+      };
+      
+      // Use a small timeout to batch state changes and prevent flickering
+      setTimeout(resetState, 50);
     }
   };
 
