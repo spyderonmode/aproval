@@ -2288,7 +2288,7 @@ export const translations = {
   // Leaderboard
   leaderboard: {
     en: 'Leaderboard',
-    ar: 'لوحة المتصدرين',
+    ar: 'Leaderboard',
     bn: 'লিডারবোর্ড',
     hi: 'लीडरबोर्ड',
     es: 'Tabla de Posiciones',
@@ -2296,7 +2296,7 @@ export const translations = {
   },
   top100Players: {
     en: 'Top 100 Players',
-    ar: 'أفضل 100 لاعب',
+    ar: 'Top 100 Players',
     bn: 'শীর্ষ 100 খেলোয়াড়',
     hi: 'शीर्ष 100 खिलाड़ी',
     es: 'Top 100 Jugadores',
