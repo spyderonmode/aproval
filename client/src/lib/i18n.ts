@@ -1,7 +1,7 @@
 // Internationalization system for TicTac 3x5 game
-// Supports Arabic, Bengali, Hindi, Spanish, and Indonesian languages
+// Supports Arabic, Bengali, Hindi, Spanish, Indonesian, and French languages
 
-export type Language = 'en' | 'ar' | 'bn' | 'hi' | 'es' | 'id';
+export type Language = 'en' | 'ar' | 'bn' | 'hi' | 'es' | 'id' | 'fr';
 
 export const languages = {
   en: { name: 'English', flag: '🇺🇸', dir: 'ltr' },
@@ -9,7 +9,8 @@ export const languages = {
   bn: { name: 'বাংলা', flag: '🇧🇩', dir: 'ltr' },
   hi: { name: 'हिंदी', flag: '🇮🇳', dir: 'ltr' },
   es: { name: 'Español', flag: '🇪🇸', dir: 'ltr' },
-  id: { name: 'Bahasa Indonesia', flag: '🇮🇩', dir: 'ltr' }
+  id: { name: 'Bahasa Indonesia', flag: '🇮🇩', dir: 'ltr' },
+  fr: { name: 'Français', flag: '🇫🇷', dir: 'ltr' }
 } as const;
 
 export const translations = {
@@ -20,7 +21,8 @@ export const translations = {
     bn: 'টিক ট্যাক 3×5',
     hi: 'टिक टैक 3×5',
     es: 'TicTac 3x5',
-    id: 'TicTac 3x5'
+    id: 'TicTac 3x5',
+    fr: 'TicTac 3x5'
   },
   getStarted: {
     en: 'Get Started',
@@ -28,7 +30,8 @@ export const translations = {
     bn: 'শুরু করুন',
     hi: 'शुरू करें',
     es: 'Comenzar',
-    id: 'Mulai'
+    id: 'Mulai',
+    fr: 'Commencer'
   },
   login: {
     en: 'Login',
@@ -36,7 +39,8 @@ export const translations = {
     bn: 'লগইন',
     hi: 'लॉग इन',
     es: 'Iniciar Sesión',
-    id: 'Masuk'
+    id: 'Masuk',
+    fr: 'Se connecter'
   },
   logout: {
     en: 'Logout',
@@ -44,7 +48,8 @@ export const translations = {
     bn: 'লগআউট',
     hi: 'लॉग आउट',
     es: 'Cerrar Sesión',
-    id: 'Keluar'
+    id: 'Keluar',
+    fr: 'Se déconnecter'
   },
   register: {
     en: 'Register',
@@ -52,7 +57,8 @@ export const translations = {
     bn: 'নিবন্ধন',
     hi: 'रजिस्टर करें',
     es: 'Registrarse',
-    id: 'Daftar'
+    id: 'Daftar',
+    fr: 'S\'inscrire'
   },
   
   // Game Interface
@@ -62,7 +68,8 @@ export const translations = {
     bn: 'কৌশলগত টিক ট্যাক টো',
     hi: 'रणनीतिक टिक टैक टो',
     es: 'Tic-Tac-Toe Estratégico',
-    id: 'Tic-Tac-Toe Strategis'
+    id: 'Tic-Tac-Toe Strategis',
+    fr: 'Tic-Tac-Toe Stratégique'
   },
   game: {
     en: 'Game',
@@ -70,7 +77,8 @@ export const translations = {
     bn: 'গেম',
     hi: 'गेम',
     es: 'Juego',
-    id: 'Permainan'
+    id: 'Permainan',
+    fr: 'Jeu'
   },
   startPlayingNow: {
     en: 'Start Playing Now',
@@ -78,7 +86,8 @@ export const translations = {
     bn: 'এখনই খেলা শুরু করুন',
     hi: 'अभी खेलना शुरू करें',
     es: 'Empezar a Jugar Ahora',
-    id: 'Mulai Bermain Sekarang'
+    id: 'Mulai Bermain Sekarang',
+    fr: 'Commencer à Jouer Maintenant'
   },
   gameDescription: {
     en: 'Experience the classic game on a 3x5 grid with strategic gameplay.',
@@ -86,7 +95,8 @@ export const translations = {
     bn: 'কৌশলগত গেমপ্লে সহ 3×5 গ্রিডে ক্লাসিক গেমটি অনুভব করুন।',
     hi: 'रणनीतिक गेमप्ले के साथ 3×5 ग्रिड पर क्लासिक गेम का अनुभव करें।',
     es: 'Experimenta el juego clásico en una cuadrícula de 3x5 con jugabilidad estratégica.',
-    id: 'Rasakan permainan klasik di grid 3x5 dengan gameplay strategis.'
+    id: 'Rasakan permainan klasik di grid 3x5 dengan gameplay strategis.',
+    fr: 'Découvrez le jeu classique sur une grille 3x5 avec un gameplay stratégique.'
   },
   
   // Game Modes
@@ -96,7 +106,8 @@ export const translations = {
     bn: 'গেম মোড',
     hi: 'गेम मोड',
     es: 'Modo de Juego',
-    id: 'Mode Permainan'
+    id: 'Mode Permainan',
+    fr: 'Mode de Jeu'
   },
   aiMode: {
     en: 'AI Mode',
@@ -104,7 +115,8 @@ export const translations = {
     bn: 'এআই মোড',
     hi: 'एआई मोड',
     es: 'Modo IA',
-    id: 'Mode AI'
+    id: 'Mode AI',
+    fr: 'Mode IA'
   },
   passPlayMode: {
     en: 'Pass & Play',
@@ -112,7 +124,8 @@ export const translations = {
     bn: 'পাস এবং প্লে',
     hi: 'पास और प्ले',
     es: 'Pasar y Jugar',
-    id: 'Pass & Play'
+    id: 'Pass & Play',
+    fr: 'Passer et Jouer'
   },
   onlineMode: {
     en: 'Online Mode',
@@ -120,7 +133,8 @@ export const translations = {
     bn: 'অনলাইন মোড',
     hi: 'ऑनलाइन मोड',
     es: 'Modo Online',
-    id: 'Mode Online'
+    id: 'Mode Online',
+    fr: 'Mode En Ligne'
   },
   
   // Game Rules
@@ -130,7 +144,8 @@ export const translations = {
     bn: 'গেমের নিয়ম',
     hi: 'गेम नियम',
     es: 'Reglas del Juego',
-    id: 'Aturan Permainan'
+    id: 'Aturan Permainan',
+    fr: 'Règles du Jeu'
   },
   horizontalWin: {
     en: 'Horizontal Win: Get 4 symbols in a row horizontally',
@@ -138,7 +153,8 @@ export const translations = {
     bn: 'অনুভূমিক জয়: একটি সারিতে 4টি চিহ্ন পান',
     hi: 'क्षैतिज जीत: एक पंक्ति में 4 प्रतीक प्राप्त करें',
     es: 'Victoria Horizontal: Consigue 4 símbolos en una fila horizontal',
-    id: 'Kemenangan Horizontal: Dapatkan 4 simbol dalam baris horizontal'
+    id: 'Kemenangan Horizontal: Dapatkan 4 simbol dalam baris horizontal',
+    fr: 'Victoire Horizontale: Obtenez 4 symboles dans une rangée horizontale'
   },
   verticalWin: {
     en: 'Vertical Win: Get 3 symbols in a column vertically',
@@ -146,7 +162,8 @@ export const translations = {
     bn: 'উল্লম্ব জয়: একটি কলামে 3টি চিহ্ন পান',
     hi: 'ऊर्ध्वाधर जीत: एक कॉलम में 3 प्रतीक प्राप्त करें',
     es: 'Victoria Vertical: Consigue 3 símbolos en una columna vertical',
-    id: 'Kemenangan Vertikal: Dapatkan 3 simbol dalam kolom vertikal'
+    id: 'Kemenangan Vertikal: Dapatkan 3 simbol dalam kolom vertikal',
+    fr: 'Victoire Verticale: Obtenez 3 symboles dans une colonne verticale'
   },
   diagonalWin: {
     en: 'Diagonal Win: Get 3 symbols diagonally (positions 5, 10, 15 restricted)',
@@ -154,7 +171,8 @@ export const translations = {
     bn: 'কর্ণ জয়: কর্ণভাবে 3টি চিহ্ন পান (অবস্থান 5, 10, 15 সীমিত)',
     hi: 'विकर्ण जीत: विकर्ण में 3 प्रतीक प्राप्त करें (स्थिति 5, 10, 15 प्रतिबंधित)',
     es: 'Victoria Diagonal: Consigue 3 símbolos en diagonal (posiciones 5, 10, 15 restringidas)',
-    id: 'Kemenangan Diagonal: Dapatkan 3 simbol secara diagonal (posisi 5, 10, 15 terbatas)'
+    id: 'Kemenangan Diagonal: Dapatkan 3 simbol secara diagonal (posisi 5, 10, 15 terbatas)',
+    fr: 'Victoire Diagonale: Obtenez 3 symboles en diagonale (positions 5, 10, 15 restreintes)'
   },
   gridLayout: {
     en: 'Grid Layout: 3 rows × 5 columns (positions 1-15)',
@@ -162,7 +180,8 @@ export const translations = {
     bn: 'গ্রিড লেআউট: 3 সারি × 5 কলাম (অবস্থান 1-15)',
     hi: 'ग्रिड लेआउट: 3 पंक्तियाँ × 5 कॉलम (स्थिति 1-15)',
     es: 'Diseño de Cuadrícula: 3 filas × 5 columnas (posiciones 1-15)',
-    id: 'Tata Letak Grid: 3 baris × 5 kolom (posisi 1-15)'
+    id: 'Tata Letak Grid: 3 baris × 5 kolom (posisi 1-15)',
+    fr: 'Disposition de la Grille: 3 rangées × 5 colonnes (positions 1-15)'
   },
   
   // Quick Chat Messages
@@ -172,7 +191,8 @@ export const translations = {
     bn: 'দ্রুত চ্যাট',
     hi: 'त्वरित चैट',
     es: 'Chat Rápido',
-    id: 'Chat Cepat'
+    id: 'Chat Cepat',
+    fr: 'Chat Rapide'
   },
   goodLuck: {
     en: 'Good luck!',
@@ -180,7 +200,8 @@ export const translations = {
     bn: 'শুভকামনা!',
     hi: 'शुभकामनाएँ!',
     es: '¡Buena suerte!',
-    id: 'Semoga beruntung!'
+    id: 'Semoga beruntung!',
+    fr: 'Bonne chance!'
   },
   wellPlayed: {
     en: 'Well played!',
@@ -188,7 +209,8 @@ export const translations = {
     bn: 'ভাল খেলেছেন!',
     hi: 'अच्छा खेला!',
     es: '¡Bien jugado!',
-    id: 'Permainan bagus!'
+    id: 'Permainan bagus!',
+    fr: 'Bien joué!'
   },
   niceMove: {
     en: 'Nice move!',
@@ -196,7 +218,8 @@ export const translations = {
     bn: 'চমৎকার চাল!',
     hi: 'अच्छी चाल!',
     es: '¡Buen movimiento!',
-    id: 'Gerakan bagus!'
+    id: 'Gerakan bagus!',
+    fr: 'Beau coup!'
   },
   greatStrategy: {
     en: 'Great strategy!',
@@ -204,7 +227,8 @@ export const translations = {
     bn: 'দুর্দান্ত কৌশল!',
     hi: 'बेहतरीन रणनीति!',
     es: '¡Gran estrategia!',
-    id: 'Strategi hebat!'
+    id: 'Strategi hebat!',
+    fr: 'Grande stratégie!'
   },
   playFaster: {
     en: 'Play faster!',
@@ -212,7 +236,8 @@ export const translations = {
     bn: 'আরো দ্রুত খেলুন!',
     hi: 'तेज़ खेलें!',
     es: '¡Juega más rápido!',
-    id: 'Main lebih cepat!'
+    id: 'Main lebih cepat!',
+    fr: 'Jouez plus vite!'
   },
   takeYourTime: {
     en: 'Take your time',
@@ -220,7 +245,8 @@ export const translations = {
     bn: 'সময় নিন',
     hi: 'अपना समय लें',
     es: 'Tómate tu tiempo',
-    id: 'Ambil waktu Anda'
+    id: 'Ambil waktu Anda',
+    fr: 'Prenez votre temps'
   },
   goodGame: {
     en: 'Good game!',
@@ -228,7 +254,8 @@ export const translations = {
     bn: 'ভাল গেম!',
     hi: 'अच्छा गेम!',
     es: '¡Buen juego!',
-    id: 'Permainan bagus!'
+    id: 'Permainan bagus!',
+    fr: 'Jeu'
   },
   thanksForGame: {
     en: 'Thanks for the game!',
@@ -236,7 +263,8 @@ export const translations = {
     bn: 'গেমের জন্য ধন্যবাদ!',
     hi: 'गेम के लिए धन्यवाद!',
     es: '¡Gracias por el juego!',
-    id: 'Terima kasih untuk permainannya!'
+    id: 'Terima kasih untuk permainannya!',
+    fr: 'Merci pour le jeu!'
   },
   oneMore: {
     en: 'One more?',
@@ -244,7 +272,8 @@ export const translations = {
     bn: 'আরো একটি?',
     hi: 'एक और?',
     es: '¿Una más?',
-    id: 'Satu lagi?'
+    id: 'Satu lagi?',
+    fr: 'Une de plus?'
   },
   impressive: {
     en: 'Impressive!',
@@ -252,7 +281,8 @@ export const translations = {
     bn: 'চমৎকার!',
     hi: 'प्रभावशाली!',
     es: '¡Impresionante!',
-    id: 'Mengesankan!'
+    id: 'Mengesankan!',
+    fr: 'Impressionnant!'
   },
   thinking: {
     en: 'Thinking...',
@@ -260,7 +290,8 @@ export const translations = {
     bn: 'ভাবছি...',
     hi: 'सोच रहा हूं...',
     es: 'Pensando...',
-    id: 'Berpikir...'
+    id: 'Berpikir...',
+    fr: 'Jeu'
   },
   readyToPlay: {
     en: 'Ready to play!',
@@ -268,7 +299,8 @@ export const translations = {
     bn: 'খেলার জন্য প্রস্তুত!',
     hi: 'खेलने के लिए तैयार!',
     es: '¡Listo para jugar!',
-    id: 'Siap bermain!'
+    id: 'Siap bermain!',
+    fr: 'Jeu'
   },
   
   // UI Elements
@@ -278,7 +310,8 @@ export const translations = {
     bn: 'বন্ধ',
     hi: 'बंद',
     es: 'Cerrar',
-    id: 'Tutup'
+    id: 'Tutup',
+    fr: 'Jeu'
   },
   chat: {
     en: 'Chat',
@@ -286,7 +319,8 @@ export const translations = {
     bn: 'চ্যাট',
     hi: 'चैट',
     es: 'Chat',
-    id: 'Chat'
+    id: 'Chat',
+    fr: 'Jeu'
   },
   resetGame: {
     en: 'Reset Game',
@@ -294,7 +328,8 @@ export const translations = {
     bn: 'গেম রিসেট',
     hi: 'गेम रीसेट',
     es: 'Reiniciar Juego',
-    id: 'Reset Permainan'
+    id: 'Reset Permainan',
+    fr: 'Jeu'
   },
   
   // Auth Forms
@@ -304,7 +339,8 @@ export const translations = {
     bn: 'ব্যবহারকারীর নাম',
     hi: 'उपयोगकर्ता नाम',
     es: 'Nombre de Usuario',
-    id: 'Nama Pengguna'
+    id: 'Nama Pengguna',
+    fr: 'Jeu'
   },
   password: {
     en: 'Password',
@@ -312,7 +348,8 @@ export const translations = {
     bn: 'পাসওয়ার্ড',
     hi: 'पासवर्ड',
     es: 'Contraseña',
-    id: 'Kata Sandi'
+    id: 'Kata Sandi',
+    fr: 'Jeu'
   },
   email: {
     en: 'Email',
@@ -320,7 +357,8 @@ export const translations = {
     bn: 'ইমেইল',
     hi: 'ईমেল',
     es: 'Correo Electrónico',
-    id: 'Email'
+    id: 'Email',
+    fr: 'Jeu'
   },
   loading: {
     en: 'Loading...',
@@ -328,7 +366,8 @@ export const translations = {
     bn: 'লোড হচ্ছে...',
     hi: 'लोड हो रहा है...',
     es: 'Cargando...',
-    id: 'Memuat...'
+    id: 'Memuat...',
+    fr: 'Jeu'
   },
   usernameOrEmail: {
     en: 'Username or Email',
@@ -336,7 +375,8 @@ export const translations = {
     bn: 'ব্যবহারকারীর নাম বা ইমেইল',
     hi: 'उपयोगकर्ता नाম या ईমেইল',
     es: 'Nombre de Usuario o Correo',
-    id: 'Nama Pengguna atau Email'
+    id: 'Nama Pengguna atau Email',
+    fr: 'Jeu'
   },
   enterCredentialsToAccess: {
     en: 'Enter your credentials to access your account',
@@ -344,7 +384,8 @@ export const translations = {
     bn: 'আপনার অ্যাকাউন্ট অ্যাক্সেস করতে আপনার তথ্য প্রবেশ করান',
     hi: 'अपने खाते तक पहुंचने के लिए अपनी जानकारी दर्ज करें',
     es: 'Ingresa tus credenciales para acceder a tu cuenta',
-    id: 'Masukkan kredensial Anda untuk mengakses akun Anda'
+    id: 'Masukkan kredensial Anda untuk mengakses akun Anda',
+    fr: 'Jeu'
   },
   enterDetailsToCreate: {
     en: 'Enter your details to create a new account',
@@ -352,7 +393,8 @@ export const translations = {
     bn: 'একটি নতুন অ্যাকাউন্ট তৈরি করতে আপনার বিবরণ প্রবেশ করান',
     hi: 'नया खाता बनाने के लिए अपना विवरण दर্জ করें',
     es: 'Ingresa tus datos para crear una nueva cuenta',
-    id: 'Masukkan detail Anda untuk membuat akun baru'
+    id: 'Masukkan detail Anda untuk membuat akun baru',
+    fr: 'Jeu'
   },
   enterUsernameOrEmail: {
     en: 'Enter your username or email',
@@ -360,7 +402,8 @@ export const translations = {
     bn: 'আপনার ব্যবহারকারীর নাম বা ইমেইল প্রবেশ করান',
     hi: 'अपना उपयोगकर्ता नाम या ईমেইল दर्ज करें',
     es: 'Ingresa tu nombre de usuario o correo',
-    id: 'Masukkan nama pengguna atau email Anda'
+    id: 'Masukkan nama pengguna atau email Anda',
+    fr: 'Jeu'
   },
   enterUsername: {
     en: 'Enter your username',
@@ -368,7 +411,8 @@ export const translations = {
     bn: 'আপনার ব্যবহারকারীর নাম প্রবেশ করান',
     hi: 'अपना उपयोगकर्ता नाम दर্জ করें',
     es: 'Ingresa tu nombre de usuario',
-    id: 'Masukkan nama pengguna Anda'
+    id: 'Masukkan nama pengguna Anda',
+    fr: 'Jeu'
   },
   enterEmail: {
     en: 'Enter your email',
@@ -376,7 +420,8 @@ export const translations = {
     bn: 'আপনার ইমেইল প্রবেশ করান',
     hi: 'अपना ईমেইল दर্জ করें',
     es: 'Ingresa tu correo electrónico',
-    id: 'Masukkan email Anda'
+    id: 'Masukkan email Anda',
+    fr: 'Jeu'
   },
   enterPassword: {
     en: 'Enter your password',
@@ -384,7 +429,8 @@ export const translations = {
     bn: 'আপনার পাসওয়ার্ড প্রবেশ করান',
     hi: 'अपना पासवर্ড दर্জ করें',
     es: 'Ingresa tu contraseña',
-    id: 'Masukkan kata sandi Anda'
+    id: 'Masukkan kata sandi Anda',
+    fr: 'Jeu'
   },
   emailRequiredForVerification: {
     en: 'Email is required for account verification and recovery',
@@ -392,7 +438,8 @@ export const translations = {
     bn: 'অ্যাকাউন্ট যাচাইকরণ এবং পুনরুদ্ধারের জন্য ইমেইল প্রয়োজন',
     hi: 'खाता सत्यापन और पुनर्प्राप्ति के लिए ईমেইল आवश্যক है',
     es: 'El correo es requerido para verificación y recuperación de cuenta',
-    id: 'Email diperlukan untuk verifikasi dan pemulihan akun'
+    id: 'Email diperlukan untuk verifikasi dan pemulihan akun',
+    fr: 'Jeu'
   },
   forgotPassword: {
     en: 'Forgot password?',
@@ -400,7 +447,8 @@ export const translations = {
     bn: 'পাসওয়ার্ড ভুলে গেছেন?',
     hi: 'पासवर्ड भूल गए?',
     es: '¿Olvidaste tu contraseña?',
-    id: 'Lupa kata sandi?'
+    id: 'Lupa kata sandi?',
+    fr: 'Jeu'
   },
   dontHaveAccountSignUp: {
     en: "Don't have an account? Sign up",
@@ -408,7 +456,8 @@ export const translations = {
     bn: 'অ্যাকাউন্ট নেই? সাইন আপ করুন',
     hi: 'खाता नहीं है? साइन अप करें',
     es: '¿No tienes cuenta? Regístrate',
-    id: 'Tidak punya akun? Daftar'
+    id: 'Tidak punya akun? Daftar',
+    fr: 'Jeu'
   },
   alreadyHaveAccountSignIn: {
     en: 'Already have an account? Sign in',
@@ -416,7 +465,8 @@ export const translations = {
     bn: 'ইতিমধ্যে অ্যাকাউন্ট আছে? সাইন ইন করুন',
     hi: 'पहले से खाता है? साइन इन करें',
     es: '¿Ya tienes cuenta? Inicia sesión',
-    id: 'Sudah punya akun? Masuk'
+    id: 'Sudah punya akun? Masuk',
+    fr: 'Jeu'
   },
   
   // Toast Messages
@@ -426,7 +476,8 @@ export const translations = {
     bn: 'লগইন সফল',
     hi: 'लॉगिन सफल',
     es: 'Inicio de sesión exitoso',
-    id: 'Login berhasil'
+    id: 'Login berhasil',
+    fr: 'Jeu'
   },
   welcomeBack: {
     en: 'Welcome back!',
@@ -434,7 +485,8 @@ export const translations = {
     bn: 'ফিরে আসার জন্য স্বাগতম!',
     hi: 'वापसी पर स्वागत है!',
     es: '¡Bienvenido de vuelta!',
-    id: 'Selamat datang kembali!'
+    id: 'Selamat datang kembali!',
+    fr: 'Jeu'
   },
   emailVerificationRequired: {
     en: 'Email verification required',
@@ -442,7 +494,8 @@ export const translations = {
     bn: 'ইমেইল যাচাইকরণ প্রয়োজন',
     hi: 'ईমেইল सत्यापन आवश्यक',
     es: 'Verificación de correo requerida',
-    id: 'Verifikasi email diperlukan'
+    id: 'Verifikasi email diperlukan',
+    fr: 'Jeu'
   },
   pleaseVerifyEmailBeforeLogin: {
     en: 'Please verify your email before logging in.',
@@ -450,7 +503,8 @@ export const translations = {
     bn: 'লগইন করার আগে দয়া করে আপনার ইমেইল যাচাই করুন।',
     hi: 'लॉगिन करने से पहले कृपया अपने ईমেইल को सत্যাপित करें।',
     es: 'Por favor verifica tu correo antes de iniciar sesión.',
-    id: 'Harap verifikasi email Anda sebelum login.'
+    id: 'Harap verifikasi email Anda sebelum login.',
+    fr: 'Jeu'
   },
   loginFailed: {
     en: 'Login failed',
@@ -458,7 +512,8 @@ export const translations = {
     bn: 'লগইন ব্যর্থ',
     hi: 'लॉगिन असफल',
     es: 'Inicio de sesión fallido',
-    id: 'Login gagal'
+    id: 'Login gagal',
+    fr: 'Jeu'
   },
   pleaseCheckCredentials: {
     en: 'Please check your credentials and try again.',
@@ -466,7 +521,8 @@ export const translations = {
     bn: 'দয়া করে আপনার তথ্য পরীক্ষা করুন এবং আবার চেষ্টা করুন।',
     hi: 'कृपया अपनी जानकारी जांचें और पুनः प्रयास करें।',
     es: 'Por favor verifica tus credenciales e inténtalo de nuevo.',
-    id: 'Harap periksa kredensial Anda dan coba lagi.'
+    id: 'Harap periksa kredensial Anda dan coba lagi.',
+    fr: 'Jeu'
   },
   emailRequired: {
     en: 'Email required',
@@ -474,7 +530,8 @@ export const translations = {
     bn: 'ইমেইল প্রয়োজন',
     hi: 'ईমেইল आवश्यक',
     es: 'Correo requerido',
-    id: 'Email diperlukan'
+    id: 'Email diperlukan',
+    fr: 'Jeu'
   },
   pleaseProvideEmailToRegister: {
     en: 'Please provide an email address to register.',
@@ -482,7 +539,8 @@ export const translations = {
     bn: 'নিবন্ধনের জন্য দয়া করে একটি ইমেইল ঠিকানা প্রদান করুন।',
     hi: 'पंजीकरण के लिए कृपया एक ईমেইल पता प्रदान करें।',
     es: 'Por favor proporciona una dirección de correo para registrarte.',
-    id: 'Harap berikan alamat email untuk mendaftar.'
+    id: 'Harap berikan alamat email untuk mendaftar.',
+    fr: 'Jeu'
   },
   registrationSuccessful: {
     en: 'Registration successful',
@@ -490,7 +548,8 @@ export const translations = {
     bn: 'নিবন্ধন সফল',
     hi: 'पंजीकरण सफल',
     es: 'Registro exitoso',
-    id: 'Pendaftaran berhasil'
+    id: 'Pendaftaran berhasil',
+    fr: 'Jeu'
   },
   pleaseVerifyEmailToContinue: {
     en: 'Please verify your email to continue.',
@@ -498,7 +557,8 @@ export const translations = {
     bn: 'চালিয়ে যেতে দয়া করে আপনার ইমেইল যাচাই করুন।',
     hi: 'जारी रखने के लिए कृपया अपने ईমেইল को सत्यापित करें।',
     es: 'Por favor verifica tu correo para continuar.',
-    id: 'Harap verifikasi email Anda untuk melanjutkan.'
+    id: 'Harap verifikasi email Anda untuk melanjutkan.',
+    fr: 'Jeu'
   },
   registrationFailed: {
     en: 'Registration failed',
@@ -506,7 +566,8 @@ export const translations = {
     bn: 'নিবন্ধন ব্যর্থ',
     hi: 'पंजीकरण असफल',
     es: 'Registro fallido',
-    id: 'Pendaftaran gagal'
+    id: 'Pendaftaran gagal',
+    fr: 'Jeu'
   },
   pleaseCheckInformationAndTryAgain: {
     en: 'Please check your information and try again.',
@@ -514,7 +575,8 @@ export const translations = {
     bn: 'দয়া করে আপনার তথ্য পরীক্ষা করুন এবং আবার চেষ্টা করুন।',
     hi: 'कृपया अपनी जानकारी जांचें और पुनः प्रयास करें।',
     es: 'Por favor verifica tu información e inténtalo de nuevo.',
-    id: 'Harap periksa informasi Anda dan coba lagi.'
+    id: 'Harap periksa informasi Anda dan coba lagi.',
+    fr: 'Jeu'
   },
   
   // Game Status
@@ -524,7 +586,8 @@ export const translations = {
     bn: 'খেলোয়াড় %s এর পালা',
     hi: 'खिलाड़ी %s की बारी',
     es: 'Turno del Jugador %s',
-    id: 'Giliran Pemain %s'
+    id: 'Giliran Pemain %s',
+    fr: 'Jeu'
   },
   winner: {
     en: 'Winner: %s',
@@ -532,7 +595,8 @@ export const translations = {
     bn: 'বিজয়ী: %s',
     hi: 'विजेता: %s',
     es: 'Ganador: %s',
-    id: 'Pemenang: %s'
+    id: 'Pemenang: %s',
+    fr: 'Jeu'
   },
   draw: {
     en: 'Draw!',
@@ -540,7 +604,8 @@ export const translations = {
     bn: 'ড্র!',
     hi: 'ड्रॉ!',
     es: '¡Empate!',
-    id: 'Seri!'
+    id: 'Seri!',
+    fr: 'Jeu'
   },
   
   // Settings
@@ -550,7 +615,8 @@ export const translations = {
     bn: 'সেটিংস',
     hi: 'सेटिंग्स',
     es: 'Configuración',
-    id: 'Pengaturan'
+    id: 'Pengaturan',
+    fr: 'Jeu'
   },
   theme: {
     en: 'Theme',
@@ -558,7 +624,8 @@ export const translations = {
     bn: 'থিম',
     hi: 'थीम',
     es: 'Tema',
-    id: 'Tema'
+    id: 'Tema',
+    fr: 'Jeu'
   },
   language: {
     en: 'Language',
@@ -566,7 +633,8 @@ export const translations = {
     bn: 'ভাষা',
     hi: 'भाषा',
     es: 'Idioma',
-    id: 'Bahasa'
+    id: 'Bahasa',
+    fr: 'Jeu'
   },
   
   // AI Difficulty Levels
@@ -576,7 +644,8 @@ export const translations = {
     bn: 'কঠিনতা',
     hi: 'कठिनाई',
     es: 'Dificultad',
-    id: 'Tingkat Kesulitan'
+    id: 'Tingkat Kesulitan',
+    fr: 'Jeu'
   },
   easy: {
     en: 'Easy',
@@ -584,7 +653,8 @@ export const translations = {
     bn: 'সহজ',
     hi: 'आसान',
     es: 'Fácil',
-    id: 'Mudah'
+    id: 'Mudah',
+    fr: 'Jeu'
   },
   medium: {
     en: 'Medium',
@@ -592,7 +662,8 @@ export const translations = {
     bn: 'মাঝারি',
     hi: 'मध्यम',
     es: 'Medio',
-    id: 'Sedang'
+    id: 'Sedang',
+    fr: 'Jeu'
   },
   hard: {
     en: 'Hard',
@@ -600,7 +671,8 @@ export const translations = {
     bn: 'কঠিন',
     hi: 'कठिन',
     es: 'Difícil',
-    id: 'Sulit'
+    id: 'Sulit',
+    fr: 'Jeu'
   },
   
   // Game Mode Descriptions
@@ -610,7 +682,8 @@ export const translations = {
     bn: 'কম্পিউটারকে চ্যালেঞ্জ করুন',
     hi: 'कंप्यूटर को चुनौती दें',
     es: 'Desafía a la computadora',
-    id: 'Tantang komputer'
+    id: 'Tantang komputer',
+    fr: 'Jeu'
   },
   localMultiplayer: {
     en: 'Local multiplayer',
@@ -618,7 +691,8 @@ export const translations = {
     bn: 'স্থানীয় বহুখেলোয়াড়',
     hi: 'स्थानीय मल्टीप्लेयर',
     es: 'Multijugador local',
-    id: 'Multiplayer lokal'
+    id: 'Multiplayer lokal',
+    fr: 'Jeu'
   },
   playWithFriends: {
     en: 'Play with friends online',
@@ -626,7 +700,8 @@ export const translations = {
     bn: 'অনলাইনে বন্ধুদের সাথে খেলুন',
     hi: 'दोस्तों के साथ ऑनलाइन खेलें',
     es: 'Juega con amigos en línea',
-    id: 'Bermain dengan teman secara online'
+    id: 'Bermain dengan teman secara online',
+    fr: 'Jeu'
   },
   
   // Profile and Dashboard
@@ -636,7 +711,8 @@ export const translations = {
     bn: 'প্রোফাইল',
     hi: 'प्रोफाइल',
     es: 'Perfil',
-    id: 'Profil'
+    id: 'Profil',
+    fr: 'Jeu'
   },
   playerDashboard: {
     en: 'Player Dashboard',
@@ -644,7 +720,8 @@ export const translations = {
     bn: 'প্লেয়ার ড্যাশবোর্ড',
     hi: 'प्लेयर डैशबोर्ड',
     es: 'Panel del Jugador',
-    id: 'Dashboard Pemain'
+    id: 'Dashboard Pemain',
+    fr: 'Jeu'
   },
   gameBoard: {
     en: 'Game Board',
@@ -652,7 +729,8 @@ export const translations = {
     bn: 'গেম বোর্ড',
     hi: 'गेम बोर्ड',
     es: 'Tablero de Juego',
-    id: 'Papan Permainan'
+    id: 'Papan Permainan',
+    fr: 'Jeu'
   },
   playerTurnX: {
     en: "Player X's Turn",
@@ -660,7 +738,8 @@ export const translations = {
     bn: 'প্লেয়ার X এর পালা',
     hi: 'प्लेयर X की बारी',
     es: 'Turno del Jugador X',
-    id: 'Giliran Pemain X'
+    id: 'Giliran Pemain X',
+    fr: 'Jeu'
   },
   gameStats: {
     en: 'Game Stats',
@@ -668,7 +747,8 @@ export const translations = {
     bn: 'গেমের পরিসংখ্যান',
     hi: 'गेम आंकड़े',
     es: 'Estadísticas del Juego',
-    id: 'Statistik Permainan'
+    id: 'Statistik Permainan',
+    fr: 'Jeu'
   },
   wins: {
     en: 'Wins',
@@ -676,7 +756,8 @@ export const translations = {
     bn: 'জয়',
     hi: 'जीत',
     es: 'Victorias',
-    id: 'Menang'
+    id: 'Menang',
+    fr: 'Jeu'
   },
   losses: {
     en: 'Losses',
@@ -684,7 +765,8 @@ export const translations = {
     bn: 'পরাজয়',
     hi: 'हार',
     es: 'Derrotas',
-    id: 'Kalah'
+    id: 'Kalah',
+    fr: 'Jeu'
   },
   draws: {
     en: 'Draws',
@@ -692,7 +774,8 @@ export const translations = {
     bn: 'ড্র',
     hi: 'ड्रॉ',
     es: 'Empates',
-    id: 'Seri'
+    id: 'Seri',
+    fr: 'Jeu'
   },
   total: {
     en: 'Total',
@@ -700,7 +783,8 @@ export const translations = {
     bn: 'মোট',
     hi: 'कुल',
     es: 'Total',
-    id: 'Total'
+    id: 'Total',
+    fr: 'Jeu'
   },
   
   // Profile Management
@@ -710,7 +794,8 @@ export const translations = {
     bn: 'প্রোফাইল সম্পাদনা',
     hi: 'प्रोफाइल संपादित करें',
     es: 'Editar Perfil',
-    id: 'Edit Profil'
+    id: 'Edit Profil',
+    fr: 'Jeu'
   },
   profilePicture: {
     en: 'Profile Picture',
@@ -718,7 +803,8 @@ export const translations = {
     bn: 'প্রোফাইল ছবি',
     hi: 'प्रोफाइल चित्र',
     es: 'Foto de Perfil',
-    id: 'Foto Profil'
+    id: 'Foto Profil',
+    fr: 'Jeu'
   },
   displayName: {
     en: 'Display Name',
@@ -726,7 +812,8 @@ export const translations = {
     bn: 'প্রদর্শন নাম',
     hi: 'प्रदर्शन नाम',
     es: 'Nombre de Visualización',
-    id: 'Nama Tampilan'
+    id: 'Nama Tampilan',
+    fr: 'Jeu'
   },
   uploadPhoto: {
     en: 'Upload Photo',
@@ -734,7 +821,8 @@ export const translations = {
     bn: 'ছবি আপলোড',
     hi: 'फोटो अपलोड करें',
     es: 'Subir Foto',
-    id: 'Unggah Foto'
+    id: 'Unggah Foto',
+    fr: 'Jeu'
   },
   saveChanges: {
     en: 'Save Changes',
@@ -742,7 +830,8 @@ export const translations = {
     bn: 'পরিবর্তন সংরক্ষণ',
     hi: 'परिवर्तन सहेजें',
     es: 'Guardar Cambios',
-    id: 'Simpan Perubahan'
+    id: 'Simpan Perubahan',
+    fr: 'Jeu'
   },
   cancel: {
     en: 'Cancel',
@@ -750,7 +839,8 @@ export const translations = {
     bn: 'বাতিল',
     hi: 'रद्द करें',
     es: 'Cancelar',
-    id: 'Batal'
+    id: 'Batal',
+    fr: 'Jeu'
   },
   
   // Friends and Social
@@ -760,7 +850,8 @@ export const translations = {
     bn: 'বন্ধুরা',
     hi: 'मित्र',
     es: 'Amigos',
-    id: 'Teman'
+    id: 'Teman',
+    fr: 'Jeu'
   },
   friendsOne: {
     en: 'Friends (1)',
@@ -768,7 +859,8 @@ export const translations = {
     bn: 'বন্ধুরা (1)',
     hi: 'मित्र (1)',
     es: 'Amigos (1)',
-    id: 'Teman (1)'
+    id: 'Teman (1)',
+    fr: 'Jeu'
   },
   requests: {
     en: 'Requests',
@@ -776,7 +868,8 @@ export const translations = {
     bn: 'অনুরোধ',
     hi: 'अनुरोध',
     es: 'Solicitudes',
-    id: 'Permintaan'
+    id: 'Permintaan',
+    fr: 'Jeu'
   },
   addFriend: {
     en: 'Add Friend',
@@ -784,7 +877,8 @@ export const translations = {
     bn: 'বন্ধু যোগ করুন',
     hi: 'मित्र जोड़ें',
     es: 'Agregar Amigo',
-    id: 'Tambah Teman'
+    id: 'Tambah Teman',
+    fr: 'Jeu'
   },
   
   // Achievements
@@ -794,7 +888,8 @@ export const translations = {
     bn: 'অর্জন',
     hi: 'उपलब्धियां',
     es: 'Logros',
-    id: 'Pencapaian'
+    id: 'Pencapaian',
+    fr: 'Jeu'
   },
   yourAchievements: {
     en: 'Your Achievements',
@@ -802,7 +897,8 @@ export const translations = {
     bn: 'আপনার অর্জন',
     hi: 'आपकी उपलब्धियां',
     es: 'Tus Logros',
-    id: 'Pencapaian Anda'
+    id: 'Pencapaian Anda',
+    fr: 'Jeu'
   },
 
   winYourFirstGame: {
@@ -811,7 +907,8 @@ export const translations = {
     bn: 'আপনার প্রথম গেম জিতুন',
     hi: 'अपना पहला गেม জীতें',
     es: 'Gana tu primer juego',
-    id: 'Menangkan permainan pertama Anda'
+    id: 'Menangkan permainan pertama Anda',
+    fr: 'Jeu'
   },
   speedDemonDesc: {
     en: 'Win 20 total games to unlock the Christmas theme - keep playing!',
@@ -819,7 +916,8 @@ export const translations = {
     bn: '২০টি গেম জিতুন ক্রিসমাস থিম আনলক করতে - খেলা চালিয়ে যান!',
     hi: 'क्रिसमस थीम अनलॉक करने के लिए 20 गेम जीतें - खेलते रहें!',
     es: 'Gana 20 juegos para desbloquear el tema navideño - ¡sigue jugando!',
-    id: 'Menangkan 20 permainan untuk membuka tema Natal - terus bermain!'
+    id: 'Menangkan 20 permainan untuk membuka tema Natal - terus bermain!',
+    fr: 'Jeu'
   },
   legendDesc: {
     en: 'Achieve 50 total wins to become a true legend with animated border!',
@@ -827,7 +925,8 @@ export const translations = {
     bn: 'অ্যানিমেটেড বর্ডার সহ প্রকৃত কিংবদন্তি হতে ৫০টি জয় অর্জন করুন!',
     hi: 'एनिमेटेड बॉर्डर के साथ सच्चे लीजेंड बनने के लिए 50 जीत हासिल करें!',
     es: '¡Consigue 50 victorias para convertirte en una verdadera leyenda con borde animado!',
-    id: 'Raih 50 kemenangan untuk menjadi legenda sejati dengan border animasi!'
+    id: 'Raih 50 kemenangan untuk menjadi legenda sejati dengan border animasi!',
+    fr: 'Jeu'
   },
   championDesc: {
     en: 'Achieve 100 total wins to become an ultimate champion with cosmic border!',
@@ -835,7 +934,8 @@ export const translations = {
     bn: 'কসমিক বর্ডার সহ চূড়ান্ত চ্যাম্পিয়ন হতে ১০০টি জয় অর্জন করুন!',
     hi: 'कॉस्मিक बॉर्डर के साथ अल्टिमेट चैंपियन बनने के लिए 100 जीत हासिल करें!',
     es: '¡Consigue 100 victorias para convertirte en el campeón definitivo con borde cósmico!',
-    id: 'Raih 100 kemenangan untuk menjadi juara ultimate dengan border kosmik!'
+    id: 'Raih 100 kemenangan untuk menjadi juara ultimate dengan border kosmik!',
+    fr: 'Jeu'
   },
   grandmaster: {
     en: 'Grandmaster',
@@ -843,7 +943,8 @@ export const translations = {
     bn: 'গ্র্যান্ডমাস্টার',
     hi: 'ग्रैंडमास्टर',
     es: 'Gran Maestro',
-    id: 'Grandmaster'
+    id: 'Grandmaster',
+    fr: 'Jeu'
   },
   achieveTwoHundredTotalWins: {
     en: 'Achieve 200 total wins',
@@ -851,7 +952,8 @@ export const translations = {
     bn: '২০০টি মোট জয় অর্জন করুন',
     hi: '200 कुल जीत हासिल करें',
     es: 'Consigue 200 victorias totales',
-    id: 'Raih 200 kemenangan total'
+    id: 'Raih 200 kemenangan total',
+    fr: 'Jeu'
   },
   ultimateVeteran: {
     en: 'Ultimate Veteran',
@@ -859,7 +961,8 @@ export const translations = {
     bn: 'চূড়ান্ত ভেটেরান',
     hi: 'अल्टिमेट वेटेरन',
     es: 'Veterano Supremo',
-    id: 'Veteran Ultimate'
+    id: 'Veteran Ultimate',
+    fr: 'Jeu'
   },
   playFiveHundredTotalGames: {
     en: 'Play 500 total games',
@@ -867,7 +970,8 @@ export const translations = {
     bn: '৫০০টি মোট গেম খেলুন',
     hi: '500 कुल गेम खेलें',
     es: 'Juega 500 juegos totales',
-    id: 'Mainkan 500 permainan total'
+    id: 'Mainkan 500 permainan total',
+    fr: 'Jeu'
   },
   
   // Quick Actions
@@ -877,7 +981,8 @@ export const translations = {
     bn: 'দ্রুত কর্ম',
     hi: 'त्वरित कार्य',
     es: 'Acciones Rápidas',
-    id: 'Tindakan Cepat'
+    id: 'Tindakan Cepat',
+    fr: 'Jeu'
   },
   change: {
     en: 'Change',
@@ -885,7 +990,8 @@ export const translations = {
     bn: 'পরিবর্তন',
     hi: 'बदलाव',
     es: 'Cambiar',
-    id: 'Ubah'
+    id: 'Ubah',
+    fr: 'Jeu'
   },
   view: {
     en: 'View',
@@ -893,7 +999,8 @@ export const translations = {
     bn: 'দেখুন',
     hi: 'देखें',
     es: 'Ver',
-    id: 'Lihat'
+    id: 'Lihat',
+    fr: 'Jeu'
   },
   menu: {
     en: 'Menu',
@@ -901,7 +1008,8 @@ export const translations = {
     bn: 'মেনু',
     hi: 'मेनू',
     es: 'Menú',
-    id: 'Menu'
+    id: 'Menu',
+    fr: 'Jeu'
   },
   online: {
     en: 'Online',
@@ -909,7 +1017,8 @@ export const translations = {
     bn: 'অনলাইন',
     hi: 'ऑनलাइन',
     es: 'En línea',
-    id: 'Online'
+    id: 'Online',
+    fr: 'Jeu'
   },
   playersLabel: {
     en: 'Players',
@@ -917,7 +1026,8 @@ export const translations = {
     bn: 'খেলোয়াড়',
     hi: 'खিলাড़ী',
     es: 'Jugadores',
-    id: 'Pemain'
+    id: 'Pemain',
+    fr: 'Jeu'
   },
   onePlayer: {
     en: '1 Player',
@@ -925,7 +1035,8 @@ export const translations = {
     bn: '১ জন খেলোয়াড়',
     hi: '1 खिलाड़ी',
     es: '1 Jugador',
-    id: '1 Pemain'
+    id: '1 Pemain',
+    fr: 'Jeu'
   },
   profileSettings: {
     en: 'Profile Settings',
@@ -933,7 +1044,8 @@ export const translations = {
     bn: 'প্রোফাইল সেটিংস',
     hi: 'प्रोफाइल सेटिंग्स',
     es: 'Configuración de Perfil',
-    id: 'Pengaturan Profil'
+    id: 'Pengaturan Profil',
+    fr: 'Jeu'
   },
   offline: {
     en: 'Offline',
@@ -941,7 +1053,8 @@ export const translations = {
     bn: 'অফলাইন',
     hi: 'ऑफलाइन',
     es: 'Desconectado',
-    id: 'Offline'
+    id: 'Offline',
+    fr: 'Jeu'
   },
   
   // Game Board Elements
@@ -951,7 +1064,8 @@ export const translations = {
     bn: 'গেম আইডি',
     hi: 'गेम आईडी',
     es: 'ID del Juego',
-    id: 'ID Permainan'
+    id: 'ID Permainan',
+    fr: 'Jeu'
   },
   roomLabel: {
     en: 'Room',
@@ -959,7 +1073,8 @@ export const translations = {
     bn: 'রুম',
     hi: 'कमरा',
     es: 'Habitación',
-    id: 'Ruang'
+    id: 'Ruang',
+    fr: 'Jeu'
   },
   local: {
     en: 'Local',
@@ -967,7 +1082,8 @@ export const translations = {
     bn: 'স্থানীয়',
     hi: 'स्थानीय',
     es: 'Local',
-    id: 'Lokal'
+    id: 'Lokal',
+    fr: 'Jeu'
   },
 
   
@@ -978,7 +1094,8 @@ export const translations = {
     bn: 'প্লেয়ার X',
     hi: 'प्लेयर X',
     es: 'Jugador X',
-    id: 'Pemain X'
+    id: 'Pemain X',
+    fr: 'Jeu'
   },
   playerO: {
     en: 'Player O',
@@ -986,7 +1103,8 @@ export const translations = {
     bn: 'প্লেয়ার O',
     hi: 'प्लेयर O',
     es: 'Jugador O',
-    id: 'Pemain O'
+    id: 'Pemain O',
+    fr: 'Jeu'
   },
   playerTurnO: {
     en: "Player O's Turn",
@@ -994,7 +1112,8 @@ export const translations = {
     bn: 'প্লেয়ার O এর পালা',
     hi: 'प्लेयर O की बारी',
     es: 'Turno del Jugador O',
-    id: 'Giliran Pemain O'
+    id: 'Giliran Pemain O',
+    fr: 'Jeu'
   },
   aiTurn: {
     en: "AI's Turn",
@@ -1002,7 +1121,8 @@ export const translations = {
     bn: 'এআই এর পালা',
     hi: 'AI की बारी',
     es: 'Turno de la IA',
-    id: 'Giliran AI'
+    id: 'Giliran AI',
+    fr: 'Jeu'
   },
   ai: {
     en: 'AI',
@@ -1010,7 +1130,8 @@ export const translations = {
     bn: 'এআই',
     hi: 'AI',
     es: 'IA',
-    id: 'AI'
+    id: 'AI',
+    fr: 'Jeu'
   },
   
   // Achievement Categories and Details
@@ -1020,7 +1141,8 @@ export const translations = {
     bn: 'বিজয়ের অর্জন',
     hi: 'विजय की उपलब्धियां',
     es: 'Logros de Victoria',
-    id: 'Pencapaian Kemenangan'
+    id: 'Pencapaian Kemenangan',
+    fr: 'Jeu'
   },
   skillAchievements: {
     en: 'Skill Achievements',
@@ -1028,7 +1150,8 @@ export const translations = {
     bn: 'দক্ষতার অর্জন',
     hi: 'कौशल की उपलब्धियां',
     es: 'Logros de Habilidad',
-    id: 'Pencapaian Keterampilan'
+    id: 'Pencapaian Keterampilan',
+    fr: 'Jeu'
   },
   experienceAchievements: {
     en: 'Experience Achievements',
@@ -1036,7 +1159,8 @@ export const translations = {
     bn: 'অভিজ্ঞতার অর্জন',
     hi: 'अनुभव की उपलब्धियां',
     es: 'Logros de Experiencia',
-    id: 'Pencapaian Pengalaman'
+    id: 'Pencapaian Pengalaman',
+    fr: 'Jeu'
   },
   playerAchievements: {
     en: 'Player Achievements',
@@ -1044,7 +1168,8 @@ export const translations = {
     bn: 'খেলোয়াড়ের অর্জন',
     hi: 'खिलाड़ी की उपलब्धियां',
     es: 'Logros del Jugador',
-    id: 'Pencapaian Pemain'
+    id: 'Pencapaian Pemain',
+    fr: 'Jeu'
   },
   
   // Achievement Names
@@ -1054,7 +1179,8 @@ export const translations = {
     bn: 'প্রথম বিজয়',
     hi: 'पहली विजय',
     es: 'Primera Victoria',
-    id: 'Kemenangan Pertama'
+    id: 'Kemenangan Pertama',
+    fr: 'Jeu'
   },
   winStreakMaster: {
     en: 'Win Streak Master',
@@ -1062,7 +1188,8 @@ export const translations = {
     bn: 'জয়ের ধারা মাস্টার',
     hi: 'जीत की लकीर के मास्टर',
     es: 'Maestro de Racha Ganadora',
-    id: 'Master Kemenangan Beruntun'
+    id: 'Master Kemenangan Beruntun',
+    fr: 'Jeu'
   },
   unstoppable: {
     en: 'Unstoppable',
@@ -1070,7 +1197,8 @@ export const translations = {
     bn: 'অপ্রতিরোধ্য',
     hi: 'अजेय',
     es: 'Imparable',
-    id: 'Tak Terhentikan'
+    id: 'Tak Terhentikan',
+    fr: 'Jeu'
   },
   masterOfDiagonals: {
     en: 'Master of Diagonals',
@@ -1078,7 +1206,8 @@ export const translations = {
     bn: 'কর্ণের মাস্টার',
     hi: 'विकर्ण के मास्टर',
     es: 'Maestro de Diagonales',
-    id: 'Master Diagonal'
+    id: 'Master Diagonal',
+    fr: 'Jeu'
   },
   speedDemon: {
     en: 'Speed Demon',
@@ -1086,7 +1215,8 @@ export const translations = {
     bn: 'গতির দানব',
     hi: 'गति के दानव',
     es: 'Demonio de la Velocidad',
-    id: 'Iblis Kecepatan'
+    id: 'Iblis Kecepatan',
+    fr: 'Jeu'
   },
   veteranPlayer: {
     en: 'Veteran Player',
@@ -1094,7 +1224,8 @@ export const translations = {
     bn: 'অভিজ্ঞ খেলোয়াড়',
     hi: 'अनुभवी खिलाड़ी',
     es: 'Jugador Veterano',
-    id: 'Pemain Veteran'
+    id: 'Pemain Veteran',
+    fr: 'Jeu'
   },
   comebackKing: {
     en: 'Comeback King',
@@ -1102,7 +1233,8 @@ export const translations = {
     bn: 'প্রত্যাবর্তনের রাজা',
     hi: 'वापसी के राजा',
     es: 'Rey del Regreso',
-    id: 'Raja Comeback'
+    id: 'Raja Comeback',
+    fr: 'Jeu'
   },
   legend: {
     en: 'Legend',
@@ -1110,7 +1242,8 @@ export const translations = {
     bn: 'কিংবদন্তি',
     hi: 'दंतकथा',
     es: 'Leyenda',
-    id: 'Legenda'
+    id: 'Legenda',
+    fr: 'Jeu'
   },
   champion: {
     en: 'Champion',
@@ -1118,7 +1251,8 @@ export const translations = {
     bn: 'চ্যাম্পিয়ন',
     hi: 'चैंपियन',
     es: 'Campeón',
-    id: 'Juara'
+    id: 'Juara',
+    fr: 'Jeu'
   },
   
   // Achievement Descriptions
@@ -1128,7 +1262,8 @@ export const translations = {
     bn: 'এই অর্জন অর্জনের জন্য যেকোনো প্রতিপক্ষের বিরুদ্ধে আপনার প্রথম গেম জিতুন',
     hi: 'इस उपलब्धि को अर्जित करने के लिए किसी भी प्रतिद्वंद्वी के खिलाफ अपना पहला गेम जीतें',
     es: 'Gana tu primer juego contra cualquier oponente para obtener este logro',
-    id: 'Menangkan permainan pertama Anda melawan lawan mana pun untuk mendapatkan pencapaian ini'
+    id: 'Menangkan permainan pertama Anda melawan lawan mana pun untuk mendapatkan pencapaian ini',
+    fr: 'Jeu'
   },
   winFiveConsecutiveGames: {
     en: 'Win 5 consecutive games without losing to unlock the Halloween theme',
@@ -1136,7 +1271,8 @@ export const translations = {
     bn: 'হ্যালোইন থিম আনলক করতে হার না মেনে পরপর 5টি গেম জিতুন',
     hi: 'हैलोवीन थीम अनलॉक करने के लिए बिना हारे 5 लगातार गेम जीतें',
     es: 'Gana 5 juegos consecutivos sin perder para desbloquear el tema de Halloween',
-    id: 'Menangkan 5 permainan berturut-turut tanpa kalah untuk membuka tema Halloween'
+    id: 'Menangkan 5 permainan berturut-turut tanpa kalah untuk membuka tema Halloween',
+    fr: 'Jeu'
   },
   winTenConsecutiveGames: {
     en: 'Win 10 consecutive games without losing - the ultimate challenge!',
@@ -1144,7 +1280,8 @@ export const translations = {
     bn: 'হার না মেনে পরপর 10টি গেম জিতুন - চূড়ান্ত চ্যালেঞ্জ!',
     hi: 'बिना हारे 10 लगातार गेम जीतें - परम चुनौती!',
     es: 'Gana 10 juegos consecutivos sin perder - ¡el desafío definitivo!',
-    id: 'Menangkan 10 permainan berturut-turut tanpa kalah - tantangan tertinggi!'
+    id: 'Menangkan 10 permainan berturut-turut tanpa kalah - tantangan tertinggi!',
+    fr: 'Jeu'
   },
   winThreeGamesDiagonally: {
     en: 'Win 3 games by getting three in a row diagonally (corner to corner)',
@@ -1152,7 +1289,8 @@ export const translations = {
     bn: 'কর্ণভাবে (কোণ থেকে কোণে) তিনটি পরপর পেয়ে 3টি গেম জিতুন',
     hi: 'विकर्ण रूप से (कोने से कोने तक) तीन को एक पंक्ति में प्राप्त करके 3 गेम जीतें',
     es: 'Gana 3 juegos obteniendo tres en fila diagonalmente (esquina a esquina)',
-    id: 'Menangkan 3 permainan dengan mendapatkan tiga berturut-turut secara diagonal (sudut ke sudut)'
+    id: 'Menangkan 3 permainan dengan mendapatkan tiga berturut-turut secara diagonal (sudut ke sudut)',
+    fr: 'Jeu'
   },
   winTwentyTotalGames: {
     en: 'Win 20 total games to unlock the Christmas theme - keep playing!',
@@ -1160,7 +1298,8 @@ export const translations = {
     bn: 'ক্রিসমাস থিম আনলক করতে মোট 20টি গেম জিতুন - খেলা চালিয়ে যান!',
     hi: 'क्रिसमस थीम अनलॉक करने के लिए कुल 20 गेम जीतें - खेलते रहें!',
     es: 'Gana 20 juegos en total para desbloquear el tema navideño - ¡sigue jugando!',
-    id: 'Menangkan 20 permainan total untuk membuka tema Natal - terus bermain!'
+    id: 'Menangkan 20 permainan total untuk membuka tema Natal - terus bermain!',
+    fr: 'Jeu'
   },
   playOneHundredTotalGames: {
     en: 'Play 100 total games (wins + losses + draws) to unlock the Summer theme',
@@ -1168,7 +1307,8 @@ export const translations = {
     bn: 'গ্রীষ্মকালীন থিম আনলক করতে মোট 100টি গেম খেলুন (জয় + হার + ড্র)',
     hi: 'गर्मियों का थीम अनलॉक करने के लिए कुल 100 गेम खेलें (जीत + हार + ड्रॉ)',
     es: 'Juega 100 juegos en total (victorias + derrotas + empates) para desbloquear el tema de verano',
-    id: 'Mainkan 100 permainan total (menang + kalah + seri) untuk membuka tema musim panas'
+    id: 'Mainkan 100 permainan total (menang + kalah + seri) untuk membuka tema musim panas',
+    fr: 'Jeu'
   },
   winAfterLosingFive: {
     en: 'Win a game after losing 5 games in a row - prove your resilience!',
@@ -1176,7 +1316,8 @@ export const translations = {
     bn: 'পরপর 5টি গেম হারার পর একটি গেম জিতুন - আপনার স্থিতিস্থাপকতা প্রমাণ করুন!',
     hi: 'लगातार 5 गेम हारने के बाद एक गेम जीतें - अपनी लचक साबित करें!',
     es: 'Gana un juego después de perder 5 juegos seguidos - ¡demuestra tu resistencia!',
-    id: 'Menangkan permainan setelah kalah 5 permainan berturut-turut - buktikan ketahananmu!'
+    id: 'Menangkan permainan setelah kalah 5 permainan berturut-turut - buktikan ketahananmu!',
+    fr: 'Jeu'
   },
   achieveFiftyTotalWins: {
     en: 'Achieve 50 total wins to become a true legend with animated fire border!',
@@ -1184,7 +1325,8 @@ export const translations = {
     bn: 'অ্যানিমেটেড ফায়ার বর্ডার সহ সত্যিকারের কিংবদন্তি হতে মোট 50টি জয় অর্জন করুন!',
     hi: 'एनिमेटेड फायर बॉर्डर के साथ एक सच्चे किंवदंती बनने के लिए कुल 50 जीत हासिल करें!',
     es: '¡Logra 50 victorias totales para convertirte en una verdadera leyenda con borde de fuego animado!',
-    id: 'Capai 50 kemenangan total untuk menjadi legenda sejati dengan border api beranimasi!'
+    id: 'Capai 50 kemenangan total untuk menjadi legenda sejati dengan border api beranimasi!',
+    fr: 'Jeu'
   },
   achieveOneHundredTotalWins: {
     en: 'Achieve 100 total wins to become an ultimate champion with cosmic border!',
@@ -1192,7 +1334,8 @@ export const translations = {
     bn: 'কসমিক বর্ডার সহ চূড়ান্ত চ্যাম্পিয়ন হতে মোট 100টি জয় অর্জন করুন!',
     hi: 'कॉस्मिक बॉर्डर के साथ एक परम चैंपियन बनने के लিए कुল 100 जीत हासिল करें!',
     es: '¡Logra 100 victorias totales para convertirte en un campeón definitivo con borde cósmico!',
-    id: 'Capai 100 kemenangan total untuk menjadi juara tertinggi dengan border kosmik!'
+    id: 'Capai 100 kemenangan total untuk menjadi juara tertinggi dengan border kosmik!',
+    fr: 'Jeu'
   },
   
   // Room Management
@@ -1202,7 +1345,8 @@ export const translations = {
     bn: 'দ্রুত ম্যাচ',
     hi: 'त्वरित मैच',
     es: 'Partida Rápida',
-    id: 'Pertandingan Cepat'
+    id: 'Pertandingan Cepat',
+    fr: 'Jeu'
   },
   getMatchedWithAnotherPlayer: {
     en: 'Get matched with another player instantly',
@@ -1210,7 +1354,8 @@ export const translations = {
     bn: 'তাৎক্ষণিকভাবে অন্য খেলোয়াড়ের সাথে ম্যাচ পান',
     hi: 'तुरंत दूसरे खिलाड़ी के साथ मैच हो जाएं',
     es: 'Obtén una partida con otro jugador al instante',
-    id: 'Dapatkan pertandingan dengan pemain lain secara instan'
+    id: 'Dapatkan pertandingan dengan pemain lain secara instan',
+    fr: 'Jeu'
   },
   findMatch: {
     en: 'Find Match',
@@ -1218,7 +1363,8 @@ export const translations = {
     bn: 'ম্যাচ খুঁজুন',
     hi: 'मैच खोजें',
     es: 'Buscar Partida',
-    id: 'Cari Pertandingan'
+    id: 'Cari Pertandingan',
+    fr: 'Jeu'
   },
   or: {
     en: 'or',
@@ -1226,7 +1372,8 @@ export const translations = {
     bn: 'অথবা',
     hi: 'या',
     es: 'o',
-    id: 'atau'
+    id: 'atau',
+    fr: 'Jeu'
   },
   createOrJoinRoom: {
     en: 'Create or join a room to play with friends',
@@ -1234,7 +1381,8 @@ export const translations = {
     bn: 'বন্ধুদের সাথে খেলার জন্য একটি রুম তৈরি করুন বা যোগ দিন',
     hi: 'दोस्तों के साथ खेलने के लिए एक रूम बनाएं या शामिल हों',
     es: 'Crea o únete a una sala para jugar con amigos',
-    id: 'Buat atau bergabung dengan ruang untuk bermain dengan teman'
+    id: 'Buat atau bergabung dengan ruang untuk bermain dengan teman',
+    fr: 'Jeu'
   },
   roomManagement: {
     en: 'Room Management',
@@ -1242,7 +1390,8 @@ export const translations = {
     bn: 'রুম ব্যবস্থাপনা',
     hi: 'रूम प्रबंधन',
     es: 'Gestión de Sala',
-    id: 'Manajemen Ruang'
+    id: 'Manajemen Ruang',
+    fr: 'Jeu'
   },
   roomCode: {
     en: 'Room code',
@@ -1250,7 +1399,8 @@ export const translations = {
     bn: 'রুম কোড',
     hi: 'रूम कोड',
     es: 'Código de sala',
-    id: 'Kode ruang'
+    id: 'Kode ruang',
+    fr: 'Jeu'
   },
   joinAsPlayer: {
     en: 'Join as Player',
@@ -1258,7 +1408,8 @@ export const translations = {
     bn: 'খেলোয়াড় হিসেবে যোগ দিন',
     hi: 'खिलाड़ी के रूप में शामिल हों',
     es: 'Unirse como Jugador',
-    id: 'Bergabung sebagai Pemain'
+    id: 'Bergabung sebagai Pemain',
+    fr: 'Jeu'
   },
   joinAsSpectator: {
     en: 'Join as Spectator',
@@ -1266,7 +1417,8 @@ export const translations = {
     bn: 'দর্শক হিসেবে যোগ দিন',
     hi: 'दर्शक के रूप में शामिल हों',
     es: 'Unirse como Espectador',
-    id: 'Bergabung sebagai Penonton'
+    id: 'Bergabung sebagai Penonton',
+    fr: 'Jeu'
   },
   createNewRoom: {
     en: 'Create New Room',
@@ -1274,7 +1426,8 @@ export const translations = {
     bn: 'নতুন রুম তৈরি করুন',
     hi: 'नया रूम बनाएं',
     es: 'Crear Nueva Sala',
-    id: 'Buat Ruang Baru'
+    id: 'Buat Ruang Baru',
+    fr: 'Jeu'
   },
   
   // Online Users
@@ -1284,7 +1437,8 @@ export const translations = {
     bn: 'অনলাইন ব্যবহারকারী',
     hi: 'ऑनलाइन उपयोगकर्ता',
     es: 'Usuarios en Línea',
-    id: 'Pengguna Online'
+    id: 'Pengguna Online',
+    fr: 'Jeu'
   },
   
   // Room and Matchmaking
@@ -1294,7 +1448,8 @@ export const translations = {
     bn: 'রুমের নাম',
     hi: 'रूम का नाम',
     es: 'Nombre de la Sala',
-    id: 'Nama Ruang'
+    id: 'Nama Ruang',
+    fr: 'Jeu'
   },
   enterRoomName: {
     en: 'Enter room name',
@@ -1302,7 +1457,8 @@ export const translations = {
     bn: 'রুমের নাম লিখুন',
     hi: 'रूम का नाम दर्ज करें',
     es: 'Ingresa el nombre de la sala',
-    id: 'Masukkan nama ruang'
+    id: 'Masukkan nama ruang',
+    fr: 'Jeu'
   },
   maxPlayers: {
     en: 'Max Players',
@@ -1310,7 +1466,8 @@ export const translations = {
     bn: 'সর্বোচ্চ খেলোয়াড়',
     hi: 'अधिकतम खिलाड़ी',
     es: 'Máximo de Jugadores',
-    id: 'Pemain Maksimal'
+    id: 'Pemain Maksimal',
+    fr: 'Jeu'
   },
   twoPlayers: {
     en: '2 Players',
@@ -1318,7 +1475,8 @@ export const translations = {
     bn: '2 জন খেলোয়াড়',
     hi: '2 खिलाड़ी',
     es: '2 Jugadores',
-    id: '2 Pemain'
+    id: '2 Pemain',
+    fr: 'Jeu'
   },
   twoPlayersSpectators: {
     en: '2 Players + 50 Spectators',
@@ -1326,7 +1484,8 @@ export const translations = {
     bn: '2 জন খেলোয়াড় + 50 জন দর্শক',
     hi: '2 खिलाड़ी + 50 दर्शक',
     es: '2 Jugadores + 50 Espectadores',
-    id: '2 Pemain + 50 Penonton'
+    id: '2 Pemain + 50 Penonton',
+    fr: 'Jeu'
   },
   private: {
     en: 'Private',
@@ -1334,7 +1493,8 @@ export const translations = {
     bn: 'ব্যক্তিগত',
     hi: 'निजी',
     es: 'Privado',
-    id: 'Pribadi'
+    id: 'Pribadi',
+    fr: 'Jeu'
   },
   makeRoomPrivate: {
     en: 'Make room private (invite only)',
@@ -1342,7 +1502,8 @@ export const translations = {
     bn: 'রুমটি ব্যক্তিগত করুন (শুধুমাত্র আমন্ত্রণের মাধ্যমে)',
     hi: 'रूम को निजी बनाएं (केवल आमंत्रण)',
     es: 'Hacer la sala privada (solo por invitación)',
-    id: 'Buat ruang privat (hanya undangan)'
+    id: 'Buat ruang privat (hanya undangan)',
+    fr: 'Jeu'
   },
   createRoom: {
     en: 'Create Room',
@@ -1350,7 +1511,8 @@ export const translations = {
     bn: 'রুম তৈরি করুন',
     hi: 'रूम बनाएं',
     es: 'Crear Sala',
-    id: 'Buat Ruang'
+    id: 'Buat Ruang',
+    fr: 'Jeu'
   },
   creating: {
     en: 'Creating...',
@@ -1358,7 +1520,8 @@ export const translations = {
     bn: 'তৈরি করা হচ্ছে...',
     hi: 'बनाया जा रहा है...',
     es: 'Creando...',
-    id: 'Membuat...'
+    id: 'Membuat...',
+    fr: 'Jeu'
   },
   roomCreated: {
     en: 'Room Created',
@@ -1366,7 +1529,8 @@ export const translations = {
     bn: 'রুম তৈরি হয়েছে',
     hi: 'रूम बनाया गया',
     es: 'Sala Creada',
-    id: 'Ruang Dibuat'
+    id: 'Ruang Dibuat',
+    fr: 'Jeu'
   },
   roomCodeCreated: {
     en: 'Room %s created successfully',
@@ -1374,7 +1538,8 @@ export const translations = {
     bn: 'রুম %s সফলভাবে তৈরি হয়েছে',
     hi: 'रूम %s सफलतापूर्वक बनाया गया',
     es: 'Sala %s creada exitosamente',
-    id: 'Ruang %s berhasil dibuat'
+    id: 'Ruang %s berhasil dibuat',
+    fr: 'Jeu'
   },
   error: {
     en: 'Error',
@@ -1382,7 +1547,8 @@ export const translations = {
     bn: 'ত্রুটি',
     hi: 'त्रुटि',
     es: 'Error',
-    id: 'Kesalahan'
+    id: 'Kesalahan',
+    fr: 'Jeu'
   },
   roomNameRequired: {
     en: 'Room name is required',
@@ -1390,7 +1556,8 @@ export const translations = {
     bn: 'রুমের নাম প্রয়োজন',
     hi: 'रूम का नाम आवश्यक है',
     es: 'Se requiere el nombre de la sala',
-    id: 'Nama ruang diperlukan'
+    id: 'Nama ruang diperlukan',
+    fr: 'Jeu'
   },
   unauthorized: {
     en: 'Unauthorized',
@@ -1398,7 +1565,8 @@ export const translations = {
     bn: 'অননুমোদিত',
     hi: 'अनधिकृत',
     es: 'No autorizado',
-    id: 'Tidak Diotorisasi'
+    id: 'Tidak Diotorisasi',
+    fr: 'Jeu'
   },
   loggedOutLoggingIn: {
     en: 'You are logged out. Logging in again...',
@@ -1406,7 +1574,8 @@ export const translations = {
     bn: 'আপনি লগ আউট হয়েছেন। আবার লগ ইন করা হচ্ছে...',
     hi: 'आप लॉग आउट हैं। फिर से लॉग इन कर रहे हैं...',
     es: 'Has cerrado sesión. Iniciando sesión de nuevo...',
-    id: 'Anda telah logout. Masuk lagi...'
+    id: 'Anda telah logout. Masuk lagi...',
+    fr: 'Jeu'
   },
   success: {
     en: 'Success',
@@ -1414,7 +1583,8 @@ export const translations = {
     bn: 'সফল',
     hi: 'सफलता',
     es: 'Éxito',
-    id: 'Berhasil'
+    id: 'Berhasil',
+    fr: 'Jeu'
   },
   joinedRoomSuccessfully: {
     en: 'Joined room successfully',
@@ -1422,7 +1592,8 @@ export const translations = {
     bn: 'সফলভাবে রুমে যোগ দিয়েছেন',
     hi: 'सफलतापूर्वक रूम में शामिल हुए',
     es: 'Se unió a la sala exitosamente',
-    id: 'Berhasil bergabung dengan ruang'
+    id: 'Berhasil bergabung dengan ruang',
+    fr: 'Jeu'
   },
   gameStarted: {
     en: 'Game Started',
@@ -1430,7 +1601,8 @@ export const translations = {
     bn: 'গেম শুরু',
     hi: 'गेम शुरू',
     es: 'Juego Iniciado',
-    id: 'Permainan Dimulai'
+    id: 'Permainan Dimulai',
+    fr: 'Jeu'
   },
   letTheBattleBegin: {
     en: 'Let the battle begin!',
@@ -1438,7 +1610,8 @@ export const translations = {
     bn: 'যুদ্ধ শুরু হোক!',
     hi: 'युद्ध शुरू हो!',
     es: '¡Que comience la batalla!',
-    id: 'Biarkan pertempuran dimulai!'
+    id: 'Biarkan pertempuran dimulai!',
+    fr: 'Jeu'
   },
   searching: {
     en: 'Searching...',
@@ -1446,7 +1619,8 @@ export const translations = {
     bn: 'খোঁজা হচ্ছে...',
     hi: 'खोज रहे हैं...',
     es: 'Buscando...',
-    id: 'Mencari...'
+    id: 'Mencari...',
+    fr: 'Jeu'
   },
   matchFound: {
     en: 'Match Found!',
@@ -1454,7 +1628,8 @@ export const translations = {
     bn: 'ম্যাচ পাওয়া গেছে!',
     hi: 'मैच मिल गया!',
     es: '¡Partida Encontrada!',
-    id: 'Pertandingan Ditemukan!'
+    id: 'Pertandingan Ditemukan!',
+    fr: 'Jeu'
   },
   matchedWithOpponent: {
     en: "You've been matched with an opponent. Game starting...",
@@ -1462,7 +1637,8 @@ export const translations = {
     bn: 'আপনাকে একজন প্রতিপক্ষের সাথে ম্যাচ করা হয়েছে। গেম শুরু হচ্ছে...',
     hi: 'आपका मैच एक प्रतिद्वंद्वी के साथ हो गया है। गेम शुरू हो रहा है...',
     es: 'Has sido emparejado con un oponente. El juego está comenzando...',
-    id: 'Anda telah dicocokkan dengan lawan. Permainan dimulai...'
+    id: 'Anda telah dicocokkan dengan lawan. Permainan dimulai...',
+    fr: 'Jeu'
   },
   searchingForOpponent: {
     en: 'Searching for Opponent',
@@ -1470,7 +1646,8 @@ export const translations = {
     bn: 'প্রতিপক্ষ খোঁজা হচ্ছে',
     hi: 'प्रतिद्वंद्वी की खोज',
     es: 'Buscando Oponente',
-    id: 'Mencari Lawan'
+    id: 'Mencari Lawan',
+    fr: 'Jeu'
   },
   lookingForPlayer: {
     en: 'Looking for another player to match with...',
@@ -1478,7 +1655,8 @@ export const translations = {
     bn: 'ম্যাচ করার জন্য অন্য খেলোয়াড় খোঁজা হচ্ছে...',
     hi: 'मैच करने के लिए दूसरा खिलाड़ी खोज रहे हैं...',
     es: 'Buscando otro jugador para emparejar...',
-    id: 'Mencari pemain lain untuk dicocokkan...'
+    id: 'Mencari pemain lain untuk dicocokkan...',
+    fr: 'Jeu'
   },
   leftQueue: {
     en: 'Left Queue',
@@ -1486,7 +1664,8 @@ export const translations = {
     bn: 'সারি ছেড়েছেন',
     hi: 'कतार छोड़ दी',
     es: 'Salió de la Cola',
-    id: 'Meninggalkan Antrian'
+    id: 'Meninggalkan Antrian',
+    fr: 'Jeu'
   },
   leftMatchmakingQueue: {
     en: "You've left the matchmaking queue.",
@@ -1494,7 +1673,8 @@ export const translations = {
     bn: 'আপনি ম্যাচমেকিং সারি ছেড়ে দিয়েছেন।',
     hi: 'आपने मैचमेकिंग कतार छोड़ दी है।',
     es: 'Has salido de la cola de emparejamiento.',
-    id: 'Anda telah meninggalkan antrian matchmaking.'
+    id: 'Anda telah meninggalkan antrian matchmaking.',
+    fr: 'Jeu'
   },
 
   findAnotherPlayerCompete: {
@@ -1503,7 +1683,8 @@ export const translations = {
     bn: 'আমরা আপনার জন্য রিয়েল-টাইমে প্রতিযোগিতা করার জন্য আরেকজন খেলোয়াড় খুঁজে দেব!',
     hi: 'हम आपके लिए रीयल-टाइम में प्रतिस्पर्धा करने के लिए एक और खिलाड़ी ढूंढेंगे!',
     es: '¡Te encontraremos otro jugador para competir en tiempo real!',
-    id: 'Kami akan menemukan pemain lain untuk Anda lawan secara real-time!'
+    id: 'Kami akan menemukan pemain lain untuk Anda lawan secara real-time!',
+    fr: 'Jeu'
   },
   onlinePlayersLookingForMatches: {
     en: 'Online players looking for matches',
@@ -1511,7 +1692,8 @@ export const translations = {
     bn: 'অনলাইন খেলোয়াড়রা ম্যাচ খুঁজছেন',
     hi: 'ऑनलाइन खिलाड़ी मैच की तलाश में हैं',
     es: 'Jugadores en línea buscando partidas',
-    id: 'Pemain online mencari pertandingan'
+    id: 'Pemain online mencari pertandingan',
+    fr: 'Jeu'
   },
   averageMatchTime: {
     en: 'Average match time: 10-30 seconds',
@@ -1519,7 +1701,8 @@ export const translations = {
     bn: 'গড় ম্যাচ সময়: 10-30 সেকেন্ড',
     hi: 'औसत मैच समय: 10-30 सेकंड',
     es: 'Tiempo promedio de partida: 10-30 segundos',
-    id: 'Waktu rata-rata pertandingan: 10-30 detik'
+    id: 'Waktu rata-rata pertandingan: 10-30 detik',
+    fr: 'Jeu'
   },
   searchTime: {
     en: 'Search Time:',
@@ -1527,7 +1710,8 @@ export const translations = {
     bn: 'অনুসন্ধানের সময়:',
     hi: 'खोज का समय:',
     es: 'Tiempo de Búsqueda:',
-    id: 'Waktu Pencarian:'
+    id: 'Waktu Pencarian:',
+    fr: 'Jeu'
   },
   status: {
     en: 'Status:',
@@ -1535,7 +1719,8 @@ export const translations = {
     bn: 'স্থিতি:',
     hi: 'स्थिति:',
     es: 'Estado:',
-    id: 'Status:'
+    id: 'Status:',
+    fr: 'Jeu'
   },
   findingPerfectOpponent: {
     en: 'Finding the perfect opponent...',
@@ -1543,7 +1728,8 @@ export const translations = {
     bn: 'নিখুঁত প্রতিপক্ষ খোঁজা হচ্ছে...',
     hi: 'सही प्रतिद्वंद्वी खोजा जा रहा है...',
     es: 'Encontrando el oponente perfecto...',
-    id: 'Mencari lawan yang sempurna...'
+    id: 'Mencari lawan yang sempurna...',
+    fr: 'Jeu'
   },
   expandingSearch: {
     en: 'Expanding search...',
@@ -1551,7 +1737,8 @@ export const translations = {
     bn: 'অনুসন্ধান সম্প্রসারণ...',
     hi: 'खोज का विस्तार कर रहे हैं...',
     es: 'Expandiendo búsqueda...',
-    id: 'Memperluas pencarian...'
+    id: 'Memperluas pencarian...',
+    fr: 'Jeu'
   },
   almostThere: {
     en: 'Almost there...',
@@ -1559,7 +1746,8 @@ export const translations = {
     bn: 'প্রায় শেষ...',
     hi: 'लगभग हो गया...',
     es: 'Casi llegamos...',
-    id: 'Hampir sampai...'
+    id: 'Hampir sampai...',
+    fr: 'Jeu'
   },
   willMatchWithBot: {
     en: 'Will match with AI bot in',
@@ -1567,7 +1755,8 @@ export const translations = {
     bn: 'AI বট এর সাথে ম্যাচ হবে',
     hi: 'AI बॉट के साथ मैच होगा',
     es: 'Se emparejará con bot de IA en',
-    id: 'Akan dicocokkan dengan bot AI dalam'
+    id: 'Akan dicocokkan dengan bot AI dalam',
+    fr: 'Jeu'
   },
   matchingWithBot: {
     en: 'Matching with AI bot...',
@@ -1575,7 +1764,8 @@ export const translations = {
     bn: 'AI বট এর সাথে ম্যাচিং...',
     hi: 'AI बॉट के साथ मैच हो रहा है...',
     es: 'Emparejando con bot de IA...',
-    id: 'Mencocokkan dengan bot AI...'
+    id: 'Mencocokkan dengan bot AI...',
+    fr: 'Jeu'
   },
 
   // Game Over Modal
@@ -1585,7 +1775,8 @@ export const translations = {
     bn: 'খেলা শেষ!',
     hi: 'खेल समाप्त!',
     es: '¡Juego Terminado!',
-    id: 'Permainan Selesai!'
+    id: 'Permainan Selesai!',
+    fr: 'Jeu'
   },
   playerWins: {
     en: '{player} Wins!',
@@ -1593,7 +1784,8 @@ export const translations = {
     bn: '{player} জিতেছে!',
     hi: '{player} जीता!',
     es: '¡{player} Gana!',
-    id: '{player} Menang!'
+    id: '{player} Menang!',
+    fr: 'Jeu'
   },
   diagonalLine: {
     en: 'Diagonal line',
@@ -1601,7 +1793,8 @@ export const translations = {
     bn: 'কর্ণ রেখা',
     hi: 'विकर्ण रेखा',
     es: 'Línea diagonal',
-    id: 'Garis diagonal'
+    id: 'Garis diagonal',
+    fr: 'Jeu'
   },
   mainMenu: {
     en: 'Main Menu',
@@ -1609,7 +1802,8 @@ export const translations = {
     bn: 'প্রধান মেনু',
     hi: 'मुख्य मेनू',
     es: 'Menú Principal',
-    id: 'Menu Utama'
+    id: 'Menu Utama',
+    fr: 'Jeu'
   },
   playAgain: {
     en: 'Play Again',
@@ -1617,7 +1811,8 @@ export const translations = {
     bn: 'আবার খেলুন',
     hi: 'फिर से खेलें',
     es: 'Jugar de Nuevo',
-    id: 'Main Lagi'
+    id: 'Main Lagi',
+    fr: 'Jeu'
   },
   itsADraw: {
     en: "It's a Draw!",
@@ -1625,7 +1820,8 @@ export const translations = {
     bn: 'এটি একটি ড্র!',
     hi: 'यह एक ड्रॉ है!',
     es: '¡Es un Empate!',
-    id: 'Ini Seri!'
+    id: 'Ini Seri!',
+    fr: 'Jeu'
   },
   horizontalLine: {
     en: 'Horizontal line',
@@ -1633,7 +1829,8 @@ export const translations = {
     bn: 'অনুভূমিক রেখা',
     hi: 'क्षैतिज रेखा',
     es: 'Línea horizontal',
-    id: 'Garis horizontal'
+    id: 'Garis horizontal',
+    fr: 'Jeu'
   },
 
   // Achievement Descriptions
@@ -1646,7 +1843,8 @@ export const translations = {
     bn: 'বার্তা পাঠান',
     hi: 'संदेश भेजें',
     es: 'Enviar Mensaje',
-    id: 'Kirim Pesan'
+    id: 'Kirim Pesan',
+    fr: 'Jeu'
   },
   typeMessage: {
     en: 'Type a message...',
@@ -1654,7 +1852,8 @@ export const translations = {
     bn: 'একটি বার্তা লিখুন...',
     hi: 'एक संदेश टाइप करें...',
     es: 'Escribe un mensaje...',
-    id: 'Ketik pesan...'
+    id: 'Ketik pesan...',
+    fr: 'Jeu'
   },
   noFriends: {
     en: 'No friends yet. Add some friends to get started!',
@@ -1662,7 +1861,8 @@ export const translations = {
     bn: 'এখনো কোনো বন্ধু নেই। শুরু করতে কিছু বন্ধু যোগ করুন!',
     hi: 'अभी तक कोई मित्र नहीं। शुरू करने के लिए कुछ मित्र जोड़ें!',
     es: '¡Aún no hay amigos. Agrega algunos amigos para comenzar!',
-    id: 'Belum ada teman. Tambahkan beberapa teman untuk memulai!'
+    id: 'Belum ada teman. Tambahkan beberapa teman untuk memulai!',
+    fr: 'Jeu'
   },
   searchFriends: {
     en: 'Search by username...',
@@ -1670,7 +1870,8 @@ export const translations = {
     bn: 'ব্যবহারকারীর নাম দিয়ে অনুসন্ধান...',
     hi: 'उपयोगकर्ता नाम से खोजें...',
     es: 'Buscar por nombre de usuario...',
-    id: 'Cari berdasarkan nama pengguna...'
+    id: 'Cari berdasarkan nama pengguna...',
+    fr: 'Jeu'
   },
   loadingFriends: {
     en: 'Loading friends...',
@@ -1678,7 +1879,8 @@ export const translations = {
     bn: 'বন্ধুদের লোড করা হচ্ছে...',
     hi: 'मित्र लोड हो रहे हैं...',
     es: 'Cargando amigos...',
-    id: 'Memuat teman...'
+    id: 'Memuat teman...',
+    fr: 'Jeu'
   },
   removeFriend: {
     en: 'Remove Friend',
@@ -1686,7 +1888,8 @@ export const translations = {
     bn: 'বন্ধু সরান',
     hi: 'मित्र हटाएं',
     es: 'Eliminar Amigo',
-    id: 'Hapus Teman'
+    id: 'Hapus Teman',
+    fr: 'Jeu'
   },
   accept: {
     en: 'Accept',
@@ -1694,7 +1897,8 @@ export const translations = {
     bn: 'গ্রহণ',
     hi: 'स्वीकार',
     es: 'Aceptar',
-    id: 'Terima'
+    id: 'Terima',
+    fr: 'Jeu'
   },
   reject: {
     en: 'Reject',
@@ -1702,7 +1906,8 @@ export const translations = {
     bn: 'প্রত্যাখ্যান',
     hi: 'अस्वीकार',
     es: 'Rechazar',
-    id: 'Tolak'
+    id: 'Tolak',
+    fr: 'Jeu'
   },
   newGame: {
     en: 'New Game',
@@ -1710,7 +1915,8 @@ export const translations = {
     bn: 'নতুন গেম',
     hi: 'नया गेम',
     es: 'Nuevo Juego',
-    id: 'Permainan Baru'
+    id: 'Permainan Baru',
+    fr: 'Jeu'
   },
   restartGame: {
     en: 'Restart Game',
@@ -1718,7 +1924,8 @@ export const translations = {
     bn: 'গেম পুনরায় শুরু',
     hi: 'गेम पुनः आरंभ करें',
     es: 'Reiniciar Juego',
-    id: 'Mulai Ulang Permainan'
+    id: 'Mulai Ulang Permainan',
+    fr: 'Jeu'
   },
   locked: {
     en: 'Locked',
@@ -1726,7 +1933,8 @@ export const translations = {
     bn: 'লক করা',
     hi: 'लॉक',
     es: 'Bloqueado',
-    id: 'Terkunci'
+    id: 'Terkunci',
+    fr: 'Jeu'
   },
   unlocked: {
     en: 'Unlocked',
@@ -1734,7 +1942,8 @@ export const translations = {
     bn: 'আনলক',
     hi: 'अनलॉक',
     es: 'Desbloqueado',
-    id: 'Terbuka'
+    id: 'Terbuka',
+    fr: 'Jeu'
   },
   emailAddress: {
     en: 'Email Address',
@@ -1742,7 +1951,8 @@ export const translations = {
     bn: 'ইমেইল ঠিকানা',
     hi: 'ईमेल पता',
     es: 'Dirección de Correo',
-    id: 'Alamat Email'
+    id: 'Alamat Email',
+    fr: 'Jeu'
   },
 
   // Additional Friends & Chat Translations
@@ -1752,7 +1962,8 @@ export const translations = {
     bn: 'কোনো পেন্ডিং বন্ধুত্বের অনুরোধ নেই',
     hi: 'कोई लंबित मित्र अनुरोध नहीं',
     es: 'No hay solicitudes de amistad pendientes',
-    id: 'Tidak ada permintaan pertemanan yang tertunda'
+    id: 'Tidak ada permintaan pertemanan yang tertunda',
+    fr: 'Jeu'
   },
   sentOn: {
     en: 'Sent on',
@@ -1760,7 +1971,8 @@ export const translations = {
     bn: 'পাঠানো হয়েছে',
     hi: 'भेजा गया',
     es: 'Enviado el',
-    id: 'Dikirim pada'
+    id: 'Dikirim pada',
+    fr: 'Jeu'
   },
   searchResults: {
     en: 'Search Results',
@@ -1768,7 +1980,8 @@ export const translations = {
     bn: 'অনুসন্ধানের ফলাফল',
     hi: 'खोज परिणाम',
     es: 'Resultados de Búsqueda',
-    id: 'Hasil Pencarian'
+    id: 'Hasil Pencarian',
+    fr: 'Jeu'
   },
   headToHeadStats: {
     en: 'Head-to-Head Stats',
@@ -1776,7 +1989,8 @@ export const translations = {
     bn: 'মুখোমুখি পরিসংখ্যান',
     hi: 'आमने-सामने के आंकड़े',
     es: 'Estadísticas Cara a Cara',
-    id: 'Statistik Head-to-Head'
+    id: 'Statistik Head-to-Head',
+    fr: 'Jeu'
   },
   youWon: {
     en: 'Your Wins',
@@ -1784,7 +1998,8 @@ export const translations = {
     bn: 'আপনার জয়',
     hi: 'आपकी जीत',
     es: 'Tus Victorias',
-    id: 'Kemenangan Anda'
+    id: 'Kemenangan Anda',
+    fr: 'Jeu'
   },
   theyWon: {
     en: 'Their Wins',
@@ -1792,7 +2007,8 @@ export const translations = {
     bn: 'তাদের জয়',
     hi: 'उनकी जीत',
     es: 'Sus Victorias',
-    id: 'Kemenangan Mereka'
+    id: 'Kemenangan Mereka',
+    fr: 'Jeu'
   },
   totalGames: {
     en: 'Total Games',
@@ -1800,7 +2016,8 @@ export const translations = {
     bn: 'মোট গেম',
     hi: 'कुल गेम',
     es: 'Juegos Totales',
-    id: 'Total Permainan'
+    id: 'Total Permainan',
+    fr: 'Jeu'
   },
 
   yourWinRate: {
@@ -1809,7 +2026,8 @@ export const translations = {
     bn: 'আপনার জয়ের হার',
     hi: 'आपकी जीत दर',
     es: 'Tu Tasa de Victorias',
-    id: 'Tingkat Kemenangan Anda'
+    id: 'Tingkat Kemenangan Anda',
+    fr: 'Jeu'
   },
   loadingStats: {
     en: 'Loading stats...',
@@ -1817,7 +2035,8 @@ export const translations = {
     bn: 'পরিসংখ্যান লোড করা হচ্ছে...',
     hi: 'आंकड़े लोड हो रहे हैं...',
     es: 'Cargando estadísticas...',
-    id: 'Memuat statistik...'
+    id: 'Memuat statistik...',
+    fr: 'Jeu'
   },
   back: {
     en: 'Back',
@@ -1825,7 +2044,8 @@ export const translations = {
     bn: 'পিছনে',
     hi: 'वापस',
     es: 'Volver',
-    id: 'Kembali'
+    id: 'Kembali',
+    fr: 'Jeu'
   },
   chatWith: {
     en: 'Chat with',
@@ -1833,7 +2053,8 @@ export const translations = {
     bn: 'এর সাথে চ্যাট করুন',
     hi: 'के साथ चैट करें',
     es: 'Chatear con',
-    id: 'Chat dengan'
+    id: 'Chat dengan',
+    fr: 'Jeu'
   },
   you: {
     en: 'You',
@@ -1841,7 +2062,8 @@ export const translations = {
     bn: 'আপনি',
     hi: 'आप',
     es: 'Tú',
-    id: 'Anda'
+    id: 'Anda',
+    fr: 'Jeu'
   },
   noMessages: {
     en: 'No messages yet. Start a conversation with your friend!',
@@ -1849,7 +2071,8 @@ export const translations = {
     bn: 'এখনো কোনো বার্তা নেই। আপনার বন্ধুর সাথে কথোপকথন শুরু করুন!',
     hi: 'अभी तक कोई संदेश नहीं। अपने मित्र से बातचीत शुरू करें!',
     es: '¡Aún no hay mensajes. Inicia una conversación con tu amigo!',
-    id: 'Belum ada pesan. Mulai percakapan dengan teman Anda!'
+    id: 'Belum ada pesan. Mulai percakapan dengan teman Anda!',
+    fr: 'Jeu'
   },
   search: {
     en: 'Search',
@@ -1857,7 +2080,8 @@ export const translations = {
     bn: 'অনুসন্ধান',
     hi: 'खोजें',
     es: 'Buscar',
-    id: 'Cari'
+    id: 'Cari',
+    fr: 'Jeu'
   },
   send: {
     en: 'Send',
@@ -1865,7 +2089,8 @@ export const translations = {
     bn: 'পাঠান',
     hi: 'भेजें',
     es: 'Enviar',
-    id: 'Kirim'
+    id: 'Kirim',
+    fr: 'Jeu'
   },
 
   // GameBoard Messages
@@ -1875,7 +2100,8 @@ export const translations = {
     bn: 'গেম সক্রিয় নয়',
     hi: 'गेम सक्रिय नहीं',
     es: 'Juego no activo',
-    id: 'Permainan tidak aktif'
+    id: 'Permainan tidak aktif',
+    fr: 'Jeu'
   },
   startNewGameToPlay: {
     en: 'Start a new game to play',
@@ -1883,7 +2109,8 @@ export const translations = {
     bn: 'খেলার জন্য একটি নতুন গেম শুরু করুন',
     hi: 'खेलने के लिए एक नया गेम शुरू करें',
     es: 'Inicia un nuevo juego para jugar',
-    id: 'Mulai permainan baru untuk bermain'
+    id: 'Mulai permainan baru untuk bermain',
+    fr: 'Jeu'
   },
   invalidMove: {
     en: 'Invalid move',
@@ -1891,7 +2118,8 @@ export const translations = {
     bn: 'অবৈধ চাল',
     hi: 'अमान्य चाल',
     es: 'Movimiento inválido',
-    id: 'Gerakan tidak valid'
+    id: 'Gerakan tidak valid',
+    fr: 'Jeu'
   },
   positionOccupied: {
     en: 'Position already occupied',
@@ -1899,7 +2127,8 @@ export const translations = {
     bn: 'অবস্থান ইতিমধ্যে দখল করা',
     hi: 'स्थिति पहले से कब्जा में',
     es: 'Posición ya ocupada',
-    id: 'Posisi sudah ditempati'
+    id: 'Posisi sudah ditempati',
+    fr: 'Jeu'
   },
   notAPlayer: {
     en: 'Not a player',
@@ -1907,7 +2136,8 @@ export const translations = {
     bn: 'একজন খেলোয়াড় নয়',
     hi: 'एक खिलाड़ी नहीं',
     es: 'No es un jugador',
-    id: 'Bukan pemain'
+    id: 'Bukan pemain',
+    fr: 'Jeu'
   },
   notPlayerInGame: {
     en: 'You are not a player in this game',
@@ -1915,7 +2145,8 @@ export const translations = {
     bn: 'আপনি এই গেমে একজন খেলোয়াড় নন',
     hi: 'आप इस गेम में एक खिलाड़ी नहीं हैं',
     es: 'No eres un jugador en este juego',
-    id: 'Anda bukan pemain dalam permainan ini'
+    id: 'Anda bukan pemain dalam permainan ini',
+    fr: 'Jeu'
   },
   notYourTurn: {
     en: 'Not your turn',
@@ -1923,7 +2154,8 @@ export const translations = {
     bn: 'আপনার পালা নয়',
     hi: 'आपकी बारी नहीं',
     es: 'No es tu turno',
-    id: 'Bukan giliran Anda'
+    id: 'Bukan giliran Anda',
+    fr: 'Jeu'
   },
   waitingFor: {
     en: 'Waiting for',
@@ -1931,7 +2163,8 @@ export const translations = {
     bn: 'অপেক্ষা করছে',
     hi: 'प्रतीक्षा में',
     es: 'Esperando a',
-    id: 'Menunggu'
+    id: 'Menunggu',
+    fr: 'Jeu'
   },
   toMakeMove: {
     en: 'to make a move',
@@ -1939,7 +2172,8 @@ export const translations = {
     bn: 'একটি চাল করতে',
     hi: 'चाल बनाने के लिए',
     es: 'para hacer un movimiento',
-    id: 'untuk bergerak'
+    id: 'untuk bergerak',
+    fr: 'Jeu'
   },
 
 
@@ -1949,7 +2183,8 @@ export const translations = {
     bn: 'আপলোড করা হচ্ছে...',
     hi: 'अपलोड हो रहा है...',
     es: 'Subiendo...',
-    id: 'Mengunggah...'
+    id: 'Mengunggah...',
+    fr: 'Jeu'
   },
 
   enterDisplayName: {
@@ -1958,7 +2193,8 @@ export const translations = {
     bn: 'আপনার প্রদর্শন নাম লিখুন',
     hi: 'अपना प्रदर्शन नाम दर्ज करें',
     es: 'Ingresa tu nombre para mostrar',
-    id: 'Masukkan nama tampilan Anda'
+    id: 'Masukkan nama tampilan Anda',
+    fr: 'Jeu'
   },
 
   saving: {
@@ -1967,7 +2203,8 @@ export const translations = {
     bn: 'সংরক্ষণ করা হচ্ছে...',
     hi: 'सेव हो रहा है...',
     es: 'Guardando...',
-    id: 'Menyimpan...'
+    id: 'Menyimpan...',
+    fr: 'Jeu'
   },
   profileUpdated: {
     en: 'Profile updated',
@@ -1975,7 +2212,8 @@ export const translations = {
     bn: 'প্রোফাইল আপডেট হয়েছে',
     hi: 'प्रोफाइल अपडेट हो गया',
     es: 'Perfil actualizado',
-    id: 'Profil diperbarui'
+    id: 'Profil diperbarui',
+    fr: 'Jeu'
   },
   profileUpdatedSuccess: {
     en: 'Your profile has been updated successfully',
@@ -1983,7 +2221,8 @@ export const translations = {
     bn: 'আপনার প্রোফাইল সফলভাবে আপডেট হয়েছে',
     hi: 'आपकी प्रोफाइल सफलतापूर्वक अपडेट हो गई है',
     es: 'Tu perfil ha sido actualizado exitosamente',
-    id: 'Profil Anda telah berhasil diperbarui'
+    id: 'Profil Anda telah berhasil diperbarui',
+    fr: 'Jeu'
   },
   fileTooLarge: {
     en: 'File too large',
@@ -1991,7 +2230,8 @@ export const translations = {
     bn: 'ফাইল খুব বড়',
     hi: 'फाइल बहुत बड़ी',
     es: 'Archivo demasiado grande',
-    id: 'File terlalu besar'
+    id: 'File terlalu besar',
+    fr: 'Jeu'
   },
   selectImageUnder1MB: {
     en: 'Please select an image under 1MB',
@@ -1999,7 +2239,8 @@ export const translations = {
     bn: 'অনুগ্রহ করে ১MB এর কম একটি ছবি নির্বাচন করুন',
     hi: 'कृपया 1MB से कम का चित्र चुनें',
     es: 'Por favor selecciona una imagen menor a 1MB',
-    id: 'Silakan pilih gambar di bawah 1MB'
+    id: 'Silakan pilih gambar di bawah 1MB',
+    fr: 'Jeu'
   },
   selectImageUnder5MB: {
     en: 'Please select an image under 5MB',
@@ -2007,7 +2248,8 @@ export const translations = {
     bn: 'অনুগ্রহ করে ৫MB এর কম একটি ছবি নির্বাচন করুন',
     hi: 'कृपया 5MB से कम का चित्र चुनें',
     es: 'Por favor selecciona una imagen menor a 5MB',
-    id: 'Silakan pilih gambar di bawah 5MB'
+    id: 'Silakan pilih gambar di bawah 5MB',
+    fr: 'Jeu'
   },
   invalidFileType: {
     en: 'Invalid file type',
@@ -2015,7 +2257,8 @@ export const translations = {
     bn: 'অবৈধ ফাইল ধরন',
     hi: 'अमान्य फाइल प्रकार',
     es: 'Tipo de archivo inválido',
-    id: 'Jenis file tidak valid'
+    id: 'Jenis file tidak valid',
+    fr: 'Jeu'
   },
   selectImageFile: {
     en: 'Please select an image file',
@@ -2023,7 +2266,8 @@ export const translations = {
     bn: 'অনুগ্রহ করে একটি ছবির ফাইল নির্বাচন করুন',
     hi: 'कृपया एक छवि फाइल चुनें',
     es: 'Por favor selecciona un archivo de imagen',
-    id: 'Silakan pilih file gambar'
+    id: 'Silakan pilih file gambar',
+    fr: 'Jeu'
   },
   uploadFailed: {
     en: 'Upload failed',
@@ -2031,7 +2275,8 @@ export const translations = {
     bn: 'আপলোড ব্যর্থ',
     hi: 'अपलोड असफल',
     es: 'Fallo al subir',
-    id: 'Gagal mengunggah'
+    id: 'Gagal mengunggah',
+    fr: 'Jeu'
   },
   failedToReadImage: {
     en: 'Failed to read the image file',
@@ -2039,7 +2284,8 @@ export const translations = {
     bn: 'ছবির ফাইল পড়তে ব্যর্থ',
     hi: 'छवि फाइल पढ़ने में असफल',
     es: 'Falló al leer el archivo de imagen',
-    id: 'Gagal membaca file gambar'
+    id: 'Gagal membaca file gambar',
+    fr: 'Jeu'
   },
 
 
@@ -2050,7 +2296,8 @@ export const translations = {
     bn: 'বর্তমান রুম',
     hi: 'वर्तमान कमरा',
     es: 'Sala Actual',
-    id: 'Ruang Saat Ini'
+    id: 'Ruang Saat Ini',
+    fr: 'Jeu'
   },
   waiting: {
     en: 'WAITING',
@@ -2058,7 +2305,8 @@ export const translations = {
     bn: 'অপেক্ষা',
     hi: 'प्रतीक्षा',
     es: 'ESPERANDO',
-    id: 'MENUNGGU'
+    id: 'MENUNGGU',
+    fr: 'Jeu'
   },
   playing: {
     en: 'PLAYING',
@@ -2066,7 +2314,8 @@ export const translations = {
     bn: 'খেলছে',
     hi: 'खेल रहा',
     es: 'JUGANDO',
-    id: 'BERMAIN'
+    id: 'BERMAIN',
+    fr: 'Jeu'
   },
   active: {
     en: 'ACTIVE',
@@ -2074,7 +2323,8 @@ export const translations = {
     bn: 'সক্রিয়',
     hi: 'सक्रिय',
     es: 'ACTIVO',
-    id: 'AKTIF'
+    id: 'AKTIF',
+    fr: 'Jeu'
   },
   roomName: {
     en: 'Room',
@@ -2082,7 +2332,8 @@ export const translations = {
     bn: 'রুম',
     hi: 'कमরा',
     es: 'Sala',
-    id: 'Ruang'
+    id: 'Ruang',
+    fr: 'Jeu'
   },
   starting: {
     en: 'Starting...',
@@ -2090,7 +2341,8 @@ export const translations = {
     bn: 'শুরু হচ্ছে...',
     hi: 'शुरू हो रहा...',
     es: 'Iniciando...',
-    id: 'Memulai...'
+    id: 'Memulai...',
+    fr: 'Jeu'
   },
   gameRunning: {
     en: 'Game Running',
@@ -2098,7 +2350,8 @@ export const translations = {
     bn: 'গেম চলছে',
     hi: 'गेम चल रहा',
     es: 'Juego en Curso',
-    id: 'Permainan Berjalan'
+    id: 'Permainan Berjalan',
+    fr: 'Jeu'
   },
   waitForStart: {
     en: 'Wait for Start',
@@ -2106,7 +2359,8 @@ export const translations = {
     bn: 'শুরুর জন্য অপেক্ষা',
     hi: 'शुरुआत का इंतजार',
     es: 'Esperar Inicio',
-    id: 'Tunggu Mulai'
+    id: 'Tunggu Mulai',
+    fr: 'Jeu'
   },
   leftRoom: {
     en: 'Left Room',
@@ -2114,7 +2368,8 @@ export const translations = {
     bn: 'রুম ছেড়েছেন',
     hi: 'कमरा छोड़ दिया',
     es: 'Salió de la Sala',
-    id: 'Keluar Ruang'
+    id: 'Keluar Ruang',
+    fr: 'Jeu'
   },
   youHaveLeftTheRoom: {
     en: 'You have left the room',
@@ -2122,7 +2377,8 @@ export const translations = {
     bn: 'আপনি রুম ছেড়েছেন',
     hi: 'आपने कमरा छोड़ दिया है',
     es: 'Has salido de la sala',
-    id: 'Anda telah meninggalkan ruang'
+    id: 'Anda telah meninggalkan ruang',
+    fr: 'Jeu'
   },
   playersAndSpectators: {
     en: 'Players & Spectators',
@@ -2130,7 +2386,8 @@ export const translations = {
     bn: 'খেলোয়াড় এবং দর্শক',
     hi: 'खिलाड़ी और दर्शक',
     es: 'Jugadores y Espectadores',
-    id: 'Pemain & Penonton'
+    id: 'Pemain & Penonton',
+    fr: 'Jeu'
   },
   playersCount: {
     en: 'Players',
@@ -2138,7 +2395,8 @@ export const translations = {
     bn: 'খেলোয়াড়',
     hi: 'खिलाड़ी',
     es: 'Jugadores',
-    id: 'Pemain'
+    id: 'Pemain',
+    fr: 'Jeu'
   },
   spectators: {
     en: 'Spectators',
@@ -2146,7 +2404,8 @@ export const translations = {
     bn: 'দর্শক',
     hi: 'दर्शक',
     es: 'Espectadores',
-    id: 'Penonton'
+    id: 'Penonton',
+    fr: 'Jeu'
   },
   noPlayersInRoom: {
     en: 'No players in room',
@@ -2154,7 +2413,8 @@ export const translations = {
     bn: 'রুমে কোন খেলোয়াড় নেই',
     hi: 'कमरे में कोई खिलाड़ी नहीं',
     es: 'No hay jugadores en la sala',
-    id: 'Tidak ada pemain di ruang'
+    id: 'Tidak ada pemain di ruang',
+    fr: 'Jeu'
   },
   noSpectators: {
     en: 'No spectators',
@@ -2162,7 +2422,8 @@ export const translations = {
     bn: 'কোন দর্শক নেই',
     hi: 'कोई दर्शक नहीं',
     es: 'No hay espectadores',
-    id: 'Tidak ada penonton'
+    id: 'Tidak ada penonton',
+    fr: 'Jeu'
   },
   playerAvatar: {
     en: 'Player Avatar',
@@ -2170,7 +2431,8 @@ export const translations = {
     bn: 'খেলোয়াড়ের ছবি',
     hi: 'खिलाड़ी अवतार',
     es: 'Avatar del Jugador',
-    id: 'Avatar Pemain'
+    id: 'Avatar Pemain',
+    fr: 'Jeu'
   },
   spectatorAvatar: {
     en: 'Spectator Avatar',
@@ -2178,7 +2440,8 @@ export const translations = {
     bn: 'দর্শকের ছবি',
     hi: 'दर्शक अवतार',
     es: 'Avatar del Espectador',
-    id: 'Avatar Penonton'
+    id: 'Avatar Penonton',
+    fr: 'Jeu'
   },
   anonymous: {
     en: 'Anonymous',
@@ -2186,7 +2449,8 @@ export const translations = {
     bn: 'অজ্ঞাত',
     hi: 'गुमनाम',
     es: 'Anónimo',
-    id: 'Anonim'
+    id: 'Anonim',
+    fr: 'Jeu'
   },
   watching: {
     en: 'WATCHING',
@@ -2194,7 +2458,8 @@ export const translations = {
     bn: 'দেখছে',
     hi: 'देख रहा',
     es: 'VIENDO',
-    id: 'MENONTON'
+    id: 'MENONTON',
+    fr: 'Jeu'
   },
 
   // Online Players Modal
@@ -2204,7 +2469,8 @@ export const translations = {
     bn: 'অনলাইন খেলোয়াড়',
     hi: 'ऑनलाइन खिलाड़ी',
     es: 'Jugadores en Línea',
-    id: 'Pemain Online'
+    id: 'Pemain Online',
+    fr: 'Jeu'
   },
   viewPlayerProfilesAndManageInteractions: {
     en: 'View player profiles and manage interactions',
@@ -2212,7 +2478,8 @@ export const translations = {
     bn: 'খেলোয়াড়ের প্রোফাইল দেখুন এবং মিথস্ক্রিয়া পরিচালনা করুন',
     hi: 'खिलाड़ी प्रोफाइल देखें और बातचीत प्रबंधित करें',
     es: 'Ver perfiles de jugadores y gestionar interacciones',
-    id: 'Lihat profil pemain dan kelola interaksi'
+    id: 'Lihat profil pemain dan kelola interaksi',
+    fr: 'Jeu'
   },
   profileMenu: {
     en: 'Profile',
@@ -2220,7 +2487,8 @@ export const translations = {
     bn: 'প্রোফাইল',
     hi: 'प्रोफाइल',
     es: 'Perfil',
-    id: 'Profil'
+    id: 'Profil',
+    fr: 'Jeu'
   },
   blocked: {
     en: 'Blocked',
@@ -2228,7 +2496,8 @@ export const translations = {
     bn: 'অবরুদ্ধ',
     hi: 'अवरुद्ध',
     es: 'Bloqueado',
-    id: 'Diblokir'
+    id: 'Diblokir',
+    fr: 'Jeu'
   },
   inRoom: {
     en: 'In Room',
@@ -2236,7 +2505,8 @@ export const translations = {
     bn: 'রুমে',
     hi: 'कमरे में',
     es: 'En Sala',
-    id: 'Di Ruang'
+    id: 'Di Ruang',
+    fr: 'Jeu'
   },
   block: {
     en: 'Block',
@@ -2244,7 +2514,8 @@ export const translations = {
     bn: 'অবরোধ',
     hi: 'ब्लॉक',
     es: 'Bloquear',
-    id: 'Blokir'
+    id: 'Blokir',
+    fr: 'Jeu'
   },
   unblock: {
     en: 'Unblock',
@@ -2252,7 +2523,8 @@ export const translations = {
     bn: 'অবরোধ সরান',
     hi: 'अनब्लॉक',
     es: 'Desbloquear',
-    id: 'Buka Blokir'
+    id: 'Buka Blokir',
+    fr: 'Jeu'
   },
   userBlocked: {
     en: 'User blocked',
@@ -2260,7 +2532,8 @@ export const translations = {
     bn: 'ব্যবহারকারী অবরুদ্ধ',
     hi: 'उपयोगकर्ता अवरुद्ध',
     es: 'Usuario bloqueado',
-    id: 'Pengguna diblokir'
+    id: 'Pengguna diblokir',
+    fr: 'Jeu'
   },
   userBlockedSuccessfully: {
     en: 'User has been blocked successfully',
@@ -2268,7 +2541,8 @@ export const translations = {
     bn: 'ব্যবহারকারী সফলভাবে অবরুদ্ধ হয়েছে',
     hi: 'उपयोगकर्ता सफलतापूर्वक अवरुद्ध कर दिया गया',
     es: 'El usuario ha sido bloqueado exitosamente',
-    id: 'Pengguna telah berhasil diblokir'
+    id: 'Pengguna telah berhasil diblokir',
+    fr: 'Jeu'
   },
   userUnblocked: {
     en: 'User unblocked',
@@ -2276,7 +2550,8 @@ export const translations = {
     bn: 'ব্যবহারকারীর অবরোধ সরানো হয়েছে',
     hi: 'उपयोगकर्ता अनब्लॉक',
     es: 'Usuario desbloqueado',
-    id: 'Pengguna dibuka blokirnya'
+    id: 'Pengguna dibuka blokirnya',
+    fr: 'Jeu'
   },
   userUnblockedSuccessfully: {
     en: 'User has been unblocked successfully',
@@ -2284,7 +2559,8 @@ export const translations = {
     bn: 'ব্যবহারকারীর অবরোধ সফলভাবে সরানো হয়েছে',
     hi: 'उपयोगकर्ता सफलतापूर्वक अनब्लॉक कर दिया गया',
     es: 'El usuario ha sido desbloqueado exitosamente',
-    id: 'Pengguna telah berhasil dibuka blokirnya'
+    id: 'Pengguna telah berhasil dibuka blokirnya',
+    fr: 'Jeu'
   },
   friendRequestSent: {
     en: 'Friend Request Sent',
@@ -2292,7 +2568,8 @@ export const translations = {
     bn: 'বন্ধুত্বের অনুরোধ পাঠানো হয়েছে',
     hi: 'मित्रता का अनুरोध भেজা गया',
     es: 'Solicitud de Amistad Enviada',
-    id: 'Permintaan Pertemanan Dikirim'
+    id: 'Permintaan Pertemanan Dikirim',
+    fr: 'Jeu'
   },
   friendRequestSentSuccessfully: {
     en: 'Friend request has been sent successfully',
@@ -2300,7 +2577,8 @@ export const translations = {
     bn: 'বন্ধুত্বের অনুরোধ সফলভাবে পাঠানো হয়েছে',
     hi: 'मित्रता का अनुरोध सफलतापূर्वक भेजा गया',
     es: 'La solicitud de amistad ha sido enviada exitosamente',
-    id: 'Permintaan pertemanan telah berhasil dikirim'
+    id: 'Permintaan pertemanan telah berhasil dikirim',
+    fr: 'Jeu'
   },
   friendRequestAlreadyExists: {
     en: 'Friend request already exists between you and this user',
@@ -2308,7 +2586,8 @@ export const translations = {
     bn: 'আপনার এবং এই ব্যবহারকারীর মধ্যে বন্ধুত্বের অনুরোধ ইতিমধ্যে বিদ্যমান',
     hi: 'आपके और इस उपयोगकर्ता के बीच मित्रता का अनुरोध पहले से मौजूद है',
     es: 'Ya existe una solicitud de amistad entre tú y este usuario',
-    id: 'Permintaan pertemanan sudah ada antara Anda dan pengguna ini'
+    id: 'Permintaan pertemanan sudah ada antara Anda dan pengguna ini',
+    fr: 'Jeu'
   },
   alreadyFriends: {
     en: 'You are already friends with this user',
@@ -2316,7 +2595,8 @@ export const translations = {
     bn: 'আপনি ইতিমধ্যে এই ব্যবহারকারীর সাথে বন্ধু',
     hi: 'आप पहले से ही इस उपयोगकर्ता के मित्र हैं',
     es: 'Ya eres amigo de este usuario',
-    id: 'Anda sudah berteman dengan pengguna ini'
+    id: 'Anda sudah berteman dengan pengguna ini',
+    fr: 'Jeu'
   },
   justNow: {
     en: 'Just now',
@@ -2324,7 +2604,8 @@ export const translations = {
     bn: 'এইমাত্র',
     hi: 'अभी',
     es: 'Ahora mismo',
-    id: 'Baru saja'
+    id: 'Baru saja',
+    fr: 'Jeu'
   },
   minutesAgo: {
     en: 'm ago',
@@ -2332,7 +2613,8 @@ export const translations = {
     bn: 'মিনিট আগে',
     hi: 'मिनट पहले',
     es: 'm hace',
-    id: 'm lalu'
+    id: 'm lalu',
+    fr: 'Jeu'
   },
   hoursAgo: {
     en: 'h ago',
@@ -2340,7 +2622,8 @@ export const translations = {
     bn: 'ঘন্টা আগে',
     hi: 'घंटे पहले',
     es: 'h hace',
-    id: 'j lalu'
+    id: 'j lalu',
+    fr: 'Jeu'
   },
   daysAgo: {
     en: 'd ago',
@@ -2348,7 +2631,8 @@ export const translations = {
     bn: 'দিন আগে',
     hi: 'दिन पहले',
     es: 'd hace',
-    id: 'h lalu'
+    id: 'h lalu',
+    fr: 'Jeu'
   },
   noOtherPlayersOnline: {
     en: 'No other players online',
@@ -2356,7 +2640,8 @@ export const translations = {
     bn: 'অন্য কোন খেলোয়াড় অনলাইনে নেই',
     hi: 'कोई अन्य खिलाड़ी ऑनलाइन नहीं',
     es: 'No hay otros jugadores en línea',
-    id: 'Tidak ada pemain lain yang online'
+    id: 'Tidak ada pemain lain yang online',
+    fr: 'Jeu'
   },
   connectedToRoom: {
     en: 'Connected to room',
@@ -2364,7 +2649,8 @@ export const translations = {
     bn: 'রুমে সংযুক্ত',
     hi: 'कमरे से जुड़ा हुआ',
     es: 'Conectado a la sala',
-    id: 'Terhubung ke ruang'
+    id: 'Terhubung ke ruang',
+    fr: 'Jeu'
   },
   startGame: {
     en: 'Start Game',
@@ -2372,7 +2658,8 @@ export const translations = {
     bn: 'খেলা শুরু করুন',
     hi: 'खेल शुरू करें',
     es: 'Iniciar Juego',
-    id: 'Mulai Permainan'
+    id: 'Mulai Permainan',
+    fr: 'Jeu'
   },
   inviteFriends: {
     en: 'Invite Friends',
@@ -2380,7 +2667,8 @@ export const translations = {
     bn: 'বন্ধুদের আমন্ত্রণ জানান',
     hi: 'दोस्तों को आमंत्रित करें',
     es: 'Invitar Amigos',
-    id: 'Undang Teman'
+    id: 'Undang Teman',
+    fr: 'Jeu'
   },
 
   // Invite Friends Modal
@@ -2390,7 +2678,8 @@ export const translations = {
     bn: 'বন্ধুদের আমন্ত্রণ জানান',
     hi: 'मित्रों को आमंत्रित करें',
     es: 'Invitar Amigos a',
-    id: 'Undang Teman ke'
+    id: 'Undang Teman ke',
+    fr: 'Jeu'
   },
   invitationSent: {
     en: 'Invitation Sent',
@@ -2398,7 +2687,8 @@ export const translations = {
     bn: 'আমন্ত্রণ পাঠানো হয়েছে',
     hi: 'निमंत्रण भेजा गया',
     es: 'Invitación Enviada',
-    id: 'Undangan Terkirim'
+    id: 'Undangan Terkirim',
+    fr: 'Jeu'
   },
   friendInvitedToRoom: {
     en: 'Your friend has been invited to join the room!',
@@ -2406,7 +2696,8 @@ export const translations = {
     bn: 'আপনার বন্ধুকে রুমে যোগ দিতে আমন্ত্রণ জানানো হয়েছে!',
     hi: 'आपके मित्र को कमरे में शामिल होने के लिए आमंत्रित किया गया है!',
     es: '¡Tu amigo ha sido invitado a unirse a la sala!',
-    id: 'Teman Anda telah diundang untuk bergabung dengan ruangan!'
+    id: 'Teman Anda telah diundang untuk bergabung dengan ruangan!',
+    fr: 'Jeu'
   },
   failedToSendInvitation: {
     en: 'Failed to send invitation',
@@ -2414,7 +2705,8 @@ export const translations = {
     bn: 'আমন্ত্রণ পাঠাতে ব্যর্থ',
     hi: 'निमंत्रण भेजने में असफल',
     es: 'Falló al enviar invitación',
-    id: 'Gagal mengirim undangan'
+    id: 'Gagal mengirim undangan',
+    fr: 'Jeu'
   },
 
   noFriendsFound: {
@@ -2423,7 +2715,8 @@ export const translations = {
     bn: 'কোন বন্ধু খুঁজে পাওয়া যায়নি',
     hi: 'कोई मित्र नहीं मिला',
     es: 'No se encontraron amigos',
-    id: 'Tidak ada teman ditemukan'
+    id: 'Tidak ada teman ditemukan',
+    fr: 'Jeu'
   },
   addFriendsFirstToInvite: {
     en: 'Add some friends first to invite them to your rooms!',
@@ -2431,7 +2724,8 @@ export const translations = {
     bn: 'প্রথমে কিছু বন্ধু যোগ করুন তাদের আপনার রুমে আমন্ত্রণ জানাতে!',
     hi: 'पहले कुछ मित्र जोड़ें ताकि आप उन्हें अपने कमरों में आमंत्रित कर सकें!',
     es: '¡Agrega algunos amigos primero para invitarlos a tus salas!',
-    id: 'Tambahkan beberapa teman dulu untuk mengundang mereka ke ruangan Anda!'
+    id: 'Tambahkan beberapa teman dulu untuk mengundang mereka ke ruangan Anda!',
+    fr: 'Jeu'
   },
   selectFriendsToInvite: {
     en: 'Select friends to invite to your room:',
@@ -2439,7 +2733,8 @@ export const translations = {
     bn: 'আপনার রুমে আমন্ত্রণ জানাতে বন্ধুদের নির্বাচন করুন:',
     hi: 'अपने कमरे में आमंत्रित करने के लिए मित्रों का चयन करें:',
     es: 'Selecciona amigos para invitar a tu sala:',
-    id: 'Pilih teman untuk diundang ke ruangan Anda:'
+    id: 'Pilih teman untuk diundang ke ruangan Anda:',
+    fr: 'Jeu'
   },
   invited: {
     en: 'Invited',
@@ -2447,7 +2742,8 @@ export const translations = {
     bn: 'আমন্ত্রিত',
     hi: 'आमंत्रित',
     es: 'Invitado',
-    id: 'Diundang'
+    id: 'Diundang',
+    fr: 'Jeu'
   },
   sending: {
     en: 'Sending...',
@@ -2455,7 +2751,8 @@ export const translations = {
     bn: 'পাঠানো হচ্ছে...',
     hi: 'भेजा जा रहा है...',
     es: 'Enviando...',
-    id: 'Mengirim...'
+    id: 'Mengirim...',
+    fr: 'Jeu'
   },
   invite: {
     en: 'Invite',
@@ -2463,7 +2760,8 @@ export const translations = {
     bn: 'আমন্ত্রণ',
     hi: 'आमंत्रित करें',
     es: 'Invitar',
-    id: 'Undang'
+    id: 'Undang',
+    fr: 'Jeu'
   },
 
 
@@ -2473,7 +2771,8 @@ export const translations = {
     bn: 'বার্তা পাঠাতে ব্যর্থ',
     hi: 'संदेश भेजने में असफल',
     es: 'Falló al enviar mensaje',
-    id: 'Gagal mengirim pesan'
+    id: 'Gagal mengirim pesan',
+    fr: 'Jeu'
   },
   noMessagesYet: {
     en: 'No messages yet. Start a conversation!',
@@ -2481,7 +2780,8 @@ export const translations = {
     bn: 'এখনও কোন বার্তা নেই। একটি কথোপকথন শুরু করুন!',
     hi: 'अभी तक कोई संदेश नहीं। बातचीत शुरू करें!',
     es: 'Aún no hay mensajes. ¡Inicia una conversación!',
-    id: 'Belum ada pesan. Mulai percakapan!'
+    id: 'Belum ada pesan. Mulai percakapan!',
+    fr: 'Jeu'
   },
 
 
@@ -2492,7 +2792,8 @@ export const translations = {
     bn: 'আমন্ত্রণ গৃহীত',
     hi: 'निमंत्रण स्वीकार किया गया',
     es: 'Invitación Aceptada',
-    id: 'Undangan Diterima'
+    id: 'Undangan Diterima',
+    fr: 'Jeu'
   },
 
   // Leaderboard
@@ -2502,7 +2803,8 @@ export const translations = {
     bn: 'লিডারবোর্ড',
     hi: 'लीडरबोर्ड',
     es: 'Tabla de Posiciones',
-    id: 'Papan Peringkat'
+    id: 'Papan Peringkat',
+    fr: 'Jeu'
   },
   top100Players: {
     en: 'Top 100 Players',
@@ -2510,7 +2812,8 @@ export const translations = {
     bn: 'শীর্ষ 100 খেলোয়াড়',
     hi: 'शीर्ष 100 खिलाड़ी',
     es: 'Top 100 Jugadores',
-    id: 'Top 100 Pemain'
+    id: 'Top 100 Pemain',
+    fr: 'Jeu'
   },
   leaderboardDescription: {
     en: 'The best players ranked by total wins. Achievement borders show player status!',
@@ -2518,7 +2821,8 @@ export const translations = {
     bn: 'মোট জয়ের ভিত্তিতে র‍্যাঙ্ক করা সেরা খেলোয়াড়। অর্জনের সীমানা খেলোয়াড়ের অবস্থা দেখায়!',
     hi: 'कुल जीत के आधार पर रैंक किए गए सर्वश्रेष्ठ खिलाड़ी। उपलब्धि सीमाएं खिलाड़ी की स्थिति दिखाती हैं!',
     es: 'Los mejores jugadores clasificados por victorias totales. ¡Los bordes de logros muestran el estado del jugador!',
-    id: 'Pemain terbaik berdasarkan total kemenangan. Batas pencapaian menunjukkan status pemain!'
+    id: 'Pemain terbaik berdasarkan total kemenangan. Batas pencapaian menunjukkan status pemain!',
+    fr: 'Jeu'
   },
   loadingLeaderboard: {
     en: 'Loading leaderboard...',
@@ -2526,7 +2830,8 @@ export const translations = {
     bn: 'লিডারবোর্ড লোড হচ্ছে...',
     hi: 'लीडरबोर्ड लोड हो रहा है...',
     es: 'Cargando tabla de posiciones...',
-    id: 'Memuat papan peringkat...'
+    id: 'Memuat papan peringkat...',
+    fr: 'Jeu'
   },
   errorLoadingLeaderboard: {
     en: 'Error loading leaderboard. Please try again.',
@@ -2534,7 +2839,8 @@ export const translations = {
     bn: 'লিডারবোর্ড লোড করতে ত্রুটি। অনুগ্রহ করে আবার চেষ্টা করুন।',
     hi: 'लीडरबोर्ड लोड करने में त्रुटि। कृपया पुनः प्रयास करें।',
     es: 'Error al cargar la tabla de posiciones. Por favor, inténtalo de nuevo.',
-    id: 'Gagal memuat papan peringkat. Silakan coba lagi.'
+    id: 'Gagal memuat papan peringkat. Silakan coba lagi.',
+    fr: 'Jeu'
   },
   winsCount: {
     en: 'wins',
@@ -2542,7 +2848,8 @@ export const translations = {
     bn: 'জয়',
     hi: 'जीत',
     es: 'victorias',
-    id: 'kemenangan'
+    id: 'kemenangan',
+    fr: 'Jeu'
   },
   games: {
     en: 'games',
@@ -2550,7 +2857,8 @@ export const translations = {
     bn: 'গেম',
     hi: 'गेम',
     es: 'juegos',
-    id: 'permainan'
+    id: 'permainan',
+    fr: 'Jeu'
   },
   wld: {
     en: 'W-L-D',
@@ -2558,7 +2866,8 @@ export const translations = {
     bn: 'জ-হ-ড',
     hi: 'जी-हा-ड्रा',
     es: 'V-D-E',
-    id: 'M-K-S'
+    id: 'M-K-S',
+    fr: 'Jeu'
   },
   showing: {
     en: 'Showing',
@@ -2566,7 +2875,8 @@ export const translations = {
     bn: 'দেখানো হচ্ছে',
     hi: 'दिखाया जा रहा',
     es: 'Mostrando',
-    id: 'Menampilkan'
+    id: 'Menampilkan',
+    fr: 'Jeu'
   },
   players: {
     en: 'players',
@@ -2574,7 +2884,8 @@ export const translations = {
     bn: 'খেলোয়াড়',
     hi: 'खिलाड़ी',
     es: 'jugadores',
-    id: 'pemain'
+    id: 'pemain',
+    fr: 'Jeu'
   },
   noPlayersFound: {
     en: 'No players found. Start playing to appear on the leaderboard!',
@@ -2582,7 +2893,8 @@ export const translations = {
     bn: 'কোনো খেলোয়াড় পাওয়া যায়নি। লিডারবোর্ডে আসতে খেলা শুরু করুন!',
     hi: 'कोई खिलाड़ी नहीं मिला। लीडरबोर्ड पर आने के लिए खेलना शुरू करें!',
     es: '¡No se encontraron jugadores. Comienza a jugar para aparecer en la tabla de posiciones!',
-    id: 'Tidak ada pemain ditemukan. Mulai bermain untuk muncul di papan peringkat!'
+    id: 'Tidak ada pemain ditemukan. Mulai bermain untuk muncul di papan peringkat!',
+    fr: 'Jeu'
   },
 
   invitationDeclined: {
@@ -2591,7 +2903,8 @@ export const translations = {
     bn: 'আমন্ত্রণ প্রত্যাখ্যান',
     hi: 'निमंत्रण अस्वीकार किया गया',
     es: 'Invitación Rechazada',
-    id: 'Undangan Ditolak'
+    id: 'Undangan Ditolak',
+    fr: 'Jeu'
   },
   youDeclinedInvitation: {
     en: 'You declined the room invitation.',
@@ -2599,7 +2912,8 @@ export const translations = {
     bn: 'আপনি রুমের আমন্ত্রণ প্রত্যাখ্যান করেছেন।',
     hi: 'आपने कमरे का निमंत्रण अस्वीकार कर दिया।',
     es: 'Rechazaste la invitación a la sala.',
-    id: 'Anda menolak undangan ruangan.'
+    id: 'Anda menolak undangan ruangan.',
+    fr: 'Jeu'
   },
   roomInvitation: {
     en: 'Room Invitation',
@@ -2607,7 +2921,8 @@ export const translations = {
     bn: 'রুমের আমন্ত্রণ',
     hi: 'कमरे का निमंत्रण',
     es: 'Invitación a la Sala',
-    id: 'Undangan Ruangan'
+    id: 'Undangan Ruangan',
+    fr: 'Jeu'
   },
   invitedYouToJoinRoom: {
     en: '{inviterName} invited you to join their room',
@@ -2615,7 +2930,8 @@ export const translations = {
     bn: '{inviterName} আপনাকে তাদের রুমে যোগ দিতে আমন্ত্রণ জানিয়েছে',
     hi: '{inviterName} ने आपको अपने कमरे में शामिल होने के लिए आमंत्रित किया',
     es: '{inviterName} te invitó a unirte a su sala',
-    id: '{inviterName} mengundang Anda untuk bergabung dengan ruangan mereka'
+    id: '{inviterName} mengundang Anda untuk bergabung dengan ruangan mereka',
+    fr: 'Jeu'
   },
 
   gameRoom: {
@@ -2624,7 +2940,8 @@ export const translations = {
     bn: 'গেম রুম',
     hi: 'गेम रूम',
     es: 'Sala de Juego',
-    id: 'Ruang Permainan'
+    id: 'Ruang Permainan',
+    fr: 'Jeu'
   },
 
   decline: {
@@ -2633,7 +2950,8 @@ export const translations = {
     bn: 'প্রত্যাখ্যান',
     hi: 'अस्वीकार करें',
     es: 'Rechazar',
-    id: 'Tolak'
+    id: 'Tolak',
+    fr: 'Jeu'
   },
   
   // Player Profile Modal
@@ -2643,7 +2961,8 @@ export const translations = {
     bn: 'প্লেয়ার প্রোফাইল',
     hi: 'खिलाड़ी प्रोफाइल',
     es: 'Perfil del Jugador',
-    id: 'Profil Pemain'
+    id: 'Profil Pemain',
+    fr: 'Jeu'
   },
   joined: {
     en: 'Joined',
@@ -2651,7 +2970,8 @@ export const translations = {
     bn: 'যোগদান',
     hi: 'शामिल हुए',
     es: 'Se unió',
-    id: 'Bergabung'
+    id: 'Bergabung',
+    fr: 'Jeu'
   },
   winRate: {
     en: 'Win Rate',
@@ -2659,7 +2979,8 @@ export const translations = {
     bn: 'জয়ের হার',
     hi: 'जीत की दर',
     es: 'Tasa de Victoria',
-    id: 'Tingkat Kemenangan'
+    id: 'Tingkat Kemenangan',
+    fr: 'Jeu'
   },
   headToHead: {
     en: 'Head-to-Head vs You',
@@ -2667,7 +2988,8 @@ export const translations = {
     bn: 'আপনার বিপরীতে সরাসরি',
     hi: 'आपके खिलाफ आमने-सामने',
     es: 'Cara a Cara contra Ti',
-    id: 'Head-to-Head vs Anda'
+    id: 'Head-to-Head vs Anda',
+    fr: 'Jeu'
   },
   yourWins: {
     en: 'Your Wins',
@@ -2675,7 +2997,8 @@ export const translations = {
     bn: 'আপনার জয়',
     hi: 'आपकी जीत',
     es: 'Tus Victorias',
-    id: 'Kemenangan Anda'
+    id: 'Kemenangan Anda',
+    fr: 'Jeu'
   },
   yourLosses: {
     en: 'Your Losses',
@@ -2683,7 +3006,8 @@ export const translations = {
     bn: 'আপনার হার',
     hi: 'आपकी হার',
     es: 'Tus Derrotas',
-    id: 'Kekalahan Anda'
+    id: 'Kekalahan Anda',
+    fr: 'Jeu'
   },
   recentGames: {
     en: 'Recent Games',
@@ -2691,7 +3015,8 @@ export const translations = {
     bn: 'সাম্প্রতিক গেম',
     hi: 'हाल के गेम',
     es: 'Juegos Recientes',
-    id: 'Permainan Terbaru'
+    id: 'Permainan Terbaru',
+    fr: 'Jeu'
   },
   win: {
     en: 'Win',
@@ -2699,7 +3024,8 @@ export const translations = {
     bn: 'জয়',
     hi: 'जीत',
     es: 'Victoria',
-    id: 'Menang'
+    id: 'Menang',
+    fr: 'Jeu'
   },
   loss: {
     en: 'Loss',
@@ -2707,7 +3033,8 @@ export const translations = {
     bn: 'হার',
     hi: 'हार',
     es: 'Derrota',
-    id: 'Kalah'
+    id: 'Kalah',
+    fr: 'Jeu'
   },
   noGamesPlayed: {
     en: 'No games played against this player yet.',
@@ -2715,7 +3042,8 @@ export const translations = {
     bn: 'এই খেলোয়াড়ের বিরুদ্ধে এখনো কোনো গেম খেলা হয়নি।',
     hi: 'इस खिलाड़ी के खिलाफ अभी तक कोई गेम नहीं खेला गया।',
     es: 'Aún no se han jugado juegos contra este jugador.',
-    id: 'Belum ada permainan yang dimainkan melawan pemain ini.'
+    id: 'Belum ada permainan yang dimainkan melawan pemain ini.',
+    fr: 'Jeu'
   },
   playerNotFound: {
     en: 'Player not found',
@@ -2723,7 +3051,8 @@ export const translations = {
     bn: 'প্লেয়ার পাওয়া যায়নি',
     hi: 'खिलाड़ी नहीं मिला',
     es: 'Jugador no encontrado',
-    id: 'Pemain tidak ditemukan'
+    id: 'Pemain tidak ditemukan',
+    fr: 'Jeu'
   }
 } as const;
 

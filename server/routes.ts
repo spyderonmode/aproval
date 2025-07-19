@@ -1741,9 +1741,38 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "Room not found" });
       }
       
-      // Check if room is already in "playing" status
-      if (room.status === 'playing') {
-        return res.status(400).json({ message: "Game is already running in this room" });
+      // Check if room is already in "playing" status AND there's an active game
+      // Allow multiple players to call start-game during the brief synchronization window
+      const existingActiveGame = await storage.getActiveGameByRoomId(roomId);
+      if (room.status === 'playing' && existingActiveGame) {
+        // Game already exists and running - return the existing game instead of error
+        console.log('🎮 Game already running, returning existing game for synchronization');
+        
+        // Get player information for the existing game
+        const [playerXInfo, playerOInfo] = await Promise.all([
+          existingActiveGame.playerXId ? storage.getUser(existingActiveGame.playerXId) : null,
+          existingActiveGame.playerOId ? storage.getUser(existingActiveGame.playerOId) : null
+        ]);
+        
+        // Get achievements for both players
+        const [playerXAchievements, playerOAchievements] = await Promise.all([
+          playerXInfo ? storage.getUserAchievements(existingActiveGame.playerXId) : [],
+          playerOInfo ? storage.getUserAchievements(existingActiveGame.playerOId) : []
+        ]);
+        
+        const gameWithPlayers = {
+          ...existingActiveGame,
+          playerXInfo: playerXInfo ? {
+            ...playerXInfo,
+            achievements: playerXAchievements.slice(0, 3)
+          } : null,
+          playerOInfo: playerOInfo ? {
+            ...playerOInfo,
+            achievements: playerOAchievements.slice(0, 3)
+          } : null
+        };
+        
+        return res.json(gameWithPlayers);
       }
       
       // Get room participants
