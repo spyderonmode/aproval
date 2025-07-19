@@ -2967,10 +2967,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
                     redirectToHome: true
                   });
                   
-                  console.log(`🏠 Broadcasting game abandonment to ${roomUsers.size} users in room ${roomId}`);
+                  // Track unique users to prevent duplicate messages
+                  const notifiedUsers = new Set<string>();
+                  const connectionsToSend: string[] = [];
                   
-                  // Send to all room participants
+                  // Filter to send only one message per unique user
                   roomUsers.forEach(connectionId => {
+                    const connection = connections.get(connectionId);
+                    if (connection && connection.ws.readyState === WebSocket.OPEN && connection.userId) {
+                      if (!notifiedUsers.has(connection.userId)) {
+                        notifiedUsers.add(connection.userId);
+                        connectionsToSend.push(connectionId);
+                      }
+                    }
+                  });
+                  
+                  console.log(`🏠 Broadcasting game abandonment to ${connectionsToSend.length} unique users in room ${roomId}`);
+                  
+                  // Send to unique users only
+                  connectionsToSend.forEach(connectionId => {
                     const connection = connections.get(connectionId);
                     if (connection && connection.ws.readyState === WebSocket.OPEN) {
                       connection.ws.send(gameEndMessage);
@@ -2986,6 +3001,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
                       }
                       
                       // Clear their connection room info
+                      connection.roomId = undefined;
+                    }
+                  });
+                  
+                  // Clear remaining duplicate connections
+                  roomUsers.forEach(connectionId => {
+                    const connection = connections.get(connectionId);
+                    if (connection) {
                       connection.roomId = undefined;
                     }
                   });

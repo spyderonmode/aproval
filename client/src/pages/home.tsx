@@ -451,30 +451,28 @@ export default function Home() {
           break;
         case 'game_abandoned':
           console.log('🏠 Game abandoned - player left:', lastMessage);
-          // Prevent multiple resets and effects from triggering
+          // Immediate transition to prevent blinking - no delays
           setIsResettingState(true);
           
+          // Batch all state changes in a single synchronous update to prevent flickering
+          setCurrentGame(null);
+          setCurrentRoom(null);
+          setSelectedMode('ai');
+          setShowGameOver(false);
+          setGameResult(null);
+          setIsCreatingGame(false);
+          
+          toast({
+            title: "Game Ended",
+            description: lastMessage.message || "Game ended because a player left the room.",
+            variant: "destructive",
+          });
+          
+          // Quick reset without delay to prevent visual artifacts
           setTimeout(() => {
-            // Batch all state changes in a single update
-            setCurrentGame(null);
-            setCurrentRoom(null);
-            setSelectedMode('ai');
-            setShowGameOver(false);
-            setGameResult(null);
-            setIsCreatingGame(false);
-            
-            toast({
-              title: "Game Ended",
-              description: lastMessage.message || "Game ended because a player left the room.",
-              variant: "destructive",
-            });
-            
-            // Complete reset and initialize game
-            setTimeout(() => {
-              setIsResettingState(false);
-              initializeLocalGame();
-            }, 200);
-          }, 350);
+            setIsResettingState(false);
+            initializeLocalGame();
+          }, 50); // Minimal delay just for state synchronization
           break;
         case 'player_reaction':
           // Handle player reaction - this will be broadcast to all players and spectators
