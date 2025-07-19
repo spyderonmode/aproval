@@ -343,21 +343,24 @@ export function Leaderboard({ trigger }: LeaderboardProps) {
           </div>
         </DialogHeader>
 
-        {/* Two-column layout like English version */}
-        <div className="flex flex-1 min-h-0 gap-6" style={{ direction: language === 'ar' ? 'rtl' : 'ltr' }}>
-          {/* Left Column - Player List (main area) */}
+        {isLoading ? (
+          <div className="flex items-center justify-center py-8 flex-1">
+            <Loader2 className="w-8 h-8 animate-spin" />
+            <span className="ml-2">{t('loadingLeaderboard') || 'Loading leaderboard...'}</span>
+          </div>
+        ) : error ? (
+          <div className="flex flex-col items-center justify-center py-8 flex-1 text-red-500">
+            <span>{t('errorLoadingLeaderboard') || 'Error loading leaderboard. Please try again.'}</span>
+            <div className="mt-4 p-3 bg-red-50 dark:bg-red-900/20 rounded-lg text-red-600 dark:text-red-400 text-sm max-w-md">
+              <p>Debug details:</p>
+              <p>Error: {String(error)}</p>
+              <p>Modal open: {isOpen.toString()}</p>
+              <p>Data length: {leaderboard?.length || 'undefined'}</p>
+            </div>
+          </div>
+        ) : (
           <div className="flex-1 min-h-0 overflow-y-auto" style={{ WebkitOverflowScrolling: 'touch' }}>
-            {isLoading ? (
-              <div className="flex items-center justify-center py-8">
-                <Loader2 className="w-8 h-8 animate-spin" />
-                <span className="ml-2">{t('loadingLeaderboard') || 'Loading leaderboard...'}</span>
-              </div>
-            ) : error ? (
-              <div className="flex flex-col items-center justify-center py-8 text-red-500">
-                <span>{t('errorLoadingLeaderboard') || 'Error loading leaderboard. Please try again.'}</span>
-              </div>
-            ) : (
-              <div className="space-y-2">
+            <div className="space-y-1 sm:space-y-1.5 pb-2 sm:pb-3 pr-1 sm:pr-2 pt-1 sm:pt-2">
               {/* Debug info always visible when no data */}
               {!isLoading && !leaderboard && (
                 <div className="p-4 bg-yellow-50 dark:bg-yellow-900/20 rounded-lg text-yellow-800 dark:text-yellow-200 text-sm">
@@ -389,97 +392,178 @@ export function Leaderboard({ trigger }: LeaderboardProps) {
                       initial={{ opacity: 0, y: 20 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: index * 0.05 }}
-                      whileHover={{ scale: 1.01, y: -1 }}
-                      className={`relative cursor-pointer p-3 rounded-lg border ${
-                        position === 1 ? 'bg-gradient-to-r from-yellow-50 to-yellow-100 border-yellow-200 dark:from-yellow-900/20 dark:to-yellow-800/20 dark:border-yellow-700' :
-                        position === 2 ? 'bg-gradient-to-r from-gray-50 to-gray-100 border-gray-200 dark:from-gray-800/20 dark:to-gray-700/20 dark:border-gray-600' :
-                        position === 3 ? 'bg-gradient-to-r from-amber-50 to-amber-100 border-amber-200 dark:from-amber-900/20 dark:to-amber-800/20 dark:border-amber-700' :
-                        'bg-white dark:bg-slate-800 border-gray-200 dark:border-gray-600'
-                      }`}
-                      onClick={() => {
-                        setSelectedPlayerId(user.id);
-                        setShowPlayerProfile(true);
-                      }}>
-                      {/* Simple horizontal row layout matching English */}
-                      <div className="flex items-center gap-3 w-full">
-                        {/* Profile Picture */}
-                        <div className="flex-shrink-0 relative">
-                          {(() => {
-                            const borderStyle = getAchievementBorderStyle(user, position);
-                            return (
-                              <motion.div
-                                className="relative"
-                                animate={borderStyle.animation ? { scale: [1, 1.01, 1] } : {}}
-                                transition={{
-                                  duration: 3,
+                    >
+                      <motion.div
+                        whileHover={{ scale: 1.02, y: -2 }}
+                        transition={{ type: "spring", stiffness: 300, damping: 20 }}
+                      >
+                        <Card 
+                          className={`relative cursor-pointer overflow-hidden ${
+                          position <= 3 ? 'border-2 shadow-xl' : 'border shadow-lg'} ${
+                          position === 1 ? 'border-yellow-400/50 bg-gradient-to-br from-yellow-50/80 via-white to-yellow-100/60 dark:from-yellow-900/20 dark:via-slate-800 dark:to-yellow-800/20 shadow-yellow-200/40' :
+                          position === 2 ? 'border-gray-400/50 bg-gradient-to-br from-gray-50/80 via-white to-gray-100/60 dark:from-gray-700/20 dark:via-slate-800 dark:to-gray-600/20 shadow-gray-200/40' :
+                          position === 3 ? 'border-amber-400/50 bg-gradient-to-br from-amber-50/80 via-white to-amber-100/60 dark:from-amber-900/20 dark:via-slate-800 dark:to-amber-800/20 shadow-amber-200/40' : 
+                          'bg-gradient-to-br from-slate-50/90 via-white to-blue-50/40 dark:from-slate-800/90 dark:via-slate-750 dark:to-slate-700/90 border-gray-200/60 dark:border-gray-600/40 shadow-gray-100/60'
+                        } ${position <= 3 ? 'ring-2 ring-opacity-30 shadow-2xl ' + (position === 1 ? 'ring-yellow-300/40' : position === 2 ? 'ring-gray-300/40' : 'ring-amber-300/40') : 'ring-1 ring-gray-200/30 dark:ring-gray-600/30'} backdrop-blur-sm`}
+                        onClick={() => {
+                          setSelectedPlayerId(user.id);
+                          setShowPlayerProfile(true);
+                        }}>
+                          <CardContent className="p-1.5 sm:p-2.5 relative">
+                            {/* Animated Background Gradient */}
+                            <div className={`absolute inset-0 opacity-5 ${
+                              position === 1 ? 'bg-gradient-to-r from-yellow-300 via-yellow-200 to-yellow-400' :
+                              position === 2 ? 'bg-gradient-to-r from-gray-300 via-gray-200 to-gray-400' :
+                              position === 3 ? 'bg-gradient-to-r from-amber-300 via-amber-200 to-amber-400' :
+                              'bg-gradient-to-r from-blue-200 via-slate-100 to-indigo-200'
+                            }`}></div>
+                            {/* Enhanced Top 3 Background Decoration */}
+                            {position <= 3 && (
+                              <motion.div 
+                                className={`absolute top-0 right-0 w-16 h-16 opacity-15 ${
+                                  position === 1 ? 'text-yellow-400' : position === 2 ? 'text-gray-400' : 'text-amber-400'
+                                }`}
+                                animate={{ 
+                                  rotate: [0, 5, -5, 0],
+                                  scale: [1, 1.05, 1]
+                                }}
+                                transition={{ 
+                                  duration: 4,
                                   repeat: Infinity,
                                   ease: "easeInOut"
                                 }}
                               >
-                                {user.profileImageUrl ? (
-                                  <img
-                                    src={user.profileImageUrl}
-                                    alt={`${user.displayName}'s profile`}
-                                    className={`w-12 h-12 rounded-lg object-cover border-2 border-white dark:border-slate-700 shadow-sm ${borderStyle.borderClass} ${borderStyle.glowEffect} transition-all duration-300`}
-                                  />
+                                {position === 1 ? (
+                                  <Crown className="w-full h-full drop-shadow-lg" />
+                                ) : position === 2 ? (
+                                  <Medal className="w-full h-full drop-shadow-lg" />
                                 ) : (
-                                  <div className={`w-12 h-12 rounded-lg bg-gradient-to-br from-blue-400 via-purple-500 to-pink-500 flex items-center justify-center text-white font-bold text-sm shadow-sm ${borderStyle.borderClass} ${borderStyle.glowEffect} transition-all duration-300`}>
-                                    {user.displayName.charAt(0).toUpperCase()}
-                                  </div>
-                                )}
-                                {position <= 3 && (
-                                  <div className={`absolute -top-1 -right-1 w-5 h-5 rounded-full ${getRankColor(position)} flex items-center justify-center shadow-sm border border-white dark:border-slate-800`}>
-                                    <span className="text-xs font-bold text-white">#{position}</span>
-                                  </div>
+                                  <Award className="w-full h-full drop-shadow-lg" />
                                 )}
                               </motion.div>
-                            );
-                          })()}
-                        </div>
+                            )}
+                          
+                          <div className="flex items-center gap-1 sm:gap-2 relative z-10">
+                            {/* Profile Picture with Achievement Border */}
+                            <div className="flex-shrink-0 relative">
+                              {(() => {
+                                const borderStyle = getAchievementBorderStyle(user, position);
+                                return (
+                                  <motion.div
+                                    className="relative"
+                                    animate={borderStyle.animation ? { scale: [1, 1.01, 1] } : {}}
+                                    transition={{
+                                      duration: 3,
+                                      repeat: Infinity,
+                                      ease: "easeInOut"
+                                    }}
+                                  >
+                                    {user.profileImageUrl ? (
+                                      <img
+                                        src={user.profileImageUrl}
+                                        alt={`${user.displayName}'s profile`}
+                                        className={`w-8 h-8 sm:w-10 sm:h-10 md:w-11 md:h-11 rounded-lg object-cover border-2 border-white dark:border-slate-700 shadow-sm ${borderStyle.borderClass} ${borderStyle.glowEffect} transition-all duration-300`}
+                                      />
+                                    ) : (
+                                      <div className={`w-8 h-8 sm:w-10 sm:h-10 md:w-11 md:h-11 rounded-lg bg-gradient-to-br from-blue-400 via-purple-500 to-pink-500 flex items-center justify-center text-white font-bold text-xs sm:text-sm shadow-sm ${borderStyle.borderClass} ${borderStyle.glowEffect} transition-all duration-300`}>
+                                        {user.displayName.charAt(0).toUpperCase()}
+                                      </div>
+                                    )}
+                                    {/* Position Badge - small overlay on profile */}
+                                    {position <= 3 && (
+                                      <div className={`absolute -top-0.5 -right-0.5 w-5 h-5 rounded-full bg-gradient-to-br ${getRankColor(position)} flex items-center justify-center shadow-sm border border-white dark:border-slate-800`}>
+                                        <span className="text-xs font-bold">#{position}</span>
+                                      </div>
+                                    )}
+                                    {/* Online Status Indicator */}
+                                    <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-green-400 border-2 border-white dark:border-slate-800 rounded-full shadow-sm z-10"></div>
+                                  </motion.div>
+                                );
+                              })()}
+                            </div>
 
-                        {/* User Name */}
-                        <div className="flex-1 min-w-0">
-                          <div className="text-sm font-bold text-gray-900 dark:text-white">
-                            {renderAchievementBorder(user, position)}
-                          </div>
-                          <div className="text-xs text-gray-500 dark:text-gray-400">
-                            @{user.username}
-                          </div>
-                        </div>
-                        
-                        {/* Stats Grid - Horizontal Layout */}
-                        <div className="grid grid-cols-3 gap-2 text-center">
-                          <div className="bg-green-50 dark:bg-green-900/20 p-2 rounded border">
-                            <div className="text-xs text-green-600 dark:text-green-400">{t('wins') || 'Wins'}</div>
-                            <div className="text-lg font-bold text-green-600 dark:text-green-400">{user.wins}</div>
-                          </div>
-                          <div className="bg-blue-50 dark:bg-blue-900/20 p-2 rounded border">
-                            <div className="text-xs text-blue-600 dark:text-blue-400">{t('winRate') || 'Win Rate'}</div>
-                            <div className="text-lg font-bold text-blue-600 dark:text-blue-400">{winRatePercentage}%</div>
-                          </div>
-                          <div className="bg-purple-50 dark:bg-purple-900/20 p-2 rounded border">
-                            <div className="text-xs text-purple-600 dark:text-purple-400">{t('games') || 'Games'}</div>
-                            <div className="text-lg font-bold text-purple-600 dark:text-purple-400">{user.totalGames}</div>
-                          </div>
-                        </div>
+                            {/* User Info */}
+                            <div className="flex-1 min-w-0 overflow-hidden">
+                              <div className="flex flex-col sm:flex-row sm:items-start gap-0.5 sm:gap-1 mb-1">
+                                <div className="min-w-0 flex-1">
+                                  <div className="text-xs sm:text-sm font-bold text-gray-900 dark:text-white mb-0.5">
+                                    {renderAchievementBorder(user, position)}
+                                  </div>
+                                  <Badge variant="outline" className="text-xs bg-gray-100 dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-600 dark:text-gray-300 font-medium">
+                                    @{user.username}
+                                  </Badge>
+                                </div>
+                              </div>
+                              
+                              {/* Stats Grid */}
+                              <div className="grid grid-cols-3 gap-1 sm:gap-1.5 text-center">
+                                <motion.div 
+                                  className="bg-gradient-to-br from-green-50 to-emerald-100 dark:from-green-900/30 dark:to-emerald-800/20 rounded-lg p-1 border border-green-200/60 dark:border-green-700/40 shadow-sm hover:shadow-md transition-shadow backdrop-blur-sm"
+                                  whileHover={{ scale: 1.05 }}
+                                  transition={{ type: "spring", stiffness: 400 }}
+                                >
+                                  <div className="flex items-center justify-center gap-0.5 mb-0.5">
+                                    <Trophy className="w-2 h-2 text-green-600 drop-shadow-sm" />
+                                    <span className="text-xs font-medium text-green-600 dark:text-green-400">{t('wins') || 'Wins'}</span>
+                                  </div>
+                                  <div className="text-xs font-bold text-green-700 dark:text-green-300">{user.wins}</div>
+                                </motion.div>
+                                
+                                <motion.div 
+                                  className="bg-gradient-to-br from-blue-50 to-cyan-100 dark:from-blue-900/30 dark:to-cyan-800/20 rounded-lg p-1 border border-blue-200/60 dark:border-blue-700/40 shadow-sm hover:shadow-md transition-shadow backdrop-blur-sm"
+                                  whileHover={{ scale: 1.05 }}
+                                  transition={{ type: "spring", stiffness: 400 }}
+                                >
+                                  <div className="flex items-center justify-center gap-0.5 mb-0.5">
+                                    <Target className="w-2 h-2 text-blue-600 drop-shadow-sm" />
+                                    <span className="text-xs font-medium text-blue-600 dark:text-blue-400">{t('winRate') || 'Win Rate'}</span>
+                                  </div>
+                                  <div className="text-xs font-bold text-blue-700 dark:text-blue-300">{winRatePercentage}%</div>
+                                </motion.div>
+                                
+                                <motion.div 
+                                  className="bg-gradient-to-br from-purple-50 to-violet-100 dark:from-purple-900/30 dark:to-violet-800/20 rounded-lg p-1 border border-purple-200/60 dark:border-purple-700/40 shadow-sm hover:shadow-md transition-shadow backdrop-blur-sm"
+                                  whileHover={{ scale: 1.05 }}
+                                  transition={{ type: "spring", stiffness: 400 }}
+                                >
+                                  <div className="flex items-center justify-center gap-0.5 mb-0.5">
+                                    <Users className="w-2 h-2 text-purple-600 drop-shadow-sm" />
+                                    <span className="text-xs font-medium text-purple-600 dark:text-purple-400">{t('games') || 'Games'}</span>
+                                  </div>
+                                  <div className="text-xs font-bold text-purple-700 dark:text-purple-300">{user.totalGames}</div>
+                                </motion.div>
+                              </div>
+                            </div>
 
-                        {/* Performance Badge */}
-                        <div className="text-right">
-                          <div className={`inline-block text-xs font-medium px-2 py-1 rounded-full mb-1 ${
-                            winRatePercentage >= 80 ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300' :
-                            winRatePercentage >= 60 ? 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300' :
-                            winRatePercentage >= 40 ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300' :
-                            'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300'
-                          }`}>
-                            {winRatePercentage >= 80 ? 'Elite' :
-                             winRatePercentage >= 60 ? 'Expert' :
-                             winRatePercentage >= 40 ? 'Good' : 'Improving'}
+                            {/* Performance Badge - Now visible on mobile */}
+                            <div className="flex flex-col items-center text-center flex-shrink-0 min-w-[70px] sm:min-w-[80px] lg:min-w-[100px]">
+                              <div className="mb-1 sm:mb-2">
+                                <div className={`text-xs font-medium px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-full ${
+                                  winRatePercentage >= 80 ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300' :
+                                  winRatePercentage >= 60 ? 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300' :
+                                  winRatePercentage >= 40 ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300' :
+                                  'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300'
+                                }`}>
+                                  {winRatePercentage >= 80 ? 'Elite' :
+                                   winRatePercentage >= 60 ? 'Expert' :
+                                   winRatePercentage >= 40 ? 'Good' : 'Improving'}
+                                </div>
+                              </div>
+                              <div className="text-xs text-gray-500 dark:text-gray-400 mb-0.5 sm:mb-1">
+                                {t('wld') || 'W-L-D'}
+                              </div>
+                              <div className="text-xs font-mono whitespace-nowrap bg-gray-100 dark:bg-gray-800 px-1 sm:px-2 py-0.5 sm:py-1 rounded">
+                                <span className="text-green-600 dark:text-green-400 font-bold">{user.wins}</span>
+                                <span className="text-gray-400 mx-0.5 sm:mx-1">-</span>
+                                <span className="text-red-600 dark:text-red-400 font-bold">{user.losses}</span>
+                                <span className="text-gray-400 mx-0.5 sm:mx-1">-</span>
+                                <span className="text-yellow-600 dark:text-yellow-400 font-bold">{user.draws}</span>
+                              </div>
+                            </div>
                           </div>
-                          <div className="text-xs text-gray-500 dark:text-gray-400">
-                            {t('wld') || 'W-L-D'}: {user.wins}-{user.losses}-{user.draws}
-                          </div>
-                        </div>
-                      </div>
+                          </CardContent>
+                        </Card>
+                      </motion.div>
                     </motion.div>
                   );
                 })
@@ -487,28 +571,18 @@ export function Leaderboard({ trigger }: LeaderboardProps) {
                 <div className="text-center py-8 text-gray-500">
                   <Trophy className="w-16 h-16 mx-auto mb-4 opacity-50" />
                   <p>{t('noPlayersFound') || 'No players found. Start playing to appear on the leaderboard!'}</p>
+                  {error && (
+                    <div className="mt-4 p-3 bg-red-50 dark:bg-red-900/20 rounded-lg text-red-600 dark:text-red-400 text-sm">
+                      <p>Debug info: {JSON.stringify(error)}</p>
+                      <p>Is loading: {isLoading.toString()}</p>
+                      <p>Modal open: {isOpen.toString()}</p>
+                    </div>
+                  )}
                 </div>
               )}
-              </div>
-            )}
-          </div>
-
-          {/* Right Column - Description Panel like English */}
-          <div className="w-80 flex-shrink-0 bg-gradient-to-br from-slate-50 to-blue-50 dark:from-slate-800 dark:to-slate-700 p-4 rounded-lg border border-gray-200 dark:border-gray-600">
-            <div className="text-center space-y-4">
-              <div className="inline-flex items-center gap-2 bg-gradient-to-r from-yellow-100 to-orange-100 dark:from-yellow-900/30 dark:to-orange-900/30 px-4 py-2 rounded-full border border-yellow-200/50 dark:border-yellow-700/30 shadow-lg">
-                <Crown className="w-4 h-4 text-yellow-600" />
-                <p className="text-gray-700 dark:text-gray-200 text-sm font-semibold">
-                  {t('top100Players') || 'Top 100 Players'}
-                </p>
-              </div>
-              
-              <p className="text-gray-600 dark:text-gray-300 text-sm leading-relaxed">
-                {t('leaderboardDescription') || 'The best players ranked by total wins. Achievement borders show player status!'}
-              </p>
             </div>
           </div>
-        </div>
+        )}
 
         <div className="flex justify-between items-center pt-6 border-t border-gradient-to-r from-transparent via-gray-200 to-transparent dark:via-gray-700 flex-shrink-0 bg-gradient-to-r from-slate-50 via-white to-slate-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
           <div className="flex items-center gap-2">
