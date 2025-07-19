@@ -75,12 +75,39 @@ export function useWebSocket() {
         // Handle game abandonment due to player leaving
         if (message.type === 'game_abandoned') {
           console.log('🏠 WebSocket: Game abandoned message received:', message);
-          console.log('🏠 WebSocket: Dispatching game_abandoned custom event');
-          const gameAbandonedEvent = new CustomEvent('game_abandoned', {
-            detail: message
-          });
-          window.dispatchEvent(gameAbandonedEvent);
-          console.log('🏠 WebSocket: game_abandoned custom event dispatched');
+          
+          // Show toast notification directly
+          const toastMessage = message.message || "Game ended because a player left the room.";
+          
+          // Create and show a temporary toast-like notification
+          const notificationDiv = document.createElement('div');
+          notificationDiv.innerHTML = `
+            <div style="
+              position: fixed;
+              top: 20px;
+              right: 20px;
+              background: #ef4444;
+              color: white;
+              padding: 16px;
+              border-radius: 8px;
+              box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+              z-index: 9999;
+              max-width: 400px;
+              font-family: system-ui, -apple-system, sans-serif;
+            ">
+              <div style="font-weight: 600; margin-bottom: 4px;">Game Ended</div>
+              <div style="font-size: 14px; opacity: 0.9;">${toastMessage}</div>
+            </div>
+          `;
+          document.body.appendChild(notificationDiv);
+          
+          // Force page reload after showing the notification
+          console.log('🏠 WebSocket: Reloading page due to game abandonment');
+          setTimeout(() => {
+            window.location.reload();
+          }, 2000); // Give user time to see the notification
+          
+          return; // Don't set lastMessage to prevent useEffect processing
         }
         
         setLastMessage(message);
