@@ -76,7 +76,7 @@ async function createUser(username: string, password: string, email?: string): P
     id: crypto.randomUUID(),
     username,
     password: hashPassword(password),
-    email,
+    email: email ? email.toLowerCase() : email,
     displayName: username,
     profilePicture: null,
     isEmailVerified: false,
@@ -140,7 +140,7 @@ function getUserById(userId: string): User | undefined {
 
 function findUserByEmail(email: string): User | undefined {
   const users = getUsers();
-  return users.find(u => u.email === email);
+  return users.find(u => u.email && u.email.toLowerCase() === email.toLowerCase());
 }
 
 async function sendVerificationEmail(email: string, token: string): Promise<void> {
