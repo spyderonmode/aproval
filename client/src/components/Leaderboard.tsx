@@ -535,10 +535,10 @@ export function Leaderboard({ trigger }: LeaderboardProps) {
                               </div>
                             </div>
 
-                            {/* Performance Badge */}
-                            <div className="hidden lg:flex flex-col items-center text-center flex-shrink-0 min-w-[100px]">
-                              <div className="mb-2">
-                                <div className={`text-xs font-medium px-2 py-1 rounded-full ${
+                            {/* Performance Badge - Now visible on mobile */}
+                            <div className="flex flex-col items-center text-center flex-shrink-0 min-w-[70px] sm:min-w-[80px] lg:min-w-[100px]">
+                              <div className="mb-1 sm:mb-2">
+                                <div className={`text-xs font-medium px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-full ${
                                   winRatePercentage >= 80 ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300' :
                                   winRatePercentage >= 60 ? 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300' :
                                   winRatePercentage >= 40 ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300' :
@@ -549,14 +549,14 @@ export function Leaderboard({ trigger }: LeaderboardProps) {
                                    winRatePercentage >= 40 ? 'Good' : 'Improving'}
                                 </div>
                               </div>
-                              <div className="text-xs text-gray-500 dark:text-gray-400 mb-1">
+                              <div className="text-xs text-gray-500 dark:text-gray-400 mb-0.5 sm:mb-1">
                                 {t('wld') || 'W-L-D'}
                               </div>
-                              <div className="text-xs font-mono whitespace-nowrap bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded">
+                              <div className="text-xs font-mono whitespace-nowrap bg-gray-100 dark:bg-gray-800 px-1 sm:px-2 py-0.5 sm:py-1 rounded">
                                 <span className="text-green-600 dark:text-green-400 font-bold">{user.wins}</span>
-                                <span className="text-gray-400 mx-1">-</span>
+                                <span className="text-gray-400 mx-0.5 sm:mx-1">-</span>
                                 <span className="text-red-600 dark:text-red-400 font-bold">{user.losses}</span>
-                                <span className="text-gray-400 mx-1">-</span>
+                                <span className="text-gray-400 mx-0.5 sm:mx-1">-</span>
                                 <span className="text-yellow-600 dark:text-yellow-400 font-bold">{user.draws}</span>
                               </div>
                             </div>
