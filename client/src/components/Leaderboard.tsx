@@ -32,18 +32,28 @@ export function Leaderboard({ trigger }: LeaderboardProps) {
   const [showPlayerProfile, setShowPlayerProfile] = useState(false);
   const { t } = useTranslation();
 
-  const { data: leaderboard, isLoading, error } = useQuery<LeaderboardUser[]>({
+  const { data: leaderboard, isLoading, error, refetch } = useQuery<LeaderboardUser[]>({
     queryKey: ['/api/leaderboard'],
     enabled: isOpen, // Only fetch when modal is open
     retry: 3,
-    staleTime: 60000, // Cache for 1 minute
+    staleTime: 30000, // Cache for 30 seconds
+    refetchOnMount: true,
+    refetchOnWindowFocus: false,
     onError: (error) => {
       console.error('Leaderboard fetch error:', error);
     },
     onSuccess: (data) => {
-      console.log('Leaderboard data loaded:', data?.length, 'users');
+      console.log('Leaderboard data loaded:', data?.length, 'users', data);
     }
   });
+
+  // Force refresh when modal opens
+  useEffect(() => {
+    if (isOpen) {
+      console.log('Modal opened - forcing leaderboard refresh');
+      refetch();
+    }
+  }, [isOpen, refetch]);
 
   // Listen for external trigger to open leaderboard
   useEffect(() => {
@@ -337,6 +347,21 @@ export function Leaderboard({ trigger }: LeaderboardProps) {
         ) : (
           <div className="flex-1 min-h-0 overflow-y-auto" style={{ WebkitOverflowScrolling: 'touch' }}>
             <div className="space-y-1.5 pb-3 pr-2 pt-2">
+              {/* Debug info always visible when no data */}
+              {!isLoading && !leaderboard && (
+                <div className="p-4 bg-yellow-50 dark:bg-yellow-900/20 rounded-lg text-yellow-800 dark:text-yellow-200 text-sm">
+                  <p>Debug: No data received</p>
+                  <p>Loading: {isLoading.toString()}</p>
+                  <p>Error: {error ? String(error) : 'None'}</p>
+                  <p>Modal open: {isOpen.toString()}</p>
+                  <button 
+                    onClick={() => refetch()} 
+                    className="mt-2 px-3 py-1 bg-yellow-600 text-white rounded text-xs"
+                  >
+                    Force Refresh
+                  </button>
+                </div>
+              )}
               {leaderboard && leaderboard.length > 0 ? (
                 leaderboard.map((user, index) => {
                   const position = index + 1;
