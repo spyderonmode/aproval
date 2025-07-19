@@ -41,7 +41,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
   const matchmakingQueue: string[] = []; // Queue of user IDs waiting for matches
   const onlineUsers = new Map<string, { userId: string; username: string; displayName: string; roomId?: string; lastSeen: Date }>();
   const userRoomStates = new Map<string, { roomId: string; gameId?: string; isInGame: boolean }>();
-  const explicitlyLeftGames = new Set<string>(); // Track games that users explicitly left
   const matchmakingTimers = new Map<string, NodeJS.Timeout>(); // Track user timers for bot matches
   
   // Game expiration system - check every 2 minutes
@@ -102,12 +101,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const activeGame = await storage.getActiveGameForUser(userId);
       
       if (activeGame && activeGame.roomId && activeGame.status === 'active') {
-        // Check if user explicitly left this game
-        if (explicitlyLeftGames.has(`${userId}_${activeGame.id}`)) {
-          console.log(`🔄 User ${userId} explicitly left game ${activeGame.id}, not reconnecting`);
-          explicitlyLeftGames.delete(`${userId}_${activeGame.id}`); // Clean up
-          return;
-        }
         // Check if game is still within 10 minute limit
         const gameAge = Date.now() - new Date(activeGame.lastMoveAt || activeGame.createdAt).getTime();
         const tenMinutes = 10 * 60 * 1000;
@@ -2916,17 +2909,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
                   (activeGame.playerXId === userId || activeGame.playerOId === userId)) {
                 console.log(`🏠 Player ${playerName} leaving active game - terminating game and redirecting all users`);
                 
-                // Track that this user explicitly left this game
-                explicitlyLeftGames.add(`${userId}_${activeGame.id}`);
-                console.log(`🔄 Tracking explicit leave for user ${userId} in game ${activeGame.id}`);
-                
-                // Mark game as finished due to player leaving
+                // Mark game as finished due to player leaving - this persists in database
                 await storage.finishGame(activeGame.id, {
                   status: 'abandoned',
                   winningPlayer: null,
                   winningPositions: [],
                   updatedAt: new Date()
                 });
+                
+                console.log(`🏠 Game ${activeGame.id} permanently ended in database due to player exit`);
                 
                 console.log(`🏠 Game ${activeGame.id} marked as abandoned due to player exit`);
                 
@@ -2958,9 +2949,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
                         if (onlineUser) {
                           onlineUser.roomId = undefined;
                         }
-                        
-                        // Clean up explicit leave tracking for this user
-                        explicitlyLeftGames.delete(`${connUserId}_${activeGame.id}`);
                       }
                       
                       // Clear their connection room info
