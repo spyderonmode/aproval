@@ -343,24 +343,21 @@ export function Leaderboard({ trigger }: LeaderboardProps) {
           </div>
         </DialogHeader>
 
-        {isLoading ? (
-          <div className="flex items-center justify-center py-8 flex-1">
-            <Loader2 className="w-8 h-8 animate-spin" />
-            <span className="ml-2">{t('loadingLeaderboard') || 'Loading leaderboard...'}</span>
-          </div>
-        ) : error ? (
-          <div className="flex flex-col items-center justify-center py-8 flex-1 text-red-500">
-            <span>{t('errorLoadingLeaderboard') || 'Error loading leaderboard. Please try again.'}</span>
-            <div className="mt-4 p-3 bg-red-50 dark:bg-red-900/20 rounded-lg text-red-600 dark:text-red-400 text-sm max-w-md">
-              <p>Debug details:</p>
-              <p>Error: {String(error)}</p>
-              <p>Modal open: {isOpen.toString()}</p>
-              <p>Data length: {leaderboard?.length || 'undefined'}</p>
-            </div>
-          </div>
-        ) : (
+        {/* Two-column layout like English version */}
+        <div className="flex flex-1 min-h-0 gap-6" style={{ direction: language === 'ar' ? 'rtl' : 'ltr' }}>
+          {/* Left Column - Player List (main area) */}
           <div className="flex-1 min-h-0 overflow-y-auto" style={{ WebkitOverflowScrolling: 'touch' }}>
-            <div className="space-y-1 sm:space-y-1.5 pb-2 sm:pb-3 pr-1 sm:pr-2 pt-1 sm:pt-2">
+            {isLoading ? (
+              <div className="flex items-center justify-center py-8">
+                <Loader2 className="w-8 h-8 animate-spin" />
+                <span className="ml-2">{t('loadingLeaderboard') || 'Loading leaderboard...'}</span>
+              </div>
+            ) : error ? (
+              <div className="flex flex-col items-center justify-center py-8 text-red-500">
+                <span>{t('errorLoadingLeaderboard') || 'Error loading leaderboard. Please try again.'}</span>
+              </div>
+            ) : (
+              <div className="space-y-2">
               {/* Debug info always visible when no data */}
               {!isLoading && !leaderboard && (
                 <div className="p-4 bg-yellow-50 dark:bg-yellow-900/20 rounded-lg text-yellow-800 dark:text-yellow-200 text-sm">
@@ -392,104 +389,97 @@ export function Leaderboard({ trigger }: LeaderboardProps) {
                       initial={{ opacity: 0, y: 20 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: index * 0.05 }}
-                    >
-                      <motion.div
-                        whileHover={{ scale: 1.01, y: -1 }}
-                        transition={{ type: "spring", stiffness: 300, damping: 20 }}
-                        className={`relative cursor-pointer p-3 rounded-lg border ${
-                          position === 1 ? 'bg-gradient-to-r from-yellow-50 to-yellow-100 border-yellow-200 dark:from-yellow-900/20 dark:to-yellow-800/20 dark:border-yellow-700' :
-                          position === 2 ? 'bg-gradient-to-r from-gray-50 to-gray-100 border-gray-200 dark:from-gray-800/20 dark:to-gray-700/20 dark:border-gray-600' :
-                          position === 3 ? 'bg-gradient-to-r from-amber-50 to-amber-100 border-amber-200 dark:from-amber-900/20 dark:to-amber-800/20 dark:border-amber-700' :
-                          'bg-white dark:bg-slate-800 border-gray-200 dark:border-gray-600'
-                        }`}
-                        onClick={() => {
-                          setSelectedPlayerId(user.id);
-                          setShowPlayerProfile(true);
-                        }}>
-                        {/* Simple horizontal row layout like English */}
-                        <div className="flex items-center gap-3 w-full" style={{ direction: language === 'ar' ? 'rtl' : 'ltr' }}>
-                          {/* Profile Picture */}
-                          <div className="flex-shrink-0 relative">
-                            {(() => {
-                              const borderStyle = getAchievementBorderStyle(user, position);
-                              return (
-                                <motion.div
-                                  className="relative"
-                                  animate={borderStyle.animation ? { scale: [1, 1.01, 1] } : {}}
-                                  transition={{
-                                    duration: 3,
-                                    repeat: Infinity,
-                                    ease: "easeInOut"
-                                  }}
-                                >
-                                  {user.profileImageUrl ? (
-                                    <img
-                                      src={user.profileImageUrl}
-                                      alt={`${user.displayName}'s profile`}
-                                      className={`w-12 h-12 rounded-lg object-cover border-2 border-white dark:border-slate-700 shadow-sm ${borderStyle.borderClass} ${borderStyle.glowEffect} transition-all duration-300`}
-                                    />
-                                  ) : (
-                                    <div className={`w-12 h-12 rounded-lg bg-gradient-to-br from-blue-400 via-purple-500 to-pink-500 flex items-center justify-center text-white font-bold text-sm shadow-sm ${borderStyle.borderClass} ${borderStyle.glowEffect} transition-all duration-300`}>
-                                      {user.displayName.charAt(0).toUpperCase()}
-                                    </div>
-                                  )}
-                                  {/* Position indicator for top 3 */}
-                                  {position <= 3 && (
-                                    <div className={`absolute -top-1 -right-1 w-5 h-5 rounded-full ${getRankColor(position)} flex items-center justify-center shadow-sm border border-white dark:border-slate-800`}>
-                                      <span className="text-xs font-bold text-white">#{position}</span>
-                                    </div>
-                                  )}
-                                </motion.div>
-                              );
-                            })()}
-                          </div>
+                      whileHover={{ scale: 1.01, y: -1 }}
+                      className={`relative cursor-pointer p-3 rounded-lg border ${
+                        position === 1 ? 'bg-gradient-to-r from-yellow-50 to-yellow-100 border-yellow-200 dark:from-yellow-900/20 dark:to-yellow-800/20 dark:border-yellow-700' :
+                        position === 2 ? 'bg-gradient-to-r from-gray-50 to-gray-100 border-gray-200 dark:from-gray-800/20 dark:to-gray-700/20 dark:border-gray-600' :
+                        position === 3 ? 'bg-gradient-to-r from-amber-50 to-amber-100 border-amber-200 dark:from-amber-900/20 dark:to-amber-800/20 dark:border-amber-700' :
+                        'bg-white dark:bg-slate-800 border-gray-200 dark:border-gray-600'
+                      }`}
+                      onClick={() => {
+                        setSelectedPlayerId(user.id);
+                        setShowPlayerProfile(true);
+                      }}>
+                      {/* Simple horizontal row layout matching English */}
+                      <div className="flex items-center gap-3 w-full">
+                        {/* Profile Picture */}
+                        <div className="flex-shrink-0 relative">
+                          {(() => {
+                            const borderStyle = getAchievementBorderStyle(user, position);
+                            return (
+                              <motion.div
+                                className="relative"
+                                animate={borderStyle.animation ? { scale: [1, 1.01, 1] } : {}}
+                                transition={{
+                                  duration: 3,
+                                  repeat: Infinity,
+                                  ease: "easeInOut"
+                                }}
+                              >
+                                {user.profileImageUrl ? (
+                                  <img
+                                    src={user.profileImageUrl}
+                                    alt={`${user.displayName}'s profile`}
+                                    className={`w-12 h-12 rounded-lg object-cover border-2 border-white dark:border-slate-700 shadow-sm ${borderStyle.borderClass} ${borderStyle.glowEffect} transition-all duration-300`}
+                                  />
+                                ) : (
+                                  <div className={`w-12 h-12 rounded-lg bg-gradient-to-br from-blue-400 via-purple-500 to-pink-500 flex items-center justify-center text-white font-bold text-sm shadow-sm ${borderStyle.borderClass} ${borderStyle.glowEffect} transition-all duration-300`}>
+                                    {user.displayName.charAt(0).toUpperCase()}
+                                  </div>
+                                )}
+                                {position <= 3 && (
+                                  <div className={`absolute -top-1 -right-1 w-5 h-5 rounded-full ${getRankColor(position)} flex items-center justify-center shadow-sm border border-white dark:border-slate-800`}>
+                                    <span className="text-xs font-bold text-white">#{position}</span>
+                                  </div>
+                                )}
+                              </motion.div>
+                            );
+                          })()}
+                        </div>
 
-                          {/* User Name Section */}
-                          <div className="flex-1 min-w-0">
-                            <div className="text-sm font-bold text-gray-900 dark:text-white">
-                              {renderAchievementBorder(user, position)}
-                            </div>
-                            <div className="text-xs text-gray-500 dark:text-gray-400">
-                              @{user.username}
-                            </div>
+                        {/* User Name */}
+                        <div className="flex-1 min-w-0">
+                          <div className="text-sm font-bold text-gray-900 dark:text-white">
+                            {renderAchievementBorder(user, position)}
                           </div>
-                          
-                          {/* Stats - Wins */}
-                          <div className="text-center min-w-[60px]">
-                            <div className="text-xs text-gray-500 dark:text-gray-400">{t('wins') || 'Wins'}</div>
-                            <div className="text-lg font-bold text-green-600 dark:text-green-400">{user.wins}</div>
-                          </div>
-                          
-                          {/* Stats - Win Rate */}
-                          <div className="text-center min-w-[80px]">
-                            <div className="text-xs text-gray-500 dark:text-gray-400">{t('winRate') || 'Win Rate'}</div>
-                            <div className="text-lg font-bold text-blue-600 dark:text-blue-400">{winRatePercentage}%</div>
-                          </div>
-                          
-                          {/* Stats - Games */}
-                          <div className="text-center min-w-[60px]">
-                            <div className="text-xs text-gray-500 dark:text-gray-400">{t('games') || 'Games'}</div>
-                            <div className="text-lg font-bold text-purple-600 dark:text-purple-400">{user.totalGames}</div>
-                          </div>
-
-                          {/* Performance Badge and W-L-D */}
-                          <div className="text-right min-w-[100px]">
-                            <div className={`inline-block text-xs font-medium px-2 py-1 rounded-full mb-1 ${
-                              winRatePercentage >= 80 ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300' :
-                              winRatePercentage >= 60 ? 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300' :
-                              winRatePercentage >= 40 ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300' :
-                              'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300'
-                            }`}>
-                              {winRatePercentage >= 80 ? 'Elite' :
-                               winRatePercentage >= 60 ? 'Expert' :
-                               winRatePercentage >= 40 ? 'Good' : 'Improving'}
-                            </div>
-                            <div className="text-xs text-gray-500 dark:text-gray-400">
-                              {t('wld') || 'W-L-D'}: {user.wins}-{user.losses}-{user.draws}
-                            </div>
+                          <div className="text-xs text-gray-500 dark:text-gray-400">
+                            @{user.username}
                           </div>
                         </div>
-                      </motion.div>
+                        
+                        {/* Stats Grid - Horizontal Layout */}
+                        <div className="grid grid-cols-3 gap-2 text-center">
+                          <div className="bg-green-50 dark:bg-green-900/20 p-2 rounded border">
+                            <div className="text-xs text-green-600 dark:text-green-400">{t('wins') || 'Wins'}</div>
+                            <div className="text-lg font-bold text-green-600 dark:text-green-400">{user.wins}</div>
+                          </div>
+                          <div className="bg-blue-50 dark:bg-blue-900/20 p-2 rounded border">
+                            <div className="text-xs text-blue-600 dark:text-blue-400">{t('winRate') || 'Win Rate'}</div>
+                            <div className="text-lg font-bold text-blue-600 dark:text-blue-400">{winRatePercentage}%</div>
+                          </div>
+                          <div className="bg-purple-50 dark:bg-purple-900/20 p-2 rounded border">
+                            <div className="text-xs text-purple-600 dark:text-purple-400">{t('games') || 'Games'}</div>
+                            <div className="text-lg font-bold text-purple-600 dark:text-purple-400">{user.totalGames}</div>
+                          </div>
+                        </div>
+
+                        {/* Performance Badge */}
+                        <div className="text-right">
+                          <div className={`inline-block text-xs font-medium px-2 py-1 rounded-full mb-1 ${
+                            winRatePercentage >= 80 ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300' :
+                            winRatePercentage >= 60 ? 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300' :
+                            winRatePercentage >= 40 ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300' :
+                            'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300'
+                          }`}>
+                            {winRatePercentage >= 80 ? 'Elite' :
+                             winRatePercentage >= 60 ? 'Expert' :
+                             winRatePercentage >= 40 ? 'Good' : 'Improving'}
+                          </div>
+                          <div className="text-xs text-gray-500 dark:text-gray-400">
+                            {t('wld') || 'W-L-D'}: {user.wins}-{user.losses}-{user.draws}
+                          </div>
+                        </div>
+                      </div>
                     </motion.div>
                   );
                 })
@@ -497,18 +487,28 @@ export function Leaderboard({ trigger }: LeaderboardProps) {
                 <div className="text-center py-8 text-gray-500">
                   <Trophy className="w-16 h-16 mx-auto mb-4 opacity-50" />
                   <p>{t('noPlayersFound') || 'No players found. Start playing to appear on the leaderboard!'}</p>
-                  {error && (
-                    <div className="mt-4 p-3 bg-red-50 dark:bg-red-900/20 rounded-lg text-red-600 dark:text-red-400 text-sm">
-                      <p>Debug info: {JSON.stringify(error)}</p>
-                      <p>Is loading: {isLoading.toString()}</p>
-                      <p>Modal open: {isOpen.toString()}</p>
-                    </div>
-                  )}
                 </div>
               )}
+              </div>
+            )}
+          </div>
+
+          {/* Right Column - Description Panel like English */}
+          <div className="w-80 flex-shrink-0 bg-gradient-to-br from-slate-50 to-blue-50 dark:from-slate-800 dark:to-slate-700 p-4 rounded-lg border border-gray-200 dark:border-gray-600">
+            <div className="text-center space-y-4">
+              <div className="inline-flex items-center gap-2 bg-gradient-to-r from-yellow-100 to-orange-100 dark:from-yellow-900/30 dark:to-orange-900/30 px-4 py-2 rounded-full border border-yellow-200/50 dark:border-yellow-700/30 shadow-lg">
+                <Crown className="w-4 h-4 text-yellow-600" />
+                <p className="text-gray-700 dark:text-gray-200 text-sm font-semibold">
+                  {t('top100Players') || 'Top 100 Players'}
+                </p>
+              </div>
+              
+              <p className="text-gray-600 dark:text-gray-300 text-sm leading-relaxed">
+                {t('leaderboardDescription') || 'The best players ranked by total wins. Achievement borders show player status!'}
+              </p>
             </div>
           </div>
-        )}
+        </div>
 
         <div className="flex justify-between items-center pt-6 border-t border-gradient-to-r from-transparent via-gray-200 to-transparent dark:via-gray-700 flex-shrink-0 bg-gradient-to-r from-slate-50 via-white to-slate-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
           <div className="flex items-center gap-2">
