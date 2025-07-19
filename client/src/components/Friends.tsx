@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useAuth } from '@/hooks/useAuth';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -26,15 +27,20 @@ interface FriendRequest {
 
 interface HeadToHeadStats {
   totalGames: number;
-  userWins: number;
-  friendWins: number;
+  wins: number;
+  losses: number;
   draws: number;
-  userWinRate: number;
-  friendWinRate: number;
+  winRate: number;
+  recentGames: Array<{
+    id: string;
+    result: 'win' | 'loss' | 'draw';
+    playedAt: string;
+  }>;
 }
 
 export function Friends() {
   const { t } = useTranslation();
+  const { user } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
   const [searchName, setSearchName] = useState('');
   const [selectedFriend, setSelectedFriend] = useState<User | null>(null);
@@ -59,8 +65,8 @@ export function Friends() {
 
   // Fetch head-to-head stats for selected friend
   const { data: headToHeadStats, isLoading: headToHeadLoading, error: headToHeadError } = useQuery<HeadToHeadStats>({
-    queryKey: ['/api/friends', selectedFriend?.id, 'stats'],
-    enabled: !!selectedFriend && !!selectedFriend?.id,
+    queryKey: ['/api/head-to-head', user?.userId, selectedFriend?.id],
+    enabled: !!selectedFriend && !!selectedFriend?.id && !!user?.userId,
     retry: 1,
   });
 
@@ -518,13 +524,13 @@ export function Friends() {
                   <div className="grid grid-cols-2 gap-4">
                     <div className="text-center p-4 border rounded-lg">
                       <div className="text-2xl font-bold text-blue-600">
-                        {headToHeadStats.userWins}
+                        {headToHeadStats.wins}
                       </div>
                       <div className="text-sm text-muted-foreground">{t('youWon')}</div>
                     </div>
                     <div className="text-center p-4 border rounded-lg">
                       <div className="text-2xl font-bold text-red-600">
-                        {headToHeadStats.friendWins}
+                        {headToHeadStats.losses}
                       </div>
                       <div className="text-sm text-muted-foreground">{t('theyWon')}</div>
                     </div>
@@ -545,7 +551,7 @@ export function Friends() {
                     </div>
                     <div className="text-center p-3 border rounded-lg">
                       <div className="text-lg font-bold">
-                        {headToHeadStats.userWinRate}%
+                        {headToHeadStats.winRate}%
                       </div>
                       <div className="text-sm text-muted-foreground">{t('yourWinRate')}</div>
                     </div>
