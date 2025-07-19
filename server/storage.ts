@@ -195,18 +195,51 @@ export class DatabaseStorage implements IStorage {
   }
 
   async upsertUser(userData: UpsertUser): Promise<User> {
-    const [user] = await db
-      .insert(users)
-      .values(userData)
-      .onConflictDoUpdate({
-        target: users.id,
-        set: {
-          ...userData,
-          updatedAt: new Date(),
-        },
-      })
-      .returning();
-    return user;
+    // Try to insert, but handle conflicts on either id, email, or username
+    try {
+      const [user] = await db
+        .insert(users)
+        .values(userData)
+        .onConflictDoUpdate({
+          target: users.id,
+          set: {
+            ...userData,
+            updatedAt: new Date(),
+          },
+        })
+        .returning();
+      return user;
+    } catch (error: any) {
+      // Handle email or username conflicts by trying to update existing record
+      if (error.code === '23505') { // Unique constraint violation
+        if (error.detail?.includes('email')) {
+          // Email conflict - update by email
+          const [user] = await db
+            .update(users)
+            .set({
+              ...userData,
+              updatedAt: new Date(),
+            })
+            .where(eq(users.email, userData.email!))
+            .returning();
+          if (user) return user;
+        }
+        if (error.detail?.includes('username')) {
+          // Username conflict - update by username  
+          const [user] = await db
+            .update(users)
+            .set({
+              ...userData,
+              updatedAt: new Date(),
+            })
+            .where(eq(users.username, userData.username!))
+            .returning();
+          if (user) return user;
+        }
+      }
+      // Re-throw if we couldn't handle the conflict
+      throw error;
+    }
   }
 
   // Room operations

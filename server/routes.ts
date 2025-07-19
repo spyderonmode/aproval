@@ -2150,11 +2150,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       }
       
+      // Check if user has other connections BEFORE deleting this one
+      const userHasOtherConnectionsAfterDelete = connection ? 
+        Array.from(connections.values()).some(conn => conn.userId === connection.userId && conn.ws !== ws) : false;
+      
       // Clean up connection
       connections.delete(connectionId);
       
       // Remove from room connections only if user doesn't have other connections
-      if (connection && !Array.from(connections.values()).some(conn => conn.userId === connection.userId)) {
+      if (connection && !userHasOtherConnectionsAfterDelete) {
         for (const [roomId, roomUsers] of roomConnections.entries()) {
           if (roomUsers.has(connectionId)) {
             roomUsers.delete(connectionId);
