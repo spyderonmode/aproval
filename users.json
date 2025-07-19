@@ -53,7 +53,9 @@
     "isEmailVerified": false,
     "emailVerificationToken": "4735d124-8870-4755-b8ee-28f203a3dc66",
     "emailVerificationExpiry": "2025-07-16T09:24:03.783Z",
-    "createdAt": "2025-07-15T09:24:03.783Z"
+    "createdAt": "2025-07-15T09:24:03.783Z",
+    "passwordResetToken": "329281",
+    "passwordResetExpiry": "2025-07-19T15:16:55.001Z"
   },
   {
     "id": "6ca4f62e-e0dc-49d5-96ec-41b47ea0cb47",
