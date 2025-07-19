@@ -53,6 +53,7 @@ export default function Home() {
   const [showHeaderSidebar, setShowHeaderSidebar] = useState(false);
   const [showAchievements, setShowAchievements] = useState(false);
   const [showLeaderboard, setShowLeaderboard] = useState(false);
+  const [isResettingState, setIsResettingState] = useState(false);
   const headerSidebarRef = useRef<HTMLDivElement>(null);
 
   const { data: userStats } = useQuery({
@@ -423,9 +424,11 @@ export default function Home() {
           break;
         case 'game_expired':
           console.log('⏰ Game expired:', lastMessage);
-          // Batch all state changes together to prevent screen blinking
+          // Prevent multiple resets and effects from triggering
+          setIsResettingState(true);
+          
           setTimeout(() => {
-            // Single batched state update
+            // Batch all state changes in a single update
             setCurrentGame(null);
             setCurrentRoom(null);
             setSelectedMode('ai');
@@ -439,17 +442,20 @@ export default function Home() {
               variant: "destructive",
             });
             
-            // Initialize new local game after all state is cleared
+            // Complete reset and initialize game
             setTimeout(() => {
+              setIsResettingState(false);
               initializeLocalGame();
-            }, 150);
-          }, 200); // Longer delay to ensure all rendering settles
+            }, 200);
+          }, 350);
           break;
         case 'game_abandoned':
           console.log('🏠 Game abandoned - player left:', lastMessage);
-          // Batch all state changes together to prevent screen blinking
+          // Prevent multiple resets and effects from triggering
+          setIsResettingState(true);
+          
           setTimeout(() => {
-            // Single batched state update
+            // Batch all state changes in a single update
             setCurrentGame(null);
             setCurrentRoom(null);
             setSelectedMode('ai');
@@ -463,11 +469,12 @@ export default function Home() {
               variant: "destructive",
             });
             
-            // Initialize new local game after all state is cleared
+            // Complete reset and initialize game
             setTimeout(() => {
+              setIsResettingState(false);
               initializeLocalGame();
-            }, 150);
-          }, 200); // Longer delay to ensure all rendering settles
+            }, 200);
+          }, 350);
           break;
         case 'player_reaction':
           // Handle player reaction - this will be broadcast to all players and spectators
@@ -534,10 +541,12 @@ export default function Home() {
       console.log('🏠 Sending leave message:', leaveMessage);
       sendMessage(leaveMessage);
 
-      // Longer delay to ensure message is sent and prevent blinking
+      // Prevent multiple resets and effects from triggering
+      setIsResettingState(true);
+      
       setTimeout(() => {
         console.log('🏠 Cleaning up after leave message sent');
-        // Single batched state update to prevent multiple renders
+        // Batch all state changes in a single update
         setCurrentRoom(null);
         setCurrentGame(null);
         setShowGameOver(false);
@@ -545,11 +554,12 @@ export default function Home() {
         setIsCreatingGame(false);
         setSelectedMode('ai');
         
-        // Initialize new local game after all state is cleared
+        // Complete reset and initialize game
         setTimeout(() => {
+          setIsResettingState(false);
           initializeLocalGame();
-        }, 150);
-      }, 250); // Longer delay to prevent rapid state changes
+        }, 200);
+      }, 400);
     } else {
       console.log('🏠 No current room, just resetting state');
       // Batch state changes to prevent screen blinking
@@ -562,14 +572,17 @@ export default function Home() {
         setSelectedMode('ai');
       };
       
-      // Use a longer timeout to batch state changes and prevent flickering
+      // Prevent multiple resets and effects from triggering
+      setIsResettingState(true);
+      
       setTimeout(() => {
         resetState();
-        // Initialize new local game after all state is cleared
+        // Complete reset and initialize game
         setTimeout(() => {
+          setIsResettingState(false);
           initializeLocalGame();
-        }, 150);
-      }, 200); // Longer delay to prevent rapid state changes
+        }, 200);
+      }, 350);
     }
   };
 
@@ -628,6 +641,8 @@ export default function Home() {
 
   // Auto-initialize game when switching to AI or pass-play mode
   useEffect(() => {
+    if (isResettingState) return; // Skip during reset operations
+    
     if (selectedMode === 'ai' || selectedMode === 'pass-play') {
       console.log('🎮 Mode changed to:', selectedMode);
       // Clear any online game state first
@@ -648,16 +663,18 @@ export default function Home() {
         }, 100);
       }
     }
-  }, [selectedMode, currentGame, user]);
+  }, [selectedMode, currentGame, user, isResettingState]);
 
   // Fix white screen issue by ensuring game exists for all modes
   useEffect(() => {
+    if (isResettingState) return; // Skip during reset operations
+    
     console.log('🎮 Effect check - currentGame:', !!currentGame, 'currentRoom:', !!currentRoom, 'selectedMode:', selectedMode);
     if (!currentGame && !currentRoom && selectedMode !== 'online') {
       console.log('🎮 White screen fix - initializing local game');
       initializeLocalGame();
     }
-  }, [currentGame, currentRoom, selectedMode, user]);
+  }, [currentGame, currentRoom, selectedMode, user, isResettingState]);
 
   // Add effect to prevent game state loss on WebSocket reconnections
   useEffect(() => {
@@ -677,6 +694,8 @@ export default function Home() {
 
   // Force game initialization when user becomes available
   useEffect(() => {
+    if (isResettingState) return; // Skip during reset operations
+    
     if (user && !currentGame && !currentRoom && selectedMode !== 'online') {
       console.log('🎮 User available - initializing local game');
       initializeLocalGame();
