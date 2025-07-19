@@ -72,33 +72,6 @@ export function AchievementBorderSelector({ user }: AchievementBorderSelectorPro
 
   const getBorderPreview = (achievementType: string) => {
     switch (achievementType) {
-      case 'first_win':
-        return (
-          <div className="px-3 py-2 rounded-md border border-yellow-400 bg-yellow-100 dark:bg-yellow-900/20">
-            <span className="text-sm font-semibold text-yellow-800 dark:text-yellow-300">🏆 First Victory</span>
-          </div>
-        );
-      case 'speed_demon':
-        return (
-          <motion.div
-            animate={{
-              boxShadow: [
-                "0 0 6px #3b82f6, 0 0 12px #1d4ed8, 0 0 18px #1e40af",
-                "0 0 8px #8b5cf6, 0 0 16px #7c3aed, 0 0 24px #6d28d9",
-                "0 0 6px #06b6d4, 0 0 12px #0891b2, 0 0 18px #0e7490"
-              ],
-              scale: [1, 1.02, 1],
-            }}
-            transition={{
-              duration: 1.8,
-              repeat: Infinity,
-              ease: "easeInOut"
-            }}
-            className="px-3 py-2 rounded-md border-2 border-blue-500 bg-blue-900/20"
-          >
-            <span className="text-sm font-bold text-white">⚡ Speed Demon</span>
-          </motion.div>
-        );
       case 'ultimate_veteran':
         return (
           <motion.div
@@ -257,7 +230,7 @@ export function AchievementBorderSelector({ user }: AchievementBorderSelectorPro
               <h4 className="text-sm font-medium">{t('unlockedBorders') || 'Unlocked Borders'}:</h4>
               {achievements
                 .filter(achievement => 
-                  ['first_win', 'speed_demon', 'legend', 'champion', 'grandmaster', 'ultimate_veteran'].includes(achievement.achievementType)
+                  ['legend', 'champion', 'grandmaster', 'ultimate_veteran'].includes(achievement.achievementType)
                 )
                 .map((achievement) => (
                   <Card 
