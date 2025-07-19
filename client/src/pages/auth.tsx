@@ -39,8 +39,8 @@ export default function Auth() {
 
         if (response.ok) {
           toast({
-            title: "Login successful",
-            description: "Welcome back!",
+            title: t('loginSuccessful'),
+            description: t('welcomeBack'),
           });
           // Force immediate redirect to dashboard
           window.location.href = "/";
@@ -52,14 +52,14 @@ export default function Auth() {
             setRegistrationEmail(email || username); // Use email if available, otherwise username
             setShowEmailVerification(true);
             toast({
-              title: "Email verification required",
-              description: errorData.message || "Please verify your email before logging in.",
+              title: t('emailVerificationRequired'),
+              description: errorData.message || t('pleaseVerifyEmailBeforeLogin'),
               variant: "destructive",
             });
           } else {
             toast({
-              title: "Login failed",
-              description: errorData.error || "Please check your credentials and try again.",
+              title: t('loginFailed'),
+              description: errorData.error || t('pleaseCheckCredentials'),
               variant: "destructive",
             });
           }
@@ -67,8 +67,8 @@ export default function Auth() {
       } else {
         if (!email) {
           toast({
-            title: "Email required",
-            description: "Please provide an email address to register.",
+            title: t('emailRequired'),
+            description: t('pleaseProvideEmailToRegister'),
             variant: "destructive",
           });
           return;
@@ -84,8 +84,8 @@ export default function Auth() {
           const data = await response.json();
           setRegistrationEmail(email);
           toast({
-            title: "Registration successful",
-            description: data.message || "Please verify your email to continue.",
+            title: t('registrationSuccessful'),
+            description: data.message || t('pleaseVerifyEmailToContinue'),
           });
           
           // Show email verification modal
@@ -93,16 +93,16 @@ export default function Auth() {
         } else {
           const errorData = await response.json();
           toast({
-            title: "Registration failed",
-            description: errorData.error || "Please check your information and try again.",
+            title: t('registrationFailed'),
+            description: errorData.error || t('pleaseCheckInformationAndTryAgain'),
             variant: "destructive",
           });
         }
       }
     } catch (error) {
       toast({
-        title: isLogin ? "Login failed" : "Registration failed",
-        description: error instanceof Error ? error.message : "Please check your credentials and try again.",
+        title: isLogin ? t('loginFailed') : t('registrationFailed'),
+        description: error instanceof Error ? error.message : t('pleaseCheckCredentials'),
         variant: "destructive",
       });
     } finally {
@@ -133,8 +133,8 @@ export default function Auth() {
             </CardTitle>
             <CardDescription className="text-slate-400">
               {isLogin 
-                ? "Enter your credentials to access your account"
-                : "Enter your details to create a new account"
+                ? t('enterCredentialsToAccess')
+                : t('enterDetailsToCreate')
               }
             </CardDescription>
           </CardHeader>
@@ -142,12 +142,12 @@ export default function Auth() {
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="username" className="text-slate-300">
-                  {isLogin ? "Username or Email" : "Username"}
+                  {isLogin ? t('usernameOrEmail') : t('username')}
                 </Label>
                 <Input
                   id="username"
                   type="text"
-                  placeholder={isLogin ? "Enter your username or email" : "Enter your username"}
+                  placeholder={isLogin ? t('enterUsernameOrEmail') : t('enterUsername')}
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
                   required
@@ -160,14 +160,14 @@ export default function Auth() {
                   <Input
                     id="email"
                     type="email"
-                    placeholder="Enter your email"
+                    placeholder={t('enterEmail')}
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     required
                     className="bg-slate-700 border-slate-600 text-white"
                   />
                   <p className="text-xs text-slate-400">
-                    Email is required for account verification and recovery
+                    {t('emailRequiredForVerification')}
                   </p>
                 </div>
               )}
@@ -176,7 +176,7 @@ export default function Auth() {
                 <Input
                   id="password"
                   type="password"
-                  placeholder="Enter your password"
+                  placeholder={t('enterPassword')}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
@@ -200,7 +200,7 @@ export default function Auth() {
                   className="text-slate-400 hover:text-white text-sm"
                   onClick={() => setShowForgotPassword(true)}
                 >
-                  Forgot password?
+                  {t('forgotPassword')}
                 </Button>
               )}
               
@@ -211,8 +211,8 @@ export default function Auth() {
                 onClick={() => setIsLogin(!isLogin)}
               >
                 {isLogin 
-                  ? "Don't have an account? Sign up"
-                  : "Already have an account? Sign in"
+                  ? t('dontHaveAccountSignUp')
+                  : t('alreadyHaveAccountSignIn')
                 }
               </Button>
             </div>

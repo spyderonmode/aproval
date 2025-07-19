@@ -318,9 +318,203 @@ export const translations = {
     en: 'Email',
     ar: 'البريد الإلكتروني',
     bn: 'ইমেইল',
-    hi: 'ईमेल',
+    hi: 'ईমেল',
     es: 'Correo Electrónico',
     id: 'Email'
+  },
+  loading: {
+    en: 'Loading...',
+    ar: 'جاري التحميل...',
+    bn: 'লোড হচ্ছে...',
+    hi: 'लोड हो रहा है...',
+    es: 'Cargando...',
+    id: 'Memuat...'
+  },
+  usernameOrEmail: {
+    en: 'Username or Email',
+    ar: 'اسم المستخدم أو البريد الإلكتروني',
+    bn: 'ব্যবহারকারীর নাম বা ইমেইল',
+    hi: 'उपयोगकर्ता नाম या ईমেইল',
+    es: 'Nombre de Usuario o Correo',
+    id: 'Nama Pengguna atau Email'
+  },
+  enterCredentialsToAccess: {
+    en: 'Enter your credentials to access your account',
+    ar: 'أدخل بياناتك للوصول إلى حسابك',
+    bn: 'আপনার অ্যাকাউন্ট অ্যাক্সেস করতে আপনার তথ্য প্রবেশ করান',
+    hi: 'अपने खाते तक पहुंचने के लिए अपनी जानकारी दर्ज करें',
+    es: 'Ingresa tus credenciales para acceder a tu cuenta',
+    id: 'Masukkan kredensial Anda untuk mengakses akun Anda'
+  },
+  enterDetailsToCreate: {
+    en: 'Enter your details to create a new account',
+    ar: 'أدخل بياناتك لإنشاء حساب جديد',
+    bn: 'একটি নতুন অ্যাকাউন্ট তৈরি করতে আপনার বিবরণ প্রবেশ করান',
+    hi: 'नया खाता बनाने के लिए अपना विवरण दर্জ করें',
+    es: 'Ingresa tus datos para crear una nueva cuenta',
+    id: 'Masukkan detail Anda untuk membuat akun baru'
+  },
+  enterUsernameOrEmail: {
+    en: 'Enter your username or email',
+    ar: 'أدخل اسم المستخدم أو البريد الإلكتروني',
+    bn: 'আপনার ব্যবহারকারীর নাম বা ইমেইল প্রবেশ করান',
+    hi: 'अपना उपयोगकर्ता नाम या ईমেইল दर्ज करें',
+    es: 'Ingresa tu nombre de usuario o correo',
+    id: 'Masukkan nama pengguna atau email Anda'
+  },
+  enterUsername: {
+    en: 'Enter your username',
+    ar: 'أدخل اسم المستخدم',
+    bn: 'আপনার ব্যবহারকারীর নাম প্রবেশ করান',
+    hi: 'अपना उपयोगकर्ता नाम दर্জ করें',
+    es: 'Ingresa tu nombre de usuario',
+    id: 'Masukkan nama pengguna Anda'
+  },
+  enterEmail: {
+    en: 'Enter your email',
+    ar: 'أدخل بريدك الإلكتروني',
+    bn: 'আপনার ইমেইল প্রবেশ করান',
+    hi: 'अपना ईমেইল दर্জ করें',
+    es: 'Ingresa tu correo electrónico',
+    id: 'Masukkan email Anda'
+  },
+  enterPassword: {
+    en: 'Enter your password',
+    ar: 'أدخل كلمة المرور',
+    bn: 'আপনার পাসওয়ার্ড প্রবেশ করান',
+    hi: 'अपना पासवर্ড दर্জ করें',
+    es: 'Ingresa tu contraseña',
+    id: 'Masukkan kata sandi Anda'
+  },
+  emailRequiredForVerification: {
+    en: 'Email is required for account verification and recovery',
+    ar: 'البريد الإلكتروني مطلوب للتحقق من الحساب والاسترداد',
+    bn: 'অ্যাকাউন্ট যাচাইকরণ এবং পুনরুদ্ধারের জন্য ইমেইল প্রয়োজন',
+    hi: 'खाता सत्यापन और पुनर्प्राप्ति के लिए ईমেইল आवश্যক है',
+    es: 'El correo es requerido para verificación y recuperación de cuenta',
+    id: 'Email diperlukan untuk verifikasi dan pemulihan akun'
+  },
+  forgotPassword: {
+    en: 'Forgot password?',
+    ar: 'نسيت كلمة المرور؟',
+    bn: 'পাসওয়ার্ড ভুলে গেছেন?',
+    hi: 'पासवर्ड भूल गए?',
+    es: '¿Olvidaste tu contraseña?',
+    id: 'Lupa kata sandi?'
+  },
+  dontHaveAccountSignUp: {
+    en: "Don't have an account? Sign up",
+    ar: 'ليس لديك حساب؟ سجل الآن',
+    bn: 'অ্যাকাউন্ট নেই? সাইন আপ করুন',
+    hi: 'खाता नहीं है? साइन अप करें',
+    es: '¿No tienes cuenta? Regístrate',
+    id: 'Tidak punya akun? Daftar'
+  },
+  alreadyHaveAccountSignIn: {
+    en: 'Already have an account? Sign in',
+    ar: 'لديك حساب بالفعل؟ سجل الدخول',
+    bn: 'ইতিমধ্যে অ্যাকাউন্ট আছে? সাইন ইন করুন',
+    hi: 'पहले से खाता है? साइन इन करें',
+    es: '¿Ya tienes cuenta? Inicia sesión',
+    id: 'Sudah punya akun? Masuk'
+  },
+  
+  // Toast Messages
+  loginSuccessful: {
+    en: 'Login successful',
+    ar: 'تم تسجيل الدخول بنجاح',
+    bn: 'লগইন সফল',
+    hi: 'लॉगिन सफल',
+    es: 'Inicio de sesión exitoso',
+    id: 'Login berhasil'
+  },
+  welcomeBack: {
+    en: 'Welcome back!',
+    ar: 'مرحباً بعودتك!',
+    bn: 'ফিরে আসার জন্য স্বাগতম!',
+    hi: 'वापसी पर स्वागत है!',
+    es: '¡Bienvenido de vuelta!',
+    id: 'Selamat datang kembali!'
+  },
+  emailVerificationRequired: {
+    en: 'Email verification required',
+    ar: 'مطلوب التحقق من البريد الإلكتروني',
+    bn: 'ইমেইল যাচাইকরণ প্রয়োজন',
+    hi: 'ईমেইল सत्यापन आवश्यक',
+    es: 'Verificación de correo requerida',
+    id: 'Verifikasi email diperlukan'
+  },
+  pleaseVerifyEmailBeforeLogin: {
+    en: 'Please verify your email before logging in.',
+    ar: 'يرجى التحقق من بريدك الإلكتروني قبل تسجيل الدخول.',
+    bn: 'লগইন করার আগে দয়া করে আপনার ইমেইল যাচাই করুন।',
+    hi: 'लॉगिन करने से पहले कृपया अपने ईমেইल को सत্যাপित करें।',
+    es: 'Por favor verifica tu correo antes de iniciar sesión.',
+    id: 'Harap verifikasi email Anda sebelum login.'
+  },
+  loginFailed: {
+    en: 'Login failed',
+    ar: 'فشل تسجيل الدخول',
+    bn: 'লগইন ব্যর্থ',
+    hi: 'लॉगिन असफल',
+    es: 'Inicio de sesión fallido',
+    id: 'Login gagal'
+  },
+  pleaseCheckCredentials: {
+    en: 'Please check your credentials and try again.',
+    ar: 'يرجى التحقق من بياناتك والمحاولة مرة أخرى.',
+    bn: 'দয়া করে আপনার তথ্য পরীক্ষা করুন এবং আবার চেষ্টা করুন।',
+    hi: 'कृपया अपनी जानकारी जांचें और पুनः प्रयास करें।',
+    es: 'Por favor verifica tus credenciales e inténtalo de nuevo.',
+    id: 'Harap periksa kredensial Anda dan coba lagi.'
+  },
+  emailRequired: {
+    en: 'Email required',
+    ar: 'البريد الإلكتروني مطلوب',
+    bn: 'ইমেইল প্রয়োজন',
+    hi: 'ईমেইল आवश्यक',
+    es: 'Correo requerido',
+    id: 'Email diperlukan'
+  },
+  pleaseProvideEmailToRegister: {
+    en: 'Please provide an email address to register.',
+    ar: 'يرجى تقديم عنوان بريد إلكتروني للتسجيل.',
+    bn: 'নিবন্ধনের জন্য দয়া করে একটি ইমেইল ঠিকানা প্রদান করুন।',
+    hi: 'पंजीकरण के लिए कृपया एक ईমেইल पता प्रदान करें।',
+    es: 'Por favor proporciona una dirección de correo para registrarte.',
+    id: 'Harap berikan alamat email untuk mendaftar.'
+  },
+  registrationSuccessful: {
+    en: 'Registration successful',
+    ar: 'نجح التسجيل',
+    bn: 'নিবন্ধন সফল',
+    hi: 'पंजीकरण सफल',
+    es: 'Registro exitoso',
+    id: 'Pendaftaran berhasil'
+  },
+  pleaseVerifyEmailToContinue: {
+    en: 'Please verify your email to continue.',
+    ar: 'يرجى التحقق من بريدك الإلكتروني للمتابعة.',
+    bn: 'চালিয়ে যেতে দয়া করে আপনার ইমেইল যাচাই করুন।',
+    hi: 'जारी रखने के लिए कृपया अपने ईমেইল को सत्यापित करें।',
+    es: 'Por favor verifica tu correo para continuar.',
+    id: 'Harap verifikasi email Anda untuk melanjutkan.'
+  },
+  registrationFailed: {
+    en: 'Registration failed',
+    ar: 'فشل التسجيل',
+    bn: 'নিবন্ধন ব্যর্থ',
+    hi: 'पंजीकरण असफल',
+    es: 'Registro fallido',
+    id: 'Pendaftaran gagal'
+  },
+  pleaseCheckInformationAndTryAgain: {
+    en: 'Please check your information and try again.',
+    ar: 'يرجى التحقق من معلوماتك والمحاولة مرة أخرى.',
+    bn: 'দয়া করে আপনার তথ্য পরীক্ষা করুন এবং আবার চেষ্টা করুন।',
+    hi: 'कृपया अपनी जानकारी जांचें और पुनः प्रयास करें।',
+    es: 'Por favor verifica tu información e inténtalo de nuevo.',
+    id: 'Harap periksa informasi Anda dan coba lagi.'
   },
   
   // Game Status
