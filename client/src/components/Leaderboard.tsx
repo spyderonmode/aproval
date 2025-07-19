@@ -286,7 +286,7 @@ export function Leaderboard({ trigger }: LeaderboardProps) {
           </div>
         ) : (
           <div className="flex-1 min-h-0 overflow-y-auto" style={{ WebkitOverflowScrolling: 'touch' }}>
-            <div className="space-y-2 pb-4 pr-2 pt-2">
+            <div className="space-y-1.5 pb-3 pr-2 pt-2">
               {leaderboard && leaderboard.length > 0 ? (
                 leaderboard.map((user, index) => {
                   const position = index + 1;
@@ -311,7 +311,7 @@ export function Leaderboard({ trigger }: LeaderboardProps) {
                           setSelectedPlayerId(user.id);
                           setShowPlayerProfile(true);
                         }}>
-                        <CardContent className="p-3 sm:p-4 relative">
+                        <CardContent className="p-2 sm:p-2.5 relative">
                           {/* Top 3 Background Decoration */}
                           {position <= 3 && (
                             <div className={`absolute top-0 right-0 w-16 h-16 opacity-10 ${
@@ -327,7 +327,7 @@ export function Leaderboard({ trigger }: LeaderboardProps) {
                             </div>
                           )}
                           
-                          <div className="flex items-center gap-2 sm:gap-3 relative z-10">
+                          <div className="flex items-center gap-1.5 sm:gap-2 relative z-10">
                             {/* Profile Picture with Achievement Border */}
                             <div className="flex-shrink-0 relative">
                               {(() => {
@@ -346,21 +346,21 @@ export function Leaderboard({ trigger }: LeaderboardProps) {
                                       <img
                                         src={user.profileImageUrl}
                                         alt={`${user.displayName}'s profile`}
-                                        className={`w-12 h-12 sm:w-14 sm:h-14 rounded-xl object-cover border-2 border-white dark:border-slate-700 shadow-md ${borderStyle.borderClass} ${borderStyle.glowEffect} transition-all duration-300`}
+                                        className={`w-10 h-10 sm:w-11 sm:h-11 rounded-lg object-cover border-2 border-white dark:border-slate-700 shadow-sm ${borderStyle.borderClass} ${borderStyle.glowEffect} transition-all duration-300`}
                                       />
                                     ) : (
-                                      <div className={`w-12 h-12 sm:w-14 sm:h-14 rounded-xl bg-gradient-to-br from-blue-400 via-purple-500 to-pink-500 flex items-center justify-center text-white font-bold text-sm sm:text-base shadow-md ${borderStyle.borderClass} ${borderStyle.glowEffect} transition-all duration-300`}>
+                                      <div className={`w-10 h-10 sm:w-11 sm:h-11 rounded-lg bg-gradient-to-br from-blue-400 via-purple-500 to-pink-500 flex items-center justify-center text-white font-bold text-xs sm:text-sm shadow-sm ${borderStyle.borderClass} ${borderStyle.glowEffect} transition-all duration-300`}>
                                         {user.displayName.charAt(0).toUpperCase()}
                                       </div>
                                     )}
                                     {/* Position Badge - small overlay on profile */}
                                     {position <= 3 && (
-                                      <div className={`absolute -top-1 -right-1 w-6 h-6 rounded-full bg-gradient-to-br ${getRankColor(position)} flex items-center justify-center shadow-md border border-white dark:border-slate-800`}>
+                                      <div className={`absolute -top-0.5 -right-0.5 w-5 h-5 rounded-full bg-gradient-to-br ${getRankColor(position)} flex items-center justify-center shadow-sm border border-white dark:border-slate-800`}>
                                         <span className="text-xs font-bold">#{position}</span>
                                       </div>
                                     )}
                                     {/* Online Status Indicator */}
-                                    <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-400 border-2 border-white dark:border-slate-800 rounded-full shadow-sm z-10"></div>
+                                    <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-green-400 border-2 border-white dark:border-slate-800 rounded-full shadow-sm z-10"></div>
                                   </motion.div>
                                 );
                               })()}
@@ -368,9 +368,9 @@ export function Leaderboard({ trigger }: LeaderboardProps) {
 
                             {/* User Info */}
                             <div className="flex-1 min-w-0 overflow-hidden">
-                              <div className="flex flex-col sm:flex-row sm:items-start gap-1 sm:gap-2 mb-2">
+                              <div className="flex flex-col sm:flex-row sm:items-start gap-0.5 sm:gap-1 mb-1.5">
                                 <div className="min-w-0 flex-1">
-                                  <div className="text-sm sm:text-base font-bold text-gray-900 dark:text-white mb-1">
+                                  <div className="text-xs sm:text-sm font-bold text-gray-900 dark:text-white mb-0.5">
                                     {renderAchievementBorder(user, position)}
                                   </div>
                                   <Badge variant="outline" className="text-xs bg-gray-100 dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-600 dark:text-gray-300 font-medium">
@@ -380,29 +380,29 @@ export function Leaderboard({ trigger }: LeaderboardProps) {
                               </div>
                               
                               {/* Stats Grid */}
-                              <div className="grid grid-cols-3 gap-2 text-center">
-                                <div className="bg-green-50 dark:bg-green-900/20 rounded-md p-1.5 border border-green-200 dark:border-green-800">
-                                  <div className="flex items-center justify-center gap-1 mb-0.5">
-                                    <Trophy className="w-2.5 h-2.5 text-green-600" />
+                              <div className="grid grid-cols-3 gap-1.5 text-center">
+                                <div className="bg-green-50 dark:bg-green-900/20 rounded p-1 border border-green-200 dark:border-green-800">
+                                  <div className="flex items-center justify-center gap-0.5 mb-0.5">
+                                    <Trophy className="w-2 h-2 text-green-600" />
                                     <span className="text-xs font-medium text-green-600 dark:text-green-400">{t('wins') || 'Wins'}</span>
                                   </div>
-                                  <div className="text-sm font-bold text-green-700 dark:text-green-300">{user.wins}</div>
+                                  <div className="text-xs font-bold text-green-700 dark:text-green-300">{user.wins}</div>
                                 </div>
                                 
-                                <div className="bg-blue-50 dark:bg-blue-900/20 rounded-md p-1.5 border border-blue-200 dark:border-blue-800">
-                                  <div className="flex items-center justify-center gap-1 mb-0.5">
-                                    <Target className="w-2.5 h-2.5 text-blue-600" />
+                                <div className="bg-blue-50 dark:bg-blue-900/20 rounded p-1 border border-blue-200 dark:border-blue-800">
+                                  <div className="flex items-center justify-center gap-0.5 mb-0.5">
+                                    <Target className="w-2 h-2 text-blue-600" />
                                     <span className="text-xs font-medium text-blue-600 dark:text-blue-400">{t('winRate') || 'Win Rate'}</span>
                                   </div>
-                                  <div className="text-sm font-bold text-blue-700 dark:text-blue-300">{winRatePercentage}%</div>
+                                  <div className="text-xs font-bold text-blue-700 dark:text-blue-300">{winRatePercentage}%</div>
                                 </div>
                                 
-                                <div className="bg-purple-50 dark:bg-purple-900/20 rounded-md p-1.5 border border-purple-200 dark:border-purple-800">
-                                  <div className="flex items-center justify-center gap-1 mb-0.5">
-                                    <Users className="w-2.5 h-2.5 text-purple-600" />
+                                <div className="bg-purple-50 dark:bg-purple-900/20 rounded p-1 border border-purple-200 dark:border-purple-800">
+                                  <div className="flex items-center justify-center gap-0.5 mb-0.5">
+                                    <Users className="w-2 h-2 text-purple-600" />
                                     <span className="text-xs font-medium text-purple-600 dark:text-purple-400">{t('games') || 'Games'}</span>
                                   </div>
-                                  <div className="text-sm font-bold text-purple-700 dark:text-purple-300">{user.totalGames}</div>
+                                  <div className="text-xs font-bold text-purple-700 dark:text-purple-300">{user.totalGames}</div>
                                 </div>
                               </div>
                             </div>
