@@ -1027,9 +1027,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!name) {
         return res.status(400).json({ error: 'Name is required' });
       }
+
+      // Validate name format and length
+      if (typeof name !== 'string' || name.trim().length === 0) {
+        return res.status(400).json({ error: 'Name must be a non-empty string' });
+      }
+
+      if (name.length > 50) {
+        return res.status(400).json({ error: 'Name is too long (max 50 characters)' });
+      }
+
+      // Sanitize the name to prevent any issues
+      const sanitizedName = name.trim();
       
       // Search for user by name
-      const users = await storage.getUsersByName(name);
+      const users = await storage.getUsersByName(sanitizedName);
       
       if (!users || users.length === 0) {
         return res.status(404).json({ error: 'No users found' });
@@ -1651,6 +1663,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const { code } = req.params;
       const { role = 'player' } = req.body;
 
+      // Validate room code format
+      if (!code || typeof code !== 'string' || !/^[A-Za-z0-9]{6,10}$/.test(code)) {
+        return res.status(400).json({ message: "Invalid room code format" });
+      }
+
+      // Validate role
+      if (!['player', 'spectator'].includes(role)) {
+        return res.status(400).json({ message: "Invalid role. Must be 'player' or 'spectator'" });
+      }
+
       const room = await storage.getRoomByCode(code);
       if (!room) {
         return res.status(404).json({ message: "Room not found" });
@@ -2096,6 +2118,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const userId = req.session.user.userId;
       const { id: gameId } = req.params;
       const { position } = req.body;
+
+      // Validate game ID format (UUID)
+      if (!gameId || typeof gameId !== 'string' || !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(gameId)) {
+        return res.status(400).json({ message: "Invalid game ID format" });
+      }
+
+      // Validate position
+      if (typeof position !== 'number' || !Number.isInteger(position) || position < 1 || position > 15) {
+        return res.status(400).json({ message: "Position must be an integer between 1 and 15" });
+      }
 
       console.log(`\n=== MOVE REQUEST ===`);
       console.log(`Game ID: ${gameId}`);

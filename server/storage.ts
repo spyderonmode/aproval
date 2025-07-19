@@ -34,7 +34,7 @@ import {
   type InsertRoomInvitation,
 } from "@shared/schema";
 import { db } from "./db";
-import { eq, and, desc, count, or, ne, isNull, isNotNull, sql, exists, inArray, lt, like } from "drizzle-orm";
+import { eq, and, desc, count, or, ne, isNull, isNotNull, sql, exists, inArray, lt, like, ilike } from "drizzle-orm";
 
 export interface IStorage {
   // User operations - mandatory for Replit Auth
@@ -184,59 +184,82 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getUsersByName(name: string): Promise<User[]> {
-    const searchTerm = `%${name}%`;
+    // Sanitize search term to prevent SQL injection
+    const sanitizedName = name.replace(/[%_]/g, '\\$&'); // Escape SQL wildcards
+    const searchTerm = `%${sanitizedName}%`;
+    
     const usersByName = await db.select().from(users).where(
       or(
-        sql`LOWER(${users.firstName}) LIKE LOWER(${searchTerm})`,
-        sql`LOWER(${users.lastName}) LIKE LOWER(${searchTerm})`,
-        sql`LOWER(${users.displayName}) LIKE LOWER(${searchTerm})`,
-        sql`LOWER(${users.username}) LIKE LOWER(${searchTerm})`,
-        sql`LOWER(${users.firstName} || ' ' || ${users.lastName}) LIKE LOWER(${searchTerm})`
+        ilike(users.firstName, searchTerm),
+        ilike(users.lastName, searchTerm),
+        ilike(users.displayName, searchTerm),
+        ilike(users.username, searchTerm),
+        sql`LOWER(CONCAT(${users.firstName}, ' ', ${users.lastName})) LIKE LOWER(${searchTerm})`
       )
     ).limit(10);
     return usersByName;
   }
 
   async upsertUser(userData: UpsertUser): Promise<User> {
-    // Try to insert, but handle conflicts on either id, email, or username
+    // First check if user exists
+    const existingUser = await this.getUser(userData.id);
+    
+    if (existingUser) {
+      // User exists, update only if data is different to avoid foreign key issues
+      const shouldUpdate = 
+        existingUser.email !== userData.email ||
+        existingUser.firstName !== userData.firstName ||
+        existingUser.lastName !== userData.lastName ||
+        existingUser.displayName !== userData.displayName ||
+        existingUser.username !== userData.username ||
+        existingUser.profileImageUrl !== userData.profileImageUrl;
+      
+      if (shouldUpdate) {
+        try {
+          const [user] = await db
+            .update(users)
+            .set({
+              email: userData.email,
+              firstName: userData.firstName,
+              lastName: userData.lastName,
+              displayName: userData.displayName,
+              username: userData.username,
+              profileImageUrl: userData.profileImageUrl,
+              updatedAt: new Date(),
+            })
+            .where(eq(users.id, userData.id))
+            .returning();
+          return user;
+        } catch (error: any) {
+          // If foreign key constraint violation, just return existing user
+          if (error.code === '23503') {
+            console.log(`⚠️ Foreign key constraint for user ${userData.id}, keeping existing data`);
+            return existingUser;
+          }
+          throw error;
+        }
+      }
+      return existingUser;
+    }
+
+    // User doesn't exist, try to insert
     try {
       const [user] = await db
         .insert(users)
         .values(userData)
-        .onConflictDoUpdate({
-          target: users.id,
-          set: {
-            ...userData,
-            updatedAt: new Date(),
-          },
-        })
         .returning();
       return user;
     } catch (error: any) {
-      // Handle email or username conflicts by trying to update existing record
+      // Handle unique constraint violations
       if (error.code === '23505') { // Unique constraint violation
-        if (error.detail?.includes('email')) {
-          // Email conflict - update by email
-          const [user] = await db
-            .update(users)
-            .set({
-              ...userData,
-              updatedAt: new Date(),
-            })
-            .where(eq(users.email, userData.email!))
-            .returning();
+        if (error.detail?.includes('email') && userData.email) {
+          // Email conflict - try to get by email
+          const user = await this.getUserByEmail(userData.email);
           if (user) return user;
         }
-        if (error.detail?.includes('username')) {
-          // Username conflict - update by username  
-          const [user] = await db
-            .update(users)
-            .set({
-              ...userData,
-              updatedAt: new Date(),
-            })
-            .where(eq(users.username, userData.username!))
-            .returning();
+        if (error.detail?.includes('username') && userData.username) {
+          // Username conflict - try to get by username
+          const [user] = await db.select().from(users).where(eq(users.username, userData.username));
           if (user) return user;
         }
       }

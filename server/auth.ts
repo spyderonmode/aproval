@@ -175,26 +175,31 @@ async function sendPasswordResetEmail(email: string, token: string): Promise<voi
 
 // Sync all existing JSON users to the database
 async function syncAllUsersToDatabase() {
-  const users = getUsers();
-  console.log(`🔄 Syncing ${users.length} users from JSON to Neon database...`);
-  
-  for (const user of users) {
-    try {
-      await storage.upsertUser({
-        id: user.id,
-        email: user.email || null,
-        firstName: user.displayName || user.username || 'Anonymous',
-        lastName: null,
-        displayName: user.displayName || user.username || 'Anonymous',
-        profileImageUrl: user.profilePicture || null,
-      });
-      console.log(`✅ Synced user: ${user.username} (${user.id})`);
-    } catch (error) {
-      console.error(`❌ Failed to sync user ${user.username}:`, error);
+  try {
+    const users = getUsers();
+    console.log(`🔄 Syncing ${users.length} users from JSON to Neon database...`);
+    
+    for (const user of users) {
+      try {
+        await storage.upsertUser({
+          id: user.id,
+          email: user.email || null,
+          firstName: user.displayName || user.username || 'Anonymous',
+          lastName: null,
+          displayName: user.displayName || user.username || 'Anonymous',
+          profileImageUrl: user.profilePicture || null,
+        });
+        console.log(`✅ Synced user: ${user.username} (${user.id})`);
+      } catch (error: any) {
+        // Log error but continue with other users
+        console.error(`❌ Failed to sync user ${user.username}:`, error.message || error);
+      }
     }
+    
+    console.log('🎉 User sync completed!');
+  } catch (error: any) {
+    console.error('Failed to sync users to database:', error.message || error);
   }
-  
-  console.log('🎉 User sync completed!');
 }
 
 export function setupAuth(app: Express) {
@@ -208,12 +213,22 @@ export function setupAuth(app: Express) {
   setTimeout(async () => {
     try {
       // Add the missing last_move_at column if it doesn't exist
-      await db.execute(sql`ALTER TABLE games ADD COLUMN IF NOT EXISTS last_move_at TIMESTAMP DEFAULT NOW()`);
-      console.log('✅ Database column last_move_at ensured');
+      try {
+        await db.execute(sql`ALTER TABLE games ADD COLUMN IF NOT EXISTS last_move_at TIMESTAMP DEFAULT NOW()`);
+        console.log('✅ Database column last_move_at ensured');
+      } catch (columnError: any) {
+        // Column might already exist, this is fine
+        if (columnError.code === '42701') {
+          console.log('ℹ️ Database column last_move_at already exists');
+        } else {
+          console.log('⚠️ Database column modification warning:', columnError.message);
+        }
+      }
       
       await storage.recalculateAllUserStats();
-    } catch (error) {
-      console.error('Failed to recalculate user stats:', error);
+      console.log('✅ User stats recalculation completed!');
+    } catch (error: any) {
+      console.error('Failed to recalculate user stats:', error.message);
     }
   }, 5000); // Wait 5 seconds to ensure database sync is complete
   
@@ -239,6 +254,21 @@ export function setupAuth(app: Express) {
 
     if (!username || !password || !email) {
       return res.status(400).json({ error: 'Username, password, and email are required' });
+    }
+
+    // Enhanced validation
+    if (typeof username !== 'string' || username.length < 3 || username.length > 20) {
+      return res.status(400).json({ error: 'Username must be between 3 and 20 characters' });
+    }
+
+    if (typeof password !== 'string' || password.length < 6) {
+      return res.status(400).json({ error: 'Password must be at least 6 characters long' });
+    }
+
+    // Email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (typeof email !== 'string' || !emailRegex.test(email)) {
+      return res.status(400).json({ error: 'Please provide a valid email address' });
     }
 
     if (findUserByUsername(username)) {
@@ -297,6 +327,15 @@ export function setupAuth(app: Express) {
 
     if (!username || !password) {
       return res.status(400).json({ error: 'Username/email and password are required' });
+    }
+
+    // Enhanced validation
+    if (typeof username !== 'string' || username.trim().length === 0) {
+      return res.status(400).json({ error: 'Username/email is required' });
+    }
+
+    if (typeof password !== 'string' || password.length === 0) {
+      return res.status(400).json({ error: 'Password is required' });
     }
 
     // Try to find user by username first, then by email
