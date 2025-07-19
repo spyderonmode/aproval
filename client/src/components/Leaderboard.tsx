@@ -293,9 +293,11 @@ export function Leaderboard({ trigger }: LeaderboardProps) {
         </div>
       </DialogTrigger>
       <DialogContent 
-        dir="ltr" 
-        className={`max-w-[98vw] sm:max-w-2xl md:max-w-4xl lg:max-w-5xl max-h-[95vh] sm:max-h-[90vh] w-full mx-auto flex flex-col overflow-hidden bg-gradient-to-br from-slate-50/95 via-white/98 to-blue-50/90 dark:from-slate-900/95 dark:via-slate-800/98 dark:to-slate-900/95 backdrop-blur-md border border-white/20 dark:border-gray-700/30 shadow-2xl ${isArabic ? 'font-arabic text-right' : ''}`}
-        style={isArabic ? { fontFamily: "'Noto Sans Arabic', 'Cairo', 'Tajawal', system-ui, sans-serif" } : {}}
+        className={`max-w-[96vw] sm:max-w-2xl md:max-w-4xl lg:max-w-5xl max-h-[94vh] sm:max-h-[90vh] w-full mx-auto flex flex-col overflow-hidden bg-gradient-to-br from-slate-50/95 via-white/98 to-blue-50/90 dark:from-slate-900/95 dark:via-slate-800/98 dark:to-slate-900/95 backdrop-blur-md border border-white/20 dark:border-gray-700/30 shadow-2xl ${isArabic ? 'font-arabic' : ''}`}
+        style={isArabic ? { 
+          fontFamily: "'Noto Sans Arabic', 'Cairo', 'Tajawal', system-ui, sans-serif",
+          direction: 'rtl'
+        } : {}}
       >
         <DialogHeader className="flex-shrink-0 pb-3 sm:pb-6 border-b bg-gradient-to-r from-transparent via-gray-200/50 to-transparent dark:via-gray-600/30 relative overflow-hidden">
           {/* Enhanced Background Effects */}
@@ -308,7 +310,7 @@ export function Leaderboard({ trigger }: LeaderboardProps) {
               animate={{ scale: 1, opacity: 1 }}
               transition={{ duration: 0.5, ease: "easeOut" }}
             >
-              <DialogTitle className={`flex items-center justify-center gap-2 sm:gap-4 text-xl sm:text-2xl md:text-3xl font-extrabold ${isArabic ? 'font-arabic flex-row-reverse' : ''}`}>
+              <DialogTitle className={`flex items-center justify-center gap-2 sm:gap-4 text-xl sm:text-2xl md:text-3xl font-extrabold ${isArabic ? 'font-arabic' : ''}`}>
                 <motion.div
                   animate={{ 
                     rotate: [0, 5, -5, 0],
@@ -414,7 +416,7 @@ export function Leaderboard({ trigger }: LeaderboardProps) {
                           setSelectedPlayerId(user.id);
                           setShowPlayerProfile(true);
                         }}>
-                          <CardContent className="p-1 sm:p-2.5 relative">
+                          <CardContent className={`${isArabic ? 'p-1.5 sm:p-2' : 'p-1 sm:p-2.5'} relative`}>
                             {/* Animated Background Gradient */}
                             <div className={`absolute inset-0 opacity-5 ${
                               position === 1 ? 'bg-gradient-to-r from-yellow-300 via-yellow-200 to-yellow-400' :
@@ -448,7 +450,7 @@ export function Leaderboard({ trigger }: LeaderboardProps) {
                               </motion.div>
                             )}
                           
-                          <div className={`flex items-center gap-1 sm:gap-2 relative z-10 ${isArabic ? 'flex-row-reverse' : ''}`}>
+                          <div className="flex items-center gap-1 sm:gap-2 relative z-10">
                             {/* Profile Picture with Achievement Border */}
                             <div className="flex-shrink-0 relative">
                               {(() => {
@@ -487,88 +489,65 @@ export function Leaderboard({ trigger }: LeaderboardProps) {
                               })()}
                             </div>
 
-                            {/* User Info */}
-                            <div className={`flex-1 min-w-0 overflow-hidden ${isArabic ? 'text-right' : 'text-left'}`}>
-                              <div className="flex flex-col sm:flex-row sm:items-start gap-0.5 sm:gap-1 mb-1">
-                                <div className="min-w-0 flex-1">
-                                  <div className={`text-xs sm:text-sm font-bold text-gray-900 dark:text-white mb-0.5 ${isArabic ? 'text-right' : 'text-left'}`}>
+                            {/* Simplified Arabic-friendly layout */}
+                            <div className="flex-1 min-w-0 space-y-2">
+                              {/* Name and Performance Badge Row */}
+                              <div className="flex items-center justify-between">
+                                <div className="flex items-center gap-2 min-w-0">
+                                  <h3 className={`font-bold text-sm text-gray-900 dark:text-white truncate ${isArabic ? 'font-arabic' : ''}`}>
                                     {renderAchievementBorder(user, position)}
-                                  </div>
-                                  <Badge variant="outline" className={`text-xs bg-gray-100 dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-600 dark:text-gray-300 font-medium ${isArabic ? 'float-right' : 'float-left'}`}>
-                                    @{user.username}
-                                  </Badge>
+                                  </h3>
+                                </div>
+                                
+                                <div className="flex-shrink-0">
+                                  <span className={`text-xs px-2 py-1 rounded-full text-white font-medium ${
+                                    winRatePercentage >= 70 ? 'bg-green-500' :
+                                    winRatePercentage >= 55 ? 'bg-blue-500' :
+                                    winRatePercentage >= 40 ? 'bg-yellow-500' : 'bg-gray-500'
+                                  }`}>
+                                    {isArabic ? (
+                                      winRatePercentage >= 70 ? 'نخبة' :
+                                      winRatePercentage >= 55 ? 'خبير' :
+                                      winRatePercentage >= 40 ? 'جيد' : 'محسن'
+                                    ) : (
+                                      winRatePercentage >= 70 ? 'Elite' :
+                                      winRatePercentage >= 55 ? 'Expert' :
+                                      winRatePercentage >= 40 ? 'Good' : 'Improving'
+                                    )}
+                                  </span>
                                 </div>
                               </div>
-                              
-                              {/* Stats Grid */}
-                              <div className={`grid grid-cols-3 gap-1 sm:gap-1.5 ${isArabic ? 'text-center' : 'text-center'}`}>
-                                <motion.div 
-                                  className="bg-gradient-to-br from-green-50 to-emerald-100 dark:from-green-900/30 dark:to-emerald-800/20 rounded-lg p-1 border border-green-200/60 dark:border-green-700/40 shadow-sm hover:shadow-md transition-shadow backdrop-blur-sm"
-                                  whileHover={{ scale: 1.05 }}
-                                  transition={{ type: "spring", stiffness: 400 }}
-                                >
-                                  <div className="flex items-center justify-center gap-0.5 mb-0.5">
-                                    <Trophy className="w-2 h-2 text-green-600 drop-shadow-sm" />
-                                    <span className="text-xs font-medium text-green-600 dark:text-green-400">{t('wins') || 'Wins'}</span>
-                                  </div>
-                                  <div className="text-xs font-bold text-green-700 dark:text-green-300">{user.wins}</div>
-                                </motion.div>
-                                
-                                <motion.div 
-                                  className="bg-gradient-to-br from-blue-50 to-cyan-100 dark:from-blue-900/30 dark:to-cyan-800/20 rounded-lg p-1 border border-blue-200/60 dark:border-blue-700/40 shadow-sm hover:shadow-md transition-shadow backdrop-blur-sm"
-                                  whileHover={{ scale: 1.05 }}
-                                  transition={{ type: "spring", stiffness: 400 }}
-                                >
-                                  <div className="flex items-center justify-center gap-0.5 mb-0.5">
-                                    <Target className="w-2 h-2 text-blue-600 drop-shadow-sm" />
-                                    <span className="text-xs font-medium text-blue-600 dark:text-blue-400">{t('winRate') || 'Win Rate'}</span>
-                                  </div>
-                                  <div className="text-xs font-bold text-blue-700 dark:text-blue-300">{winRatePercentage}%</div>
-                                </motion.div>
-                                
-                                <motion.div 
-                                  className="bg-gradient-to-br from-purple-50 to-violet-100 dark:from-purple-900/30 dark:to-violet-800/20 rounded-lg p-1 border border-purple-200/60 dark:border-purple-700/40 shadow-sm hover:shadow-md transition-shadow backdrop-blur-sm"
-                                  whileHover={{ scale: 1.05 }}
-                                  transition={{ type: "spring", stiffness: 400 }}
-                                >
-                                  <div className="flex items-center justify-center gap-0.5 mb-0.5">
-                                    <Users className="w-2 h-2 text-purple-600 drop-shadow-sm" />
-                                    <span className="text-xs font-medium text-purple-600 dark:text-purple-400">{t('games') || 'Games'}</span>
-                                  </div>
-                                  <div className="text-xs font-bold text-purple-700 dark:text-purple-300">{user.totalGames}</div>
-                                </motion.div>
-                              </div>
-                            </div>
 
-                            {/* Performance Badge - Optimized for mobile and Arabic */}
-                            <div className={`flex flex-col items-center text-center flex-shrink-0 min-w-[60px] sm:min-w-[80px] lg:min-w-[100px] ${isArabic ? 'arabic-numbers' : ''}`}>
-                              <div className="mb-1 sm:mb-2">
-                                <div className={`text-xs font-medium px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-full ${
-                                  winRatePercentage >= 80 ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300' :
-                                  winRatePercentage >= 60 ? 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300' :
-                                  winRatePercentage >= 40 ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300' :
-                                  'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300'
-                                }`}>
-                                  {isArabic ? (
-                                    winRatePercentage >= 80 ? 'نخبة' :
-                                    winRatePercentage >= 60 ? 'خبير' :
-                                    winRatePercentage >= 40 ? 'جيد' : 'محسن'
-                                  ) : (
-                                    winRatePercentage >= 80 ? 'Elite' :
-                                    winRatePercentage >= 60 ? 'Expert' :
-                                    winRatePercentage >= 40 ? 'Good' : 'Improving'
-                                  )}
+                              {/* Stats Row */}
+                              <div className="grid grid-cols-3 gap-2 text-center">
+                                <div className="bg-green-50 dark:bg-green-900/20 rounded-lg p-1.5">
+                                  <div className="text-xs text-green-600 dark:text-green-400 font-medium">{t('wins') || 'Wins'}</div>
+                                  <div className="text-sm font-bold text-green-700 dark:text-green-300" dir="ltr">{user.wins}</div>
+                                </div>
+                                
+                                <div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-1.5">
+                                  <div className="text-xs text-blue-600 dark:text-blue-400 font-medium">{t('winRate') || 'Rate'}</div>
+                                  <div className="text-sm font-bold text-blue-700 dark:text-blue-300" dir="ltr">{winRatePercentage}%</div>
+                                </div>
+                                
+                                <div className="bg-purple-50 dark:bg-purple-900/20 rounded-lg p-1.5">
+                                  <div className="text-xs text-purple-600 dark:text-purple-400 font-medium">{t('games') || 'Games'}</div>
+                                  <div className="text-sm font-bold text-purple-700 dark:text-purple-300" dir="ltr">{user.totalGames}</div>
                                 </div>
                               </div>
-                              <div className={`text-xs text-gray-500 dark:text-gray-400 mb-0.5 sm:mb-1 ${isArabic ? 'arabic-text' : ''}`}>
-                                {t('wld') || 'W-L-D'}
-                              </div>
-                              <div className={`text-xs font-mono whitespace-nowrap bg-gray-100 dark:bg-gray-800 px-1 sm:px-2 py-0.5 sm:py-1 rounded ${isArabic ? 'arabic-numbers' : ''}`} dir="ltr">
-                                <span className="text-green-600 dark:text-green-400 font-bold">{user.wins}</span>
-                                <span className="text-gray-400 mx-0.5 sm:mx-1">-</span>
-                                <span className="text-red-600 dark:text-red-400 font-bold">{user.losses}</span>
-                                <span className="text-gray-400 mx-0.5 sm:mx-1">-</span>
-                                <span className="text-yellow-600 dark:text-yellow-400 font-bold">{user.draws}</span>
+
+                              {/* W-L-D Badge */}
+                              <div className="flex justify-center">
+                                <div className="bg-gray-100 dark:bg-gray-800 px-3 py-1 rounded-full">
+                                  <span className="text-xs text-gray-500 dark:text-gray-400 mr-2">{t('wld') || 'W-L-D'}:</span>
+                                  <span className="text-xs font-mono" dir="ltr">
+                                    <span className="text-green-600 dark:text-green-400 font-bold">{user.wins}</span>
+                                    <span className="text-gray-400 mx-1">-</span>
+                                    <span className="text-red-600 dark:text-red-400 font-bold">{user.losses}</span>
+                                    <span className="text-gray-400 mx-1">-</span>
+                                    <span className="text-yellow-600 dark:text-yellow-400 font-bold">{user.draws}</span>
+                                  </span>
+                                </div>
                               </div>
                             </div>
                           </div>
@@ -595,7 +574,7 @@ export function Leaderboard({ trigger }: LeaderboardProps) {
           </div>
         )}
 
-        <div className={`flex justify-between items-center pt-3 sm:pt-6 border-t border-gradient-to-r from-transparent via-gray-200 to-transparent dark:via-gray-700 flex-shrink-0 bg-gradient-to-r from-slate-50 via-white to-slate-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 ${isArabic ? 'flex-row-reverse' : ''}`}>
+        <div className="flex justify-between items-center pt-3 sm:pt-6 border-t border-gradient-to-r from-transparent via-gray-200 to-transparent dark:via-gray-700 flex-shrink-0 bg-gradient-to-r from-slate-50 via-white to-slate-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
           <div className={`flex items-center gap-2 ${isArabic ? 'font-arabic' : ''}`}>
             <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
             <span className="text-xs sm:text-sm font-medium text-gray-600 dark:text-gray-400">
