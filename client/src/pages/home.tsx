@@ -95,6 +95,16 @@ export default function Home() {
     }
   }, [showHeaderSidebar]);
 
+  // Listen for leaderboard open events
+  useEffect(() => {
+    const handleOpenLeaderboard = () => {
+      setShowLeaderboard(true);
+    };
+
+    window.addEventListener('openLeaderboard', handleOpenLeaderboard);
+    return () => window.removeEventListener('openLeaderboard', handleOpenLeaderboard);
+  }, []);
+
   useEffect(() => {
     if (lastMessage) {
       console.log('🎮 Home received WebSocket message:', lastMessage);
@@ -744,11 +754,7 @@ export default function Home() {
             <Button
               variant="outline"
               size="sm"
-              onClick={() => {
-                // Dispatch custom event to open leaderboard
-                const event = new CustomEvent('openLeaderboard');
-                window.dispatchEvent(event);
-              }}
+              onClick={() => setShowLeaderboard(true)}
               className="bg-gradient-to-r from-yellow-600 to-orange-600 border-yellow-500 text-white hover:from-yellow-500 hover:to-orange-500 px-2 md:px-3 py-1 md:py-2"
             >
               <Trophy className="w-3 h-3 md:w-4 md:h-4" />
@@ -1166,6 +1172,14 @@ export default function Home() {
         open={showAchievements}
         onClose={() => setShowAchievements(false)}
         user={user}
+      />
+
+      <Leaderboard 
+        open={showLeaderboard}
+        onClose={() => setShowLeaderboard(false)}
+        trigger={
+          <div style={{ display: 'none' }} />
+        }
       />
 
       {/* Global Room Invitation Popup */}

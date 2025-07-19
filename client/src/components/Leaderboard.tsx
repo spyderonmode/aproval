@@ -24,10 +24,16 @@ interface LeaderboardUser {
 
 interface LeaderboardProps {
   trigger?: React.ReactNode;
+  open?: boolean;
+  onClose?: () => void;
 }
 
-export function Leaderboard({ trigger }: LeaderboardProps) {
+export function Leaderboard({ trigger, open, onClose }: LeaderboardProps) {
   const [isOpen, setIsOpen] = useState(false);
+  
+  // Use external open state if provided, otherwise use internal state
+  const modalOpen = open !== undefined ? open : isOpen;
+  const handleClose = onClose || (() => setIsOpen(false));
   const [selectedPlayerId, setSelectedPlayerId] = useState<string | null>(null);
   const [showPlayerProfile, setShowPlayerProfile] = useState(false);
   const { t, language } = useTranslation();
@@ -45,7 +51,7 @@ export function Leaderboard({ trigger }: LeaderboardProps) {
       }
       return await response.json();
     },
-    enabled: isOpen, // Only fetch when modal is open
+    enabled: modalOpen, // Only fetch when modal is open
     retry: 3,
     staleTime: language === 'ar' ? 0 : 30000, // No cache for Arabic to force fresh data
     refetchOnMount: true,
@@ -60,7 +66,7 @@ export function Leaderboard({ trigger }: LeaderboardProps) {
 
   // Force refresh when modal opens or language changes
   useEffect(() => {
-    if (isOpen) {
+    if (modalOpen) {
       console.log(`Modal opened (${language}) - forcing leaderboard refresh`);
       // Clear all leaderboard cache when switching to Arabic
       if (language === 'ar') {
@@ -68,7 +74,7 @@ export function Leaderboard({ trigger }: LeaderboardProps) {
       }
       refetch();
     }
-  }, [isOpen, language, refetch, queryClient]);
+  }, [modalOpen, language, refetch, queryClient]);
 
   // Listen for external trigger to open leaderboard
   useEffect(() => {
@@ -283,11 +289,16 @@ export function Leaderboard({ trigger }: LeaderboardProps) {
   );
 
   return (
-    <Dialog open={isOpen} onOpenChange={setIsOpen}>
+    <Dialog open={modalOpen} onOpenChange={handleClose}>
       <DialogTrigger asChild>
         <div onClick={(e) => {
           e.stopPropagation();
-          setIsOpen(true);
+          if (open !== undefined) {
+            // External control - don't use internal state
+            onClose?.();
+          } else {
+            setIsOpen(true);
+          }
         }}>
           {trigger || defaultTrigger}
         </div>
