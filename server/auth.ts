@@ -67,9 +67,14 @@ function findUserByUsername(username: string): User | undefined {
   return users.find(u => u.username === username);
 }
 
+// Generate 6-digit verification code
+function generateVerificationCode(): string {
+  return Math.floor(100000 + Math.random() * 900000).toString();
+}
+
 async function createUser(username: string, password: string, email?: string): Promise<User> {
   const users = getUsers();
-  const verificationToken = email ? crypto.randomUUID() : undefined;
+  const verificationToken = email ? generateVerificationCode() : undefined;
   const verificationExpiry = email ? new Date(Date.now() + 24 * 60 * 60 * 1000) : undefined; // 24 hours
   
   const newUser: User = {
@@ -479,8 +484,8 @@ export function setupAuth(app: Express) {
       return res.status(400).json({ error: 'Email is already verified' });
     }
 
-    // Generate new verification token
-    const newToken = crypto.randomUUID();
+    // Generate new verification code
+    const newToken = generateVerificationCode();
     const newExpiry = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 hours
 
     const updatedUser = updateUser(user.id, {

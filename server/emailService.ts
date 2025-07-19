@@ -51,22 +51,25 @@ export class EmailService {
     }
   }
 
-  async sendVerificationEmail(email: string, token: string): Promise<boolean> {
-    const verificationUrl = `https://tic-tac-master-zanv1.replit.app/verify-email?token=${token}`;
-    
+  async sendVerificationEmail(email: string, verificationCode: string): Promise<boolean> {
     const html = `
-      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-        <h2 style="color: #1e40af;">Verify Your Email - TicTac 3x5</h2>
-        <p>Thanks for signing up for TicTac 3x5! Please verify your email address to secure your account.</p>
-        <div style="text-align: center; margin: 30px 0;">
-          <a href="${verificationUrl}" 
-             style="background-color: #1e40af; color: white; padding: 12px 24px; text-decoration: none; border-radius: 5px; display: inline-block;">
-            Verify Email Address
-          </a>
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+        <h2 style="color: #1e40af; text-align: center;">Verify Your Email - TicTac 3x5</h2>
+        <p>Thanks for signing up for TicTac 3x5! Please use the verification code below to verify your email address.</p>
+        
+        <div style="text-align: center; margin: 30px 0; padding: 20px; background-color: #f8fafc; border-radius: 8px; border: 2px dashed #1e40af;">
+          <h3 style="margin: 0; color: #1e40af;">Your Verification Code:</h3>
+          <div style="font-size: 32px; font-weight: bold; color: #1e40af; letter-spacing: 4px; margin: 10px 0;">
+            ${verificationCode}
+          </div>
+          <p style="margin: 0; color: #666; font-size: 14px;">Enter this code on the verification page</p>
         </div>
-        <p>Or copy and paste this link into your browser:</p>
-        <p style="color: #666; word-break: break-all;">${verificationUrl}</p>
-        <p style="color: #666; font-size: 12px; margin-top: 30px;">
+        
+        <p style="text-align: center; margin: 20px 0;">
+          <strong>Code expires in 24 hours</strong>
+        </p>
+        
+        <p style="color: #666; font-size: 12px; margin-top: 30px; text-align: center;">
           If you didn't create an account, you can safely ignore this email.
         </p>
       </div>
@@ -74,9 +77,9 @@ export class EmailService {
 
     return await this.sendEmail({
       to: email,
-      subject: 'Verify Your Email - TicTac 3x5',
+      subject: 'Your Verification Code - TicTac 3x5',
       html,
-      text: `Please verify your email by clicking this link: ${verificationUrl}`,
+      text: `Your TicTac 3x5 verification code is: ${verificationCode}. This code expires in 24 hours.`,
     });
   }
 

@@ -65,12 +65,12 @@ export function EmailVerificationModal({ email, onClose }: EmailVerificationModa
           <Alert className="bg-slate-700 border-slate-600">
             <CheckCircle className="h-4 w-4 text-green-400" />
             <AlertDescription className="text-slate-300">
-              A verification email has been sent to <strong className="text-white">{email}</strong>
+              A 6-digit verification code has been sent to <strong className="text-white">{email}</strong>
             </AlertDescription>
           </Alert>
           
           <div className="text-sm text-slate-400 text-center">
-            Check your email inbox and click the verification link to activate your account.
+            Check your email inbox for the verification code and enter it on the verification page.
           </div>
           
           {resendSuccess && (
@@ -84,12 +84,19 @@ export function EmailVerificationModal({ email, onClose }: EmailVerificationModa
           
           <div className="flex flex-col gap-2">
             <Button
+              onClick={() => window.location.href = '/verify-email'}
+              className="w-full bg-primary hover:bg-primary/90"
+            >
+              Enter Verification Code
+            </Button>
+            
+            <Button
               onClick={handleResendVerification}
               disabled={isResending}
               variant="outline"
               className="w-full border-slate-600 text-slate-300 hover:bg-slate-700"
             >
-              {isResending ? 'Resending...' : 'Resend Verification Email'}
+              {isResending ? 'Resending...' : 'Resend Verification Code'}
             </Button>
             
             <Button
@@ -102,7 +109,7 @@ export function EmailVerificationModal({ email, onClose }: EmailVerificationModa
           </div>
           
           <div className="text-xs text-slate-500 text-center">
-            Didn't receive the email? Check your spam folder or try resending.
+            Didn't receive the code? Check your spam folder or try resending.
           </div>
         </CardContent>
       </Card>
