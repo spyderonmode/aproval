@@ -35,6 +35,14 @@ export function Leaderboard({ trigger }: LeaderboardProps) {
   const { data: leaderboard, isLoading, error } = useQuery<LeaderboardUser[]>({
     queryKey: ['/api/leaderboard'],
     enabled: isOpen, // Only fetch when modal is open
+    retry: 3,
+    staleTime: 60000, // Cache for 1 minute
+    onError: (error) => {
+      console.error('Leaderboard fetch error:', error);
+    },
+    onSuccess: (data) => {
+      console.log('Leaderboard data loaded:', data?.length, 'users');
+    }
   });
 
   // Listen for external trigger to open leaderboard
@@ -260,18 +268,54 @@ export function Leaderboard({ trigger }: LeaderboardProps) {
         </div>
       </DialogTrigger>
       <DialogContent className="max-w-5xl max-h-[95vh] w-[95vw] sm:w-full mx-auto flex flex-col overflow-hidden bg-gradient-to-br from-slate-50/95 via-white/98 to-blue-50/90 dark:from-slate-900/95 dark:via-slate-800/98 dark:to-slate-900/95 backdrop-blur-md border border-white/20 dark:border-gray-700/30 shadow-2xl">
-        <DialogHeader className="flex-shrink-0 pb-6 border-b border-gradient-to-r from-transparent via-gray-200 to-transparent dark:via-gray-700">
-          <div className="text-center space-y-2">
-            <DialogTitle className="flex items-center justify-center gap-3 text-2xl font-bold bg-gradient-to-r from-yellow-500 via-orange-500 to-red-500 bg-clip-text text-transparent">
-              <Trophy className="w-8 h-8 text-yellow-500 drop-shadow-lg" />
-              {t('leaderboard') || 'Leaderboard'}
-            </DialogTitle>
-            <p className="text-lg font-semibold text-gray-700 dark:text-gray-300">
-              {t('top100Players') || 'Top 100 Players'}
-            </p>
-            <p className="text-sm text-gray-600 dark:text-gray-400 max-w-md mx-auto">
-              {t('leaderboardDescription') || 'The best players ranked by total wins. Achievement borders show player status!'}
-            </p>
+        <DialogHeader className="flex-shrink-0 pb-6 border-b bg-gradient-to-r from-transparent via-gray-200/50 to-transparent dark:via-gray-600/30 relative overflow-hidden">
+          {/* Enhanced Background Effects */}
+          <div className="absolute inset-0 bg-gradient-to-br from-yellow-50/30 via-orange-50/20 to-red-50/30 dark:from-yellow-900/10 dark:via-orange-900/5 dark:to-red-900/10"></div>
+          <div className="absolute top-0 left-1/2 transform -translate-x-1/2 w-full h-32 bg-gradient-to-b from-yellow-100/20 to-transparent dark:from-yellow-800/10 blur-3xl"></div>
+          
+          <div className="text-center space-y-3 relative z-10">
+            <motion.div
+              initial={{ scale: 0.8, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ duration: 0.5, ease: "easeOut" }}
+            >
+              <DialogTitle className="flex items-center justify-center gap-4 text-3xl font-extrabold">
+                <motion.div
+                  animate={{ 
+                    rotate: [0, 5, -5, 0],
+                    scale: [1, 1.1, 1]
+                  }}
+                  transition={{ 
+                    duration: 3,
+                    repeat: Infinity,
+                    ease: "easeInOut"
+                  }}
+                >
+                  <Trophy className="w-10 h-10 text-yellow-500 drop-shadow-2xl filter brightness-110" />
+                </motion.div>
+                <span className="bg-gradient-to-r from-yellow-600 via-orange-500 to-red-500 bg-clip-text text-transparent drop-shadow-sm">
+                  {t('leaderboard') || 'Leaderboard'}
+                </span>
+              </DialogTitle>
+            </motion.div>
+            
+            <motion.div
+              initial={{ y: 20, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ delay: 0.2, duration: 0.5 }}
+              className="space-y-2"
+            >
+              <div className="inline-flex items-center gap-2 bg-gradient-to-r from-yellow-100 to-orange-100 dark:from-yellow-900/30 dark:to-orange-900/30 px-4 py-2 rounded-full border border-yellow-200/50 dark:border-yellow-700/30 shadow-lg backdrop-blur-sm">
+                <Crown className="w-4 h-4 text-yellow-600" />
+                <p className="text-gray-700 dark:text-gray-200 text-sm font-semibold">
+                  {t('top100Players') || 'Top 100 Players'}
+                </p>
+              </div>
+              
+              <p className="text-gray-600 dark:text-gray-300 text-xs max-w-md mx-auto leading-relaxed">
+                {t('leaderboardDescription') || 'The best players ranked by total wins. Achievement borders show player status!'}
+              </p>
+            </motion.div>
           </div>
         </DialogHeader>
 
@@ -281,8 +325,14 @@ export function Leaderboard({ trigger }: LeaderboardProps) {
             <span className="ml-2">{t('loadingLeaderboard') || 'Loading leaderboard...'}</span>
           </div>
         ) : error ? (
-          <div className="flex items-center justify-center py-8 flex-1 text-red-500">
+          <div className="flex flex-col items-center justify-center py-8 flex-1 text-red-500">
             <span>{t('errorLoadingLeaderboard') || 'Error loading leaderboard. Please try again.'}</span>
+            <div className="mt-4 p-3 bg-red-50 dark:bg-red-900/20 rounded-lg text-red-600 dark:text-red-400 text-sm max-w-md">
+              <p>Debug details:</p>
+              <p>Error: {String(error)}</p>
+              <p>Modal open: {isOpen.toString()}</p>
+              <p>Data length: {leaderboard?.length || 'undefined'}</p>
+            </div>
           </div>
         ) : (
           <div className="flex-1 min-h-0 overflow-y-auto" style={{ WebkitOverflowScrolling: 'touch' }}>
@@ -477,6 +527,13 @@ export function Leaderboard({ trigger }: LeaderboardProps) {
                 <div className="text-center py-8 text-gray-500">
                   <Trophy className="w-16 h-16 mx-auto mb-4 opacity-50" />
                   <p>{t('noPlayersFound') || 'No players found. Start playing to appear on the leaderboard!'}</p>
+                  {error && (
+                    <div className="mt-4 p-3 bg-red-50 dark:bg-red-900/20 rounded-lg text-red-600 dark:text-red-400 text-sm">
+                      <p>Debug info: {JSON.stringify(error)}</p>
+                      <p>Is loading: {isLoading.toString()}</p>
+                      <p>Modal open: {isOpen.toString()}</p>
+                    </div>
+                  )}
                 </div>
               )}
             </div>
