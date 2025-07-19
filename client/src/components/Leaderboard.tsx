@@ -443,121 +443,120 @@ export function Leaderboard({ trigger }: LeaderboardProps) {
                               </motion.div>
                             )}
                           
-                          <div className="flex items-center gap-1 sm:gap-2 relative z-10 w-full">
-                            {/* Profile Picture with Achievement Border */}
-                            <div className="flex-shrink-0 relative">
-                              {(() => {
-                                const borderStyle = getAchievementBorderStyle(user, position);
-                                return (
-                                  <motion.div
-                                    className="relative"
-                                    animate={borderStyle.animation ? { scale: [1, 1.01, 1] } : {}}
-                                    transition={{
-                                      duration: 3,
-                                      repeat: Infinity,
-                                      ease: "easeInOut"
-                                    }}
-                                  >
-                                    {user.profileImageUrl ? (
-                                      <img
-                                        src={user.profileImageUrl}
-                                        alt={`${user.displayName}'s profile`}
-                                        className={`w-8 h-8 sm:w-10 sm:h-10 md:w-11 md:h-11 rounded-lg object-cover border-2 border-white dark:border-slate-700 shadow-sm ${borderStyle.borderClass} ${borderStyle.glowEffect} transition-all duration-300`}
-                                      />
-                                    ) : (
-                                      <div className={`w-8 h-8 sm:w-10 sm:h-10 md:w-11 md:h-11 rounded-lg bg-gradient-to-br from-blue-400 via-purple-500 to-pink-500 flex items-center justify-center text-white font-bold text-xs sm:text-sm shadow-sm ${borderStyle.borderClass} ${borderStyle.glowEffect} transition-all duration-300`}>
-                                        {user.displayName.charAt(0).toUpperCase()}
-                                      </div>
-                                    )}
-                                    {/* Position Badge - small overlay on profile */}
-                                    {position <= 3 && (
-                                      <div className={`absolute -top-0.5 -right-0.5 w-5 h-5 rounded-full bg-gradient-to-br ${getRankColor(position)} flex items-center justify-center shadow-sm border border-white dark:border-slate-800`}>
-                                        <span className="text-xs font-bold">#{position}</span>
-                                      </div>
-                                    )}
-                                    {/* Online Status Indicator */}
-                                    <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-green-400 border-2 border-white dark:border-slate-800 rounded-full shadow-sm z-10"></div>
-                                  </motion.div>
-                                );
-                              })()}
+                          {/* Vertical Card Layout */}
+                          <div className="flex flex-col gap-2 relative z-10 w-full">
+                            {/* Top Row: Profile Picture + User Info */}
+                            <div className="flex items-center gap-2">
+                              {/* Profile Picture with Achievement Border */}
+                              <div className="flex-shrink-0 relative">
+                                {(() => {
+                                  const borderStyle = getAchievementBorderStyle(user, position);
+                                  return (
+                                    <motion.div
+                                      className="relative"
+                                      animate={borderStyle.animation ? { scale: [1, 1.01, 1] } : {}}
+                                      transition={{
+                                        duration: 3,
+                                        repeat: Infinity,
+                                        ease: "easeInOut"
+                                      }}
+                                    >
+                                      {user.profileImageUrl ? (
+                                        <img
+                                          src={user.profileImageUrl}
+                                          alt={`${user.displayName}'s profile`}
+                                          className={`w-10 h-10 sm:w-12 sm:h-12 rounded-lg object-cover border-2 border-white dark:border-slate-700 shadow-sm ${borderStyle.borderClass} ${borderStyle.glowEffect} transition-all duration-300`}
+                                        />
+                                      ) : (
+                                        <div className={`w-10 h-10 sm:w-12 sm:h-12 rounded-lg bg-gradient-to-br from-blue-400 via-purple-500 to-pink-500 flex items-center justify-center text-white font-bold text-sm shadow-sm ${borderStyle.borderClass} ${borderStyle.glowEffect} transition-all duration-300`}>
+                                          {user.displayName.charAt(0).toUpperCase()}
+                                        </div>
+                                      )}
+                                      {/* Position Badge - small overlay on profile */}
+                                      {position <= 3 && (
+                                        <div className={`absolute -top-1 -right-1 w-6 h-6 rounded-full bg-gradient-to-br ${getRankColor(position)} flex items-center justify-center shadow-sm border border-white dark:border-slate-800`}>
+                                          <span className="text-xs font-bold">#{position}</span>
+                                        </div>
+                                      )}
+                                      {/* Online Status Indicator */}
+                                      <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-green-400 border-2 border-white dark:border-slate-800 rounded-full shadow-sm z-10"></div>
+                                    </motion.div>
+                                  );
+                                })()}
+                              </div>
+
+                              {/* User Basic Info */}
+                              <div className="flex-1 min-w-0">
+                                <div className="text-sm sm:text-base font-bold text-gray-900 dark:text-white mb-1">
+                                  {renderAchievementBorder(user, position)}
+                                </div>
+                                <Badge variant="outline" className="text-xs bg-gray-100 dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-600 dark:text-gray-300 font-medium">
+                                  @{user.username}
+                                </Badge>
+                              </div>
+                            </div>
+                            
+                            {/* Bottom Row: Stats Grid */}
+                            <div className="grid grid-cols-3 gap-2 text-center">
+                              <motion.div 
+                                className="bg-gradient-to-br from-green-50 to-emerald-100 dark:from-green-900/30 dark:to-emerald-800/20 rounded-lg p-2 border border-green-200/60 dark:border-green-700/40 shadow-sm hover:shadow-md transition-shadow backdrop-blur-sm"
+                                whileHover={{ scale: 1.05 }}
+                                transition={{ type: "spring", stiffness: 400 }}
+                              >
+                                <div className="flex items-center justify-center gap-1 mb-1">
+                                  <Trophy className="w-3 h-3 text-green-600 drop-shadow-sm" />
+                                  <span className="text-xs font-medium text-green-600 dark:text-green-400">{t('wins') || 'Wins'}</span>
+                                </div>
+                                <div className="text-sm font-bold text-green-700 dark:text-green-300">{user.wins}</div>
+                              </motion.div>
+                              
+                              <motion.div 
+                                className="bg-gradient-to-br from-blue-50 to-cyan-100 dark:from-blue-900/30 dark:to-cyan-800/20 rounded-lg p-2 border border-blue-200/60 dark:border-blue-700/40 shadow-sm hover:shadow-md transition-shadow backdrop-blur-sm"
+                                whileHover={{ scale: 1.05 }}
+                                transition={{ type: "spring", stiffness: 400 }}
+                              >
+                                <div className="flex items-center justify-center gap-1 mb-1">
+                                  <Target className="w-3 h-3 text-blue-600 drop-shadow-sm" />
+                                  <span className="text-xs font-medium text-blue-600 dark:text-blue-400">{t('winRate') || 'Win Rate'}</span>
+                                </div>
+                                <div className="text-sm font-bold text-blue-700 dark:text-blue-300">{winRatePercentage}%</div>
+                              </motion.div>
+                              
+                              <motion.div 
+                                className="bg-gradient-to-br from-purple-50 to-violet-100 dark:from-purple-900/30 dark:to-violet-800/20 rounded-lg p-2 border border-purple-200/60 dark:border-purple-700/40 shadow-sm hover:shadow-md transition-shadow backdrop-blur-sm"
+                                whileHover={{ scale: 1.05 }}
+                                transition={{ type: "spring", stiffness: 400 }}
+                              >
+                                <div className="flex items-center justify-center gap-1 mb-1">
+                                  <Users className="w-3 h-3 text-purple-600 drop-shadow-sm" />
+                                  <span className="text-xs font-medium text-purple-600 dark:text-purple-400">{t('games') || 'Games'}</span>
+                                </div>
+                                <div className="text-sm font-bold text-purple-700 dark:text-purple-300">{user.totalGames}</div>
+                              </motion.div>
                             </div>
 
-                            {/* User Info */}
-                            <div className="flex-1 min-w-0 overflow-hidden">
-                              <div className="flex flex-col sm:flex-row sm:items-start gap-0.5 sm:gap-1 mb-1">
-                                <div className="min-w-0 flex-1">
-                                  <div className="text-xs sm:text-sm font-bold text-gray-900 dark:text-white mb-0.5">
-                                    {renderAchievementBorder(user, position)}
-                                  </div>
-                                  <Badge variant="outline" className="text-xs bg-gray-100 dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-600 dark:text-gray-300 font-medium">
-                                    @{user.username}
-                                  </Badge>
-                                </div>
+                            {/* Bottom Row: Performance Badge and W-L-D Stats */}
+                            <div className="flex items-center justify-between gap-2">
+                              <div className={`text-xs font-medium px-3 py-1 rounded-full ${
+                                winRatePercentage >= 80 ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300' :
+                                winRatePercentage >= 60 ? 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300' :
+                                winRatePercentage >= 40 ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300' :
+                                'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300'
+                              }`}>
+                                {winRatePercentage >= 80 ? 'Elite' :
+                                 winRatePercentage >= 60 ? 'Expert' :
+                                 winRatePercentage >= 40 ? 'Good' : 'Improving'}
                               </div>
                               
-                              {/* Stats Grid */}
-                              <div className="grid grid-cols-3 gap-1 sm:gap-1.5 text-center">
-                                <motion.div 
-                                  className="bg-gradient-to-br from-green-50 to-emerald-100 dark:from-green-900/30 dark:to-emerald-800/20 rounded-lg p-1 border border-green-200/60 dark:border-green-700/40 shadow-sm hover:shadow-md transition-shadow backdrop-blur-sm"
-                                  whileHover={{ scale: 1.05 }}
-                                  transition={{ type: "spring", stiffness: 400 }}
-                                >
-                                  <div className="flex items-center justify-center gap-0.5 mb-0.5">
-                                    <Trophy className="w-2 h-2 text-green-600 drop-shadow-sm" />
-                                    <span className="text-xs font-medium text-green-600 dark:text-green-400">{t('wins') || 'Wins'}</span>
-                                  </div>
-                                  <div className="text-xs font-bold text-green-700 dark:text-green-300">{user.wins}</div>
-                                </motion.div>
-                                
-                                <motion.div 
-                                  className="bg-gradient-to-br from-blue-50 to-cyan-100 dark:from-blue-900/30 dark:to-cyan-800/20 rounded-lg p-1 border border-blue-200/60 dark:border-blue-700/40 shadow-sm hover:shadow-md transition-shadow backdrop-blur-sm"
-                                  whileHover={{ scale: 1.05 }}
-                                  transition={{ type: "spring", stiffness: 400 }}
-                                >
-                                  <div className="flex items-center justify-center gap-0.5 mb-0.5">
-                                    <Target className="w-2 h-2 text-blue-600 drop-shadow-sm" />
-                                    <span className="text-xs font-medium text-blue-600 dark:text-blue-400">{t('winRate') || 'Win Rate'}</span>
-                                  </div>
-                                  <div className="text-xs font-bold text-blue-700 dark:text-blue-300">{winRatePercentage}%</div>
-                                </motion.div>
-                                
-                                <motion.div 
-                                  className="bg-gradient-to-br from-purple-50 to-violet-100 dark:from-purple-900/30 dark:to-violet-800/20 rounded-lg p-1 border border-purple-200/60 dark:border-purple-700/40 shadow-sm hover:shadow-md transition-shadow backdrop-blur-sm"
-                                  whileHover={{ scale: 1.05 }}
-                                  transition={{ type: "spring", stiffness: 400 }}
-                                >
-                                  <div className="flex items-center justify-center gap-0.5 mb-0.5">
-                                    <Users className="w-2 h-2 text-purple-600 drop-shadow-sm" />
-                                    <span className="text-xs font-medium text-purple-600 dark:text-purple-400">{t('games') || 'Games'}</span>
-                                  </div>
-                                  <div className="text-xs font-bold text-purple-700 dark:text-purple-300">{user.totalGames}</div>
-                                </motion.div>
-                              </div>
-                            </div>
-
-                            {/* Performance Badge - Now visible on mobile */}
-                            <div className="flex flex-col items-center text-center flex-shrink-0 min-w-[70px] sm:min-w-[80px] lg:min-w-[100px]">
-                              <div className="mb-1 sm:mb-2">
-                                <div className={`text-xs font-medium px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-full ${
-                                  winRatePercentage >= 80 ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300' :
-                                  winRatePercentage >= 60 ? 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300' :
-                                  winRatePercentage >= 40 ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300' :
-                                  'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300'
-                                }`}>
-                                  {winRatePercentage >= 80 ? 'Elite' :
-                                   winRatePercentage >= 60 ? 'Expert' :
-                                   winRatePercentage >= 40 ? 'Good' : 'Improving'}
+                              <div className="flex items-center gap-2">
+                                <span className="text-xs text-gray-500 dark:text-gray-400">{t('wld') || 'W-L-D'}:</span>
+                                <div className="text-xs font-mono bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded">
+                                  <span className="text-green-600 dark:text-green-400 font-bold">{user.wins}</span>
+                                  <span className="text-gray-400 mx-1">-</span>
+                                  <span className="text-red-600 dark:text-red-400 font-bold">{user.losses}</span>
+                                  <span className="text-gray-400 mx-1">-</span>
+                                  <span className="text-yellow-600 dark:text-yellow-400 font-bold">{user.draws}</span>
                                 </div>
-                              </div>
-                              <div className="text-xs text-gray-500 dark:text-gray-400 mb-0.5 sm:mb-1">
-                                {t('wld') || 'W-L-D'}
-                              </div>
-                              <div className="text-xs font-mono whitespace-nowrap bg-gray-100 dark:bg-gray-800 px-1 sm:px-2 py-0.5 sm:py-1 rounded">
-                                <span className="text-green-600 dark:text-green-400 font-bold">{user.wins}</span>
-                                <span className="text-gray-400 mx-0.5 sm:mx-1">-</span>
-                                <span className="text-red-600 dark:text-red-400 font-bold">{user.losses}</span>
-                                <span className="text-gray-400 mx-0.5 sm:mx-1">-</span>
-                                <span className="text-yellow-600 dark:text-yellow-400 font-bold">{user.draws}</span>
                               </div>
                             </div>
                           </div>
