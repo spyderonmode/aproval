@@ -1361,15 +1361,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
                   // Update room status to playing
                   await storage.updateRoomStatus(room.id, 'playing');
                   
-                  // Notify user about game start
-                  if (connection.ws.readyState === WebSocket.OPEN) {
-                    connection.ws.send(JSON.stringify({
-                      type: 'game_started',
-                      game: gameWithPlayers,
-                      roomId: room.id
-                    }));
-                    
-                    console.log(`🎮 Bot game started in room ${room.id}`);
+                  // Broadcast game start to all room participants (should only be the user)
+                  const roomConnections_botGame = roomConnections.get(room.id);
+                  if (roomConnections_botGame) {
+                    console.log(`🎮 Broadcasting bot game start to ${roomConnections_botGame.size} connections in room ${room.id}`);
+                    roomConnections_botGame.forEach(connectionId => {
+                      const conn = connections.get(connectionId);
+                      if (conn && conn.ws.readyState === WebSocket.OPEN) {
+                        console.log(`🎮 Sending game_started message to connection ${connectionId} (user: ${conn.userId})`);
+                        conn.ws.send(JSON.stringify({
+                          type: 'game_started',
+                          game: gameWithPlayers,
+                          roomId: room.id
+                        }));
+                      }
+                    });
+                    console.log(`🎮 Bot game started and broadcasted in room ${room.id}`);
+                  } else {
+                    console.log(`🎮 Warning: No room connections found for room ${room.id}`);
                   }
                 } catch (error) {
                   console.error('🤖 Error starting bot game:', error);
