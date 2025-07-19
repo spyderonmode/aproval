@@ -35,6 +35,15 @@ export function Leaderboard({ trigger }: LeaderboardProps) {
 
   const { data: leaderboard, isLoading, error, refetch } = useQuery<LeaderboardUser[]>({
     queryKey: ['/api/leaderboard', language], // Include language in key to prevent cache conflicts
+    queryFn: async () => {
+      const response = await fetch('/api/leaderboard', {
+        credentials: 'include'
+      });
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      return await response.json();
+    },
     enabled: isOpen, // Only fetch when modal is open
     retry: 3,
     staleTime: language === 'ar' ? 0 : 30000, // No cache for Arabic to force fresh data
