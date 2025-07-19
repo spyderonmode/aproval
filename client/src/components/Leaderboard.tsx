@@ -360,7 +360,7 @@ export function Leaderboard({ trigger }: LeaderboardProps) {
           </div>
         ) : (
           <div className="flex-1 min-h-0 overflow-y-auto" style={{ WebkitOverflowScrolling: 'touch' }}>
-            <div className="space-y-1 sm:space-y-1.5 pb-2 sm:pb-3 pr-1 sm:pr-2 pt-1 sm:pt-2">
+            <div className="flex flex-col space-y-1 sm:space-y-1.5 pb-2 sm:pb-3 pr-1 sm:pr-2 pt-1 sm:pt-2 w-full" style={{ direction: 'ltr' }}>
               {/* Debug info always visible when no data */}
               {!isLoading && !leaderboard && (
                 <div className="p-4 bg-yellow-50 dark:bg-yellow-900/20 rounded-lg text-yellow-800 dark:text-yellow-200 text-sm">
@@ -409,7 +409,7 @@ export function Leaderboard({ trigger }: LeaderboardProps) {
                           setSelectedPlayerId(user.id);
                           setShowPlayerProfile(true);
                         }}>
-                          <CardContent className="p-1.5 sm:p-2.5 relative">
+                          <CardContent className="p-1.5 sm:p-2.5 relative" style={{ direction: language === 'ar' ? 'rtl' : 'ltr' }}>
                             {/* Animated Background Gradient */}
                             <div className={`absolute inset-0 opacity-5 ${
                               position === 1 ? 'bg-gradient-to-r from-yellow-300 via-yellow-200 to-yellow-400' :
@@ -443,7 +443,7 @@ export function Leaderboard({ trigger }: LeaderboardProps) {
                               </motion.div>
                             )}
                           
-                          <div className="flex items-center gap-1 sm:gap-2 relative z-10">
+                          <div className="flex items-center gap-1 sm:gap-2 relative z-10 w-full">
                             {/* Profile Picture with Achievement Border */}
                             <div className="flex-shrink-0 relative">
                               {(() => {
