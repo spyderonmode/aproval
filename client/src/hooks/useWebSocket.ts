@@ -6,6 +6,11 @@ interface WebSocketMessage {
   [key: string]: any;
 }
 
+// Global WebSocket instance to prevent duplicates
+let globalWebSocket: WebSocket | null = null;
+let globalConnectionState = false;
+let globalUserId: string | null = null;
+
 export function useWebSocket() {
   const { user } = useAuth();
   const ws = useRef<WebSocket | null>(null);
@@ -15,14 +20,35 @@ export function useWebSocket() {
 
   useEffect(() => {
     if (!user) return;
+    
+    const currentUserId = user.userId || user.id;
+    
+    // Use global WebSocket if it exists and is for the same user
+    if (globalWebSocket && globalUserId === currentUserId && globalWebSocket.readyState !== WebSocket.CLOSED) {
+      console.log('🔌 Reusing existing global WebSocket connection for user:', currentUserId);
+      ws.current = globalWebSocket;
+      setIsConnected(globalConnectionState);
+      return;
+    }
+    
+    // Close any existing global connection for different user
+    if (globalWebSocket && globalUserId !== currentUserId) {
+      console.log('🔌 Closing existing WebSocket for different user');
+      globalWebSocket.close();
+      globalWebSocket = null;
+    }
 
     const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
     const wsUrl = `${protocol}//${window.location.host}/ws`;
     
-    ws.current = new WebSocket(wsUrl);
+    console.log('🔌 Creating new global WebSocket connection for user:', currentUserId);
+    globalWebSocket = new WebSocket(wsUrl);
+    globalUserId = currentUserId;
+    ws.current = globalWebSocket;
 
     ws.current.onopen = () => {
-      console.log('🔌 WebSocket connected');
+      console.log('🔌 Global WebSocket connected');
+      globalConnectionState = true;
       setIsConnected(true);
       // Clear joined rooms on reconnect to prevent duplicates
       joinedRooms.current.clear();
@@ -81,9 +107,15 @@ export function useWebSocket() {
     };
 
     ws.current.onclose = (event) => {
-      console.log('🔌 WebSocket connection closed:', event.code, event.reason);
+      console.log('🔌 Global WebSocket connection closed:', event.code, event.reason);
       console.log('🔌 Close event details:', event);
+      globalConnectionState = false;
       setIsConnected(false);
+      // Clear global references when connection closes
+      if (globalWebSocket === ws.current) {
+        globalWebSocket = null;
+        globalUserId = null;
+      }
       // Don't clear game state on connection close to prevent white screen
     };
 
@@ -92,9 +124,16 @@ export function useWebSocket() {
     };
 
     return () => {
-      ws.current?.close();
+      console.log('🔌 Cleaning up WebSocket hook reference');
+      // Only clear local reference, don't close global connection
+      // unless it's specifically for this user
+      if (ws.current === globalWebSocket && globalUserId === currentUserId) {
+        // Keep global connection alive for other potential hooks
+        console.log('🔌 Keeping global WebSocket alive for other hooks');
+      }
+      ws.current = null;
     };
-  }, [user]);
+  }, [user?.userId || user?.id]); // Only recreate when user ID changes, not the entire user object
 
   const sendMessage = (message: WebSocketMessage) => {
     if (ws.current && ws.current.readyState === WebSocket.OPEN) {
