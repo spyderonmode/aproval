@@ -41,6 +41,49 @@ export async function registerRoutes(app: Express): Promise<Server> {
   const matchmakingQueue: string[] = []; // Queue of user IDs waiting for matches
   const onlineUsers = new Map<string, { userId: string; username: string; displayName: string; roomId?: string; lastSeen: Date }>();
   const userRoomStates = new Map<string, { roomId: string; gameId?: string; isInGame: boolean }>();
+  const matchmakingTimers = new Map<string, NodeJS.Timeout>(); // Track user timers for bot matches
+  
+  // AI Bot System - 100 AI opponents with varied difficulties and personalities
+  const AI_BOTS = [
+    // Easy Bots (30 bots)
+    ...Array.from({ length: 30 }, (_, i) => ({
+      id: `bot_easy_${i + 1}`,
+      username: `EasyBot${i + 1}`,
+      displayName: `EasyBot ${i + 1}`,
+      difficulty: 'easy' as const,
+      profilePicture: null,
+      firstName: `EasyBot ${i + 1}`,
+      isBot: true
+    })),
+    // Medium Bots (40 bots)
+    ...Array.from({ length: 40 }, (_, i) => ({
+      id: `bot_medium_${i + 1}`,
+      username: `MediumBot${i + 1}`,
+      displayName: `MediumBot ${i + 1}`,
+      difficulty: 'medium' as const,
+      profilePicture: null,
+      firstName: `MediumBot ${i + 1}`,
+      isBot: true
+    })),
+    // Hard Bots (30 bots)
+    ...Array.from({ length: 30 }, (_, i) => ({
+      id: `bot_hard_${i + 1}`,
+      username: `HardBot${i + 1}`,
+      displayName: `HardBot ${i + 1}`,
+      difficulty: 'hard' as const,
+      profilePicture: null,
+      firstName: `HardBot ${i + 1}`,
+      isBot: true
+    }))
+  ];
+  
+  // Function to get a random available bot
+  function getRandomAvailableBot(): any {
+    const difficulties = ['easy', 'medium', 'hard'];
+    const randomDifficulty = difficulties[Math.floor(Math.random() * difficulties.length)];
+    const botsOfDifficulty = AI_BOTS.filter(bot => bot.difficulty === randomDifficulty);
+    return botsOfDifficulty[Math.floor(Math.random() * botsOfDifficulty.length)];
+  }
 
   // Error logging endpoint
   app.post('/api/error-log', (req, res) => {
@@ -791,15 +834,152 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.json({ status: 'waiting', message: 'Already in matchmaking queue' });
       }
       
+      // Clear any existing timer for this user
+      if (matchmakingTimers.has(userId)) {
+        clearTimeout(matchmakingTimers.get(userId)!);
+        matchmakingTimers.delete(userId);
+      }
+      
       // Add to queue
       matchmakingQueue.push(userId);
       console.log(`🎯 User ${userId} joined matchmaking queue. Queue size: ${matchmakingQueue.length}`);
       
+      // Set 25-second timer for AI bot matchmaking
+      const botTimer = setTimeout(async () => {
+        try {
+          // Check if user is still in queue (hasn't been matched with real player)
+          if (matchmakingQueue.includes(userId)) {
+            console.log(`🤖 25 seconds passed - matching ${userId} with AI bot`);
+            
+            // Remove user from queue
+            const userIndex = matchmakingQueue.indexOf(userId);
+            if (userIndex > -1) {
+              matchmakingQueue.splice(userIndex, 1);
+            }
+            
+            // Get a random bot
+            const bot = getRandomAvailableBot();
+            console.log(`🤖 Selected bot: ${bot.displayName} (${bot.difficulty} difficulty)`);
+            
+            // Create room for user vs bot
+            const room = await storage.createRoom({
+              name: `${bot.displayName} Match`,
+              isPrivate: false,
+              maxPlayers: 2,
+              ownerId: userId,
+            });
+            
+            // Add user as participant
+            await storage.addRoomParticipant({
+              roomId: room.id,
+              userId: userId,
+              role: 'player',
+            });
+            
+            // Notify user about bot match
+            const userConnections = Array.from(connections.entries())
+              .filter(([_, connection]) => connection.userId === userId && connection.ws.readyState === WebSocket.OPEN);
+            
+            if (userConnections.length > 0) {
+              const [connId, connection] = userConnections[0];
+              
+              // Add to room connections
+              if (!roomConnections.has(room.id)) {
+                roomConnections.set(room.id, new Set());
+              }
+              roomConnections.get(room.id)!.add(connId);
+              connection.roomId = room.id;
+              
+              userRoomStates.set(userId, {
+                roomId: room.id,
+                isInGame: false,
+                role: 'player'
+              });
+              
+              // Send match found notification with bot
+              connection.ws.send(JSON.stringify({
+                type: 'match_found',
+                room: room,
+                message: `Matched with ${bot.displayName}!`,
+                isBot: true,
+                botInfo: bot
+              }));
+              
+              console.log(`🤖 User ${userId} matched with bot in room ${room.id}`);
+              
+              // Auto-start game with bot after 2 seconds
+              setTimeout(async () => {
+                try {
+                  const game = await storage.createGame({
+                    roomId: room.id,
+                    playerXId: userId,
+                    playerOId: bot.id,
+                    gameMode: 'online',
+                    currentPlayer: 'X',
+                    board: {},
+                    status: 'active',
+                  });
+                  
+                  // Get user info
+                  const userInfo = await storage.getUser(userId);
+                  const userAchievements = await storage.getUserAchievements(userId);
+                  
+                  const gameWithPlayers = {
+                    ...game,
+                    playerXInfo: userInfo ? {
+                      ...userInfo,
+                      achievements: userAchievements.slice(0, 3)
+                    } : null,
+                    playerOInfo: {
+                      ...bot,
+                      achievements: [] // Bots don't have achievements
+                    }
+                  };
+                  
+                  // Notify user about game start
+                  if (connection.ws.readyState === WebSocket.OPEN) {
+                    connection.ws.send(JSON.stringify({
+                      type: 'game_started',
+                      game: gameWithPlayers,
+                      roomId: room.id
+                    }));
+                    
+                    console.log(`🎮 Bot game started in room ${room.id}`);
+                  }
+                } catch (error) {
+                  console.error('🤖 Error starting bot game:', error);
+                }
+              }, 2000);
+            }
+            
+            // Clean up timer
+            matchmakingTimers.delete(userId);
+          }
+        } catch (error) {
+          console.error('🤖 Error in bot matchmaking:', error);
+          matchmakingTimers.delete(userId);
+        }
+      }, 25000); // 25 seconds
+      
+      // Store timer for cleanup
+      matchmakingTimers.set(userId, botTimer);
+      
       // Check if we can make a match (need 2 players)
       if (matchmakingQueue.length >= 2) {
-        // Remove two players from queue
-        const player1Id = matchmakingQueue.shift()!;
-        const player2Id = matchmakingQueue.shift()!;
+        // Clear timers for both players since they matched with real players
+        const player1Id = matchmakingQueue[0];
+        const player2Id = matchmakingQueue[1];
+        
+        if (matchmakingTimers.has(player1Id)) {
+          clearTimeout(matchmakingTimers.get(player1Id)!);
+          matchmakingTimers.delete(player1Id);
+        }
+        if (matchmakingTimers.has(player2Id)) {
+          clearTimeout(matchmakingTimers.get(player2Id)!);
+          matchmakingTimers.delete(player2Id);
+        }
+        // Remove both players from queue (variables already declared above)
+        matchmakingQueue.splice(0, 2);
         
         console.log(`🎯 Match found! Pairing ${player1Id} vs ${player2Id}`);
         
@@ -966,6 +1146,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post('/api/matchmaking/leave', requireAuth, async (req: any, res) => {
     try {
       const userId = req.session.user.userId;
+      
+      // Clear timer if user leaves manually
+      if (matchmakingTimers.has(userId)) {
+        clearTimeout(matchmakingTimers.get(userId)!);
+        matchmakingTimers.delete(userId);
+        console.log(`🤖 Cleared bot timer for user ${userId}`);
+      }
+      
       const index = matchmakingQueue.indexOf(userId);
       if (index > -1) {
         matchmakingQueue.splice(index, 1);
@@ -1735,6 +1923,204 @@ export async function registerRoutes(app: Express): Promise<Server> {
               connection.ws.send(moveMessage);
             }
           });
+        }
+        
+        // Handle Bot move if it's an online game against a bot
+        const isGameAgainstBot = game.playerOId && AI_BOTS.some(bot => bot.id === game.playerOId);
+        if (game.gameMode === 'online' && isGameAgainstBot && nextPlayer === 'O') {
+          console.log(`🤖 Bot's turn - ${game.playerOId} making move`);
+          setTimeout(async () => {
+            try {
+              // Find the bot information
+              const botInfo = AI_BOTS.find(bot => bot.id === game.playerOId);
+              if (!botInfo) {
+                console.error(`🤖 Bot not found: ${game.playerOId}`);
+                return;
+              }
+              
+              // Create AI player with bot's difficulty
+              const aiBot = new AIPlayer('O', botInfo.difficulty);
+              const botMove = aiBot.makeMove(newBoard);
+              
+              console.log(`🤖 ${botInfo.displayName} (${botInfo.difficulty}) chose position ${botMove}`);
+              
+              const botBoard = makeMove(newBoard, botMove, 'O');
+              
+              // Save bot move
+              await storage.createMove({
+                gameId,
+                playerId: game.playerOId,
+                position: botMove,
+                symbol: 'O',
+                moveNumber: moveCount.length + 2,
+              });
+              
+              await storage.updateGameBoard(gameId, botBoard);
+              
+              // Check bot win
+              const botWinResult = checkWin(botBoard, 'O');
+              if (botWinResult.winner) {
+                await storage.updateGameStatus(gameId, 'finished', game.playerOId, botWinResult.condition || undefined);
+                await storage.updateUserStats(userId, 'loss'); // User loses to bot
+                
+                // Check and grant achievements for the human player (they lost to bot)
+                if (game.roomId) {
+                  await storage.updateRoomStatus(game.roomId, 'waiting');
+                  try {
+                    await storage.checkAndGrantAchievements(userId, 'loss', {
+                      winCondition: botWinResult.condition,
+                      isOnlineGame: true,
+                      againstBot: true
+                    });
+                  } catch (error) {
+                    console.error('🏆 Error checking achievements for user (lost to bot):', error);
+                  }
+                }
+                
+                // Broadcast bot win to room
+                if (game.roomId && roomConnections.has(game.roomId)) {
+                  const roomUsers = roomConnections.get(game.roomId)!;
+                  
+                  // First broadcast the winning move with highlight
+                  const winningMoveMessage = JSON.stringify({
+                    type: 'winning_move',
+                    gameId,
+                    position: botMove,
+                    player: 'O',
+                    board: botBoard,
+                    currentPlayer: 'X',
+                    winningPositions: botWinResult.winningPositions || [],
+                    roomId: game.roomId
+                  });
+                  
+                  roomUsers.forEach(connectionId => {
+                    const connection = connections.get(connectionId);
+                    if (connection && connection.ws.readyState === WebSocket.OPEN) {
+                      connection.ws.send(winningMoveMessage);
+                    }
+                  });
+                  
+                  // Then broadcast game over after 2.5 seconds
+                  setTimeout(async () => {
+                    const playerXInfo = await storage.getUser(game.playerXId);
+                    
+                    roomUsers.forEach(connectionId => {
+                      const connection = connections.get(connectionId);
+                      if (connection && connection.ws.readyState === WebSocket.OPEN) {
+                        connection.ws.send(JSON.stringify({
+                          type: 'game_over',
+                          gameId,
+                          winner: 'O',
+                          condition: botWinResult.condition,
+                          board: botBoard,
+                          winnerInfo: {
+                            displayName: botInfo.displayName,
+                            firstName: botInfo.firstName,
+                            username: botInfo.username,
+                            profilePicture: null,
+                            profileImageUrl: null
+                          },
+                          playerXInfo: playerXInfo ? {
+                            displayName: playerXInfo.displayName,
+                            firstName: playerXInfo.firstName,
+                            username: playerXInfo.username,
+                            profilePicture: playerXInfo.profilePicture,
+                            profileImageUrl: playerXInfo.profileImageUrl
+                          } : null,
+                          playerOInfo: {
+                            displayName: botInfo.displayName,
+                            firstName: botInfo.firstName,
+                            username: botInfo.username,
+                            profilePicture: null,
+                            profileImageUrl: null
+                          }
+                        }));
+                      }
+                    });
+                  }, 2500);
+                }
+              } else if (checkDraw(botBoard)) {
+                await storage.updateGameStatus(gameId, 'finished', undefined, 'draw');
+                await storage.updateUserStats(userId, 'draw'); // User draws with bot
+                
+                if (game.roomId) {
+                  await storage.updateRoomStatus(game.roomId, 'waiting');
+                  try {
+                    await storage.checkAndGrantAchievements(userId, 'draw', {
+                      winCondition: 'draw',
+                      isOnlineGame: true,
+                      againstBot: true
+                    });
+                  } catch (error) {
+                    console.error('🏆 Error checking achievements for user (draw with bot):', error);
+                  }
+                }
+                
+                // Broadcast draw to room
+                if (game.roomId && roomConnections.has(game.roomId)) {
+                  const roomUsers = roomConnections.get(game.roomId)!;
+                  roomUsers.forEach(connectionId => {
+                    const connection = connections.get(connectionId);
+                    if (connection && connection.ws.readyState === WebSocket.OPEN) {
+                      connection.ws.send(JSON.stringify({
+                        type: 'game_over',
+                        gameId,
+                        winner: null,
+                        condition: 'draw',
+                        board: botBoard,
+                      }));
+                    }
+                  });
+                }
+              } else {
+                // Bot made a move, switch back to human player
+                await storage.updateCurrentPlayer(gameId, 'X');
+                
+                // Broadcast bot move to room
+                if (game.roomId && roomConnections.has(game.roomId)) {
+                  const roomUsers = roomConnections.get(game.roomId)!;
+                  const playerXInfo = await storage.getUser(game.playerXId);
+                  const playerXAchievements = playerXInfo ? await storage.getUserAchievements(game.playerXId) : [];
+                  
+                  const botMoveMessage = JSON.stringify({
+                    type: 'move',
+                    gameId,
+                    roomId: game.roomId,
+                    position: botMove,
+                    player: 'O',
+                    board: botBoard,
+                    currentPlayer: 'X',
+                    playerXInfo: playerXInfo ? {
+                      displayName: playerXInfo.displayName,
+                      firstName: playerXInfo.firstName,
+                      username: playerXInfo.username,
+                      profilePicture: playerXInfo.profilePicture,
+                      profileImageUrl: playerXInfo.profileImageUrl,
+                      achievements: playerXAchievements.slice(0, 3)
+                    } : null,
+                    playerOInfo: {
+                      displayName: botInfo.displayName,
+                      firstName: botInfo.firstName,
+                      username: botInfo.username,
+                      profilePicture: null,
+                      profileImageUrl: null,
+                      achievements: []
+                    }
+                  });
+                  
+                  console.log(`🤖 Broadcasting bot move to ${roomUsers.size} users`);
+                  roomUsers.forEach(connectionId => {
+                    const connection = connections.get(connectionId);
+                    if (connection && connection.ws.readyState === WebSocket.OPEN) {
+                      connection.ws.send(botMoveMessage);
+                    }
+                  });
+                }
+              }
+            } catch (error) {
+              console.error('🤖 Error in bot move handling:', error);
+            }
+          }, 1000 + Math.random() * 2000); // Random delay 1-3 seconds for realistic bot behavior
         }
         
         // Handle AI move if it's AI mode

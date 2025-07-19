@@ -201,15 +201,23 @@ export function MatchmakingModal({ open, onClose, onMatchFound, user }: Matchmak
                     
                     <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
                       <div 
-                        className="bg-gradient-to-r from-blue-500 to-purple-500 h-2 rounded-full transition-all duration-1000"
-                        style={{ width: `${Math.min((searchTime / 30) * 100, 100)}%` }}
+                        className={`h-2 rounded-full transition-all duration-1000 ${
+                          searchTime >= 25 ? 'bg-gradient-to-r from-orange-500 to-red-500' : 'bg-gradient-to-r from-blue-500 to-purple-500'
+                        }`}
+                        style={{ width: `${Math.min((searchTime / 25) * 100, 100)}%` }}
                       ></div>
                     </div>
                     
-                    <div className="text-xs text-gray-500 text-center">
-                      {searchTime < 10 ? t('findingPerfectOpponent') : 
-                       searchTime < 20 ? t('expandingSearch') : 
-                       t('almostThere')}
+                    <div className="text-xs text-center">
+                      {searchTime < 10 ? (
+                        <span className="text-gray-500">{t('findingPerfectOpponent')}</span>
+                      ) : searchTime < 20 ? (
+                        <span className="text-gray-500">{t('expandingSearch')}</span>
+                      ) : searchTime < 25 ? (
+                        <span className="text-orange-500 font-medium">🤖 {t('willMatchWithBot')} {25 - searchTime}s</span>
+                      ) : (
+                        <span className="text-green-500 font-medium">🤖 {t('matchingWithBot')}</span>
+                      )}
                     </div>
                   </div>
                 </CardContent>

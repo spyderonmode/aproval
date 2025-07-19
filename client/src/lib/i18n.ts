@@ -1561,6 +1561,22 @@ export const translations = {
     es: 'Casi llegamos...',
     id: 'Hampir sampai...'
   },
+  willMatchWithBot: {
+    en: 'Will match with AI bot in',
+    ar: 'سيتم المطابقة مع روبوت الذكاء الاصطناعي خلال',
+    bn: 'AI বট এর সাথে ম্যাচ হবে',
+    hi: 'AI बॉट के साथ मैच होगा',
+    es: 'Se emparejará con bot de IA en',
+    id: 'Akan dicocokkan dengan bot AI dalam'
+  },
+  matchingWithBot: {
+    en: 'Matching with AI bot...',
+    ar: 'مطابقة مع روبوت الذكاء الاصطناعي...',
+    bn: 'AI বট এর সাথে ম্যাচিং...',
+    hi: 'AI बॉट के साथ मैच हो रहा है...',
+    es: 'Emparejando con bot de IA...',
+    id: 'Mencocokkan dengan bot AI...'
+  },
 
   // Game Over Modal
   gameOver: {
