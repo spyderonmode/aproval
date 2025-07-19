@@ -129,7 +129,7 @@ export default function Home() {
           console.log('🎮 Game data:', lastMessage.game);
           console.log('🎮 Current user ID:', user?.userId || user?.id);
           // Handle game start from WebSocket - ensure both players transition
-          if (lastMessage.roomId === currentRoom?.id) {
+          if (lastMessage.roomId === currentRoom?.id || !currentRoom) {
             console.log('🎮 Setting current game from WebSocket:', lastMessage.game);
             console.log('🎮 New game ID:', lastMessage.game.id);
             console.log('🎮 Previous game ID:', currentGame?.id);
@@ -142,6 +142,12 @@ export default function Home() {
             // Ensure game mode is set to online when receiving game_started
             console.log('🎮 Setting selectedMode to online for game_started');
             setSelectedMode('online');
+            
+            // Set the room if not already set (for bot matches)
+            if (!currentRoom && lastMessage.roomId) {
+              console.log('🎮 Setting room from game_started message');
+              setCurrentRoom({ id: lastMessage.roomId, status: 'playing' });
+            }
             
             // Update room status to playing to sync with backend
             if (currentRoom) {
@@ -330,8 +336,17 @@ export default function Home() {
           }
           setIsMatchmaking(false);
           setShowMatchmaking(false);
-          // Server automatically joins players to room, just set room state
+          // Server automatically joins players to room, set room state and join the room
+          console.log('🎮 Setting room from match_found:', lastMessage.room);
           setCurrentRoom(lastMessage.room);
+          setSelectedMode('online'); // Ensure we're in online mode
+          
+          // Join the room via WebSocket to receive game updates
+          if (lastMessage.room?.id) {
+            console.log('🎮 Joining room after match found:', lastMessage.room.id);
+            joinRoom(lastMessage.room.id);
+          }
+          
           toast({
             title: "Match Found!",
             description: "You've been matched with an opponent. Game starting...",
