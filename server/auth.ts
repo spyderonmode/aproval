@@ -464,6 +464,20 @@ export function setupAuth(app: Express) {
       return res.status(500).json({ error: 'Failed to verify email' });
     }
 
+    // Sync updated user to database
+    try {
+      await storage.upsertUser({
+        id: updatedUser.id,
+        email: updatedUser.email || null,
+        firstName: updatedUser.displayName || updatedUser.username || 'Anonymous',
+        lastName: null,
+        profileImageUrl: updatedUser.profilePicture || null,
+      });
+      console.log('User synced to database:', updatedUser.id);
+    } catch (error) {
+      console.error('Error syncing verified user to database:', error);
+    }
+
     res.json({ message: 'Email verified successfully! You can now log in.' });
   });
 
@@ -495,6 +509,20 @@ export function setupAuth(app: Express) {
 
     if (!updatedUser) {
       return res.status(500).json({ error: 'Failed to generate new verification token' });
+    }
+
+    // Sync updated user to database
+    try {
+      await storage.upsertUser({
+        id: updatedUser.id,
+        email: updatedUser.email || null,
+        firstName: updatedUser.displayName || updatedUser.username || 'Anonymous',
+        lastName: null,
+        profileImageUrl: updatedUser.profilePicture || null,
+      });
+      console.log('User resend verification synced to database:', updatedUser.id);
+    } catch (error) {
+      console.error('Error syncing resend verification user to database:', error);
     }
 
     // Send verification email
@@ -616,10 +644,26 @@ export function setupAuth(app: Express) {
       const resetCode = generateVerificationCode();
       const resetExpiry = new Date(Date.now() + 60 * 60 * 1000); // 1 hour
 
-      updateUser(user.id, {
+      const updatedUser = updateUser(user.id, {
         passwordResetToken: resetCode,
         passwordResetExpiry: resetExpiry
       });
+
+      // Sync updated user to database
+      if (updatedUser) {
+        try {
+          await storage.upsertUser({
+            id: updatedUser.id,
+            email: updatedUser.email || null,
+            firstName: updatedUser.displayName || updatedUser.username || 'Anonymous',
+            lastName: null,
+            profileImageUrl: updatedUser.profilePicture || null,
+          });
+          console.log('User forgot password synced to database:', updatedUser.id);
+        } catch (error) {
+          console.error('Error syncing forgot password user to database:', error);
+        }
+      }
 
       await sendPasswordResetEmail(email, resetCode);
 
@@ -687,6 +731,20 @@ export function setupAuth(app: Express) {
 
       if (!updatedUser) {
         return res.status(500).json({ error: 'Failed to update password' });
+      }
+
+      // Sync updated user to database
+      try {
+        await storage.upsertUser({
+          id: updatedUser.id,
+          email: updatedUser.email || null,
+          firstName: updatedUser.displayName || updatedUser.username || 'Anonymous',
+          lastName: null,
+          profileImageUrl: updatedUser.profilePicture || null,
+        });
+        console.log('User password reset synced to database:', updatedUser.id);
+      } catch (error) {
+        console.error('Error syncing password reset user to database:', error);
       }
 
       res.json({ message: 'Password has been reset successfully. You can now log in with your new password.' });
