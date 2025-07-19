@@ -64,6 +64,7 @@ export const games = pgTable("games", {
   winnerId: varchar("winner_id").references(() => users.id),
   winCondition: varchar("win_condition"), // horizontal, diagonal, draw
   board: jsonb("board").default('{}'), // position -> player mapping
+  lastMoveAt: timestamp("last_move_at").defaultNow(), // Track last move/game update time
   createdAt: timestamp("created_at").defaultNow(),
   finishedAt: timestamp("finished_at"),
 });

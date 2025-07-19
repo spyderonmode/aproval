@@ -343,6 +343,45 @@ export default function Home() {
             description: lastMessage.message || "You've been matched with a real player!",
           });
           break;
+        case 'reconnection_room_join':
+          console.log('🔄 Reconnection room join:', lastMessage);
+          if (lastMessage.room) {
+            handleRoomJoin(lastMessage.room);
+            toast({
+              title: "Reconnected!",
+              description: lastMessage.message || "You've been reconnected to your game room.",
+            });
+          }
+          break;
+        case 'game_reconnection':
+          console.log('🔄 Game reconnection:', lastMessage);
+          if (lastMessage.game && lastMessage.roomId === currentRoom?.id) {
+            console.log('🔄 Restoring game state from reconnection:', lastMessage.game);
+            setSelectedMode('online');
+            setCurrentGame({
+              ...lastMessage.game,
+              status: 'active',
+              gameMode: 'online',
+              timestamp: Date.now()
+            });
+            setIsCreatingGame(false);
+            setShowGameOver(false);
+            setGameResult(null);
+            toast({
+              title: "Game Restored!",
+              description: lastMessage.message || "Your game has been restored successfully.",
+            });
+          }
+          break;
+        case 'player_reconnected':
+          console.log('🔄 Player reconnected:', lastMessage);
+          if (currentRoom && lastMessage.userId !== (user?.userId || user?.id)) {
+            toast({
+              title: "Player Reconnected",
+              description: `${lastMessage.playerName} has reconnected to the game.`,
+            });
+          }
+          break;
         case 'player_reaction':
           // Handle player reaction - this will be broadcast to all players and spectators
           if (currentGame && (lastMessage.gameId === currentGame.id || lastMessage.roomId === currentRoom?.id)) {

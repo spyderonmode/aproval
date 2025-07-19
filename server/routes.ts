@@ -43,6 +43,115 @@ export async function registerRoutes(app: Express): Promise<Server> {
   const userRoomStates = new Map<string, { roomId: string; gameId?: string; isInGame: boolean }>();
   const matchmakingTimers = new Map<string, NodeJS.Timeout>(); // Track user timers for bot matches
   
+  // Offline reconnection handler
+  async function handleUserReconnection(userId: string, connectionId: string, ws: WebSocket) {
+    try {
+      console.log(`🔄 Checking for active game reconnection for user: ${userId}`);
+      
+      // Check if user has an active game
+      const activeGame = await storage.getActiveGameForUser(userId);
+      
+      if (activeGame && activeGame.roomId) {
+        console.log(`🎮 Found active game ${activeGame.id} in room ${activeGame.roomId} for reconnecting user ${userId}`);
+        
+        // Add user back to room connections
+        if (!roomConnections.has(activeGame.roomId)) {
+          roomConnections.set(activeGame.roomId, new Set());
+        }
+        roomConnections.get(activeGame.roomId)!.add(connectionId);
+        
+        // Update connection room info
+        const connection = connections.get(connectionId);
+        if (connection) {
+          connection.roomId = activeGame.roomId;
+        }
+        
+        // Update user room state
+        userRoomStates.set(userId, {
+          roomId: activeGame.roomId,
+          gameId: activeGame.id,
+          isInGame: true
+        });
+        
+        // Get complete game data with player info
+        const [playerXInfo, playerOInfo] = await Promise.all([
+          storage.getUser(activeGame.playerXId!),
+          storage.getUser(activeGame.playerOId!)
+        ]);
+        
+        // Get achievements for both players
+        const [playerXAchievements, playerOAchievements] = await Promise.all([
+          storage.getUserAchievements(activeGame.playerXId!),
+          storage.getUserAchievements(activeGame.playerOId!)
+        ]);
+        
+        const gameWithPlayers = {
+          ...activeGame,
+          playerXInfo: playerXInfo ? {
+            ...playerXInfo,
+            achievements: playerXAchievements.slice(0, 3)
+          } : null,
+          playerOInfo: playerOInfo ? {
+            ...playerOInfo,
+            achievements: playerOAchievements.slice(0, 3)
+          } : null,
+          gameMode: activeGame.gameMode
+        };
+        
+        // Get room info
+        const room = await storage.getRoomById(activeGame.roomId);
+        
+        // Send reconnection messages
+        if (ws.readyState === WebSocket.OPEN) {
+          // First, send room join notification
+          ws.send(JSON.stringify({
+            type: 'reconnection_room_join',
+            room: room,
+            message: 'Reconnected to your game room'
+          }));
+          
+          // Then send current game state
+          setTimeout(() => {
+            if (ws.readyState === WebSocket.OPEN) {
+              ws.send(JSON.stringify({
+                type: 'game_reconnection',
+                game: gameWithPlayers,
+                roomId: activeGame.roomId,
+                message: 'Game state recovered successfully'
+              }));
+              
+              console.log(`🔄 Sent reconnection data to user ${userId} for game ${activeGame.id}`);
+            }
+          }, 500);
+          
+          // Notify other players in the room about reconnection
+          const roomUsers = roomConnections.get(activeGame.roomId);
+          if (roomUsers) {
+            const reconnectionNotification = JSON.stringify({
+              type: 'player_reconnected',
+              userId: userId,
+              playerName: playerXInfo?.displayName || playerOInfo?.displayName || 'Player',
+              message: 'Player reconnected to the game'
+            });
+            
+            roomUsers.forEach(otherConnectionId => {
+              if (otherConnectionId !== connectionId) {
+                const otherConnection = connections.get(otherConnectionId);
+                if (otherConnection && otherConnection.ws.readyState === WebSocket.OPEN) {
+                  otherConnection.ws.send(reconnectionNotification);
+                }
+              }
+            });
+          }
+        }
+      } else {
+        console.log(`🔄 No active game found for user ${userId} - normal connection`);
+      }
+    } catch (error) {
+      console.error(`🔄 Error handling reconnection for user ${userId}:`, error);
+    }
+  }
+
   // AI Bot System - 100 AI opponents with varied difficulties and personalities
   const REALISTIC_NAMES = [
     // English names
@@ -2480,6 +2589,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
               displayName: userInfo?.displayName || userInfo?.firstName || 'Anonymous',
               lastSeen: new Date()
             });
+            
+            // Check for active game reconnection
+            await handleUserReconnection(data.userId, connectionId, ws);
             
             // Broadcast updated online count to all connected users
             const onlineCount = onlineUsers.size;

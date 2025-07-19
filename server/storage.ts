@@ -56,6 +56,8 @@ export interface IStorage {
   updateGameBoard(gameId: string, board: Record<string, string>): Promise<void>;
   updateGameStatus(gameId: string, status: string, winnerId?: string, winCondition?: string): Promise<void>;
   updateCurrentPlayer(gameId: string, currentPlayer: string): Promise<void>;
+  getActiveGameForUser(userId: string): Promise<Game | undefined>;
+  updateLastMoveTime(gameId: string): Promise<void>;
   
   // Move operations
   createMove(move: InsertMove): Promise<Move>;
@@ -290,7 +292,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   async updateGameBoard(gameId: string, board: Record<string, string>): Promise<void> {
-    await db.update(games).set({ board }).where(eq(games.id, gameId));
+    await db.update(games).set({ board, lastMoveAt: new Date() }).where(eq(games.id, gameId));
   }
 
   async updateGameStatus(gameId: string, status: string, winnerId?: string, winCondition?: string): Promise<void> {
@@ -325,7 +327,27 @@ export class DatabaseStorage implements IStorage {
   }
 
   async updateCurrentPlayer(gameId: string, currentPlayer: string): Promise<void> {
-    await db.update(games).set({ currentPlayer }).where(eq(games.id, gameId));
+    await db.update(games).set({ currentPlayer, lastMoveAt: new Date() }).where(eq(games.id, gameId));
+  }
+
+  async getActiveGameForUser(userId: string): Promise<Game | undefined> {
+    const [game] = await db
+      .select()
+      .from(games)
+      .where(and(
+        eq(games.status, 'active'),
+        or(
+          eq(games.playerXId, userId),
+          eq(games.playerOId, userId)
+        )
+      ))
+      .orderBy(desc(games.lastMoveAt))
+      .limit(1);
+    return game;
+  }
+
+  async updateLastMoveTime(gameId: string): Promise<void> {
+    await db.update(games).set({ lastMoveAt: new Date() }).where(eq(games.id, gameId));
   }
 
   // Move operations
