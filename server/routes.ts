@@ -3254,13 +3254,83 @@ export async function registerRoutes(app: Express): Promise<Server> {
           if (roomUsers.has(connectionId)) {
             roomUsers.delete(connectionId);
             
-            // Check if user is in active game before notifying room end
+            // Check if user is in active game
             const userState = userRoomStates.get(connection.userId);
             const activeGame = await storage.getActiveGameByRoomId(roomId);
             
-            if (!(activeGame && activeGame.status === 'active' && 
-                  (activeGame.playerXId === connection.userId || activeGame.playerOId === connection.userId))) {
-              // Only notify room end if user is not in active game
+            if (activeGame && activeGame.status === 'active' && 
+                (activeGame.playerXId === connection.userId || activeGame.playerOId === connection.userId)) {
+              // User disconnected from active game - abandon the game
+              const userInfo = await storage.getUser(connection.userId);
+              const playerName = userInfo?.displayName || userInfo?.firstName || userInfo?.username || 'A player';
+              
+              console.log(`🏠 Player ${playerName} disconnected from active game - terminating game and redirecting all users`);
+              
+              // Mark game as finished due to player disconnection
+              await storage.finishGame(activeGame.id, {
+                status: 'abandoned',
+                winningPlayer: null,
+                winningPositions: [],
+                updatedAt: new Date()
+              });
+              
+              console.log(`🏠 Game ${activeGame.id} permanently ended in database due to player disconnect`);
+              
+              // Get all users in the room (players and spectators)
+              const roomUsers = roomConnections.get(roomId);
+              if (roomUsers && roomUsers.size > 0) {
+                const gameEndMessage = JSON.stringify({
+                  type: 'game_abandoned',
+                  roomId,
+                  gameId: activeGame.id,
+                  leavingPlayer: playerName,
+                  message: `Game ended - ${playerName} disconnected`,
+                  redirectToHome: true
+                });
+                
+                // Track unique users to prevent duplicate messages
+                const notifiedUsers = new Set<string>();
+                const connectionsToSend: string[] = [];
+                
+                // Filter to send only one message per unique user
+                roomUsers.forEach(connectionId => {
+                  const conn = connections.get(connectionId);
+                  if (conn && conn.ws.readyState === WebSocket.OPEN && conn.userId) {
+                    if (!notifiedUsers.has(conn.userId)) {
+                      notifiedUsers.add(conn.userId);
+                      connectionsToSend.push(connectionId);
+                    }
+                  }
+                });
+                
+                console.log(`🏠 Broadcasting game abandonment to ${connectionsToSend.length} unique users in room ${roomId}`);
+                
+                // Send to unique users only
+                connectionsToSend.forEach(connectionId => {
+                  const conn = connections.get(connectionId);
+                  if (conn && conn.ws.readyState === WebSocket.OPEN) {
+                    conn.ws.send(gameEndMessage);
+                    
+                    // Clear their room state immediately
+                    const connUserId = conn.userId;
+                    if (connUserId) {
+                      userRoomStates.delete(connUserId);
+                      const onlineUser = onlineUsers.get(connUserId);
+                      if (onlineUser) {
+                        onlineUser.roomId = undefined;
+                      }
+                    }
+                    
+                    // Clear their connection room info
+                    conn.roomId = undefined;
+                  }
+                });
+                
+                // Clear room connections
+                roomConnections.delete(roomId);
+              }
+            } else {
+              // User was not in active game - just notify room end
               const userInfo = await storage.getUser(connection.userId);
               const playerName = userInfo?.displayName || userInfo?.firstName || userInfo?.username || 'A player';
               
