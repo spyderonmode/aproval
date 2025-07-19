@@ -1675,13 +1675,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Get player information with achievements for the game
       const [playerXInfo, playerOInfo] = await Promise.all([
         storage.getUser(game.playerXId),
-        game.playerOId && game.playerOId !== 'AI' ? storage.getUser(game.playerOId) : Promise.resolve(null)
+        game.playerOId && game.playerOId !== 'AI' && !AI_BOTS.some(bot => bot.id === game.playerOId) ? 
+          storage.getUser(game.playerOId) : 
+          Promise.resolve(AI_BOTS.find(bot => bot.id === game.playerOId) || null)
       ]);
       
       // Get achievements for both players
       const [playerXAchievements, playerOAchievements] = await Promise.all([
         playerXInfo ? storage.getUserAchievements(game.playerXId) : Promise.resolve([]),
-        playerOInfo ? storage.getUserAchievements(game.playerOId) : Promise.resolve([])
+        playerOInfo && !AI_BOTS.some(bot => bot.id === game.playerOId) ? storage.getUserAchievements(game.playerOId) : Promise.resolve([])
       ]);
       
       const gameWithPlayers = {
