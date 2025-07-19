@@ -43,15 +43,90 @@ export async function registerRoutes(app: Express): Promise<Server> {
   const userRoomStates = new Map<string, { roomId: string; gameId?: string; isInGame: boolean }>();
   const matchmakingTimers = new Map<string, NodeJS.Timeout>(); // Track user timers for bot matches
   
-  // Offline reconnection handler
+  // Game expiration system - check every 2 minutes
+  setInterval(async () => {
+    try {
+      const expiredGames = await storage.getExpiredGames();
+      
+      for (const expiredGame of expiredGames) {
+        console.log(`⏰ Game ${expiredGame.id} expired after 10 minutes of inactivity`);
+        
+        // Update game status to expired
+        await storage.expireGame(expiredGame.id);
+        
+        // Update room status back to waiting
+        if (expiredGame.roomId) {
+          await storage.updateRoomStatus(expiredGame.roomId, 'waiting');
+        }
+        
+        // Notify all players in the room about expiration
+        if (expiredGame.roomId && roomConnections.has(expiredGame.roomId)) {
+          const roomUsers = roomConnections.get(expiredGame.roomId);
+          const expirationMessage = JSON.stringify({
+            type: 'game_expired',
+            gameId: expiredGame.id,
+            roomId: expiredGame.roomId,
+            message: 'Game expired due to 10 minutes of inactivity. Returning to lobby.'
+          });
+          
+          roomUsers?.forEach(connectionId => {
+            const connection = connections.get(connectionId);
+            if (connection && connection.ws.readyState === WebSocket.OPEN) {
+              connection.ws.send(expirationMessage);
+            }
+          });
+          
+          // Clear room connections
+          roomConnections.delete(expiredGame.roomId);
+        }
+        
+        // Clear user room states for expired game players
+        userRoomStates.forEach((state, userId) => {
+          if (state.gameId === expiredGame.id) {
+            userRoomStates.delete(userId);
+          }
+        });
+      }
+    } catch (error) {
+      console.error('⏰ Error checking for expired games:', error);
+    }
+  }, 2 * 60 * 1000); // Check every 2 minutes
+
+  // Offline reconnection handler with expiration check
   async function handleUserReconnection(userId: string, connectionId: string, ws: WebSocket) {
     try {
       console.log(`🔄 Checking for active game reconnection for user: ${userId}`);
       
-      // Check if user has an active game
+      // Check if user has an active game (not expired)
       const activeGame = await storage.getActiveGameForUser(userId);
       
-      if (activeGame && activeGame.roomId) {
+      if (activeGame && activeGame.roomId && activeGame.status === 'active') {
+        // Check if game is still within 10 minute limit
+        const gameAge = Date.now() - new Date(activeGame.lastMoveAt || activeGame.createdAt).getTime();
+        const tenMinutes = 10 * 60 * 1000;
+        
+        if (gameAge > tenMinutes) {
+          console.log(`⏰ Game ${activeGame.id} is expired (${Math.round(gameAge / 60000)} minutes old), expiring now`);
+          
+          // Expire the game immediately
+          await storage.expireGame(activeGame.id);
+          await storage.updateRoomStatus(activeGame.roomId, 'waiting');
+          
+          // Send expiration message to user
+          if (ws.readyState === WebSocket.OPEN) {
+            ws.send(JSON.stringify({
+              type: 'game_expired',
+              gameId: activeGame.id,
+              roomId: activeGame.roomId,
+              message: 'Your game has expired. Returning to lobby.'
+            }));
+          }
+          
+          // Clear user room state
+          userRoomStates.delete(userId);
+          return;
+        }
+        
         console.log(`🎮 Found active game ${activeGame.id} in room ${activeGame.roomId} for reconnecting user ${userId}`);
         
         // Add user back to room connections

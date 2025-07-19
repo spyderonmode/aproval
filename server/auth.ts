@@ -5,6 +5,8 @@ import { Express } from 'express';
 import session from 'express-session';
 import MemoryStore from 'memorystore';
 import { storage } from './storage';
+import { db } from './db';
+import { sql } from 'drizzle-orm';
 import { createEmailService } from './emailService';
 
 interface User {
@@ -205,6 +207,10 @@ export function setupAuth(app: Express) {
   // Recalculate all user stats to ensure they're up to date
   setTimeout(async () => {
     try {
+      // Add the missing last_move_at column if it doesn't exist
+      await db.execute(sql`ALTER TABLE games ADD COLUMN IF NOT EXISTS last_move_at TIMESTAMP DEFAULT NOW()`);
+      console.log('✅ Database column last_move_at ensured');
+      
       await storage.recalculateAllUserStats();
     } catch (error) {
       console.error('Failed to recalculate user stats:', error);

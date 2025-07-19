@@ -34,7 +34,7 @@ import {
   type InsertRoomInvitation,
 } from "@shared/schema";
 import { db } from "./db";
-import { eq, and, desc, count, or, ne, isNull, isNotNull, sql, exists, inArray } from "drizzle-orm";
+import { eq, and, desc, count, or, ne, isNull, isNotNull, sql, exists, inArray, lt } from "drizzle-orm";
 
 export interface IStorage {
   // User operations - mandatory for Replit Auth
@@ -273,9 +273,7 @@ export class DatabaseStorage implements IStorage {
 
   // Game operations
   async createGame(gameData: InsertGame): Promise<Game> {
-    // Remove lastMoveAt from gameData if it exists since column doesn't exist yet
-    const { lastMoveAt, ...safeGameData } = gameData as any;
-    const [game] = await db.insert(games).values(safeGameData).returning();
+    const [game] = await db.insert(games).values(gameData).returning();
     return game;
   }
 
@@ -294,7 +292,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   async updateGameBoard(gameId: string, board: Record<string, string>): Promise<void> {
-    await db.update(games).set({ board }).where(eq(games.id, gameId));
+    await db.update(games).set({ board, lastMoveAt: new Date() }).where(eq(games.id, gameId));
   }
 
   async updateGameStatus(gameId: string, status: string, winnerId?: string, winCondition?: string): Promise<void> {
@@ -329,7 +327,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   async updateCurrentPlayer(gameId: string, currentPlayer: string): Promise<void> {
-    await db.update(games).set({ currentPlayer }).where(eq(games.id, gameId));
+    await db.update(games).set({ currentPlayer, lastMoveAt: new Date() }).where(eq(games.id, gameId));
   }
 
   async getActiveGameForUser(userId: string): Promise<Game | undefined> {
@@ -349,8 +347,25 @@ export class DatabaseStorage implements IStorage {
   }
 
   async updateLastMoveTime(gameId: string): Promise<void> {
-    // Temporarily disabled - will be re-enabled once database column is added
-    // await db.update(games).set({ lastMoveAt: new Date() }).where(eq(games.id, gameId));
+    await db.update(games).set({ lastMoveAt: new Date() }).where(eq(games.id, gameId));
+  }
+
+  async getExpiredGames(): Promise<Game[]> {
+    const tenMinutesAgo = new Date(Date.now() - 10 * 60 * 1000); // 10 minutes ago
+    return await db
+      .select()
+      .from(games)
+      .where(and(
+        eq(games.status, 'active'),
+        lt(games.lastMoveAt, tenMinutesAgo)
+      ));
+  }
+
+  async expireGame(gameId: string): Promise<void> {
+    await db.update(games).set({ 
+      status: 'expired',
+      finishedAt: new Date()
+    }).where(eq(games.id, gameId));
   }
 
   // Move operations

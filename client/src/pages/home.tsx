@@ -382,6 +382,20 @@ export default function Home() {
             });
           }
           break;
+        case 'game_expired':
+          console.log('⏰ Game expired:', lastMessage);
+          // Return user to lobby when game expires
+          setCurrentGame(null);
+          setCurrentRoom(null);
+          setSelectedMode('ai');
+          setShowGameOver(false);
+          setGameResult(null);
+          toast({
+            title: "Game Expired",
+            description: lastMessage.message || "Game expired due to inactivity. Returning to lobby.",
+            variant: "destructive",
+          });
+          break;
         case 'player_reaction':
           // Handle player reaction - this will be broadcast to all players and spectators
           if (currentGame && (lastMessage.gameId === currentGame.id || lastMessage.roomId === currentRoom?.id)) {
