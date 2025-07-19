@@ -4,7 +4,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Trophy, Medal, Award, Crown, TrendingUp, Users, Target, Loader2 } from "lucide-react";
 import { useTranslation } from "@/contexts/LanguageContext";
 import { motion } from "framer-motion";
@@ -30,30 +30,35 @@ export function Leaderboard({ trigger }: LeaderboardProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [selectedPlayerId, setSelectedPlayerId] = useState<string | null>(null);
   const [showPlayerProfile, setShowPlayerProfile] = useState(false);
-  const { t } = useTranslation();
+  const { t, language } = useTranslation();
+  const queryClient = useQueryClient();
 
   const { data: leaderboard, isLoading, error, refetch } = useQuery<LeaderboardUser[]>({
-    queryKey: ['/api/leaderboard'],
+    queryKey: ['/api/leaderboard', language], // Include language in key to prevent cache conflicts
     enabled: isOpen, // Only fetch when modal is open
     retry: 3,
-    staleTime: 30000, // Cache for 30 seconds
+    staleTime: language === 'ar' ? 0 : 30000, // No cache for Arabic to force fresh data
     refetchOnMount: true,
     refetchOnWindowFocus: false,
     onError: (error) => {
-      console.error('Leaderboard fetch error:', error);
+      console.error(`Leaderboard fetch error (${language}):`, error);
     },
     onSuccess: (data) => {
-      console.log('Leaderboard data loaded:', data?.length, 'users', data);
+      console.log(`Leaderboard data loaded (${language}):`, data?.length, 'users', data?.slice(0, 2));
     }
   });
 
-  // Force refresh when modal opens
+  // Force refresh when modal opens or language changes
   useEffect(() => {
     if (isOpen) {
-      console.log('Modal opened - forcing leaderboard refresh');
+      console.log(`Modal opened (${language}) - forcing leaderboard refresh`);
+      // Clear all leaderboard cache when switching to Arabic
+      if (language === 'ar') {
+        queryClient.removeQueries({ queryKey: ['/api/leaderboard'] });
+      }
       refetch();
     }
-  }, [isOpen, refetch]);
+  }, [isOpen, language, refetch, queryClient]);
 
   // Listen for external trigger to open leaderboard
   useEffect(() => {
@@ -351,14 +356,19 @@ export function Leaderboard({ trigger }: LeaderboardProps) {
               {!isLoading && !leaderboard && (
                 <div className="p-4 bg-yellow-50 dark:bg-yellow-900/20 rounded-lg text-yellow-800 dark:text-yellow-200 text-sm">
                   <p>Debug: No data received</p>
+                  <p>Language: {language}</p>
                   <p>Loading: {isLoading.toString()}</p>
                   <p>Error: {error ? String(error) : 'None'}</p>
                   <p>Modal open: {isOpen.toString()}</p>
+                  <p>Data: {leaderboard ? `${leaderboard.length} users` : 'null/undefined'}</p>
                   <button 
-                    onClick={() => refetch()} 
+                    onClick={() => {
+                      console.log('Force refresh clicked');
+                      refetch();
+                    }} 
                     className="mt-2 px-3 py-1 bg-yellow-600 text-white rounded text-xs"
                   >
-                    Force Refresh
+                    Force Refresh ({language})
                   </button>
                 </div>
               )}
