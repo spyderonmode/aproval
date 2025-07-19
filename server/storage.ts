@@ -1860,14 +1860,7 @@ export class DatabaseStorage implements IStorage {
     try {
       // Get all games where both players participated
       const gamesQuery = await db
-        .select({
-          gameId: games.id,
-          winner: games.winner,
-          status: games.status,
-          createdAt: games.createdAt,
-          playerXId: games.playerXId,
-          playerOId: games.playerOId,
-        })
+        .select()
         .from(games)
         .where(
           and(
@@ -1889,10 +1882,10 @@ export class DatabaseStorage implements IStorage {
       for (const game of gamesQuery) {
         let result: 'win' | 'loss' | 'draw';
         
-        if (game.winner === 'draw') {
+        if (!game.winnerId) {
           result = 'draw';
           draws++;
-        } else if (game.winner === currentUserId) {
+        } else if (game.winnerId === currentUserId) {
           result = 'win';
           wins++;
         } else {
@@ -1901,9 +1894,9 @@ export class DatabaseStorage implements IStorage {
         }
 
         recentGames.push({
-          id: game.gameId,
+          id: game.id,
           result,
-          playedAt: game.createdAt
+          playedAt: game.createdAt || new Date().toISOString()
         });
       }
 
