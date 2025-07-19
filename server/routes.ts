@@ -151,14 +151,30 @@ export async function registerRoutes(app: Express): Promise<Server> {
         // Get complete game data with player info
         const [playerXInfo, playerOInfo] = await Promise.all([
           storage.getUser(activeGame.playerXId!),
-          storage.getUser(activeGame.playerOId!)
+          activeGame.playerOId && !AI_BOTS.some(bot => bot.id === activeGame.playerOId) ? storage.getUser(activeGame.playerOId!) : Promise.resolve(null)
         ]);
         
         // Get achievements for both players
         const [playerXAchievements, playerOAchievements] = await Promise.all([
           storage.getUserAchievements(activeGame.playerXId!),
-          storage.getUserAchievements(activeGame.playerOId!)
+          playerOInfo && !AI_BOTS.some(bot => bot.id === activeGame.playerOId) ? storage.getUserAchievements(activeGame.playerOId!) : Promise.resolve([])
         ]);
+        
+        // Handle bot player info
+        let finalPlayerOInfo = playerOInfo;
+        if (activeGame.playerOId && AI_BOTS.some(bot => bot.id === activeGame.playerOId)) {
+          const botInfo = AI_BOTS.find(bot => bot.id === activeGame.playerOId);
+          finalPlayerOInfo = {
+            id: activeGame.playerOId,
+            firstName: botInfo?.firstName || 'AI',
+            lastName: botInfo?.lastName || 'Player',
+            displayName: botInfo?.displayName || 'AI Player',
+            username: botInfo?.username || 'ai',
+            profilePicture: botInfo?.profilePicture || null,
+            profileImageUrl: botInfo?.profilePicture || null,
+            achievements: []
+          };
+        }
         
         const gameWithPlayers = {
           ...activeGame,
@@ -166,9 +182,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
             ...playerXInfo,
             achievements: playerXAchievements.slice(0, 3)
           } : null,
-          playerOInfo: playerOInfo ? {
-            ...playerOInfo,
-            achievements: playerOAchievements.slice(0, 3)
+          playerOInfo: finalPlayerOInfo ? {
+            ...finalPlayerOInfo,
+            achievements: (finalPlayerOInfo as any).achievements || playerOAchievements.slice(0, 3)
           } : null,
           gameMode: activeGame.gameMode
         };
@@ -2165,7 +2181,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
                     username: playerOInfo.username,
                     profilePicture: playerOInfo.profilePicture,
                     profileImageUrl: playerOInfo.profileImageUrl
-                  } : null
+                  } : (game.playerOId && AI_BOTS.some(bot => bot.id === game.playerOId) ? {
+                    displayName: AI_BOTS.find(bot => bot.id === game.playerOId)?.displayName || 'AI Player',
+                    firstName: AI_BOTS.find(bot => bot.id === game.playerOId)?.firstName || 'AI',
+                    username: AI_BOTS.find(bot => bot.id === game.playerOId)?.username || 'ai',
+                    profilePicture: AI_BOTS.find(bot => bot.id === game.playerOId)?.profilePicture || null,
+                    profileImageUrl: AI_BOTS.find(bot => bot.id === game.playerOId)?.profilePicture || null
+                  } : null)
                 }));
               }
             });
@@ -2283,7 +2305,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
               profilePicture: playerOInfo.profilePicture,
               profileImageUrl: playerOInfo.profilePicture || playerOInfo.profileImageUrl,
               achievements: playerOAchievements.slice(0, 3)
-            } : null
+            } : (game.playerOId && AI_BOTS.some(bot => bot.id === game.playerOId) ? {
+              displayName: AI_BOTS.find(bot => bot.id === game.playerOId)?.displayName || 'AI Player',
+              firstName: AI_BOTS.find(bot => bot.id === game.playerOId)?.firstName || 'AI',
+              username: AI_BOTS.find(bot => bot.id === game.playerOId)?.username || 'ai',
+              profilePicture: AI_BOTS.find(bot => bot.id === game.playerOId)?.profilePicture || null,
+              profileImageUrl: AI_BOTS.find(bot => bot.id === game.playerOId)?.profilePicture || null,
+              achievements: []
+            } : null)
           });
           
           // Enhanced broadcast with debugging
