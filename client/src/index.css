@@ -1,3 +1,4 @@
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic:wght@400;500;600;700&family=Cairo:wght@400;500;600;700&display=swap');
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -79,8 +80,31 @@
   z-index: 9999 !important;
 }
 
+/* Arabic Font Support */
+
+.font-arabic {
+  font-family: 'Noto Sans Arabic', 'Cairo', 'Tajawal', system-ui, sans-serif;
+  font-feature-settings: "kern" 1, "liga" 1, "calt" 1;
+}
+
+.arabic-numbers {
+  font-variant-numeric: lining-nums;
+  direction: ltr;
+  unicode-bidi: embed;
+}
+
 /* RTL Language Support */
 [dir="rtl"] {
+  direction: rtl;
+  text-align: right;
+}
+
+[dir="rtl"] .leaderboard-content {
+  direction: ltr;
+  text-align: left;
+}
+
+[dir="rtl"] .arabic-text {
   direction: rtl;
   text-align: right;
 }
