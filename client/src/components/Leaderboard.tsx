@@ -291,13 +291,13 @@ export function Leaderboard({ trigger }: LeaderboardProps) {
           {trigger || defaultTrigger}
         </div>
       </DialogTrigger>
-      <DialogContent dir="ltr" className="max-w-[95vw] sm:max-w-2xl md:max-w-4xl lg:max-w-5xl max-h-[90vh] w-full mx-auto flex flex-col overflow-hidden bg-gradient-to-br from-slate-50/95 via-white/98 to-blue-50/90 dark:from-slate-900/95 dark:via-slate-800/98 dark:to-slate-900/95 backdrop-blur-md border border-white/20 dark:border-gray-700/30 shadow-2xl">
-        <DialogHeader className="flex-shrink-0 pb-6 border-b bg-gradient-to-r from-transparent via-gray-200/50 to-transparent dark:via-gray-600/30 relative overflow-hidden">
+      <DialogContent dir="ltr" className="max-w-[98vw] sm:max-w-2xl md:max-w-4xl lg:max-w-5xl max-h-[95vh] sm:max-h-[90vh] w-full mx-auto flex flex-col overflow-hidden bg-gradient-to-br from-slate-50/95 via-white/98 to-blue-50/90 dark:from-slate-900/95 dark:via-slate-800/98 dark:to-slate-900/95 backdrop-blur-md border border-white/20 dark:border-gray-700/30 shadow-2xl">
+        <DialogHeader className="flex-shrink-0 pb-3 sm:pb-6 border-b bg-gradient-to-r from-transparent via-gray-200/50 to-transparent dark:via-gray-600/30 relative overflow-hidden">
           {/* Enhanced Background Effects */}
           <div className="absolute inset-0 bg-gradient-to-br from-yellow-50/30 via-orange-50/20 to-red-50/30 dark:from-yellow-900/10 dark:via-orange-900/5 dark:to-red-900/10"></div>
           <div className="absolute top-0 left-1/2 transform -translate-x-1/2 w-full h-32 bg-gradient-to-b from-yellow-100/20 to-transparent dark:from-yellow-800/10 blur-3xl"></div>
           
-          <div className="text-center space-y-3 relative z-10">
+          <div className="text-center space-y-2 sm:space-y-3 relative z-10">
             <motion.div
               initial={{ scale: 0.8, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
@@ -336,7 +336,7 @@ export function Leaderboard({ trigger }: LeaderboardProps) {
                 </p>
               </div>
               
-              <p className="text-gray-600 dark:text-gray-300 text-xs sm:text-sm max-w-xs sm:max-w-md mx-auto leading-relaxed px-2">
+              <p className="text-gray-600 dark:text-gray-300 text-xs sm:text-sm max-w-xs sm:max-w-md mx-auto leading-relaxed px-2 hidden sm:block">
                 {t('leaderboardDescription') || 'The best players ranked by total wins. Achievement borders show player status!'}
               </p>
             </motion.div>
@@ -359,8 +359,8 @@ export function Leaderboard({ trigger }: LeaderboardProps) {
             </div>
           </div>
         ) : (
-          <div className="flex-1 min-h-0 overflow-y-auto" style={{ WebkitOverflowScrolling: 'touch' }}>
-            <div className="space-y-1 sm:space-y-1.5 pb-2 sm:pb-3 pr-1 sm:pr-2 pt-1 sm:pt-2">
+          <div className="flex-1 min-h-0 overflow-y-auto px-1 sm:px-2" style={{ WebkitOverflowScrolling: 'touch' }}>
+            <div className="space-y-1 sm:space-y-1.5 py-2 sm:py-3">
               {/* Debug info always visible when no data */}
               {!isLoading && !leaderboard && (
                 <div className="p-4 bg-yellow-50 dark:bg-yellow-900/20 rounded-lg text-yellow-800 dark:text-yellow-200 text-sm">
@@ -409,7 +409,7 @@ export function Leaderboard({ trigger }: LeaderboardProps) {
                           setSelectedPlayerId(user.id);
                           setShowPlayerProfile(true);
                         }}>
-                          <CardContent className="p-1.5 sm:p-2.5 relative">
+                          <CardContent className="p-1 sm:p-2.5 relative">
                             {/* Animated Background Gradient */}
                             <div className={`absolute inset-0 opacity-5 ${
                               position === 1 ? 'bg-gradient-to-r from-yellow-300 via-yellow-200 to-yellow-400' :
@@ -535,8 +535,8 @@ export function Leaderboard({ trigger }: LeaderboardProps) {
                               </div>
                             </div>
 
-                            {/* Performance Badge - Now visible on mobile */}
-                            <div className="flex flex-col items-center text-center flex-shrink-0 min-w-[70px] sm:min-w-[80px] lg:min-w-[100px]">
+                            {/* Performance Badge - Optimized for mobile */}
+                            <div className="flex flex-col items-center text-center flex-shrink-0 min-w-[60px] sm:min-w-[80px] lg:min-w-[100px]">
                               <div className="mb-1 sm:mb-2">
                                 <div className={`text-xs font-medium px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-full ${
                                   winRatePercentage >= 80 ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300' :
@@ -584,17 +584,17 @@ export function Leaderboard({ trigger }: LeaderboardProps) {
           </div>
         )}
 
-        <div className="flex justify-between items-center pt-6 border-t border-gradient-to-r from-transparent via-gray-200 to-transparent dark:via-gray-700 flex-shrink-0 bg-gradient-to-r from-slate-50 via-white to-slate-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
+        <div className="flex justify-between items-center pt-3 sm:pt-6 border-t border-gradient-to-r from-transparent via-gray-200 to-transparent dark:via-gray-700 flex-shrink-0 bg-gradient-to-r from-slate-50 via-white to-slate-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
           <div className="flex items-center gap-2">
             <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
-            <span className="text-sm font-medium text-gray-600 dark:text-gray-400">
+            <span className="text-xs sm:text-sm font-medium text-gray-600 dark:text-gray-400">
               {leaderboard?.length ? 
                 `${t('showing') || 'Showing'} ${leaderboard.length} ${t('players') || 'players'}` :
                 ''
               }
             </span>
           </div>
-          <Button onClick={() => setIsOpen(false)} variant="default" className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white border-0 shadow-lg px-6">
+          <Button onClick={() => setIsOpen(false)} variant="default" className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white border-0 shadow-lg px-3 sm:px-6 text-xs sm:text-sm">
             {t('close') || 'Close'}
           </Button>
         </div>
