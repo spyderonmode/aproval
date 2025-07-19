@@ -138,12 +138,6 @@ export function AchievementModal({ open, onClose, userId, user }: AchievementMod
             <Trophy className="w-5 h-5 sm:w-6 sm:h-6" />
             {userId ? t('playerAchievements') : t('yourAchievements')}
           </DialogTitle>
-          {/* Only show border selector for current user (not viewing other players) */}
-          {!userId && user && (
-            <div className="pt-3 border-t">
-              <AchievementBorderSelector user={user} />
-            </div>
-          )}
         </DialogHeader>
 
         {isLoading ? (
@@ -232,8 +226,8 @@ export function AchievementModal({ open, onClose, userId, user }: AchievementMod
           </div>
         )}
 
-        {/* Achievement Border Selector */}
-        {user && (
+        {/* Achievement Border Selector - Only show for current user (not viewing other players) */}
+        {!userId && user && (
           <div className="pt-6 border-t border-gray-200 dark:border-gray-700">
             <AchievementBorderSelector user={user} />
           </div>

@@ -35,6 +35,11 @@ export function AchievementBorderSelector({ user }: AchievementBorderSelectorPro
   const queryClient = useQueryClient();
   const { t } = useTranslation();
 
+  // Update selectedBorder when user prop changes (when selectedAchievementBorder is loaded from database)
+  useEffect(() => {
+    setSelectedBorder(user.selectedAchievementBorder || null);
+  }, [user.selectedAchievementBorder]);
+
   // Fetch user's achievements
   const { data: achievements, isLoading } = useQuery<Achievement[]>({
     queryKey: ['/api/achievements'],
@@ -53,7 +58,7 @@ export function AchievementBorderSelector({ user }: AchievementBorderSelectorPro
         title: t('borderUpdated') || 'Border Updated',
         description: t('borderUpdateSuccess') || 'Your achievement border has been updated successfully!',
       });
-      queryClient.invalidateQueries({ queryKey: ['/api/user'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/auth/user'] });
       setIsOpen(false);
     },
     onError: (error: any) => {

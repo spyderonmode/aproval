@@ -344,7 +344,7 @@ export function setupAuth(app: Express) {
   });
 
   // Get current user endpoint
-  app.get('/api/auth/user', (req, res) => {
+  app.get('/api/auth/user', async (req, res) => {
     if (!req.session.user) {
       return res.status(401).json({ error: 'Not authenticated' });
     }
@@ -355,14 +355,32 @@ export function setupAuth(app: Express) {
       return res.status(404).json({ error: 'User not found' });
     }
     
-    res.json({
-      userId: user.id,
-      username: user.username,
-      displayName: user.displayName,
-      profilePicture: user.profilePicture,
-      email: user.email,
-      isEmailVerified: user.isEmailVerified
-    });
+    try {
+      // Get selectedAchievementBorder from database
+      const dbUser = await storage.getUser(user.id);
+      
+      res.json({
+        userId: user.id,
+        username: user.username,
+        displayName: user.displayName,
+        profilePicture: user.profilePicture,
+        email: user.email,
+        isEmailVerified: user.isEmailVerified,
+        selectedAchievementBorder: dbUser?.selectedAchievementBorder || null
+      });
+    } catch (error) {
+      console.error('Error fetching user from database:', error);
+      // Return basic user info if database fails
+      res.json({
+        userId: user.id,
+        username: user.username,
+        displayName: user.displayName,
+        profilePicture: user.profilePicture,
+        email: user.email,
+        isEmailVerified: user.isEmailVerified,
+        selectedAchievementBorder: null
+      });
+    }
   });
 
   // Email verification endpoint
