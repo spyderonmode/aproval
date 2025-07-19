@@ -1846,26 +1846,47 @@ export async function registerRoutes(app: Express): Promise<Server> {
         } : playerOInfo,
       };
       
-      // Broadcast to all room participants
+      // Broadcast to all room participants with proper synchronization
+      let broadcastSuccess = false;
       if (roomConnections.has(roomId)) {
         const roomUsers = roomConnections.get(roomId)!;
         console.log(`🎮 Broadcasting game_started to ${roomUsers.size} users in room ${roomId}`);
         
+        const broadcastPromises: Promise<void>[] = [];
         roomUsers.forEach(connectionId => {
           const connection = connections.get(connectionId);
           if (connection && connection.ws.readyState === WebSocket.OPEN) {
             console.log(`🎮 Sending game_started to user: ${connection.userId}`);
-            connection.ws.send(JSON.stringify({
-              type: 'game_started',
-              game: gameWithPlayers,
-              gameId: game.id,
-              roomId: roomId,
-            }));
+            // Create a promise for each WebSocket send to ensure delivery
+            const sendPromise = new Promise<void>((resolve) => {
+              try {
+                connection.ws.send(JSON.stringify({
+                  type: 'game_started',
+                  game: gameWithPlayers,
+                  gameId: game.id,
+                  roomId: roomId,
+                }));
+                // Small delay to ensure message is processed
+                setTimeout(resolve, 10);
+              } catch (error) {
+                console.error(`🎮 Error sending to user ${connection.userId}:`, error);
+                resolve();
+              }
+            });
+            broadcastPromises.push(sendPromise);
           }
         });
+        
+        // Wait for all broadcasts to complete
+        await Promise.all(broadcastPromises);
+        broadcastSuccess = true;
+        console.log(`🎮 All game_started broadcasts completed for room ${roomId}`);
       }
       
-      res.json(gameWithPlayers);
+      // Ensure API response comes after WebSocket broadcasts
+      setTimeout(() => {
+        res.json(gameWithPlayers);
+      }, broadcastSuccess ? 50 : 10);
     } catch (error) {
       console.error("Error starting room game:", error);
       res.status(500).json({ message: "Failed to start game" });
@@ -1962,21 +1983,34 @@ export async function registerRoutes(app: Express): Promise<Server> {
           if (roomConnections.has(gameData.roomId)) {
             const roomUsers = roomConnections.get(gameData.roomId)!;
             console.log(`🎮 Broadcasting to ${roomUsers.size} users in room`);
+            const broadcastPromises: Promise<void>[] = [];
             roomUsers.forEach(connectionId => {
               const connection = connections.get(connectionId);
               if (connection && connection.ws.readyState === WebSocket.OPEN) {
                 console.log(`🎮 Sending game_started to user: ${connection.userId}`);
-                connection.ws.send(JSON.stringify({
-                  type: 'game_started',
-                  game: refreshedGameWithPlayers,
-                  gameId: refreshedGame.id,
-                  roomId: gameData.roomId,
-                }));
+                const sendPromise = new Promise<void>((resolve) => {
+                  try {
+                    connection.ws.send(JSON.stringify({
+                      type: 'game_started',
+                      game: refreshedGameWithPlayers,
+                      gameId: refreshedGame.id,
+                      roomId: gameData.roomId,
+                    }));
+                    setTimeout(resolve, 10);
+                  } catch (error) {
+                    console.error(`🎮 Error sending to user ${connection.userId}:`, error);
+                    resolve();
+                  }
+                });
+                broadcastPromises.push(sendPromise);
               }
             });
+            await Promise.all(broadcastPromises);
           }
           
-          return res.json(refreshedGameWithPlayers);
+          setTimeout(() => {
+            return res.json(refreshedGameWithPlayers);
+          }, 50);
         }
         
         // Get room participants and assign as players
@@ -2047,26 +2081,39 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (gameData.roomId) {
         await storage.updateRoomStatus(gameData.roomId, 'playing');
         
-        // Broadcast game start to all room participants
+        // Broadcast game start to all room participants with proper synchronization
         console.log('🎮 Broadcasting game_started for new game to room:', gameData.roomId);
         if (roomConnections.has(gameData.roomId)) {
           const roomUsers = roomConnections.get(gameData.roomId)!;
           console.log(`🎮 Broadcasting to ${roomUsers.size} users in room`);
+          const broadcastPromises: Promise<void>[] = [];
           roomUsers.forEach(connectionId => {
             const connection = connections.get(connectionId);
             if (connection && connection.ws.readyState === WebSocket.OPEN) {
               console.log(`🎮 Sending game_started to user: ${connection.userId}`);
-              connection.ws.send(JSON.stringify({
-                type: 'game_started',
-                game: gameWithPlayers,
-                roomId: gameData.roomId,
-              }));
+              const sendPromise = new Promise<void>((resolve) => {
+                try {
+                  connection.ws.send(JSON.stringify({
+                    type: 'game_started',
+                    game: gameWithPlayers,
+                    roomId: gameData.roomId,
+                  }));
+                  setTimeout(resolve, 10);
+                } catch (error) {
+                  console.error(`🎮 Error sending to user ${connection.userId}:`, error);
+                  resolve();
+                }
+              });
+              broadcastPromises.push(sendPromise);
             }
           });
+          await Promise.all(broadcastPromises);
         }
       }
 
-      res.json(gameWithPlayers);
+      setTimeout(() => {
+        res.json(gameWithPlayers);
+      }, 50);
     } catch (error) {
       console.error("Error creating game:", error);
       console.error("Error stack:", error.stack);
