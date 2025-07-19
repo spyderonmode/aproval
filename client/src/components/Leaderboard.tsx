@@ -227,10 +227,10 @@ export function Leaderboard({ trigger }: LeaderboardProps) {
                         position === 2 ? 'border-gray-400 shadow-gray-200/50' :
                         position === 3 ? 'border-amber-400 shadow-amber-200/50' : ''
                       }`}>
-                        <CardContent className="p-4">
-                          <div className="flex items-center gap-4">
+                        <CardContent className="p-3 sm:p-4">
+                          <div className="flex items-center gap-2 sm:gap-4">
                             {/* Rank */}
-                            <div className={`flex items-center justify-center w-12 h-12 rounded-full bg-gradient-to-br ${getRankColor(position)} flex-shrink-0`}>
+                            <div className={`flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-gradient-to-br ${getRankColor(position)} flex-shrink-0`}>
                               {getRankIcon(position)}
                             </div>
 
@@ -240,47 +240,49 @@ export function Leaderboard({ trigger }: LeaderboardProps) {
                                 <img
                                   src={user.profileImageUrl}
                                   alt={`${user.displayName}'s profile`}
-                                  className="w-12 h-12 rounded-full object-cover border-2 border-gray-200 dark:border-gray-700"
+                                  className="w-10 h-10 sm:w-12 sm:h-12 rounded-full object-cover border-2 border-gray-200 dark:border-gray-700"
                                 />
                               ) : (
-                                <div className="w-12 h-12 rounded-full bg-gradient-to-br from-blue-400 to-purple-500 flex items-center justify-center text-white font-bold text-lg">
+                                <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-gradient-to-br from-blue-400 to-purple-500 flex items-center justify-center text-white font-bold text-sm sm:text-lg">
                                   {user.displayName.charAt(0).toUpperCase()}
                                 </div>
                               )}
                             </div>
 
                             {/* User Info */}
-                            <div className="flex-1 min-w-0">
-                              <div className="flex items-center gap-2 mb-1">
-                                {renderAchievementBorder(user, position)}
-                                <Badge variant="secondary" className="text-xs">
+                            <div className="flex-1 min-w-0 overflow-hidden">
+                              <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2 mb-1">
+                                <div className="min-w-0 flex-1">
+                                  {renderAchievementBorder(user, position)}
+                                </div>
+                                <Badge variant="secondary" className="text-xs w-fit flex-shrink-0 max-w-[80px] truncate">
                                   @{user.username}
                                 </Badge>
                               </div>
-                              <div className="flex items-center gap-4 text-sm text-gray-600 dark:text-gray-400">
+                              <div className="flex flex-wrap items-center gap-2 sm:gap-4 text-xs sm:text-sm text-gray-600 dark:text-gray-400">
                                 <div className="flex items-center gap-1">
-                                  <Trophy className="w-4 h-4 text-yellow-500" />
+                                  <Trophy className="w-3 h-3 sm:w-4 sm:h-4 text-yellow-500" />
                                   <span className="font-semibold text-green-600 dark:text-green-400">{user.wins}</span>
-                                  <span>{t('winsCount') || 'wins'}</span>
+                                  <span className="hidden sm:inline">{t('winsCount') || 'wins'}</span>
                                 </div>
                                 <div className="flex items-center gap-1">
-                                  <Target className="w-4 h-4 text-blue-500" />
+                                  <Target className="w-3 h-3 sm:w-4 sm:h-4 text-blue-500" />
                                   <span>{winRatePercentage}%</span>
                                 </div>
                                 <div className="flex items-center gap-1">
-                                  <Users className="w-4 h-4 text-gray-500" />
-                                  <span>{user.totalGames}</span>
-                                  <span>{t('games') || 'games'}</span>
+                                  <Users className="w-3 h-3 sm:w-4 sm:h-4 text-gray-500" />
+                                  <span className="truncate">{user.totalGames}</span>
+                                  <span className="hidden sm:inline">{t('games') || 'games'}</span>
                                 </div>
                               </div>
                             </div>
 
                             {/* Stats Summary */}
-                            <div className="hidden sm:flex flex-col items-end text-right">
-                              <div className="text-sm text-gray-500 dark:text-gray-400 mb-1">
+                            <div className="hidden md:flex flex-col items-end text-right flex-shrink-0">
+                              <div className="text-xs text-gray-500 dark:text-gray-400 mb-1">
                                 {t('wld') || 'W-L-D'}
                               </div>
-                              <div className="text-sm font-mono">
+                              <div className="text-xs font-mono whitespace-nowrap">
                                 <span className="text-green-600 dark:text-green-400">{user.wins}</span>
                                 <span className="text-gray-400 mx-1">-</span>
                                 <span className="text-red-600 dark:text-red-400">{user.losses}</span>
