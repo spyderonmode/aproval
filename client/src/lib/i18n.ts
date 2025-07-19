@@ -478,7 +478,7 @@ export const translations = {
   },
   wins: {
     en: 'Wins',
-    ar: 'Wins',
+    ar: 'انتصارات',
     bn: 'জয়',
     hi: 'जीत',
     es: 'Victorias',
@@ -486,7 +486,7 @@ export const translations = {
   },
   losses: {
     en: 'Losses',
-    ar: 'Losses',
+    ar: 'هزائم',
     bn: 'পরাজয়',
     hi: 'हार',
     es: 'Derrotas',
@@ -494,7 +494,7 @@ export const translations = {
   },
   draws: {
     en: 'Draws',
-    ar: 'Draws',
+    ar: 'تعادل',
     bn: 'ড্র',
     hi: 'ड्रॉ',
     es: 'Empates',
@@ -2288,7 +2288,7 @@ export const translations = {
   // Leaderboard
   leaderboard: {
     en: 'Leaderboard',
-    ar: 'Leaderboard',
+    ar: 'لوحة المتصدرين',
     bn: 'লিডারবোর্ড',
     hi: 'लीडरबोर्ड',
     es: 'Tabla de Posiciones',
@@ -2296,7 +2296,7 @@ export const translations = {
   },
   top100Players: {
     en: 'Top 100 Players',
-    ar: 'Top 100 Players',
+    ar: 'أفضل 100 لاعب',
     bn: 'শীর্ষ 100 খেলোয়াড়',
     hi: 'शीर्ष 100 खिलाड़ी',
     es: 'Top 100 Jugadores',
@@ -2304,9 +2304,9 @@ export const translations = {
   },
   leaderboardDescription: {
     en: 'The best players ranked by total wins. Achievement borders show player status!',
-    ar: 'The best players ranked by total wins. Achievement borders show player status!',
+    ar: 'أفضل اللاعبين مرتبين حسب إجمالي الانتصارات. حدود الإنجازات تظهر حالة اللاعب!',
     bn: 'মোট জয়ের ভিত্তিতে র‍্যাঙ্ক করা সেরা খেলোয়াড়। অর্জনের সীমানা খেলোয়াড়ের অবস্থা দেখায়!',
-    hi: 'कुल जीत के आधार पर रैंक किए गए सर्वश्रेष्ठ खिलाড़ी। उपलब्धि सीमाएं खिलाड़ी की स्थिति दिखाती हैं!',
+    hi: 'कुल जीत के आधार पर रैंक किए गए सर्वश्रेष्ठ खिलाड़ी। उपलब्धि सीमाएं खिलाड़ी की स्थिति दिखाती हैं!',
     es: 'Los mejores jugadores clasificados por victorias totales. ¡Los bordes de logros muestran el estado del jugador!',
     id: 'Pemain terbaik berdasarkan total kemenangan. Batas pencapaian menunjukkan status pemain!'
   },
@@ -2328,7 +2328,7 @@ export const translations = {
   },
   winsCount: {
     en: 'wins',
-    ar: 'wins',
+    ar: 'انتصارات',
     bn: 'জয়',
     hi: 'जीत',
     es: 'victorias',
@@ -2336,7 +2336,7 @@ export const translations = {
   },
   games: {
     en: 'games',
-    ar: 'games',
+    ar: 'ألعاب',
     bn: 'গেম',
     hi: 'गेम',
     es: 'juegos',
@@ -2344,7 +2344,7 @@ export const translations = {
   },
   wld: {
     en: 'W-L-D',
-    ar: 'W-L-D',
+    ar: 'ف-خ-ت',
     bn: 'জ-হ-ড',
     hi: 'जी-हा-ड्रा',
     es: 'V-D-E',
@@ -2352,7 +2352,7 @@ export const translations = {
   },
   showing: {
     en: 'Showing',
-    ar: 'Showing',
+    ar: 'عرض',
     bn: 'দেখানো হচ্ছে',
     hi: 'दिखाया जा रहा',
     es: 'Mostrando',
@@ -2360,7 +2360,7 @@ export const translations = {
   },
   players: {
     en: 'players',
-    ar: 'players',
+    ar: 'لاعبين',
     bn: 'খেলোয়াড়',
     hi: 'खिलाड़ी',
     es: 'jugadores',
@@ -2445,7 +2445,7 @@ export const translations = {
   },
   winRate: {
     en: 'Win Rate',
-    ar: 'Win Rate',
+    ar: 'معدل الفوز',
     bn: 'জয়ের হার',
     hi: 'जीत की दर',
     es: 'Tasa de Victoria',
