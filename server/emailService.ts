@@ -83,33 +83,36 @@ export class EmailService {
     });
   }
 
-  async sendPasswordResetEmail(email: string, token: string): Promise<boolean> {
-    const resetUrl = `https://tic-tac-master-zanv1.replit.app/reset-password?token=${token}`;
-    
+  async sendPasswordResetEmail(email: string, resetCode: string): Promise<boolean> {
     const html = `
-      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-        <h2 style="color: #dc2626;">Password Reset - TicTac 3x5</h2>
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+        <h2 style="color: #dc2626; text-align: center;">Password Reset - TicTac 3x5</h2>
         <p>You requested a password reset for your TicTac 3x5 account.</p>
-        <p>Click the button below to reset your password:</p>
-        <div style="text-align: center; margin: 30px 0;">
-          <a href="${resetUrl}" 
-             style="background-color: #dc2626; color: white; padding: 12px 24px; text-decoration: none; border-radius: 5px; display: inline-block;">
-            Reset Password
-          </a>
+        <p>Use the verification code below to reset your password:</p>
+        
+        <div style="text-align: center; margin: 30px 0; padding: 20px; background-color: #fef2f2; border-radius: 8px; border: 2px dashed #dc2626;">
+          <h3 style="margin: 0; color: #dc2626;">Your Password Reset Code:</h3>
+          <div style="font-size: 32px; font-weight: bold; color: #dc2626; letter-spacing: 4px; margin: 10px 0;">
+            ${resetCode}
+          </div>
+          <p style="margin: 0; color: #666; font-size: 14px;">Enter this code on the password reset page</p>
         </div>
-        <p>Or copy and paste this link into your browser:</p>
-        <p style="color: #666; word-break: break-all;">${resetUrl}</p>
-        <p style="color: #666; font-size: 12px; margin-top: 30px;">
-          This link will expire in 1 hour. If you didn't request a password reset, you can safely ignore this email.
+        
+        <p style="text-align: center; margin: 20px 0;">
+          <strong>Code expires in 1 hour</strong>
+        </p>
+        
+        <p style="color: #666; font-size: 12px; margin-top: 30px; text-align: center;">
+          If you didn't request a password reset, you can safely ignore this email.
         </p>
       </div>
     `;
 
     return await this.sendEmail({
       to: email,
-      subject: 'Password Reset - TicTac 3x5',
+      subject: 'Your Password Reset Code - TicTac 3x5',
       html,
-      text: `Reset your password by clicking this link: ${resetUrl}`,
+      text: `Your TicTac 3x5 password reset code is: ${resetCode}. This code expires in 1 hour.`,
     });
   }
 }

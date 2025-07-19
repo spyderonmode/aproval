@@ -33,7 +33,7 @@ export function ForgotPasswordModal({ onClose }: ForgotPasswordModalProps) {
       if (response.ok) {
         setIsSuccess(true);
         toast({
-          title: "Reset Email Sent",
+          title: "Reset Code Sent",
           description: data.message,
         });
       } else {
@@ -66,8 +66,8 @@ export function ForgotPasswordModal({ onClose }: ForgotPasswordModalProps) {
           </CardTitle>
           <CardDescription className="text-slate-300">
             {isSuccess 
-              ? "Check your email for reset instructions"
-              : "Enter your email address to receive a password reset link"
+              ? "Check your email for your password reset code"
+              : "Enter your email address to receive a password reset code"
             }
           </CardDescription>
         </CardHeader>
@@ -77,20 +77,30 @@ export function ForgotPasswordModal({ onClose }: ForgotPasswordModalProps) {
               <Alert className="bg-green-900 border-green-700">
                 <CheckCircle className="h-4 w-4 text-green-400" />
                 <AlertDescription className="text-green-300">
-                  If an account with this email exists, a password reset link has been sent.
+                  If an account with this email exists, a password reset code has been sent.
                 </AlertDescription>
               </Alert>
               
               <div className="text-sm text-slate-400 text-center">
-                Check your email inbox and follow the instructions to reset your password.
+                Check your email inbox for your 6-digit reset code.
               </div>
               
-              <Button
-                onClick={onClose}
-                className="w-full bg-primary hover:bg-primary/90"
-              >
-                Back to Login
-              </Button>
+              <div className="flex flex-col gap-2">
+                <Button
+                  onClick={() => window.location.href = '/reset-password'}
+                  className="w-full bg-primary hover:bg-primary/90"
+                >
+                  Enter Reset Code
+                </Button>
+                
+                <Button
+                  onClick={onClose}
+                  variant="outline"
+                  className="w-full border-slate-600 text-slate-300 hover:bg-slate-700"
+                >
+                  Back to Login
+                </Button>
+              </div>
             </>
           ) : (
             <form onSubmit={handleSubmit} className="space-y-4">
@@ -113,7 +123,7 @@ export function ForgotPasswordModal({ onClose }: ForgotPasswordModalProps) {
                   disabled={isLoading}
                   className="w-full bg-red-600 hover:bg-red-700"
                 >
-                  {isLoading ? 'Sending...' : 'Send Reset Link'}
+                  {isLoading ? 'Sending...' : 'Send Reset Code'}
                 </Button>
                 
                 <Button

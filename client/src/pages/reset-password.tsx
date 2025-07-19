@@ -9,7 +9,7 @@ import { useToast } from "@/hooks/use-toast";
 import { KeyRound, CheckCircle, XCircle } from "lucide-react";
 
 export default function ResetPassword() {
-  const [token, setToken] = useState('');
+  const [resetCode, setResetCode] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -18,21 +18,22 @@ export default function ResetPassword() {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
 
-  useEffect(() => {
-    const urlParams = new URLSearchParams(window.location.search);
-    const resetToken = urlParams.get('token');
-    
-    if (resetToken) {
-      setToken(resetToken);
-    } else {
-      setError('Invalid reset link');
-    }
-  }, []);
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     setError('');
+
+    if (!resetCode.trim()) {
+      setError('Please enter your reset code');
+      setIsLoading(false);
+      return;
+    }
+
+    if (resetCode.length !== 6 || !/^\d+$/.test(resetCode)) {
+      setError('Reset code must be 6 digits');
+      setIsLoading(false);
+      return;
+    }
 
     if (newPassword !== confirmPassword) {
       setError('Passwords do not match');
@@ -50,7 +51,7 @@ export default function ResetPassword() {
       const response = await fetch('/api/auth/reset-password', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ token, newPassword })
+        body: JSON.stringify({ token: resetCode, newPassword })
       });
 
       const data = await response.json();
@@ -112,7 +113,7 @@ export default function ResetPassword() {
               ? 'Your password has been successfully reset'
               : error 
                 ? 'There was an issue resetting your password'
-                : 'Enter your new password below'
+                : 'Enter your reset code and new password below'
             }
           </CardDescription>
         </CardHeader>
@@ -142,8 +143,22 @@ export default function ResetPassword() {
                 Continue to Login
               </Button>
             </>
-          ) : !error && token ? (
+          ) : !error ? (
             <form onSubmit={handleSubmit} className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="resetCode" className="text-slate-300">Reset Code</Label>
+                <Input
+                  id="resetCode"
+                  type="text"
+                  placeholder="Enter 6-digit code"
+                  value={resetCode}
+                  onChange={(e) => setResetCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                  className="bg-slate-700 border-slate-600 text-white text-center text-2xl font-mono letter-spacing-wide"
+                  maxLength={6}
+                  autoComplete="off"
+                />
+              </div>
+              
               <div className="space-y-2">
                 <Label htmlFor="new-password" className="text-slate-300">New Password</Label>
                 <Input

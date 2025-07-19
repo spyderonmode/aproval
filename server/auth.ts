@@ -613,17 +613,17 @@ export function setupAuth(app: Express) {
     }
 
     try {
-      const resetToken = crypto.randomUUID();
+      const resetCode = generateVerificationCode();
       const resetExpiry = new Date(Date.now() + 60 * 60 * 1000); // 1 hour
 
       updateUser(user.id, {
-        passwordResetToken: resetToken,
+        passwordResetToken: resetCode,
         passwordResetExpiry: resetExpiry
       });
 
-      await sendPasswordResetEmail(email, resetToken);
+      await sendPasswordResetEmail(email, resetCode);
 
-      res.json({ message: 'If an account with this email exists, a password reset link has been sent.' });
+      res.json({ message: 'If an account with this email exists, a password reset code has been sent.' });
     } catch (error) {
       console.error('Error sending password reset email:', error);
       res.status(500).json({ error: 'Failed to send password reset email' });
