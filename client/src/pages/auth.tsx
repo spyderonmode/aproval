@@ -10,7 +10,7 @@ import { EmailVerificationModal } from "@/components/EmailVerificationModal";
 import { ForgotPasswordModal } from "@/components/ForgotPasswordModal";
 import { GamepadIcon, Mail } from "lucide-react";
 import { useTranslation } from "@/contexts/LanguageContext";
-import { LanguageSelector } from "@/components/LanguageSelector";
+
 
 export default function Auth() {
   const [isLogin, setIsLogin] = useState(true);
@@ -114,12 +114,9 @@ export default function Auth() {
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center p-4">
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
-          <div className="flex justify-center items-center gap-4 mb-4">
+          <div className="flex justify-center mb-4">
             <div className="w-16 h-16 bg-primary rounded-2xl flex items-center justify-center">
               <GamepadIcon className="w-8 h-8 text-white" />
-            </div>
-            <div className="ml-auto">
-              <LanguageSelector />
             </div>
           </div>
           <h1 className="text-3xl font-bold text-white mb-2">{t('appName')}</h1>
