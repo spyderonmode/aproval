@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useLocation } from 'wouter';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -17,6 +18,7 @@ export function ForgotPasswordModal({ onClose }: ForgotPasswordModalProps) {
   const [isSuccess, setIsSuccess] = useState(false);
   const [showTroubleshooting, setShowTroubleshooting] = useState(false);
   const [isTestingEmail, setIsTestingEmail] = useState(false);
+  const [, setLocation] = useLocation();
   const { toast } = useToast();
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -147,7 +149,10 @@ export function ForgotPasswordModal({ onClose }: ForgotPasswordModalProps) {
               
               <div className="flex flex-col gap-2">
                 <Button
-                  onClick={() => window.location.href = '/reset-password'}
+                  onClick={() => {
+                    onClose();
+                    setLocation('/reset-password');
+                  }}
                   className="w-full bg-primary hover:bg-primary/90"
                 >
                   Enter Reset Code

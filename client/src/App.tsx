@@ -1,4 +1,4 @@
-import { Switch, Route } from "wouter";
+import { Switch, Route, useLocation } from "wouter";
 import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
@@ -57,10 +57,18 @@ class ErrorBoundary extends Component<
 
 function Router() {
   const { isAuthenticated, isLoading, user } = useAuth();
+  const [location] = useLocation();
 
-  console.log('🔐 Router render - isLoading:', isLoading, 'isAuthenticated:', isAuthenticated, 'user:', user);
+  console.log('🔐 Router render - isLoading:', isLoading, 'isAuthenticated:', isAuthenticated, 'user:', user, 'location:', location);
 
-  if (isLoading) {
+  // Define public routes that don't require authentication
+  const publicRoutes = ['/reset-password', '/verify-email', '/auth', '/'];
+
+  // Check if current route is public
+  const isPublicRoute = publicRoutes.includes(location) || location.startsWith('/reset-password') || location.startsWith('/verify-email');
+
+  // Show loading screen only for authenticated routes when still loading
+  if (isLoading && !isPublicRoute) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center relative overflow-hidden">
         {/* Background animated particles */}
@@ -102,20 +110,33 @@ function Router() {
     );
   }
 
-  console.log('🔐 About to render content - isAuthenticated:', isAuthenticated, 'user?.isEmailVerified:', user?.isEmailVerified);
+  console.log('🔐 About to render content - isAuthenticated:', isAuthenticated, 'user?.isEmailVerified:', user?.isEmailVerified, 'isPublicRoute:', isPublicRoute);
 
-  // If user is not authenticated, show auth
+  // Handle public routes without authentication check
+  if (isPublicRoute) {
+    return (
+      <Switch>
+        <Route path="/reset-password" component={ResetPassword} />
+        <Route path="/verify-email" component={VerifyEmail} />
+        <Route path="/auth">
+          <Auth />
+        </Route>
+        <Route path="/">
+          {isAuthenticated && user ? (
+            user.isEmailVerified ? <Home /> : <Auth />
+          ) : (
+            <Auth />
+          )}
+        </Route>
+        <Route component={NotFound} />
+      </Switch>
+    );
+  }
+
+  // For protected routes, check authentication
   if (!isAuthenticated) {
     console.log('🔐 Rendering Auth component - user not authenticated');
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center">
-        <div className="text-white text-center">
-          <h1 className="text-2xl font-bold mb-4">Please Login</h1>
-          <p className="text-slate-300 mb-4">Auth component should render here</p>
-          <Auth />
-        </div>
-      </div>
-    );
+    return <Auth />;
   }
 
   // If user is authenticated but email is not verified, redirect to auth for verification
