@@ -1376,6 +1376,20 @@ export function GameBoard({ game, onGameOver, gameMode, user, lastMessage, sendM
             <span>{t('chat')}</span>
           </Button>
           
+          {/* Test Profile Modal Button - for debugging */}
+          {gameMode === 'online' && game?.playerOInfo && (
+            <Button 
+              variant="outline"
+              onClick={() => {
+                console.log('🎮 TEST BUTTON clicked for player:', game.playerOInfo.id);
+                handleProfileClick(game.playerOInfo.id);
+              }}
+              className="flex items-center space-x-2"
+            >
+              <span>Test Profile</span>
+            </Button>
+          )}
+          
           {/* Only show Reset Game button for non-online modes */}
           {gameMode !== 'online' && (
             <Button 
@@ -1399,12 +1413,14 @@ export function GameBoard({ game, onGameOver, gameMode, user, lastMessage, sendM
       </CardContent>
 
       {/* Player Profile Modal */}
-      <PlayerProfileModal
-        playerId={selectedPlayerId}
-        open={showProfileModal}
-        onClose={handleCloseProfileModal}
-        currentUserId={user?.userId || user?.id}
-      />
+      {showProfileModal && selectedPlayerId && (
+        <PlayerProfileModal
+          playerId={selectedPlayerId}
+          open={showProfileModal}
+          onClose={handleCloseProfileModal}
+          currentUserId={user?.userId || user?.id}
+        />
+      )}
 
     </Card>
   );

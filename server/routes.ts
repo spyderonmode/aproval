@@ -130,16 +130,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
         
         console.log(`🎮 Found active game ${activeGame.id} in room ${activeGame.roomId} for reconnecting user ${userId}`);
         
-        // Check if we recently sent reconnection message to this user (within last 3 seconds)
+        // Check if we recently sent reconnection message to this specific connection (within last 1 second)
         const now = Date.now();
-        const lastReconnection = recentReconnections.get(userId);
-        if (lastReconnection && (now - lastReconnection) < 3000) {
-          console.log(`🔄 Skipping duplicate reconnection for user ${userId} (sent ${now - lastReconnection}ms ago)`);
+        const connectionKey = `${userId}-${connectionId}`;
+        const lastReconnection = recentReconnections.get(connectionKey);
+        if (lastReconnection && (now - lastReconnection) < 1000) {
+          console.log(`🔄 Skipping duplicate reconnection for connection ${connectionId} (sent ${now - lastReconnection}ms ago)`);
           return;
         }
         
-        // Track this reconnection
-        recentReconnections.set(userId, now);
+        // Track this specific connection's reconnection
+        recentReconnections.set(connectionKey, now);
         
         // Add user back to room connections
         if (!roomConnections.has(activeGame.roomId)) {
