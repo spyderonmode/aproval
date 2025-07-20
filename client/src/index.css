@@ -304,3 +304,31 @@
 .animate-shimmer {
   animation: shimmer 2s ease-in-out infinite;
 }
+
+/* Player Profile Modal Styling */
+.player-profile-modal {
+  z-index: 9998 !important;
+  opacity: 1 !important;
+  position: fixed !important;
+}
+
+.player-profile-modal [data-radix-popper-content-wrapper] {
+  z-index: 9998 !important;
+}
+
+.player-profile-modal .bg-background {
+  opacity: 1 !important;
+  background-color: var(--background) !important;
+}
+
+/* Dialog overlay styling */
+[data-radix-dialog-overlay] {
+  z-index: 9997 !important;
+  opacity: 0.8 !important;
+  background-color: rgba(0, 0, 0, 0.8) !important;
+}
+
+[data-radix-dialog-content] {
+  z-index: 9998 !important;
+  opacity: 1 !important;
+}
