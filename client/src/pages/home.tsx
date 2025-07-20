@@ -341,6 +341,16 @@ export default function Home() {
 
             console.log('🎮 Setting complete game result:', gameResult);
             setGameResult(gameResult);
+            
+            // Close all modals to prevent blocking the game over modal
+            setShowOnlineUsers(false);
+            setShowProfile(false);
+            setShowAchievements(false);
+            setShowLeaderboard(false);
+            setShowCreateRoom(false);
+            setShowMatchmaking(false);
+            setShowHeaderSidebar(false);
+            
             setShowGameOver(true);
 
             // Check if this is a bot game and auto-navigate to main menu after 1 second

@@ -432,13 +432,16 @@ export function GameBoard({ game, onGameOver, gameMode, user, lastMessage, sendM
     }
   }, [game?.winningPositions]);
 
-  // Auto-close profile modal when game ends
+  // Auto-close profile modal when game ends  
   useEffect(() => {
     if (game?.status === 'finished' || game?.status === 'abandoned') {
-      setShowProfileModal(false);
-      setSelectedPlayerId(null);
+      if (showProfileModal) {
+        console.log('🎮 Auto-closing profile modal due to game end');
+        setShowProfileModal(false);
+        setSelectedPlayerId(null);
+      }
     }
-  }, [game?.status]);
+  }, [game?.status, showProfileModal]);
   const { toast } = useToast();
   const { currentTheme, themes } = useTheme();
   const { t } = useTranslation();
