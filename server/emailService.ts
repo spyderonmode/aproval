@@ -191,7 +191,7 @@ export function loadEmailConfig() {
   };
 }
 
-function createEmailService(): EmailService | null {
+export function createEmailService(): EmailService | null {
   // Return cached instance if already created
   if (emailServiceInitialized) {
     return emailServiceInstance;
