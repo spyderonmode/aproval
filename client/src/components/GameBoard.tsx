@@ -447,6 +447,11 @@ export function GameBoard({ game, onGameOver, gameMode, user, lastMessage, sendM
       }
     }
   }, [game?.status, showProfileModal]);
+
+  // Debug effect to track modal state changes
+  useEffect(() => {
+    console.log('🎮 Modal state changed - showProfileModal:', showProfileModal, 'selectedPlayerId:', selectedPlayerId);
+  }, [showProfileModal, selectedPlayerId]);
   const { toast } = useToast();
   const { currentTheme, themes } = useTheme();
   const { t } = useTranslation();
@@ -1317,7 +1322,6 @@ export function GameBoard({ game, onGameOver, gameMode, user, lastMessage, sendM
 
         {/* 3x5 Game Grid */}
         <div 
-          key={`board-${JSON.stringify(board)}`}
           className="relative grid grid-cols-5 gap-2 sm:gap-3 md:gap-4 max-w-xs sm:max-w-md md:max-w-lg mx-auto"
         >
           {/* Row 1: 1,2,3,4,5 */}
