@@ -1,10 +1,27 @@
 import { useQuery } from "@tanstack/react-query";
+import { useState, useEffect, useRef } from "react";
 
 export function useAuth() {
-  const { data: user, isLoading } = useQuery({
+  const { data: user, isLoading: queryLoading } = useQuery({
     queryKey: ["/api/auth/user"],
     retry: false,
   });
+
+  const [isLoading, setIsLoading] = useState(true);
+  const startTimeRef = useRef(Date.now());
+
+  useEffect(() => {
+    if (!queryLoading) {
+      const elapsed = Date.now() - startTimeRef.current;
+      const remainingTime = Math.max(0, 1000 - elapsed);
+      
+      const timer = setTimeout(() => {
+        setIsLoading(false);
+      }, remainingTime);
+      
+      return () => clearTimeout(timer);
+    }
+  }, [queryLoading]);
 
   return {
     user,
