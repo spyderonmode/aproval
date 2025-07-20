@@ -63,7 +63,7 @@ function Router() {
   if (isLoading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center">
-        <div className="text-white">Loading...</div>
+        <div className="text-white font-semibold bg-gradient-to-r from-primary to-blue-400 bg-clip-text text-transparent">Made By DarkLayer Studios</div>
       </div>
     );
   }
