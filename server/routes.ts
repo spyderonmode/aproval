@@ -1093,6 +1093,90 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Email diagnostic endpoints
+  app.post('/api/email/test', requireAuth, async (req: any, res) => {
+    try {
+      const { emailService } = await import('./emailService');
+      const service = emailService.createEmailService();
+      
+      if (!service) {
+        return res.status(500).json({ 
+          error: 'Email service not configured',
+          recommendation: 'Please check SMTP configuration in server/config/email.json'
+        });
+      }
+
+      const testEmail = req.session.user.email;
+      console.log(`🔬 Sending diagnostic test email to: ${testEmail}`);
+      
+      const success = await service.sendTestEmail(testEmail);
+      
+      if (success) {
+        res.json({ 
+          success: true, 
+          message: 'Test email sent successfully! Check your inbox (including spam folder).',
+          recommendations: [
+            'Check your inbox and spam folder',
+            'Add admin@darkester.online to your contacts to improve deliverability',
+            'If not received, try using a different email provider (Gmail, Yahoo, etc.)'
+          ]
+        });
+      } else {
+        res.status(500).json({ 
+          error: 'Failed to send test email',
+          recommendation: 'Check server logs for detailed error information'
+        });
+      }
+    } catch (error) {
+      console.error('❌ Email test error:', error);
+      res.status(500).json({ 
+        error: 'Email test failed',
+        details: error.message,
+        recommendation: 'Check SMTP configuration and network connectivity'
+      });
+    }
+  });
+
+  app.get('/api/email/config-status', requireAuth, async (req: any, res) => {
+    try {
+      const { emailService } = await import('./emailService');
+      const config = emailService.loadEmailConfig();
+      
+      const status = {
+        configured: !!(config.host && config.port && config.user && config.pass && config.fromEmail),
+        smtp: {
+          host: config.host || 'Not configured',
+          port: config.port || 'Not configured',
+          user: config.user || 'Not configured',
+          fromEmail: config.fromEmail || 'Not configured',
+          hasPassword: !!config.pass
+        },
+        recommendations: []
+      };
+
+      if (!status.configured) {
+        status.recommendations.push(
+          'Email service is not fully configured',
+          'Check server/config/email.json file exists and has all required fields',
+          'Required fields: host, port, user, pass, fromEmail'
+        );
+      } else {
+        status.recommendations.push(
+          'Email service appears to be configured correctly',
+          'Use the test email endpoint to verify connectivity'
+        );
+      }
+
+      res.json(status);
+    } catch (error) {
+      console.error('❌ Email config check error:', error);
+      res.status(500).json({ 
+        error: 'Failed to check email configuration',
+        details: error.message
+      });
+    }
+  });
+
   // Clean up duplicate bots and sync all AI bots with deterministic stats  
   app.post('/api/sync-bots', async (req, res) => {
     try {

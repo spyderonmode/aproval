@@ -86,11 +86,23 @@ export class EmailService {
         // Ensure connection is alive before sending
         await this.ensureConnection();
         const mailOptions = {
-          from: this.fromEmail,
+          from: {
+            name: 'TicTac 3x5 Game',
+            address: this.fromEmail
+          },
           to: params.to,
           subject: params.subject,
           text: params.text,
           html: params.html,
+          headers: {
+            'X-Mailer': 'TicTac3x5-EmailService',
+            'X-Priority': '3',
+            'X-MSMail-Priority': 'Normal',
+            'Importance': 'Normal',
+            'List-Unsubscribe': '<mailto:admin@darkester.online?subject=Unsubscribe>',
+            'X-Auto-Response-Suppress': 'OOF, DR, RN, NRN',
+          },
+          messageId: `<${Date.now()}.${Math.random().toString(36).substr(2, 9)}@darkester.online>`,
         };
 
         console.log(`📧 Sending email (attempt ${attempt}/${maxRetries}):`, {
@@ -190,34 +202,93 @@ export class EmailService {
 
   async sendPasswordResetEmail(email: string, resetCode: string): Promise<boolean> {
     const html = `
-      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
-        <h2 style="color: #dc2626; text-align: center;">Password Reset - TicTac 3x5</h2>
-        <p>You requested a password reset for your TicTac 3x5 account.</p>
-        <p>Use the verification code below to reset your password:</p>
-        
-        <div style="text-align: center; margin: 30px 0; padding: 20px; background-color: #fef2f2; border-radius: 8px; border: 2px dashed #dc2626;">
-          <h3 style="margin: 0; color: #dc2626;">Your Password Reset Code:</h3>
-          <div style="font-size: 32px; font-weight: bold; color: #dc2626; letter-spacing: 4px; margin: 10px 0;">
-            ${resetCode}
+      <!DOCTYPE html>
+      <html lang="en">
+      <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Password Reset - TicTac 3x5</title>
+      </head>
+      <body style="margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; line-height: 1.6; color: #333; background-color: #f4f4f4;">
+        <div style="max-width: 600px; margin: 20px auto; background-color: #ffffff; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); overflow: hidden;">
+          <!-- Header -->
+          <div style="background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%); color: white; padding: 30px 20px; text-align: center;">
+            <h1 style="margin: 0; font-size: 28px; font-weight: bold;">🔒 Password Reset</h1>
+            <p style="margin: 10px 0 0 0; font-size: 16px; opacity: 0.9;">TicTac 3x5 Game</p>
           </div>
-          <p style="margin: 0; color: #666; font-size: 14px;">Enter this code on the password reset page</p>
+          
+          <!-- Content -->
+          <div style="padding: 40px 30px;">
+            <h2 style="color: #333; margin: 0 0 20px 0; font-size: 24px;">Reset Your Password</h2>
+            <p style="margin: 0 0 20px 0; font-size: 16px; color: #555;">
+              Hello! We received a request to reset your password for your TicTac 3x5 account.
+            </p>
+            <p style="margin: 0 0 30px 0; font-size: 16px; color: #555;">
+              Use the verification code below to create a new password:
+            </p>
+            
+            <!-- Code Box -->
+            <div style="background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%); border: 2px solid #dc2626; border-radius: 12px; padding: 30px; text-align: center; margin: 30px 0;">
+              <p style="margin: 0 0 15px 0; font-size: 18px; font-weight: bold; color: #dc2626;">Your Reset Code</p>
+              <div style="font-size: 36px; font-weight: bold; color: #dc2626; letter-spacing: 8px; font-family: 'Courier New', monospace; margin: 15px 0; padding: 15px; background: white; border-radius: 8px; border: 1px dashed #dc2626;">
+                ${resetCode}
+              </div>
+              <p style="margin: 15px 0 0 0; font-size: 14px; color: #666;">
+                Enter this 6-digit code on the password reset page
+              </p>
+            </div>
+            
+            <!-- Important Info -->
+            <div style="background-color: #fff3cd; border: 1px solid #ffeaa7; border-radius: 8px; padding: 20px; margin: 30px 0;">
+              <p style="margin: 0; font-size: 16px; color: #856404;">
+                <strong>⚠️ Important:</strong> This code expires in <strong>1 hour</strong> for security reasons.
+              </p>
+            </div>
+            
+            <p style="margin: 30px 0 0 0; font-size: 14px; color: #666; text-align: center;">
+              If you didn't request this password reset, you can safely ignore this email.<br>
+              Your password will remain unchanged.
+            </p>
+          </div>
+          
+          <!-- Footer -->
+          <div style="background-color: #f8f9fa; padding: 20px 30px; border-top: 1px solid #e9ecef; text-align: center;">
+            <p style="margin: 0; font-size: 12px; color: #666;">
+              This is an automated message from TicTac 3x5 Game<br>
+              Sent on ${new Date().toLocaleString()}
+            </p>
+          </div>
         </div>
-        
-        <p style="text-align: center; margin: 20px 0;">
-          <strong>Code expires in 1 hour</strong>
-        </p>
-        
-        <p style="color: #666; font-size: 12px; margin-top: 30px; text-align: center;">
-          If you didn't request a password reset, you can safely ignore this email.
-        </p>
-      </div>
+      </body>
+      </html>
+    `;
+
+    const plainText = `
+Password Reset - TicTac 3x5 Game
+
+Hello! We received a request to reset your password for your TicTac 3x5 account.
+
+Your password reset code is: ${resetCode}
+
+This code expires in 1 hour for security reasons.
+
+To reset your password:
+1. Go to the password reset page
+2. Enter this 6-digit code: ${resetCode}
+3. Create your new password
+
+If you didn't request this password reset, you can safely ignore this email. Your password will remain unchanged.
+
+---
+This is an automated message from TicTac 3x5 Game
+Sent on ${new Date().toLocaleString()}
     `;
 
     return await this.sendEmail({
       to: email,
-      subject: 'Your Password Reset Code - TicTac 3x5',
+      subject: '🔒 Your Password Reset Code - TicTac 3x5',
       html,
-      text: `Your TicTac 3x5 password reset code is: ${resetCode}. This code expires in 1 hour.`,
+      text: plainText.trim(),
     });
   }
 }
