@@ -110,6 +110,14 @@ export function useWebSocket() {
           return; // Don't set lastMessage to prevent useEffect processing
         }
         
+        // For critical reconnection messages, dispatch custom events immediately
+        if (message.type === 'game_reconnection') {
+          console.log('🔔 Dispatching immediate game_reconnection event');
+          window.dispatchEvent(new CustomEvent('game_reconnection', {
+            detail: message
+          }));
+        }
+        
         console.log('🔔 Setting lastMessage in useWebSocket:', message.type);
         setLastMessage(message);
       } catch (error) {

@@ -154,12 +154,44 @@ export default function Home() {
     };
 
     window.addEventListener('game_abandoned', handleGameAbandoned);
-    return () => window.removeEventListener('game_abandoned', handleGameAbandoned);
+    // Handle immediate game reconnection events
+    const handleGameReconnection = (event: any) => {
+      const message = event.detail;
+      console.log('🔄 IMMEDIATE GAME RECONNECTION EVENT:', message);
+      console.log('🔄 Full game data:', JSON.stringify(message.game, null, 2));
+      
+      if (message.game && message.roomId) {
+        console.log('🔄 Processing immediate reconnection:', message.game);
+        console.log('🔄 Room ID from message:', message.roomId, 'Current room ID:', currentRoom?.id);
+        
+        // Process reconnection immediately
+        setSelectedMode('online');
+        setCurrentGame({
+          ...message.game,
+          status: 'active',
+          gameMode: 'online',
+          timestamp: Date.now(),
+          syncTimestamp: Date.now()
+        });
+        setIsCreatingGame(false);
+        setShowGameOver(false);
+        setGameResult(null);
+        
+        console.log('🔄 Immediate reconnection completed');
+      }
+    };
+
+    window.addEventListener('game_reconnection', handleGameReconnection);
+    return () => {
+      window.removeEventListener('game_abandoned', handleGameAbandoned);
+      window.removeEventListener('game_reconnection', handleGameReconnection);
+    };
   }, []); // Remove toast dependency to prevent effect recreation
 
   useEffect(() => {
     if (lastMessage) {
       console.log('🎮 Home received WebSocket message:', lastMessage);
+      console.log('🎮 Message type being processed:', lastMessage.type);
       switch (lastMessage.type) {
         case 'online_users_update':
           setOnlineUserCount(lastMessage.count);
@@ -454,6 +486,7 @@ export default function Home() {
           }
           break;
         case 'game_reconnection':
+          console.log('🔄 PROCESSING GAME RECONNECTION MESSAGE');
           console.log('🔄 Game reconnection:', lastMessage);
           console.log('🔄 Full game data:', JSON.stringify(lastMessage.game, null, 2));
           console.log('🔄 Current game before restore:', currentGame);
