@@ -13,6 +13,7 @@ import { User, MessageCircle } from "lucide-react";
 import { QuickChatPanel } from '@/components/QuickChatPanel';
 import { useTranslation } from "@/contexts/LanguageContext";
 import { GameExpirationTimer } from '@/components/GameExpirationTimer';
+import { PlayerProfileModal } from '@/components/PlayerProfileModal';
 
 const VALID_POSITIONS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15];
 
@@ -408,6 +409,21 @@ export function GameBoard({ game, onGameOver, gameMode, user, lastMessage, sendM
   const [playerOMessage, setPlayerOMessage] = useState<PlayerMessage | null>(null);
   const [messageTimeouts, setMessageTimeouts] = useState<{ X?: NodeJS.Timeout; O?: NodeJS.Timeout }>({});
   const [showChatPanel, setShowChatPanel] = useState(false);
+  
+  // Profile modal state
+  const [selectedPlayerId, setSelectedPlayerId] = useState<string | null>(null);
+  const [showProfileModal, setShowProfileModal] = useState(false);
+
+  // Handle profile picture click
+  const handleProfileClick = (playerId: string) => {
+    setSelectedPlayerId(playerId);
+    setShowProfileModal(true);
+  };
+
+  const handleCloseProfileModal = () => {
+    setShowProfileModal(false);
+    setSelectedPlayerId(null);
+  };
   
   // Update winning line when game has winning positions
   useEffect(() => {
@@ -1165,7 +1181,9 @@ export function GameBoard({ game, onGameOver, gameMode, user, lastMessage, sendM
                 <img 
                   src={game.playerXInfo.profileImageUrl || game.playerXInfo.profilePicture} 
                   alt="Player X" 
-                  className="w-6 h-6 rounded-full object-cover"
+                  className="w-6 h-6 rounded-full object-cover cursor-pointer hover:ring-2 hover:ring-blue-400 transition-all duration-200 hover:scale-110"
+                  onClick={() => handleProfileClick(game.playerXInfo.id)}
+                  title="Click to view player profile"
                 />
               ) : (
                 <div className="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center">
@@ -1240,7 +1258,9 @@ export function GameBoard({ game, onGameOver, gameMode, user, lastMessage, sendM
                 <img 
                   src={game.playerOInfo.profileImageUrl || game.playerOInfo.profilePicture} 
                   alt="Player O" 
-                  className="w-6 h-6 rounded-full object-cover"
+                  className="w-6 h-6 rounded-full object-cover cursor-pointer hover:ring-2 hover:ring-red-400 transition-all duration-200 hover:scale-110"
+                  onClick={() => handleProfileClick(game.playerOInfo.id)}
+                  title="Click to view player profile"
                 />
               ) : (
                 <div className="w-6 h-6 bg-red-500 rounded-full flex items-center justify-center">
@@ -1322,6 +1342,14 @@ export function GameBoard({ game, onGameOver, gameMode, user, lastMessage, sendM
           />
         </div>
       </CardContent>
+
+      {/* Player Profile Modal */}
+      <PlayerProfileModal
+        playerId={selectedPlayerId}
+        open={showProfileModal}
+        onClose={handleCloseProfileModal}
+        currentUserId={user?.userId || user?.id}
+      />
 
     </Card>
   );
