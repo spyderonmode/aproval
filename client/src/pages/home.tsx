@@ -70,12 +70,12 @@ export default function Home() {
   });
 
   // Check if current user is a spectator
-  const currentUserParticipant = roomParticipants.find(p => p.userId === (user?.userId || user?.id));
+  const currentUserParticipant = (roomParticipants as any[]).find((p: any) => p.userId === ((user as any)?.userId || (user as any)?.id));
   const isSpectator = currentUserParticipant?.role === 'spectator';
 
   // Check if email verification is required
   useEffect(() => {
-    if (user && user.email && !user.isEmailVerified) {
+    if (user && (user as any).email && !(user as any).isEmailVerified) {
       setShowEmailVerification(true);
     }
   }, [user]);

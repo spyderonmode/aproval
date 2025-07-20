@@ -59,6 +59,7 @@ function Router() {
   const { isAuthenticated, isLoading, user } = useAuth();
   const [location] = useLocation();
   const [hasInitiallyLoaded, setHasInitiallyLoaded] = useState(false);
+  const [isInitialLoad, setIsInitialLoad] = useState(true);
 
   console.log('🔐 Router render - isLoading:', isLoading, 'isAuthenticated:', isAuthenticated, 'user:', user, 'location:', location);
 
@@ -68,15 +69,39 @@ function Router() {
   // Check if current route is public
   const isPublicRoute = publicRoutes.includes(location) || location.startsWith('/reset-password') || location.startsWith('/verify-email');
 
-  // Mark as initially loaded once we get the first auth response
+  // Mark as initially loaded once we get the first auth response (success or failure)
   useEffect(() => {
     if (!isLoading && !hasInitiallyLoaded) {
       setHasInitiallyLoaded(true);
+      // Set a flag to indicate we've moved past the initial load
+      setTimeout(() => {
+        setIsInitialLoad(false);
+      }, 100);
     }
   }, [isLoading, hasInitiallyLoaded]);
 
-  // Show loading screen ONLY on very first app load, not on subsequent navigations
-  if (isLoading && !hasInitiallyLoaded) {
+  // Force loading to complete after 3 seconds to prevent infinite loading
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (!hasInitiallyLoaded) {
+        setHasInitiallyLoaded(true);
+        setIsInitialLoad(false);
+      }
+    }, 3000);
+
+    return () => clearTimeout(timer);
+  }, [hasInitiallyLoaded]);
+
+  // Prevent loading screen from showing on navigations (room exits, page refreshes, etc)
+  useEffect(() => {
+    // If we've already shown the initial loading screen once, don't show it again
+    if (hasInitiallyLoaded) {
+      setIsInitialLoad(false);
+    }
+  }, [location, hasInitiallyLoaded]);
+
+  // Show loading screen ONLY on very first app load, never on subsequent navigations
+  if (isLoading && !hasInitiallyLoaded && isInitialLoad) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center relative overflow-hidden">
         {/* Background animated particles */}
@@ -118,7 +143,7 @@ function Router() {
     );
   }
 
-  console.log('🔐 About to render content - isAuthenticated:', isAuthenticated, 'user?.isEmailVerified:', user?.isEmailVerified, 'isPublicRoute:', isPublicRoute);
+  console.log('🔐 About to render content - isAuthenticated:', isAuthenticated, 'user?.isEmailVerified:', (user as any)?.isEmailVerified, 'isPublicRoute:', isPublicRoute);
 
   // Handle public routes without authentication check
   if (isPublicRoute) {
@@ -131,7 +156,7 @@ function Router() {
         </Route>
         <Route path="/">
           {isAuthenticated && user ? (
-            user.isEmailVerified ? <Home /> : <Auth />
+            (user as any).isEmailVerified ? <Home /> : <Auth />
           ) : (
             <Auth />
           )}
@@ -148,7 +173,7 @@ function Router() {
   }
 
   // If user is authenticated but email is not verified, redirect to auth for verification
-  if (isAuthenticated && user && !user.isEmailVerified) {
+  if (isAuthenticated && user && !(user as any).isEmailVerified) {
     console.log('🔐 Rendering Auth component - email not verified');
     return <Auth />;
   }
