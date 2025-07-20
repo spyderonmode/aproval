@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import React, { createContext, useContext, useState, useEffect, ReactNode, useCallback } from 'react';
 import { ChatPopup } from '@/components/ChatPopup';
 
 interface ChatMessage {
@@ -38,6 +38,14 @@ export function ChatProvider({ children, currentUser }: ChatProviderProps) {
   } | null>(null);
   const [currentMessage, setCurrentMessage] = useState<string>('');
 
+  const showChatPopup = useCallback((sender: { userId: string; displayName: string; username: string }, message: string) => {
+    console.log('📨 ChatContext: showChatPopup called with sender:', sender, 'message:', message);
+    setCurrentSender(sender);
+    setCurrentMessage(message);
+    setIsPopupOpen(true);
+    console.log('📨 ChatContext: Popup state set to open, isPopupOpen:', true);
+  }, []);
+
   // Listen for incoming chat messages
   useEffect(() => {
     const handleChatMessage = (event: CustomEvent) => {
@@ -69,15 +77,7 @@ export function ChatProvider({ children, currentUser }: ChatProviderProps) {
       console.log('📨 ChatContext: Removing event listener');
       window.removeEventListener('chat_message_received', handleChatMessage as EventListener);
     };
-  }, []);
-
-  const showChatPopup = (sender: { userId: string; displayName: string; username: string }, message: string) => {
-    console.log('📨 ChatContext: showChatPopup called with sender:', sender, 'message:', message);
-    setCurrentSender(sender);
-    setCurrentMessage(message);
-    setIsPopupOpen(true);
-    console.log('📨 ChatContext: Popup state set to open, isPopupOpen:', true);
-  };
+  }, [showChatPopup]);
 
   // Add test function for debugging
   (window as any).testChatPopup = () => {
