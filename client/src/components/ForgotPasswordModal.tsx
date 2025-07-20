@@ -16,8 +16,6 @@ export function ForgotPasswordModal({ onClose }: ForgotPasswordModalProps) {
   const [email, setEmail] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
-  const [showTroubleshooting, setShowTroubleshooting] = useState(false);
-  const [isTestingEmail, setIsTestingEmail] = useState(false);
   const [, setLocation] = useLocation();
   const { toast } = useToast();
 
@@ -41,17 +39,11 @@ export function ForgotPasswordModal({ onClose }: ForgotPasswordModalProps) {
           description: data.message,
         });
       } else {
-        // Show more detailed error information if available
-        const errorMessage = data.details 
-          ? `${data.error}\n\nDetails: ${data.details}`
-          : data.error || "Failed to send reset email.";
-        
         toast({
-          title: "Email Service Issue",
-          description: errorMessage,
+          title: "Error",
+          description: data.error || "Failed to send reset email.",
           variant: "destructive",
         });
-        setShowTroubleshooting(true);
       }
     } catch (error) {
       toast({
@@ -59,53 +51,12 @@ export function ForgotPasswordModal({ onClose }: ForgotPasswordModalProps) {
         description: "Failed to send reset email. Please check your internet connection.",
         variant: "destructive",
       });
-      setShowTroubleshooting(true);
     } finally {
       setIsLoading(false);
     }
   };
 
-  const handleTestEmail = async () => {
-    if (!email) {
-      toast({
-        title: "Email Required",
-        description: "Please enter your email address first.",
-        variant: "destructive",
-      });
-      return;
-    }
 
-    setIsTestingEmail(true);
-    try {
-      const response = await fetch('/api/email/test', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' }
-      });
-
-      const data = await response.json();
-
-      if (response.ok) {
-        toast({
-          title: "Test Email Sent",
-          description: data.message,
-        });
-      } else {
-        toast({
-          title: "Email Test Failed",
-          description: data.recommendation || "Failed to send test email.",
-          variant: "destructive",
-        });
-      }
-    } catch (error) {
-      toast({
-        title: "Test Failed",
-        description: "Could not test email delivery.",
-        variant: "destructive",
-      });
-    } finally {
-      setIsTestingEmail(false);
-    }
-  };
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
@@ -134,17 +85,8 @@ export function ForgotPasswordModal({ onClose }: ForgotPasswordModalProps) {
                 </AlertDescription>
               </Alert>
               
-              <div className="bg-blue-900 border border-blue-700 rounded-lg p-4 space-y-3">
-                <h4 className="text-blue-300 font-medium flex items-center gap-2">
-                  <Mail className="h-4 w-4" />
-                  Email Delivery Tips
-                </h4>
-                <div className="text-sm text-blue-200 space-y-2">
-                  <div>• Check your <strong>spam/junk folder</strong> first</div>
-                  <div>• Look for emails from <strong>admin@darkester.online</strong></div>
-                  <div>• Wait up to 5 minutes for delivery</div>
-                  <div>• Add our sender to your contacts to improve delivery</div>
-                </div>
+              <div className="text-sm text-slate-400 text-center">
+                Check your email inbox for your 6-digit reset code.
               </div>
               
               <div className="flex flex-col gap-2">
@@ -201,31 +143,7 @@ export function ForgotPasswordModal({ onClose }: ForgotPasswordModalProps) {
                 </Button>
               </div>
               
-              {showTroubleshooting && (
-                <Alert className="bg-amber-900 border-amber-700">
-                  <AlertTriangle className="h-4 w-4 text-amber-400" />
-                  <AlertDescription className="text-amber-200">
-                    <div className="space-y-2">
-                      <div className="font-medium">Email delivery issue detected</div>
-                      <div className="text-sm space-y-1">
-                        <div>• Email service might be temporarily unavailable</div>
-                        <div>• Check if your email address is correct</div>
-                        <div>• Try using a different email provider (Gmail, Yahoo, etc.)</div>
-                        <div>• Contact support if the problem persists</div>
-                      </div>
-                      <Button
-                        onClick={handleTestEmail}
-                        disabled={isTestingEmail}
-                        variant="outline" 
-                        size="sm"
-                        className="mt-2 bg-amber-800 border-amber-600 text-amber-100 hover:bg-amber-700"
-                      >
-                        {isTestingEmail ? 'Testing...' : 'Test Email Delivery'}
-                      </Button>
-                    </div>
-                  </AlertDescription>
-                </Alert>
-              )}
+
             </form>
           )}
           
