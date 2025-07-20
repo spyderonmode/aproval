@@ -467,10 +467,7 @@ export default function Home() {
             setIsCreatingGame(false);
             setShowGameOver(false);
             setGameResult(null);
-            toast({
-              title: "Game Restored!",
-              description: lastMessage.message || "Your game has been restored successfully.",
-            });
+            // Removed toast notification to prevent multiple "Game Restored" messages during reconnection
           }
           break;
         case 'player_reconnected':
