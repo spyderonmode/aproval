@@ -25,7 +25,7 @@ export function useWebSocket() {
     const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
     const wsUrl = `${protocol}//${window.location.host}/ws`;
     
-    console.log('🔌 Creating WebSocket connection for user:', user.userId || user.id);
+    console.log('🔌 Creating WebSocket connection for user:', (user as any)?.userId || (user as any)?.id);
     ws.current = new WebSocket(wsUrl);
 
     ws.current.onopen = () => {
@@ -36,7 +36,7 @@ export function useWebSocket() {
       // Authenticate with WebSocket
       const authMessage = {
         type: 'auth',
-        userId: user.userId || user.id,
+        userId: (user as any)?.userId || (user as any)?.id,
       };
       console.log('🔐 Sending auth message:', authMessage);
       ws.current?.send(JSON.stringify(authMessage));
@@ -143,7 +143,7 @@ export function useWebSocket() {
       }
       ws.current = null;
     };
-  }, [user?.userId || user?.id]); // Only recreate when user ID changes, not the entire user object
+  }, [(user as any)?.userId || (user as any)?.id]); // Only recreate when user ID changes, not the entire user object
 
   const sendMessage = (message: WebSocketMessage) => {
     if (ws.current && ws.current.readyState === WebSocket.OPEN) {

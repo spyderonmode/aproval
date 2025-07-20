@@ -82,7 +82,7 @@ export function ChatProvider({ children, currentUser }: ChatProviderProps) {
         isOpen={isPopupOpen}
         onClose={closeChatPopup}
         currentUser={currentUser}
-        initialSender={currentSender}
+        initialSender={currentSender || undefined}
         initialMessage={currentMessage}
       />
     </ChatContext.Provider>

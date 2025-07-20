@@ -65,8 +65,8 @@ export function Friends() {
 
   // Fetch head-to-head stats for selected friend
   const { data: headToHeadStats, isLoading: headToHeadLoading, error: headToHeadError } = useQuery<HeadToHeadStats>({
-    queryKey: ['/api/head-to-head', user?.userId, selectedFriend?.id],
-    enabled: !!selectedFriend && !!selectedFriend?.id && !!user?.userId,
+    queryKey: ['/api/head-to-head', (user as any)?.userId, selectedFriend?.id],
+    enabled: !!selectedFriend && !!selectedFriend?.id && !!(user as any)?.userId,
     retry: 1,
   });
 
@@ -558,7 +558,7 @@ export function Friends() {
                   </div>
                 </div>
               ) : (
-                <div className="text-center py-8">{t('noStatsAvailable')}</div>
+                <div className="text-center py-8">No games played yet</div>
               )}
             </DialogContent>
           </Dialog>
