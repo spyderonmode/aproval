@@ -57,6 +57,11 @@ export default function LoadingScreen() {
         <p className="text-slate-400 text-sm animate-pulse">
           Loading your gaming experience...
         </p>
+
+        {/* Made by text */}
+        <p className="text-slate-500 text-xs animate-fade-in animation-delay-1000 mt-4">
+          Made By DarkLayer Studios
+        </p>
       </div>
     </div>
   );
