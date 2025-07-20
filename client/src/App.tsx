@@ -13,7 +13,8 @@ import Auth from "@/pages/auth";
 import VerifyEmail from "@/pages/verify-email";
 import ResetPassword from "@/pages/reset-password";
 import NotFound from "@/pages/not-found";
-import { Component } from "react";
+import LoadingScreen from "@/components/LoadingScreen";
+import { Component, useState, useEffect } from "react";
 
 // Error boundary to catch white screen crashes
 class ErrorBoundary extends Component<
@@ -96,6 +97,33 @@ function Router() {
 }
 
 function App() {
+  const [showLoading, setShowLoading] = useState(true);
+
+  useEffect(() => {
+    // Show loading screen for 2.5 seconds
+    const timer = setTimeout(() => {
+      setShowLoading(false);
+    }, 2500);
+
+    return () => clearTimeout(timer);
+  }, []);
+
+  if (showLoading) {
+    return (
+      <ErrorBoundary>
+        <QueryClientProvider client={queryClient}>
+          <LanguageProvider>
+            <ThemeProvider>
+              <TooltipProvider>
+                <LoadingScreen />
+              </TooltipProvider>
+            </ThemeProvider>
+          </LanguageProvider>
+        </QueryClientProvider>
+      </ErrorBoundary>
+    );
+  }
+
   return (
     <ErrorBoundary>
       <QueryClientProvider client={queryClient}>
