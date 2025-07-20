@@ -89,7 +89,34 @@ export function Leaderboard({ trigger, open, onClose }: LeaderboardProps) {
   const getRankIcon = (position: number) => {
     switch (position) {
       case 1:
-        return <Crown className="w-6 h-6 text-yellow-500" />;
+        return (
+          <motion.div
+            animate={{ 
+              rotate: [0, 5, -5, 0],
+              scale: [1, 1.1, 1]
+            }}
+            transition={{ 
+              duration: 2,
+              repeat: Infinity,
+              ease: "easeInOut"
+            }}
+            className="relative"
+          >
+            <Crown className="w-7 h-7 text-yellow-500 drop-shadow-lg filter brightness-110" />
+            <motion.div 
+              className="absolute -top-0.5 -right-0.5 w-2 h-2 bg-yellow-400 rounded-full"
+              animate={{ 
+                scale: [0.5, 1, 0.5],
+                opacity: [0.5, 1, 0.5]
+              }}
+              transition={{ 
+                duration: 1.5,
+                repeat: Infinity,
+                ease: "easeInOut"
+              }}
+            />
+          </motion.div>
+        );
       case 2:
         return <Medal className="w-6 h-6 text-gray-400" />;
       case 3:
@@ -418,11 +445,11 @@ export function Leaderboard({ trigger, open, onClose }: LeaderboardProps) {
                         <Card 
                           className={`relative cursor-pointer overflow-hidden ${
                           position <= 3 ? 'border-2 shadow-xl' : 'border shadow-lg'} ${
-                          position === 1 ? 'border-yellow-400/50 bg-gradient-to-br from-yellow-50/80 via-white to-yellow-100/60 dark:from-yellow-900/20 dark:via-slate-800 dark:to-yellow-800/20 shadow-yellow-200/40' :
+                          position === 1 ? 'border-yellow-400/60 bg-gradient-to-br from-yellow-50/90 via-amber-50/80 to-yellow-100/70 dark:from-yellow-900/30 dark:via-amber-900/25 dark:to-yellow-800/30 shadow-yellow-200/60 shadow-2xl' :
                           position === 2 ? 'border-gray-400/50 bg-gradient-to-br from-gray-50/80 via-white to-gray-100/60 dark:from-gray-700/20 dark:via-slate-800 dark:to-gray-600/20 shadow-gray-200/40' :
                           position === 3 ? 'border-amber-400/50 bg-gradient-to-br from-amber-50/80 via-white to-amber-100/60 dark:from-amber-900/20 dark:via-slate-800 dark:to-amber-800/20 shadow-amber-200/40' : 
                           'bg-gradient-to-br from-slate-50/90 via-white to-blue-50/40 dark:from-slate-800/90 dark:via-slate-750 dark:to-slate-700/90 border-gray-200/60 dark:border-gray-600/40 shadow-gray-100/60'
-                        } ${position <= 3 ? 'ring-2 ring-opacity-30 shadow-2xl ' + (position === 1 ? 'ring-yellow-300/40' : position === 2 ? 'ring-gray-300/40' : 'ring-amber-300/40') : 'ring-1 ring-gray-200/30 dark:ring-gray-600/30'} backdrop-blur-sm`}
+                        } ${position === 1 ? 'ring-4 ring-yellow-300/50 shadow-yellow-300/40 shadow-2xl' : position <= 3 ? 'ring-2 ring-opacity-30 shadow-2xl ' + (position === 2 ? 'ring-gray-300/40' : 'ring-amber-300/40') : 'ring-1 ring-gray-200/30 dark:ring-gray-600/30'} backdrop-blur-sm ${position === 1 ? 'animate-pulse' : ''}`}
                         onClick={() => {
                           setSelectedPlayerId(user.id);
                           setShowPlayerProfile(true);
@@ -435,11 +462,83 @@ export function Leaderboard({ trigger, open, onClose }: LeaderboardProps) {
                               position === 3 ? 'bg-gradient-to-r from-amber-300 via-amber-200 to-amber-400' :
                               'bg-gradient-to-r from-blue-200 via-slate-100 to-indigo-200'
                             }`}></div>
-                            {/* Enhanced Top 3 Background Decoration */}
-                            {position <= 3 && (
+                            {/* Special #1 Player Effects */}
+                            {position === 1 && (
+                              <>
+                                {/* Golden Sparkles Animation */}
+                                <motion.div 
+                                  className="absolute top-1 left-1 w-2 h-2 bg-yellow-400 rounded-full opacity-70"
+                                  animate={{ 
+                                    scale: [0, 1, 0],
+                                    opacity: [0, 1, 0]
+                                  }}
+                                  transition={{ 
+                                    duration: 2,
+                                    repeat: Infinity,
+                                    delay: 0
+                                  }}
+                                />
+                                <motion.div 
+                                  className="absolute top-3 right-4 w-1.5 h-1.5 bg-amber-300 rounded-full opacity-60"
+                                  animate={{ 
+                                    scale: [0, 1, 0],
+                                    opacity: [0, 1, 0]
+                                  }}
+                                  transition={{ 
+                                    duration: 2.5,
+                                    repeat: Infinity,
+                                    delay: 0.8
+                                  }}
+                                />
+                                <motion.div 
+                                  className="absolute bottom-2 left-3 w-1 h-1 bg-yellow-300 rounded-full opacity-80"
+                                  animate={{ 
+                                    scale: [0, 1, 0],
+                                    opacity: [0, 1, 0]
+                                  }}
+                                  transition={{ 
+                                    duration: 1.8,
+                                    repeat: Infinity,
+                                    delay: 1.2
+                                  }}
+                                />
+                                {/* Champion Crown with Special Effects */}
+                                <motion.div 
+                                  className="absolute top-0 right-0 w-16 h-16 opacity-20 text-yellow-400"
+                                  animate={{ 
+                                    rotate: [0, 5, -5, 0],
+                                    scale: [1, 1.1, 1]
+                                  }}
+                                  transition={{ 
+                                    duration: 3,
+                                    repeat: Infinity,
+                                    ease: "easeInOut"
+                                  }}
+                                >
+                                  <Crown className="w-full h-full drop-shadow-xl filter brightness-125" />
+                                </motion.div>
+                                {/* Extra Champion Badge */}
+                                <motion.div 
+                                  className="absolute -top-1 -right-1 bg-gradient-to-r from-yellow-400 to-amber-500 text-white text-xs font-bold px-2 py-0.5 rounded-full shadow-lg border border-yellow-300"
+                                  animate={{ 
+                                    scale: [1, 1.05, 1]
+                                  }}
+                                  transition={{ 
+                                    duration: 2,
+                                    repeat: Infinity,
+                                    ease: "easeInOut"
+                                  }}
+                                >
+                                  👑 #1
+                                </motion.div>
+                              </>
+                            )}
+                            
+                            {/* Enhanced Top 3 Background Decoration for positions 2-3 */}
+                            {position > 1 && position <= 3 && (
                               <motion.div 
                                 className={`absolute top-0 right-0 w-16 h-16 opacity-15 ${
-                                  position === 1 ? 'text-yellow-400' : position === 2 ? 'text-gray-400' : 'text-amber-400'
+                                  position === 2 ? 'text-gray-400' : 'text-amber-400'
                                 }`}
                                 animate={{ 
                                   rotate: [0, 5, -5, 0],
@@ -451,9 +550,7 @@ export function Leaderboard({ trigger, open, onClose }: LeaderboardProps) {
                                   ease: "easeInOut"
                                 }}
                               >
-                                {position === 1 ? (
-                                  <Crown className="w-full h-full drop-shadow-lg" />
-                                ) : position === 2 ? (
+                                {position === 2 ? (
                                   <Medal className="w-full h-full drop-shadow-lg" />
                                 ) : (
                                   <Award className="w-full h-full drop-shadow-lg" />
