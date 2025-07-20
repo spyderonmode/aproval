@@ -184,7 +184,7 @@ export function PlayerProfileModal({ playerId, open, onClose, currentUserId }: P
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="max-w-2xl max-h-[90vh] w-[95vw] sm:w-full mx-auto flex flex-col overflow-hidden">
+      <DialogContent className="max-w-2xl max-h-[90vh] w-[95vw] sm:w-full mx-auto flex flex-col overflow-hidden z-40">
         <DialogHeader className="flex-shrink-0 pb-4">
           <DialogTitle className="flex items-center gap-2 text-xl">
             <Users className="w-6 h-6 text-blue-500" />

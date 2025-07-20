@@ -431,6 +431,14 @@ export function GameBoard({ game, onGameOver, gameMode, user, lastMessage, sendM
       setWinningLine(game.winningPositions);
     }
   }, [game?.winningPositions]);
+
+  // Auto-close profile modal when game ends
+  useEffect(() => {
+    if (game?.status === 'finished' || game?.status === 'abandoned') {
+      setShowProfileModal(false);
+      setSelectedPlayerId(null);
+    }
+  }, [game?.status]);
   const { toast } = useToast();
   const { currentTheme, themes } = useTheme();
   const { t } = useTranslation();
