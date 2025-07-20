@@ -41,32 +41,51 @@ export function ChatProvider({ children, currentUser }: ChatProviderProps) {
   // Listen for incoming chat messages
   useEffect(() => {
     const handleChatMessage = (event: CustomEvent) => {
+      console.log('📨 ChatContext: Event listener triggered with event:', event);
       const data = event.detail;
+      console.log('📨 ChatContext: Event detail:', data);
       
-      if (data.type === 'chat_message_received') {
+      if (data && data.type === 'chat_message_received') {
+        console.log('📨 ChatContext: Processing chat message:', data.message);
         const sender = {
           userId: data.message.senderId,
           displayName: data.message.senderName,
           username: data.message.senderName
         };
         
+        console.log('📨 ChatContext: Calling showChatPopup with sender:', sender, 'message:', data.message.message);
         // Show popup with the new message
         showChatPopup(sender, data.message.message);
+      } else {
+        console.log('📨 ChatContext: Event data is not chat_message_received type:', data);
       }
     };
 
+    console.log('📨 ChatContext: Setting up event listener for chat_message_received');
     // Listen for WebSocket messages
     window.addEventListener('chat_message_received', handleChatMessage as EventListener);
     
     return () => {
+      console.log('📨 ChatContext: Removing event listener');
       window.removeEventListener('chat_message_received', handleChatMessage as EventListener);
     };
   }, []);
 
   const showChatPopup = (sender: { userId: string; displayName: string; username: string }, message: string) => {
+    console.log('📨 ChatContext: showChatPopup called with sender:', sender, 'message:', message);
     setCurrentSender(sender);
     setCurrentMessage(message);
     setIsPopupOpen(true);
+    console.log('📨 ChatContext: Popup state set to open, isPopupOpen:', true);
+  };
+
+  // Add test function for debugging
+  (window as any).testChatPopup = () => {
+    console.log('🧪 Testing chat popup directly');
+    showChatPopup(
+      { userId: 'test123', displayName: 'Test User', username: 'testuser' },
+      'Test message from test function'
+    );
   };
 
   const closeChatPopup = () => {

@@ -57,10 +57,12 @@ export function useWebSocket() {
         
         // Dispatch custom events for different message types
         if (message.type === 'chat_message_received') {
+          console.log('📨 useWebSocket: Dispatching chat_message_received event with data:', message);
           const chatEvent = new CustomEvent('chat_message_received', {
             detail: message
           });
           window.dispatchEvent(chatEvent);
+          console.log('📨 useWebSocket: Event dispatched successfully');
         }
 
         // Handle room invitation messages
