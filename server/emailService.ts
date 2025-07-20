@@ -55,12 +55,36 @@ export class EmailService {
     }
   }
 
+  private async ensureConnection(): Promise<void> {
+    // Create a fresh transporter for each email send to avoid stale connections
+    // This fixes the issue where emails don't send after the first one
+    console.log('🔄 Creating fresh SMTP connection...');
+    
+    // Get the original config from environment/file
+    const emailConfig = loadEmailConfig();
+    const config = {
+      host: emailConfig.host,
+      port: parseInt(emailConfig.port),
+      secure: emailConfig.secure !== null ? emailConfig.secure : parseInt(emailConfig.port) === 465,
+      auth: {
+        user: emailConfig.user,
+        pass: emailConfig.pass,
+      },
+    };
+    
+    this.transporter = nodemailer.createTransporter(config);
+    await this.transporter.verify();
+    console.log('✅ Fresh SMTP connection created and verified');
+  }
+
   async sendEmail(params: EmailParams): Promise<boolean> {
     const maxRetries = 3;
     let lastError: any;
 
     for (let attempt = 1; attempt <= maxRetries; attempt++) {
       try {
+        // Ensure connection is alive before sending
+        await this.ensureConnection();
         const mailOptions = {
           from: this.fromEmail,
           to: params.to,
