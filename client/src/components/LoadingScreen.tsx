@@ -59,7 +59,7 @@ export default function LoadingScreen() {
         </p>
 
         {/* Made by text */}
-        <p className="text-slate-500 text-xs animate-fade-in animation-delay-1000 mt-4">
+        <p className="text-slate-300 text-sm font-semibold animate-fade-in animation-delay-1000 mt-4 bg-gradient-to-r from-primary to-blue-400 bg-clip-text text-transparent">
           Made By DarkLayer Studios
         </p>
       </div>
