@@ -342,3 +342,14 @@
   color: hsl(var(--foreground)) !important;
   border: 2px solid hsl(var(--primary)) !important;
 }
+
+/* Ensure cards within profile modal have proper backgrounds */
+.player-profile-modal [data-ui="card"] {
+  background-color: hsl(var(--card)) !important;
+  border: 1px solid hsl(var(--border)) !important;
+}
+
+/* Fallback for shadcn cards */
+.player-profile-modal .bg-card {
+  background-color: hsl(var(--card)) !important;
+}

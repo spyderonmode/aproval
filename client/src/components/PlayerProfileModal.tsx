@@ -229,7 +229,7 @@ export function PlayerProfileModal({ playerId, open, onClose, currentUserId }: P
         ) : (
           <div className="flex-1 overflow-y-auto space-y-6">
             {/* Profile Header */}
-            <Card>
+            <Card className="bg-card border border-border">
               <CardContent className="p-6">
                 <div className="flex items-center gap-4">
                   {/* Profile Picture */}
@@ -265,7 +265,7 @@ export function PlayerProfileModal({ playerId, open, onClose, currentUserId }: P
             </Card>
 
             {/* Game Statistics */}
-            <Card>
+            <Card className="bg-card border border-border">
               <CardContent className="p-6">
                 <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
                   <Trophy className="w-5 h-5" />
@@ -294,7 +294,7 @@ export function PlayerProfileModal({ playerId, open, onClose, currentUserId }: P
 
             {/* Head-to-Head Statistics */}
             {!isOwnProfile && currentUserId && (
-              <Card>
+              <Card className="bg-card border border-border">
                 <CardContent className="p-6">
                   <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
                     <Swords className="w-5 h-5" />
@@ -357,7 +357,7 @@ export function PlayerProfileModal({ playerId, open, onClose, currentUserId }: P
 
             {/* Achievements */}
             {profile.achievements.length > 0 && (
-              <Card>
+              <Card className="bg-card border border-border">
                 <CardContent className="p-6">
                   <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
                     <Trophy className="w-5 h-5" />
