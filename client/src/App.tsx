@@ -58,6 +58,7 @@ class ErrorBoundary extends Component<
 function Router() {
   const { isAuthenticated, isLoading, user } = useAuth();
   const [location] = useLocation();
+  const [hasInitiallyLoaded, setHasInitiallyLoaded] = useState(false);
 
   console.log('🔐 Router render - isLoading:', isLoading, 'isAuthenticated:', isAuthenticated, 'user:', user, 'location:', location);
 
@@ -67,8 +68,15 @@ function Router() {
   // Check if current route is public
   const isPublicRoute = publicRoutes.includes(location) || location.startsWith('/reset-password') || location.startsWith('/verify-email');
 
-  // Show loading screen only for authenticated routes when still loading
-  if (isLoading && !isPublicRoute) {
+  // Mark as initially loaded once we get the first auth response
+  useEffect(() => {
+    if (!isLoading && !hasInitiallyLoaded) {
+      setHasInitiallyLoaded(true);
+    }
+  }, [isLoading, hasInitiallyLoaded]);
+
+  // Show loading screen ONLY on very first app load, not on subsequent navigations
+  if (isLoading && !hasInitiallyLoaded) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center relative overflow-hidden">
         {/* Background animated particles */}
