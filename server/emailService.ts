@@ -72,7 +72,7 @@ export class EmailService {
       },
     };
     
-    this.transporter = nodemailer.createTransporter(config);
+    this.transporter = nodemailer.createTransport(config);
     await this.transporter.verify();
     console.log('✅ Fresh SMTP connection created and verified');
   }
@@ -105,8 +105,18 @@ export class EmailService {
           messageId: info.messageId,
           response: info.response,
           accepted: info.accepted,
-          rejected: info.rejected
+          rejected: info.rejected,
+          pending: info.pending,
+          envelope: info.envelope
         });
+        
+        // Additional delivery info
+        if (info.rejected && info.rejected.length > 0) {
+          console.log('⚠️ Some emails were rejected:', info.rejected);
+        }
+        if (info.pending && info.pending.length > 0) {
+          console.log('⏳ Some emails are pending:', info.pending);
+        }
         return true;
       } catch (error) {
         lastError = error;
