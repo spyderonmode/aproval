@@ -1310,9 +1310,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       // Send to all active connections for the target user
       let messageSent = false;
+      console.log(`📨 Found ${targetConnections.length} connections for target user ${targetUserId}`);
       for (const targetConnection of targetConnections) {
+        console.log(`📨 Checking connection - readyState: ${targetConnection.ws?.readyState}, userId: ${targetConnection.userId}`);
         if (targetConnection.ws && targetConnection.ws.readyState === WebSocket.OPEN) {
-          targetConnection.ws.send(JSON.stringify({
+          const chatMessage = {
             type: 'chat_message_received',
             message: {
               senderId,
@@ -1320,8 +1322,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
               message,
               timestamp: new Date().toISOString()
             }
-          }));
+          };
+          console.log(`📨 Sending WebSocket message to ${targetUserId}:`, JSON.stringify(chatMessage));
+          targetConnection.ws.send(JSON.stringify(chatMessage));
+          console.log(`📨 Message sent successfully to connection`);
           messageSent = true;
+        } else {
+          console.log(`📨 Connection not ready or closed for ${targetUserId}`);
         }
       }
 
