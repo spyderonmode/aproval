@@ -37,9 +37,14 @@ export function ForgotPasswordModal({ onClose }: ForgotPasswordModalProps) {
           description: data.message,
         });
       } else {
+        // Show more detailed error information if available
+        const errorMessage = data.details 
+          ? `${data.error}\n\nDetails: ${data.details}`
+          : data.error || "Failed to send reset email.";
+        
         toast({
-          title: "Error",
-          description: data.error || "Failed to send reset email.",
+          title: "Email Service Unavailable",
+          description: errorMessage,
           variant: "destructive",
         });
       }

@@ -177,14 +177,16 @@ async function sendPasswordResetEmail(email: string, token: string): Promise<boo
   }
   
   try {
+    console.log(`📧 Attempting to send password reset email to: ${email}`);
     const result = await emailService.sendPasswordResetEmail(email, token);
     if (!result) {
-      console.error('Failed to send password reset email - sendEmail returned false');
+      console.error('❌ Failed to send password reset email - email service returned false');
       return false;
     }
+    console.log(`✅ Password reset email sent successfully to: ${email}`);
     return true;
   } catch (error) {
-    console.error('Failed to send password reset email:', error);
+    console.error('❌ Exception while sending password reset email:', error);
     return false;
   }
 }
@@ -690,7 +692,10 @@ export function setupAuth(app: Express) {
       const emailSent = await sendPasswordResetEmail(email, resetCode);
       if (!emailSent) {
         console.error('Failed to send password reset email - email service returned false');
-        return res.status(500).json({ error: 'Failed to send password reset email. Please try again later.' });
+        return res.status(500).json({ 
+          error: 'Email service is currently unavailable. Please contact support or try again later.',
+          details: 'The email service configuration is incomplete. Please ensure SMTP settings are properly configured.'
+        });
       }
 
       res.json({ message: 'If an account with this email exists, a password reset code has been sent.' });
