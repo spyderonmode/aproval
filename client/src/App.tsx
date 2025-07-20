@@ -156,7 +156,11 @@ function Router() {
         </Route>
         <Route path="/">
           {isAuthenticated && user ? (
-            (user as any).isEmailVerified ? <Home /> : <Auth />
+            (user as any).isEmailVerified ? (
+              <ChatProvider currentUser={user}>
+                <Home />
+              </ChatProvider>
+            ) : <Auth />
           ) : (
             <Auth />
           )}

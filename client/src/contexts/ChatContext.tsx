@@ -30,6 +30,8 @@ interface ChatProviderProps {
 }
 
 export function ChatProvider({ children, currentUser }: ChatProviderProps) {
+  console.log('📨 ChatProvider: Initializing with currentUser:', currentUser);
+  
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [currentSender, setCurrentSender] = useState<{
     userId: string;
@@ -48,6 +50,7 @@ export function ChatProvider({ children, currentUser }: ChatProviderProps) {
 
   // Listen for incoming chat messages
   useEffect(() => {
+    console.log('📨 ChatProvider: useEffect initializing - currentUser:', currentUser);
     const handleChatMessage = (event: CustomEvent) => {
       console.log('📨 ChatContext: Event listener triggered with event:', event);
       const data = event.detail;
