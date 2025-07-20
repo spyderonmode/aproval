@@ -1308,28 +1308,36 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ error: 'Target user connection not found' });
       }
 
-      // Send to all active connections for the target user
+      // Send to only the most recent active connection for the target user to avoid duplicates
       let messageSent = false;
       console.log(`📨 Found ${targetConnections.length} connections for target user ${targetUserId}`);
-      for (const targetConnection of targetConnections) {
-        console.log(`📨 Checking connection - readyState: ${targetConnection.ws?.readyState}, userId: ${targetConnection.userId}`);
-        if (targetConnection.ws && targetConnection.ws.readyState === WebSocket.OPEN) {
-          const chatMessage = {
-            type: 'chat_message_received',
-            message: {
-              senderId,
-              senderName: senderInfo.displayName || senderInfo.username,
-              message,
-              timestamp: new Date().toISOString()
-            }
-          };
-          console.log(`📨 Sending WebSocket message to ${targetUserId}:`, JSON.stringify(chatMessage));
-          targetConnection.ws.send(JSON.stringify(chatMessage));
-          console.log(`📨 Message sent successfully to connection`);
-          messageSent = true;
-        } else {
-          console.log(`📨 Connection not ready or closed for ${targetUserId}`);
-        }
+      
+      // Find the most recent active connection
+      const activeConnections = targetConnections.filter(conn => 
+        conn.ws && conn.ws.readyState === WebSocket.OPEN
+      );
+      
+      if (activeConnections.length > 0) {
+        // Sort by last seen (most recent first) and take the first one
+        activeConnections.sort((a, b) => b.lastSeen.getTime() - a.lastSeen.getTime());
+        const targetConnection = activeConnections[0];
+        
+        console.log(`📨 Sending to most recent connection - readyState: ${targetConnection.ws?.readyState}, userId: ${targetConnection.userId}`);
+        const chatMessage = {
+          type: 'chat_message_received',
+          message: {
+            senderId,
+            senderName: senderInfo.displayName || senderInfo.username,
+            message,
+            timestamp: new Date().toISOString()
+          }
+        };
+        console.log(`📨 Sending WebSocket message to ${targetUserId}:`, JSON.stringify(chatMessage));
+        targetConnection.ws.send(JSON.stringify(chatMessage));
+        console.log(`📨 Message sent successfully to most recent connection`);
+        messageSent = true;
+      } else {
+        console.log(`📨 No active connections found for ${targetUserId}`);
       }
 
       if (!messageSent) {
