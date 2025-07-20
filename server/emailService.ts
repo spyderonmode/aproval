@@ -48,8 +48,10 @@ export class EmailService {
     try {
       await this.transporter.verify();
       console.log('✅ SMTP connection verified successfully');
+      console.log('📧 SMTP server details verified for:', this.fromEmail);
     } catch (error) {
       console.error('❌ SMTP connection verification failed:', error);
+      console.error('❌ Full error details:', JSON.stringify(error, null, 2));
     }
   }
 
@@ -73,12 +75,19 @@ export class EmailService {
           from: this.fromEmail
         });
 
-        await this.transporter.sendMail(mailOptions);
+        const info = await this.transporter.sendMail(mailOptions);
         console.log('✅ Email sent successfully to:', params.to);
+        console.log('📧 Message info:', {
+          messageId: info.messageId,
+          response: info.response,
+          accepted: info.accepted,
+          rejected: info.rejected
+        });
         return true;
       } catch (error) {
         lastError = error;
         console.error(`❌ SMTP email error (attempt ${attempt}/${maxRetries}):`, error);
+        console.error('❌ Full error details:', JSON.stringify(error, null, 2));
         
         // If it's the last attempt, don't wait
         if (attempt < maxRetries) {
@@ -122,6 +131,26 @@ export class EmailService {
       subject: 'Your Verification Code - TicTac 3x5',
       html,
       text: `Your TicTac 3x5 verification code is: ${verificationCode}. This code expires in 24 hours.`,
+    });
+  }
+
+  async sendTestEmail(email: string): Promise<boolean> {
+    const html = `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+        <h2 style="color: #1e40af; text-align: center;">Test Email - TicTac 3x5</h2>
+        <p>This is a test email to verify that the SMTP service is working correctly.</p>
+        <p>If you receive this email, the email service is properly configured and working.</p>
+        <p style="color: #666; font-size: 12px; margin-top: 30px; text-align: center;">
+          Test sent at: ${new Date().toISOString()}
+        </p>
+      </div>
+    `;
+
+    return await this.sendEmail({
+      to: email,
+      subject: 'Test Email from TicTac 3x5',
+      html,
+      text: 'This is a test email to verify that the SMTP service is working correctly.',
     });
   }
 

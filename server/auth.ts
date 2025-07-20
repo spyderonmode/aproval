@@ -648,6 +648,36 @@ export function setupAuth(app: Express) {
     }
   });
 
+  // Test email endpoint (for debugging)
+  app.post('/api/auth/test-email', async (req, res) => {
+    const { email } = req.body;
+
+    if (!email) {
+      return res.status(400).json({ error: 'Email is required' });
+    }
+
+    const emailService = createEmailService();
+    if (!emailService) {
+      return res.status(500).json({ error: 'Email service is currently unavailable. Please contact support or try again later.' });
+    }
+
+    try {
+      console.log(`📧 Sending test email to: ${email}`);
+      const result = await emailService.sendTestEmail(email);
+      
+      if (result) {
+        console.log(`✅ Test email sent successfully to: ${email}`);
+        return res.json({ message: 'Test email sent successfully!' });
+      } else {
+        console.error(`❌ Failed to send test email to: ${email}`);
+        return res.status(500).json({ error: 'Failed to send test email. Please check server logs.' });
+      }
+    } catch (error: any) {
+      console.error('❌ Error sending test email:', error);
+      return res.status(500).json({ error: 'Internal server error while sending email.' });
+    }
+  });
+
   // Forgot password endpoint
   app.post('/api/auth/forgot-password', async (req, res) => {
     const { email } = req.body;
