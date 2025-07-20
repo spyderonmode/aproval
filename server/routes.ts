@@ -130,17 +130,30 @@ export async function registerRoutes(app: Express): Promise<Server> {
         
         console.log(`🎮 Found active game ${activeGame.id} in room ${activeGame.roomId} for reconnecting user ${userId}`);
         
-        // Check if we recently sent reconnection message to this specific connection (within last 1 second)
+        // Check if user already has an active reconnection in progress (within last 2 seconds)
         const now = Date.now();
-        const connectionKey = `${userId}-${connectionId}`;
-        const lastReconnection = recentReconnections.get(connectionKey);
-        if (lastReconnection && (now - lastReconnection) < 1000) {
-          console.log(`🔄 Skipping duplicate reconnection for connection ${connectionId} (sent ${now - lastReconnection}ms ago)`);
+        const lastReconnection = recentReconnections.get(userId);
+        if (lastReconnection && (now - lastReconnection) < 2000) {
+          console.log(`🔄 Skipping duplicate reconnection for user ${userId} (sent ${now - lastReconnection}ms ago)`);
+          // Still add to room connections but don't send messages
+          if (!roomConnections.has(activeGame.roomId)) {
+            roomConnections.set(activeGame.roomId, new Set());
+          }
+          roomConnections.get(activeGame.roomId)!.add(connectionId);
+          const connection = connections.get(connectionId);
+          if (connection) {
+            connection.roomId = activeGame.roomId;
+          }
+          userRoomStates.set(userId, {
+            roomId: activeGame.roomId,
+            gameId: activeGame.id,
+            isInGame: true
+          });
           return;
         }
         
-        // Track this specific connection's reconnection
-        recentReconnections.set(connectionKey, now);
+        // Track this user's reconnection
+        recentReconnections.set(userId, now);
         
         // Add user back to room connections
         if (!roomConnections.has(activeGame.roomId)) {
