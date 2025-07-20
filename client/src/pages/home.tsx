@@ -455,19 +455,49 @@ export default function Home() {
           break;
         case 'game_reconnection':
           console.log('🔄 Game reconnection:', lastMessage);
-          if (lastMessage.game && lastMessage.roomId === currentRoom?.id) {
+          console.log('🔄 Full game data:', JSON.stringify(lastMessage.game, null, 2));
+          console.log('🔄 Current game before restore:', currentGame);
+          if (lastMessage.game && lastMessage.roomId) {
             console.log('🔄 Restoring game state from reconnection:', lastMessage.game);
-            setSelectedMode('online');
-            setCurrentGame({
-              ...lastMessage.game,
-              status: 'active',
-              gameMode: 'online',
-              timestamp: Date.now()
-            });
-            setIsCreatingGame(false);
-            setShowGameOver(false);
-            setGameResult(null);
-            // Removed toast notification to prevent multiple "Game Restored" messages during reconnection
+            console.log('🔄 Room ID from message:', lastMessage.roomId, 'Current room ID:', currentRoom?.id);
+            
+            // First ensure we're in the right room
+            if (!currentRoom || currentRoom.id !== lastMessage.roomId) {
+              console.log('🔄 Room mismatch - waiting for room join to complete');
+              // Wait a bit for room join to complete, then try again
+              setTimeout(() => {
+                if (lastMessage.game && lastMessage.roomId) {
+                  console.log('🔄 Retrying game restoration after room join');
+                  setSelectedMode('online');
+                  setCurrentGame({
+                    ...lastMessage.game,
+                    status: 'active',
+                    gameMode: 'online',
+                    timestamp: Date.now(),
+                    syncTimestamp: Date.now() // Force GameBoard re-sync
+                  });
+                  setIsCreatingGame(false);
+                  setShowGameOver(false);
+                  setGameResult(null);
+                }
+              }, 100);
+            } else {
+              // Room already set, restore game immediately
+              console.log('🔄 Room matches - restoring game immediately');
+              setSelectedMode('online');
+              setCurrentGame({
+                ...lastMessage.game,
+                status: 'active',
+                gameMode: 'online',
+                timestamp: Date.now(),
+                syncTimestamp: Date.now() // Force GameBoard re-sync
+              });
+              setIsCreatingGame(false);
+              setShowGameOver(false);
+              setGameResult(null);
+            }
+            
+            console.log('🔄 Game state restoration completed');
           }
           break;
         case 'player_reconnected':

@@ -110,6 +110,7 @@ export function useWebSocket() {
           return; // Don't set lastMessage to prevent useEffect processing
         }
         
+        console.log('🔔 Setting lastMessage in useWebSocket:', message.type);
         setLastMessage(message);
       } catch (error) {
         console.error('Failed to parse WebSocket message:', error);
