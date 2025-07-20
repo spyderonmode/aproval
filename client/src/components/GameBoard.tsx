@@ -420,9 +420,22 @@ export function GameBoard({ game, onGameOver, gameMode, user, lastMessage, sendM
     console.log('🎮 Current showProfileModal state:', showProfileModal);
     console.log('🎮 Current selectedPlayerId state:', selectedPlayerId);
     console.log('🎮 Setting selectedPlayerId and showProfileModal to true');
-    setSelectedPlayerId(playerId);
-    setShowProfileModal(true);
-    console.log('🎮 After setting - selectedPlayerId:', playerId, 'showProfileModal:', true);
+    
+    // Force close first if already open, then open with new player
+    if (showProfileModal) {
+      setShowProfileModal(false);
+      setSelectedPlayerId(null);
+      // Use setTimeout to ensure state is updated before opening with new player
+      setTimeout(() => {
+        setSelectedPlayerId(playerId);
+        setShowProfileModal(true);
+        console.log('🎮 Modal reopened with playerId:', playerId);
+      }, 100);
+    } else {
+      setSelectedPlayerId(playerId);
+      setShowProfileModal(true);
+      console.log('🎮 Modal opened with playerId:', playerId);
+    }
   };
 
   const handleCloseProfileModal = () => {
@@ -1202,9 +1215,13 @@ export function GameBoard({ game, onGameOver, gameMode, user, lastMessage, sendM
                 <img 
                   src={game.playerXInfo.profileImageUrl || game.playerXInfo.profilePicture} 
                   alt="Player X" 
-                  className="w-6 h-6 rounded-full object-cover cursor-pointer hover:ring-2 hover:ring-blue-400 transition-all duration-200 hover:scale-110"
-                  onClick={() => {
+                  className="w-6 h-6 rounded-full object-cover cursor-pointer hover:ring-2 hover:ring-blue-400 transition-all duration-200 hover:scale-110 relative z-50"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
                     console.log('🎮 Player X profile clicked:', game.playerXInfo.id);
+                    console.log('🎮 Current modal states:', { showProfileModal, selectedPlayerId });
+                    console.log('🎮 Game state:', game?.status);
                     handleProfileClick(game.playerXInfo.id);
                   }}
                   title="Click to view player profile"
@@ -1282,9 +1299,13 @@ export function GameBoard({ game, onGameOver, gameMode, user, lastMessage, sendM
                 <img 
                   src={game.playerOInfo.profileImageUrl || game.playerOInfo.profilePicture} 
                   alt="Player O" 
-                  className="w-6 h-6 rounded-full object-cover cursor-pointer hover:ring-2 hover:ring-red-400 transition-all duration-200 hover:scale-110"
-                  onClick={() => {
+                  className="w-6 h-6 rounded-full object-cover cursor-pointer hover:ring-2 hover:ring-red-400 transition-all duration-200 hover:scale-110 relative z-50"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
                     console.log('🎮 Player O profile clicked:', game.playerOInfo.id);
+                    console.log('🎮 Current modal states:', { showProfileModal, selectedPlayerId });
+                    console.log('🎮 Game state:', game?.status);
                     handleProfileClick(game.playerOInfo.id);
                   }}
                   title="Click to view player profile"
