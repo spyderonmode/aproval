@@ -728,19 +728,7 @@ export function setupAuth(app: Express) {
         });
       }
 
-      // For development/testing purposes, if email is samil000828@gmail.com, 
-      // also return the reset code in response (remove this in production)
-      const isDevelopmentMode = process.env.NODE_ENV === 'development';
-      const isTestEmail = email.toLowerCase() === 'samil000828@gmail.com';
-      
-      const response: any = { message: 'If an account with this email exists, a password reset code has been sent.' };
-      
-      if (isDevelopmentMode && isTestEmail) {
-        response.resetCode = resetCode;
-        response.note = 'Reset code provided for development testing - check your email as well';
-      }
-
-      res.json(response);
+      res.json({ message: 'If an account with this email exists, a password reset code has been sent.' });
     } catch (error) {
       console.error('Error sending password reset email:', error);
       res.status(500).json({ error: 'Failed to send password reset email' });

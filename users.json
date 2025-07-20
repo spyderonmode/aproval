@@ -228,15 +228,23 @@
   {
     "id": "4659f4ba-7152-4f27-aeee-ba3bad850c06",
     "username": "testuser123",
-    "password": "7e6e0c3079a08c5cc6036789b57e951f65f82383913ba1a49ae992544f1b4b6e",
+    "password": "44d8a37077a0371d348502162aa4547889de06ed8b045beedefa143c00c6945a",
     "email": "natibi6312@forexru.com",
     "displayName": "testuser123",
     "profilePicture": null,
     "isEmailVerified": false,
     "emailVerificationToken": "428754",
     "emailVerificationExpiry": "2025-07-21T12:03:00.159Z",
-    "createdAt": "2025-07-20T12:03:00.159Z",
-    "passwordResetToken": "718892",
-    "passwordResetExpiry": "2025-07-20T13:03:04.329Z"
+    "createdAt": "2025-07-20T12:03:00.159Z"
+  },
+  {
+    "id": "1f300678-1385-44c3-bdfc-1cea4b57afc5",
+    "username": "sawan",
+    "password": "44d8a37077a0371d348502162aa4547889de06ed8b045beedefa143c00c6945a",
+    "email": "gogof62247@forexru.com",
+    "displayName": "sawan",
+    "profilePicture": null,
+    "isEmailVerified": true,
+    "createdAt": "2025-07-20T12:09:10.443Z"
   }
 ]
