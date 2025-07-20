@@ -1,4 +1,4 @@
-import * as nodemailer from 'nodemailer';
+import nodemailer from 'nodemailer';
 
 interface EmailConfig {
   host: string;
@@ -23,32 +23,67 @@ export class EmailService {
 
   constructor(config: EmailConfig, fromEmail: string) {
     this.fromEmail = fromEmail;
-    this.transporter = nodemailer.createTransport(config);
+    // Add connection pooling and better error handling
+    this.transporter = nodemailer.createTransport({
+      ...config,
+      pool: true, // Enable connection pooling
+      maxConnections: 5, // Maximum concurrent connections
+      maxMessages: 100, // Maximum messages per connection
+      rateDelta: 1000, // Rate limiting: 1 second between messages
+      rateLimit: 5, // Rate limiting: max 5 messages per rateDelta
+    });
+    
+    // Verify connection on startup
+    this.verifyConnection();
+  }
+
+  private async verifyConnection(): Promise<void> {
+    try {
+      await this.transporter.verify();
+      console.log('✅ SMTP connection verified successfully');
+    } catch (error) {
+      console.error('❌ SMTP connection verification failed:', error);
+    }
   }
 
   async sendEmail(params: EmailParams): Promise<boolean> {
-    try {
-      const mailOptions = {
-        from: this.fromEmail,
-        to: params.to,
-        subject: params.subject,
-        text: params.text,
-        html: params.html,
-      };
+    const maxRetries = 3;
+    let lastError: any;
 
-      console.log('📧 Sending email:', {
-        to: params.to,
-        subject: params.subject,
-        from: this.fromEmail
-      });
+    for (let attempt = 1; attempt <= maxRetries; attempt++) {
+      try {
+        const mailOptions = {
+          from: this.fromEmail,
+          to: params.to,
+          subject: params.subject,
+          text: params.text,
+          html: params.html,
+        };
 
-      await this.transporter.sendMail(mailOptions);
-      console.log('✅ Email sent successfully to:', params.to);
-      return true;
-    } catch (error) {
-      console.error('❌ SMTP email error:', error);
-      return false;
+        console.log(`📧 Sending email (attempt ${attempt}/${maxRetries}):`, {
+          to: params.to,
+          subject: params.subject,
+          from: this.fromEmail
+        });
+
+        await this.transporter.sendMail(mailOptions);
+        console.log('✅ Email sent successfully to:', params.to);
+        return true;
+      } catch (error) {
+        lastError = error;
+        console.error(`❌ SMTP email error (attempt ${attempt}/${maxRetries}):`, error);
+        
+        // If it's the last attempt, don't wait
+        if (attempt < maxRetries) {
+          const delay = attempt * 1000; // Exponential backoff: 1s, 2s, 3s
+          console.log(`⏳ Waiting ${delay}ms before retry...`);
+          await new Promise(resolve => setTimeout(resolve, delay));
+        }
+      }
     }
+
+    console.error('❌ Failed to send email after all retries:', lastError);
+    return false;
   }
 
   async sendVerificationEmail(email: string, verificationCode: string): Promise<boolean> {
@@ -117,13 +152,24 @@ export class EmailService {
   }
 }
 
-// Create email service instance if SMTP settings are provided
+// Singleton email service instance
+let emailServiceInstance: EmailService | null = null;
+let emailServiceInitialized = false;
+
+// Create email service instance if SMTP settings are provided (singleton pattern)
 export function createEmailService(): EmailService | null {
+  // Return cached instance if already created
+  if (emailServiceInitialized) {
+    return emailServiceInstance;
+  }
+
   const smtpHost = process.env.SMTP_HOST;
   const smtpPort = process.env.SMTP_PORT;
   const smtpUser = process.env.SMTP_USER;
   const smtpPass = process.env.SMTP_PASS;
   const fromEmail = process.env.FROM_EMAIL;
+
+  emailServiceInitialized = true; // Mark as initialized to prevent multiple attempts
 
   if (!smtpHost || !smtpPort || !smtpUser || !smtpPass || !fromEmail) {
     console.log('SMTP configuration not complete - email verification disabled');
@@ -134,6 +180,7 @@ export function createEmailService(): EmailService | null {
       smtpPass: !!smtpPass,
       fromEmail: !!fromEmail
     });
+    emailServiceInstance = null;
     return null;
   }
 
@@ -155,5 +202,13 @@ export function createEmailService(): EmailService | null {
     },
   };
 
-  return new EmailService(config, fromEmail);
+  emailServiceInstance = new EmailService(config, fromEmail);
+  return emailServiceInstance;
+}
+
+// Function to reset email service (for testing or configuration changes)
+export function resetEmailService(): void {
+  emailServiceInitialized = false;
+  emailServiceInstance = null;
+  console.log('🔄 Email service reset - will recreate on next use');
 }

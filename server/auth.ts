@@ -149,33 +149,43 @@ function findUserByEmail(email: string): User | undefined {
   return users.find(u => u.email && u.email.toLowerCase() === email.toLowerCase());
 }
 
-async function sendVerificationEmail(email: string, token: string): Promise<void> {
+async function sendVerificationEmail(email: string, token: string): Promise<boolean> {
   const emailService = createEmailService();
   if (!emailService) {
     console.log('Email service not configured - verification email not sent');
-    return;
+    return false;
   }
   
   try {
-    await emailService.sendVerificationEmail(email, token);
+    const result = await emailService.sendVerificationEmail(email, token);
+    if (!result) {
+      console.error('Failed to send verification email - sendEmail returned false');
+      return false;
+    }
+    return true;
   } catch (error) {
     console.error('Failed to send verification email:', error);
-    throw error;
+    return false;
   }
 }
 
-async function sendPasswordResetEmail(email: string, token: string): Promise<void> {
+async function sendPasswordResetEmail(email: string, token: string): Promise<boolean> {
   const emailService = createEmailService();
   if (!emailService) {
     console.log('Email service not configured - password reset email not sent');
-    return;
+    return false;
   }
   
   try {
-    await emailService.sendPasswordResetEmail(email, token);
+    const result = await emailService.sendPasswordResetEmail(email, token);
+    if (!result) {
+      console.error('Failed to send password reset email - sendEmail returned false');
+      return false;
+    }
+    return true;
   } catch (error) {
     console.error('Failed to send password reset email:', error);
-    throw error;
+    return false;
   }
 }
 
@@ -309,11 +319,10 @@ export function setupAuth(app: Express) {
       
       // Send verification email (mandatory)
       if (email && user.emailVerificationToken) {
-        try {
-          await sendVerificationEmail(email, user.emailVerificationToken);
-        } catch (error) {
-          console.error('Failed to send verification email:', error);
-          return res.status(500).json({ error: 'Failed to send verification email. Please try again.' });
+        const emailSent = await sendVerificationEmail(email, user.emailVerificationToken);
+        if (!emailSent) {
+          console.error('Failed to send verification email - email service returned false');
+          return res.status(500).json({ error: 'Failed to send verification email. Please try again later.' });
         }
       }
       
@@ -535,13 +544,13 @@ export function setupAuth(app: Express) {
     }
 
     // Send verification email
-    try {
-      await sendVerificationEmail(email, newToken);
-      res.json({ message: 'Verification email sent successfully' });
-    } catch (error) {
-      console.error('Failed to send verification email:', error);
-      res.status(500).json({ error: 'Failed to send verification email' });
+    const emailSent = await sendVerificationEmail(email, newToken);
+    if (!emailSent) {
+      console.error('Failed to send verification email - email service returned false');
+      return res.status(500).json({ error: 'Failed to send verification email. Please try again later.' });
     }
+    
+    res.json({ message: 'Verification email sent successfully' });
   });
 
   // Update user profile endpoint
@@ -678,7 +687,11 @@ export function setupAuth(app: Express) {
         }
       }
 
-      await sendPasswordResetEmail(email, resetCode);
+      const emailSent = await sendPasswordResetEmail(email, resetCode);
+      if (!emailSent) {
+        console.error('Failed to send password reset email - email service returned false');
+        return res.status(500).json({ error: 'Failed to send password reset email. Please try again later.' });
+      }
 
       res.json({ message: 'If an account with this email exists, a password reset code has been sent.' });
     } catch (error) {
