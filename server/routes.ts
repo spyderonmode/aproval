@@ -42,6 +42,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   const onlineUsers = new Map<string, { userId: string; username: string; displayName: string; roomId?: string; lastSeen: Date }>();
   const userRoomStates = new Map<string, { roomId: string; gameId?: string; isInGame: boolean }>();
   const matchmakingTimers = new Map<string, NodeJS.Timeout>(); // Track user timers for bot matches
+  const recentReconnections = new Map<string, number>(); // Track recent reconnection messages to prevent duplicates
   
   // Game expiration system - check every 2 minutes
   setInterval(async () => {
@@ -129,6 +130,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
         
         console.log(`🎮 Found active game ${activeGame.id} in room ${activeGame.roomId} for reconnecting user ${userId}`);
         
+        // Check if we recently sent reconnection message to this user (within last 3 seconds)
+        const now = Date.now();
+        const lastReconnection = recentReconnections.get(userId);
+        if (lastReconnection && (now - lastReconnection) < 3000) {
+          console.log(`🔄 Skipping duplicate reconnection for user ${userId} (sent ${now - lastReconnection}ms ago)`);
+          return;
+        }
+        
+        // Track this reconnection
+        recentReconnections.set(userId, now);
+        
         // Add user back to room connections
         if (!roomConnections.has(activeGame.roomId)) {
           roomConnections.set(activeGame.roomId, new Set());
@@ -212,6 +224,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
               }));
               
               console.log(`🔄 Sent reconnection data to user ${userId} for game ${activeGame.id}`);
+          
+          // Clean up old reconnection tracking entries (older than 5 seconds)
+          setTimeout(() => {
+            const cutoff = Date.now() - 5000;
+            for (const [trackingUserId, timestamp] of recentReconnections.entries()) {
+              if (timestamp < cutoff) {
+                recentReconnections.delete(trackingUserId);
+              }
+            }
+          }, 5000);
             }
           }, 500);
           

@@ -1212,20 +1212,24 @@ export function GameBoard({ game, onGameOver, gameMode, user, lastMessage, sendM
                 )}
               </div>
               {(gameMode === 'online' && (game?.playerXInfo?.profileImageUrl || game?.playerXInfo?.profilePicture)) ? (
-                <img 
-                  src={game.playerXInfo.profileImageUrl || game.playerXInfo.profilePicture} 
-                  alt="Player X" 
-                  className="w-6 h-6 rounded-full object-cover cursor-pointer hover:ring-2 hover:ring-blue-400 transition-all duration-200 hover:scale-110 relative z-50"
+                <button
+                  className="p-0 bg-transparent border-0 cursor-pointer hover:ring-2 hover:ring-blue-400 rounded-full transition-all duration-200 hover:scale-110 relative z-50"
                   onClick={(e) => {
                     e.preventDefault();
                     e.stopPropagation();
-                    console.log('🎮 Player X profile clicked:', game.playerXInfo.id);
+                    console.log('🎮 Player X profile BUTTON clicked:', game.playerXInfo.id);
                     console.log('🎮 Current modal states:', { showProfileModal, selectedPlayerId });
                     console.log('🎮 Game state:', game?.status);
                     handleProfileClick(game.playerXInfo.id);
                   }}
                   title="Click to view player profile"
-                />
+                >
+                  <img 
+                    src={game.playerXInfo.profileImageUrl || game.playerXInfo.profilePicture} 
+                    alt="Player X" 
+                    className="w-6 h-6 rounded-full object-cover pointer-events-none"
+                  />
+                </button>
               ) : (
                 <div className="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center">
                   <span className="text-xs text-white font-bold">X</span>
@@ -1296,20 +1300,24 @@ export function GameBoard({ game, onGameOver, gameMode, user, lastMessage, sendM
                 )}
               </div>
               {(gameMode === 'online' && (game?.playerOInfo?.profileImageUrl || game?.playerOInfo?.profilePicture)) ? (
-                <img 
-                  src={game.playerOInfo.profileImageUrl || game.playerOInfo.profilePicture} 
-                  alt="Player O" 
-                  className="w-6 h-6 rounded-full object-cover cursor-pointer hover:ring-2 hover:ring-red-400 transition-all duration-200 hover:scale-110 relative z-50"
+                <button
+                  className="p-0 bg-transparent border-0 cursor-pointer hover:ring-2 hover:ring-red-400 rounded-full transition-all duration-200 hover:scale-110 relative z-50"
                   onClick={(e) => {
                     e.preventDefault();
                     e.stopPropagation();
-                    console.log('🎮 Player O profile clicked:', game.playerOInfo.id);
+                    console.log('🎮 Player O profile BUTTON clicked:', game.playerOInfo.id);
                     console.log('🎮 Current modal states:', { showProfileModal, selectedPlayerId });
                     console.log('🎮 Game state:', game?.status);
                     handleProfileClick(game.playerOInfo.id);
                   }}
                   title="Click to view player profile"
-                />
+                >
+                  <img 
+                    src={game.playerOInfo.profileImageUrl || game.playerOInfo.profilePicture} 
+                    alt="Player O" 
+                    className="w-6 h-6 rounded-full object-cover pointer-events-none"
+                  />
+                </button>
               ) : (
                 <div className="w-6 h-6 bg-red-500 rounded-full flex items-center justify-center">
                   <span className="text-xs text-white font-bold">O</span>
