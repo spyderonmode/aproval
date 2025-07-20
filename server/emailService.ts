@@ -72,7 +72,15 @@ export class EmailService {
       },
     };
     
-    this.transporter = nodemailer.createTransport(config);
+    this.transporter = nodemailer.createTransport({
+      ...config,
+      tls: {
+        rejectUnauthorized: false,
+        ciphers: 'SSLv3'
+      },
+      debug: true,
+      logger: true
+    });
     await this.transporter.verify();
     console.log('✅ Fresh SMTP connection created and verified');
   }
@@ -86,10 +94,7 @@ export class EmailService {
         // Ensure connection is alive before sending
         await this.ensureConnection();
         const mailOptions = {
-          from: {
-            name: 'TicTac 3x5 Game',
-            address: this.fromEmail
-          },
+          from: `"TicTac 3x5 Game" <${this.fromEmail}>`,
           to: params.to,
           subject: params.subject,
           text: params.text,
