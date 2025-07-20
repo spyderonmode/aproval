@@ -502,9 +502,9 @@ export function Leaderboard({ trigger, open, onClose }: LeaderboardProps) {
                                     delay: 1.2
                                   }}
                                 />
-                                {/* Champion Crown with Special Effects */}
+                                {/* Champion Crown with Special Effects - lower z-index to not overlap buttons */}
                                 <motion.div 
-                                  className="absolute top-0 right-0 w-16 h-16 opacity-20 text-yellow-400"
+                                  className="absolute top-0 right-0 w-16 h-16 opacity-15 text-yellow-400 z-0"
                                   animate={{ 
                                     rotate: [0, 5, -5, 0],
                                     scale: [1, 1.1, 1]
@@ -517,9 +517,9 @@ export function Leaderboard({ trigger, open, onClose }: LeaderboardProps) {
                                 >
                                   <Crown className="w-full h-full drop-shadow-xl filter brightness-125" />
                                 </motion.div>
-                                {/* Extra Champion Badge */}
+                                {/* Extra Champion Badge - positioned to not overlap content */}
                                 <motion.div 
-                                  className="absolute -top-1 -right-1 bg-gradient-to-r from-yellow-400 to-amber-500 text-white text-xs font-bold px-2 py-0.5 rounded-full shadow-lg border border-yellow-300"
+                                  className="absolute -top-1 -left-2 bg-gradient-to-r from-yellow-400 to-amber-500 text-white text-xs font-bold px-2 py-0.5 rounded-full shadow-lg border border-yellow-300 z-0"
                                   animate={{ 
                                     scale: [1, 1.05, 1]
                                   }}
@@ -606,8 +606,8 @@ export function Leaderboard({ trigger, open, onClose }: LeaderboardProps) {
                                   </h3>
                                 </div>
                                 
-                                <div className="flex-shrink-0">
-                                  <span className={`text-xs px-2 py-1 rounded-full text-white font-medium ${
+                                <div className="flex-shrink-0 relative z-20">
+                                  <span className={`text-xs px-2 py-1 rounded-full text-white font-medium relative z-20 shadow-lg ${
                                     winRatePercentage >= 70 ? 'bg-green-500' :
                                     winRatePercentage >= 55 ? 'bg-blue-500' :
                                     winRatePercentage >= 40 ? 'bg-yellow-500' : 'bg-gray-500'
