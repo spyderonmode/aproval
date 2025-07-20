@@ -131,7 +131,7 @@ export function ChatPopup({
 
   return (
     <div className="fixed inset-0 z-50 pointer-events-none">
-      <div className="absolute bottom-4 right-4 pointer-events-auto">
+      <div className="absolute inset-0 flex items-center justify-center pointer-events-auto">
         <AnimatePresence>
           <motion.div
             initial={{ opacity: 0, scale: 0.8, y: 20 }}

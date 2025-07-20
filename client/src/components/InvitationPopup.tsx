@@ -106,9 +106,9 @@ export function InvitationPopup({ onRoomJoin }: InvitationPopupProps) {
         animate={{ opacity: 1, scale: 1, y: 0 }}
         exit={{ opacity: 0, scale: 0.8, y: 50 }}
         transition={{ duration: 0.3, ease: "easeOut" }}
-        className="fixed bottom-4 right-4 z-50 max-w-sm"
+        className="fixed inset-0 z-50 flex items-center justify-center"
       >
-        <Card className="bg-gradient-to-br from-blue-900/95 to-purple-900/95 border-blue-500/50 shadow-2xl backdrop-blur-sm">
+        <Card className="bg-gradient-to-br from-blue-900/95 to-purple-900/95 border-blue-500/50 shadow-2xl backdrop-blur-sm max-w-sm w-full mx-4">
           <CardHeader className="pb-3">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
