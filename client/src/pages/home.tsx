@@ -455,7 +455,7 @@ export default function Home() {
           break;
         case 'game_reconnection':
           console.log('🔄 Game reconnection:', lastMessage);
-          if (lastMessage.game && lastMessage.roomId === currentRoom?.id) {
+          if (lastMessage.game && lastMessage.roomId) {
             console.log('🔄 Restoring game state from reconnection:', lastMessage.game);
             setSelectedMode('online');
             setCurrentGame({
