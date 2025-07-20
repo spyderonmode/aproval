@@ -107,15 +107,7 @@ function Router() {
   // If user is not authenticated, show auth
   if (!isAuthenticated) {
     console.log('🔐 Rendering Auth component - user not authenticated');
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center">
-        <div className="text-white text-center">
-          <h1 className="text-2xl font-bold mb-4">Please Login</h1>
-          <p className="text-slate-300 mb-4">Auth component should render here</p>
-          <Auth />
-        </div>
-      </div>
-    );
+    return <Auth />;
   }
 
   // If user is authenticated but email is not verified, redirect to auth for verification
@@ -152,10 +144,10 @@ function App() {
   const [showLoading, setShowLoading] = useState(true);
 
   useEffect(() => {
-    // Show loading screen for 2.5 seconds
+    // Show loading screen for 1 second (reduced from 2.5 seconds)
     const timer = setTimeout(() => {
       setShowLoading(false);
-    }, 2500);
+    }, 1000);
 
     return () => clearTimeout(timer);
   }, []);
