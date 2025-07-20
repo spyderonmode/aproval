@@ -54,10 +54,6 @@ export function useWebSocket() {
           console.log(`📥 Game started message - RoomId: ${message.roomId}, GameId: ${message.game?.id}`);
           console.log(`📥 Game players - X: ${message.game?.playerXInfo?.displayName}, O: ${message.game?.playerOInfo?.displayName}`);
         }
-        if (message.type === 'game_reconnection') {
-          console.log(`📥 Game reconnection message - RoomId: ${message.roomId}, GameId: ${message.game?.id}`);
-          console.log(`📥 Game reconnection data:`, message.game);
-        }
         
         // Dispatch custom events for different message types
         if (message.type === 'chat_message_received') {

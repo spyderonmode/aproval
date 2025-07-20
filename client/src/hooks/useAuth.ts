@@ -13,7 +13,7 @@ export function useAuth() {
   useEffect(() => {
     if (!queryLoading) {
       const elapsed = Date.now() - startTimeRef.current;
-      const remainingTime = Math.max(0, 500 - elapsed); // Reduced from 3000ms to 500ms
+      const remainingTime = Math.max(0, 3000 - elapsed);
       
       const timer = setTimeout(() => {
         setIsLoading(false);
