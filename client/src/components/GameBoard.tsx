@@ -416,6 +416,8 @@ export function GameBoard({ game, onGameOver, gameMode, user, lastMessage, sendM
 
   // Handle profile picture click
   const handleProfileClick = (playerId: string) => {
+    console.log('🎮 Profile click handler called with playerId:', playerId);
+    console.log('🎮 Setting selectedPlayerId and showProfileModal to true');
     setSelectedPlayerId(playerId);
     setShowProfileModal(true);
   };
@@ -1188,12 +1190,15 @@ export function GameBoard({ game, onGameOver, gameMode, user, lastMessage, sendM
                   </div>
                 )}
               </div>
-              {gameMode === 'online' && (game?.playerXInfo?.profileImageUrl || game?.playerXInfo?.profilePicture) ? (
+              {(gameMode === 'online' && (game?.playerXInfo?.profileImageUrl || game?.playerXInfo?.profilePicture)) ? (
                 <img 
                   src={game.playerXInfo.profileImageUrl || game.playerXInfo.profilePicture} 
                   alt="Player X" 
                   className="w-6 h-6 rounded-full object-cover cursor-pointer hover:ring-2 hover:ring-blue-400 transition-all duration-200 hover:scale-110"
-                  onClick={() => handleProfileClick(game.playerXInfo.id)}
+                  onClick={() => {
+                    console.log('🎮 Player X profile clicked:', game.playerXInfo.id);
+                    handleProfileClick(game.playerXInfo.id);
+                  }}
                   title="Click to view player profile"
                 />
               ) : (
@@ -1265,12 +1270,15 @@ export function GameBoard({ game, onGameOver, gameMode, user, lastMessage, sendM
                   </div>
                 )}
               </div>
-              {gameMode === 'online' && (game?.playerOInfo?.profileImageUrl || game?.playerOInfo?.profilePicture) ? (
+              {(gameMode === 'online' && (game?.playerOInfo?.profileImageUrl || game?.playerOInfo?.profilePicture)) ? (
                 <img 
                   src={game.playerOInfo.profileImageUrl || game.playerOInfo.profilePicture} 
                   alt="Player O" 
                   className="w-6 h-6 rounded-full object-cover cursor-pointer hover:ring-2 hover:ring-red-400 transition-all duration-200 hover:scale-110"
-                  onClick={() => handleProfileClick(game.playerOInfo.id)}
+                  onClick={() => {
+                    console.log('🎮 Player O profile clicked:', game.playerOInfo.id);
+                    handleProfileClick(game.playerOInfo.id);
+                  }}
                   title="Click to view player profile"
                 />
               ) : (
