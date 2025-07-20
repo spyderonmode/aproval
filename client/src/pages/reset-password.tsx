@@ -7,6 +7,8 @@ import { Label } from "@/components/ui/label";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { useToast } from "@/hooks/use-toast";
 import { KeyRound, CheckCircle, XCircle } from "lucide-react";
+import { parseErrorMessage } from "@/lib/errorUtils";
+import { t } from "@/lib/i18n";
 
 export default function ResetPassword() {
   const [resetCode, setResetCode] = useState('');
@@ -24,25 +26,25 @@ export default function ResetPassword() {
     setError('');
 
     if (!resetCode.trim()) {
-      setError('Please enter your reset code');
+      setError(t('pleaseEnterResetCode'));
       setIsLoading(false);
       return;
     }
 
     if (resetCode.length !== 6 || !/^\d+$/.test(resetCode)) {
-      setError('Reset code must be 6 digits');
+      setError(t('resetCodeMustBe6Digits'));
       setIsLoading(false);
       return;
     }
 
     if (newPassword !== confirmPassword) {
-      setError('Passwords do not match');
+      setError(t('passwordsDoNotMatch'));
       setIsLoading(false);
       return;
     }
 
     if (newPassword.length < 6) {
-      setError('Password must be at least 6 characters long');
+      setError(t('passwordMinLength'));
       setIsLoading(false);
       return;
     }
@@ -59,22 +61,22 @@ export default function ResetPassword() {
       if (response.ok) {
         setIsSuccess(true);
         toast({
-          title: "Password Reset",
-          description: "Your password has been reset successfully.",
+          title: t('passwordReset'),
+          description: t('passwordResetSuccessfully'),
         });
       } else {
-        setError(data.error || 'Failed to reset password');
+        setError(parseErrorMessage(data.error || t('failedToResetPassword')));
         toast({
-          title: "Error",
-          description: data.error || "Failed to reset password.",
+          title: t('error'),
+          description: parseErrorMessage(data.error || t('failedToResetPassword')),
           variant: "destructive",
         });
       }
     } catch (error) {
-      setError('Failed to reset password. Please try again.');
+      setError(t('failedToResetTryAgain'));
       toast({
-        title: "Error",
-        description: "Failed to reset password. Please try again.",
+        title: t('error'),
+        description: t('failedToResetTryAgain'),
         variant: "destructive",
       });
     } finally {
@@ -106,14 +108,14 @@ export default function ResetPassword() {
             )}
           </div>
           <CardTitle className="text-white text-xl">
-            {isSuccess ? 'Password Reset Complete' : error ? 'Reset Failed' : 'Reset Password'}
+            {isSuccess ? t('passwordResetComplete') : error ? t('resetFailed') : t('resetPassword')}
           </CardTitle>
           <CardDescription className="text-slate-300">
             {isSuccess 
-              ? 'Your password has been successfully reset'
+              ? t('passwordResetSuccessfully')
               : error 
-                ? 'There was an issue resetting your password'
-                : 'Enter your reset code and new password below'
+                ? t('issueResettingPassword')
+                : t('enterResetCodeAndPassword')
             }
           </CardDescription>
         </CardHeader>

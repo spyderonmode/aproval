@@ -4,6 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { useToast } from "@/hooks/use-toast";
 import { Mail, CheckCircle } from "lucide-react";
+import { t } from "@/lib/i18n";
 
 interface EmailVerificationModalProps {
   email: string;
@@ -33,15 +34,15 @@ export function EmailVerificationModal({ email, onClose }: EmailVerificationModa
       } else {
         const errorData = await response.json();
         toast({
-          title: "Error",
-          description: errorData.error || "Failed to resend verification email.",
+          title: t('error'),
+          description: errorData.error || t('failedToResendVerificationEmail'),
           variant: "destructive",
         });
       }
     } catch (error) {
       toast({
-        title: "Error",
-        description: "Failed to resend verification email. Please try again.",
+        title: t('error'),
+        description: t('failedToResendTryAgain'),
         variant: "destructive",
       });
     } finally {

@@ -7,6 +7,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { CheckCircle, XCircle, Mail } from "lucide-react";
+import { parseErrorMessage } from "@/lib/errorUtils";
+import { t } from "@/lib/i18n";
 
 export default function VerifyEmail() {
   const [verificationCode, setVerificationCode] = useState('');
@@ -18,8 +20,8 @@ export default function VerifyEmail() {
   const handleVerifyCode = async () => {
     if (!verificationCode.trim()) {
       toast({
-        title: "Error",
-        description: "Please enter your verification code",
+        title: t('error'),
+        description: t('pleaseEnterVerificationCode'),
         variant: "destructive",
       });
       return;
@@ -27,8 +29,8 @@ export default function VerifyEmail() {
 
     if (verificationCode.length !== 6 || !/^\d+$/.test(verificationCode)) {
       toast({
-        title: "Error",
-        description: "Verification code must be 6 digits",
+        title: t('error'),
+        description: t('verificationCodeMustBe6Digits'),
         variant: "destructive",
       });
       return;
@@ -46,20 +48,20 @@ export default function VerifyEmail() {
       if (response.ok) {
         const data = await response.json();
         setVerificationStatus('success');
-        setMessage(data.message || 'Email verified successfully!');
+        setMessage(data.message || t('emailVerifiedSuccessfully'));
         
         toast({
-          title: "Email Verified",
-          description: "Your email has been verified successfully. You can now log in.",
+          title: t('emailVerified'),
+          description: t('emailVerifiedCanLogin'),
         });
       } else {
         const errorData = await response.json();
         setVerificationStatus('error');
-        setMessage(errorData.error || 'Failed to verify email');
+        setMessage(parseErrorMessage(errorData.error || t('failedToVerifyEmail')));
       }
     } catch (error) {
       setVerificationStatus('error');
-      setMessage('Failed to verify email. Please try again.');
+      setMessage(t('failedToVerifyTryAgain'));
     }
   };
 
@@ -94,14 +96,14 @@ export default function VerifyEmail() {
             )}
           </div>
           <CardTitle className="text-white text-xl">
-            {(verificationStatus === 'idle' || verificationStatus === 'loading') && 'Verify Your Email'}
-            {verificationStatus === 'success' && 'Email Verified!'}
-            {verificationStatus === 'error' && 'Verification Failed'}
+            {(verificationStatus === 'idle' || verificationStatus === 'loading') && t('verifyYourEmail')}
+            {verificationStatus === 'success' && t('emailVerified')}
+            {verificationStatus === 'error' && t('verificationFailed')}
           </CardTitle>
           <CardDescription className="text-slate-300">
-            {(verificationStatus === 'idle' || verificationStatus === 'loading') && 'Enter the 6-digit code we sent to your email'}
-            {verificationStatus === 'success' && 'Your account has been successfully verified'}
-            {verificationStatus === 'error' && 'There was an issue verifying your email'}
+            {(verificationStatus === 'idle' || verificationStatus === 'loading') && t('enterSixDigitCode')}
+            {verificationStatus === 'success' && t('accountSuccessfullyVerified')}
+            {verificationStatus === 'error' && t('issueVerifyingEmail')}
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">

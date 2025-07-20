@@ -11,6 +11,7 @@ import { useToast } from "@/hooks/use-toast";
 import { isUnauthorizedError } from "@/lib/authUtils";
 import { showUserFriendlyError } from "@/lib/errorUtils";
 import { useTranslation } from "@/contexts/LanguageContext";
+import { parseErrorMessage } from "@/lib/errorUtils";
 
 interface CreateRoomModalProps {
   open: boolean;
@@ -46,12 +47,15 @@ export function CreateRoomModal({ open, onClose, onRoomCreated }: CreateRoomModa
           description: t('loggedOutLoggingIn'),
           variant: "destructive",
         });
-        setTimeout(() => {
-          window.location.href = "/api/login";
-        }, 500);
+        window.location.href = "/auth";
         return;
       }
-      showUserFriendlyError(error, toast);
+      
+      toast({
+        title: t('error'),
+        description: parseErrorMessage(error instanceof Error ? error.message : t('failedToCreateRoom')),
+        variant: "destructive",
+      });
     },
   });
 
