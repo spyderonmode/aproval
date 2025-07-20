@@ -50,6 +50,11 @@ interface PlayerProfileModalProps {
 export function PlayerProfileModal({ playerId, open, onClose, currentUserId }: PlayerProfileModalProps) {
   const { t } = useTranslation();
   
+  // Debug logging for profile modal
+  useEffect(() => {
+    console.log('🎮 PlayerProfileModal props changed:', { playerId, open, currentUserId });
+  }, [playerId, open, currentUserId]);
+  
   const { data: profile, isLoading: profileLoading } = useQuery<PlayerProfile>({
     queryKey: ['/api/players', playerId],
     enabled: open && !!playerId,

@@ -417,9 +417,12 @@ export function GameBoard({ game, onGameOver, gameMode, user, lastMessage, sendM
   // Handle profile picture click
   const handleProfileClick = (playerId: string) => {
     console.log('🎮 Profile click handler called with playerId:', playerId);
+    console.log('🎮 Current showProfileModal state:', showProfileModal);
+    console.log('🎮 Current selectedPlayerId state:', selectedPlayerId);
     console.log('🎮 Setting selectedPlayerId and showProfileModal to true');
     setSelectedPlayerId(playerId);
     setShowProfileModal(true);
+    console.log('🎮 After setting - selectedPlayerId:', playerId, 'showProfileModal:', true);
   };
 
   const handleCloseProfileModal = () => {
