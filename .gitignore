@@ -4,3 +4,6 @@ dist
 server/public
 vite.config.ts.*
 *.tar.gz
+
+# Email configuration (contains sensitive SMTP credentials)
+server/config/email.json

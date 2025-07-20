@@ -1,4 +1,6 @@
 import nodemailer from 'nodemailer';
+import fs from 'fs';
+import path from 'path';
 
 interface EmailConfig {
   host: string;
@@ -157,27 +159,56 @@ let emailServiceInstance: EmailService | null = null;
 let emailServiceInitialized = false;
 
 // Create email service instance if SMTP settings are provided (singleton pattern)
-export function createEmailService(): EmailService | null {
+export function loadEmailConfig() {
+  try {
+    // Try to load from config file first
+    const configPath = path.join(__dirname, 'config', 'email.json');
+    if (fs.existsSync(configPath)) {
+      const configData = fs.readFileSync(configPath, 'utf8');
+      const config = JSON.parse(configData);
+      console.log('✅ Email configuration loaded from config file');
+      return {
+        host: config.smtp.host,
+        port: config.smtp.port.toString(),
+        user: config.smtp.auth.user,
+        pass: config.smtp.auth.pass,
+        fromEmail: config.fromEmail,
+        secure: config.smtp.secure
+      };
+    }
+  } catch (error) {
+    console.log('⚠️ Could not load email config file, falling back to environment variables:', error.message);
+  }
+
+  // Fall back to environment variables
+  return {
+    host: process.env.SMTP_HOST,
+    port: process.env.SMTP_PORT,
+    user: process.env.SMTP_USER,
+    pass: process.env.SMTP_PASS,
+    fromEmail: process.env.FROM_EMAIL,
+    secure: null // Will be determined based on port
+  };
+}
+
+function createEmailService(): EmailService | null {
   // Return cached instance if already created
   if (emailServiceInitialized) {
     return emailServiceInstance;
   }
 
-  const smtpHost = process.env.SMTP_HOST;
-  const smtpPort = process.env.SMTP_PORT;
-  const smtpUser = process.env.SMTP_USER;
-  const smtpPass = process.env.SMTP_PASS;
-  const fromEmail = process.env.FROM_EMAIL;
+  const emailConfig = loadEmailConfig();
+  const { host, port, user, pass, fromEmail, secure } = emailConfig;
 
   emailServiceInitialized = true; // Mark as initialized to prevent multiple attempts
 
-  if (!smtpHost || !smtpPort || !smtpUser || !smtpPass || !fromEmail) {
+  if (!host || !port || !user || !pass || !fromEmail) {
     console.log('SMTP configuration not complete - email verification disabled');
     console.log('Missing:', {
-      smtpHost: !!smtpHost,
-      smtpPort: !!smtpPort,
-      smtpUser: !!smtpUser,
-      smtpPass: !!smtpPass,
+      smtpHost: !!host,
+      smtpPort: !!port,
+      smtpUser: !!user,
+      smtpPass: !!pass,
       fromEmail: !!fromEmail
     });
     emailServiceInstance = null;
@@ -186,19 +217,19 @@ export function createEmailService(): EmailService | null {
 
   console.log('✅ SMTP configuration complete - email service enabled');
   console.log('SMTP settings:', {
-    host: smtpHost,
-    port: smtpPort,
-    user: smtpUser,
+    host,
+    port,
+    user,
     from: fromEmail
   });
 
   const config: EmailConfig = {
-    host: smtpHost,
-    port: parseInt(smtpPort),
-    secure: parseInt(smtpPort) === 465, // true for 465, false for other ports
+    host,
+    port: parseInt(port),
+    secure: secure !== null ? secure : parseInt(port) === 465, // Use config value or determine from port
     auth: {
-      user: smtpUser,
-      pass: smtpPass,
+      user,
+      pass,
     },
   };
 
