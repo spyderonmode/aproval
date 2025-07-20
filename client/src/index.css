@@ -80,17 +80,6 @@
   z-index: 9999 !important;
 }
 
-/* Ensure select dropdowns appear above all other content */
-[data-radix-select-content] {
-  z-index: 10000 !important;
-  position: fixed !important;
-  background-color: #1e293b !important;
-  color: white !important;
-  border: 1px solid #475569 !important;
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8) !important;
-  transform: translateZ(0) !important;
-}
-
 /* Arabic Font Support */
 
 .font-arabic {
