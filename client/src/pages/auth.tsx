@@ -11,7 +11,6 @@ import { ForgotPasswordModal } from "@/components/ForgotPasswordModal";
 import { GamepadIcon, Mail } from "lucide-react";
 import { useTranslation } from "@/contexts/LanguageContext";
 import { LanguageSelector } from "@/components/LanguageSelector";
-import { parseErrorMessage } from "@/lib/errorUtils";
 
 export default function Auth() {
   const [isLogin, setIsLogin] = useState(true);
@@ -60,7 +59,7 @@ export default function Auth() {
           } else {
             toast({
               title: t('loginFailed'),
-              description: parseErrorMessage(errorData.error || t('pleaseCheckCredentials')),
+              description: errorData.error || t('pleaseCheckCredentials'),
               variant: "destructive",
             });
           }
@@ -95,7 +94,7 @@ export default function Auth() {
           const errorData = await response.json();
           toast({
             title: t('registrationFailed'),
-            description: parseErrorMessage(errorData.error || t('pleaseCheckInformationAndTryAgain')),
+            description: errorData.error || t('pleaseCheckInformationAndTryAgain'),
             variant: "destructive",
           });
         }
@@ -103,7 +102,7 @@ export default function Auth() {
     } catch (error) {
       toast({
         title: isLogin ? t('loginFailed') : t('registrationFailed'),
-        description: parseErrorMessage(error instanceof Error ? error.message : t('pleaseCheckCredentials')),
+        description: error instanceof Error ? error.message : t('pleaseCheckCredentials'),
         variant: "destructive",
       });
     } finally {

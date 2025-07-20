@@ -6,7 +6,6 @@ import { Label } from "@/components/ui/label";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { useToast } from "@/hooks/use-toast";
 import { KeyRound, CheckCircle } from "lucide-react";
-import { t } from "@/lib/i18n";
 
 interface ForgotPasswordModalProps {
   onClose: () => void;
@@ -34,13 +33,13 @@ export function ForgotPasswordModal({ onClose }: ForgotPasswordModalProps) {
       if (response.ok) {
         setIsSuccess(true);
         toast({
-          title: t('resetCodeSent'),
+          title: "Reset Code Sent",
           description: data.message,
         });
       } else {
         toast({
-          title: t('error'),
-          description: data.error || t('failedToSendResetEmail'),
+          title: "Error",
+          description: data.error || "Failed to send reset email.",
           variant: "destructive",
         });
       }

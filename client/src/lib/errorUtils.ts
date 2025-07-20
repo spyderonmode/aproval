@@ -1,8 +1,7 @@
 // Utility functions for handling and formatting error messages
-import { t } from "@/lib/i18n";
 
 export function parseErrorMessage(error: any): string {
-  if (!error) return t('unexpectedError');
+  if (!error) return "An unexpected error occurred";
   
   // If error is a string, try to parse it
   if (typeof error === 'string') {
@@ -40,61 +39,61 @@ export function parseErrorMessage(error: any): string {
     return formatUserFriendlyError(error.error);
   }
   
-  return t('unexpectedError');
+  return "An unexpected error occurred";
 }
 
 function formatUserFriendlyError(errorMessage: string): string {
-  // Common error message mappings with translations
-  const errorMappings: Record<string, () => string> = {
-    "You are blocked by this user": () => t('blocked'),
-    "Target user connection not found": () => t('userOffline'),
-    "User not found": () => t('playerNotFound'),
-    "Not authenticated": () => t('notAuthenticated'),
-    "Access denied": () => t('accessDenied'),
-    "Invalid request": () => t('unexpectedError'),
-    "Server error": () => t('serviceUnavailable'),
-    "Network error": () => t('networkError'),
-    "Unauthorized": () => t('unauthorized'),
-    "Forbidden": () => t('accessDenied'),
-    "Not found": () => t('playerNotFound'),
-    "Conflict": () => t('unexpectedError'),
-    "Too many requests": () => t('tooManyRequests'),
-    "Service unavailable": () => t('serviceUnavailable')
+  // Common error message mappings
+  const errorMappings: Record<string, string> = {
+    "You are blocked by this user": "This user has blocked you and you cannot send messages to them.",
+    "Target user connection not found": "Your friend is offline. You can send messages when they are online.",
+    "User not found": "This user could not be found.",
+    "Not authenticated": "Please log in to continue.",
+    "Access denied": "You don't have permission to perform this action.",
+    "Invalid request": "The request is invalid. Please try again.",
+    "Server error": "Something went wrong on our end. Please try again later.",
+    "Network error": "Please check your internet connection and try again.",
+    "Unauthorized": "You are not authorized to perform this action.",
+    "Forbidden": "This action is not allowed.",
+    "Not found": "The requested resource could not be found.",
+    "Conflict": "This action conflicts with the current state.",
+    "Too many requests": "Too many requests. Please wait a moment and try again.",
+    "Service unavailable": "The service is temporarily unavailable. Please try again later."
   };
   
   // Check for exact matches first
   if (errorMappings[errorMessage]) {
-    return errorMappings[errorMessage]();
+    return errorMappings[errorMessage];
   }
   
   // Check for partial matches
   for (const [key, value] of Object.entries(errorMappings)) {
     if (errorMessage.toLowerCase().includes(key.toLowerCase())) {
-      return value();
+      return value;
     }
   }
   
   // Handle common HTTP status codes
   if (errorMessage.includes('400')) {
-    return t('unexpectedError');
+    return "The request is invalid. Please check your input and try again.";
   }
   if (errorMessage.includes('401') || errorMessage.includes('403')) {
-    return t('unauthorized');
+    return "You are not authorized to perform this action.";
   }
   if (errorMessage.includes('404')) {
-    return t('playerNotFound');
+    return "The requested resource could not be found.";
   }
   if (errorMessage.includes('409')) {
-    return t('unexpectedError');
+    return "This action conflicts with the current state.";
   }
   if (errorMessage.includes('429')) {
-    return t('tooManyRequests');
+    return "Too many requests. Please wait a moment and try again.";
   }
   if (errorMessage.includes('500')) {
-    return t('serviceUnavailable');
+    return "Something went wrong on our end. Please try again later.";
   }
   if (errorMessage.includes('503')) {
-    return t('serviceUnavailable');
+    return "The service is temporarily unavailable. Please try again later.";
   }
   
   // Clean up technical error messages
@@ -107,7 +106,7 @@ function formatUserFriendlyError(errorMessage: string): string {
   
   // If the cleaned message is empty or too technical, provide a generic message
   if (!cleanedMessage || cleanedMessage.length < 5 || containsTechnicalTerms(cleanedMessage)) {
-    return t('unexpectedError');
+    return "An error occurred. Please try again.";
   }
   
   // Capitalize first letter
@@ -129,7 +128,7 @@ export function showUserFriendlyError(error: any, toast: any) {
   const friendlyMessage = parseErrorMessage(error);
   
   toast({
-    title: t('error'),
+    title: "Error",
     description: friendlyMessage,
     variant: "destructive",
   });
