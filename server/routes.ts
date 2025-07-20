@@ -227,7 +227,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
             message: 'Reconnected to your game room'
           }));
           
-          // Then send current game state
+          // Then send current game state (only once)
           setTimeout(() => {
             if (ws.readyState === WebSocket.OPEN) {
               ws.send(JSON.stringify({
@@ -238,16 +238,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
               }));
               
               console.log(`🔄 Sent reconnection data to user ${userId} for game ${activeGame.id}`);
-          
-          // Clean up old reconnection tracking entries (older than 5 seconds)
-          setTimeout(() => {
-            const cutoff = Date.now() - 5000;
-            for (const [trackingUserId, timestamp] of recentReconnections.entries()) {
-              if (timestamp < cutoff) {
-                recentReconnections.delete(trackingUserId);
-              }
-            }
-          }, 5000);
+              
+              // Clean up old reconnection tracking entries (older than 5 seconds)
+              setTimeout(() => {
+                const cutoff = Date.now() - 5000;
+                for (const [trackingUserId, timestamp] of recentReconnections.entries()) {
+                  if (timestamp < cutoff) {
+                    recentReconnections.delete(trackingUserId);
+                  }
+                }
+              }, 5000);
             }
           }, 500);
           
@@ -2982,41 +2982,51 @@ export async function registerRoutes(app: Express): Promise<Server> {
               console.log(`🏠 Room ${data.roomId} now has ${roomConnections.get(data.roomId)?.size} connections`);
               
               // If there's an active game in this room, send the game state to the joining user
+              // BUT only if this is NOT a reconnection (to prevent duplicate notifications)
               if (activeGame && activeGame.status === 'active') {
-                console.log(`🎮 Sending active game state to joining user ${connection.userId}`);
+                // Check if this is a reconnection (user was recently reconnected)
+                const now = Date.now();
+                const lastReconnection = recentReconnections.get(connection.userId);
+                const isRecentReconnection = lastReconnection && (now - lastReconnection) < 3000; // 3 second window
                 
-                // Get player information with achievements
-                const [playerXInfo, playerOInfo] = await Promise.all([
-                  storage.getUser(activeGame.playerXId),
-                  activeGame.playerOId && activeGame.playerOId !== 'AI' ? storage.getUser(activeGame.playerOId) : Promise.resolve(null)
-                ]);
-                
-                // Get achievements for both players
-                const [playerXAchievements, playerOAchievements] = await Promise.all([
-                  playerXInfo ? storage.getUserAchievements(activeGame.playerXId) : Promise.resolve([]),
-                  playerOInfo ? storage.getUserAchievements(activeGame.playerOId) : Promise.resolve([])
-                ]);
-                
-                const gameWithPlayers = {
-                  ...activeGame,
-                  playerXInfo: playerXInfo ? {
-                    ...playerXInfo,
-                    achievements: playerXAchievements.slice(0, 3)
-                  } : playerXInfo,
-                  playerOInfo: playerOInfo ? {
-                    ...playerOInfo,
-                    achievements: playerOAchievements.slice(0, 3)
-                  } : playerOInfo,
-                  gameMode: 'online'
-                };
-                
-                // Send game state to the joining user
-                connection.ws.send(JSON.stringify({
-                  type: 'game_started',
-                  game: gameWithPlayers,
-                  gameId: activeGame.id,
-                  roomId: data.roomId,
-                }));
+                if (!isRecentReconnection) {
+                  console.log(`🎮 Sending active game state to joining user ${connection.userId} (not a reconnection)`);
+                  
+                  // Get player information with achievements
+                  const [playerXInfo, playerOInfo] = await Promise.all([
+                    storage.getUser(activeGame.playerXId),
+                    activeGame.playerOId && activeGame.playerOId !== 'AI' ? storage.getUser(activeGame.playerOId) : Promise.resolve(null)
+                  ]);
+                  
+                  // Get achievements for both players
+                  const [playerXAchievements, playerOAchievements] = await Promise.all([
+                    playerXInfo ? storage.getUserAchievements(activeGame.playerXId) : Promise.resolve([]),
+                    playerOInfo ? storage.getUserAchievements(activeGame.playerOId) : Promise.resolve([])
+                  ]);
+                  
+                  const gameWithPlayers = {
+                    ...activeGame,
+                    playerXInfo: playerXInfo ? {
+                      ...playerXInfo,
+                      achievements: playerXAchievements.slice(0, 3)
+                    } : playerXInfo,
+                    playerOInfo: playerOInfo ? {
+                      ...playerOInfo,
+                      achievements: playerOAchievements.slice(0, 3)
+                    } : playerOInfo,
+                    gameMode: 'online'
+                  };
+                  
+                  // Send game state to the joining user
+                  connection.ws.send(JSON.stringify({
+                    type: 'game_started',
+                    game: gameWithPlayers,
+                    gameId: activeGame.id,
+                    roomId: data.roomId,
+                  }));
+                } else {
+                  console.log(`🔄 Skipping game state send for ${connection.userId} - recent reconnection detected`);
+                }
               }
               
               // Notify all participants in the room about the new connection
