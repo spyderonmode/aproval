@@ -185,7 +185,19 @@ export function PlayerProfileModal({ playerId, open, onClose, currentUserId }: P
     return null;
   }
 
-  console.log('🎮 PlayerProfileModal rendering:', { open, playerId, profileLoading, profile: !!profile });
+  console.log('🎮 PlayerProfileModal rendering:', { 
+    open, 
+    playerId, 
+    profileLoading, 
+    profile: profile ? {
+      id: profile.id,
+      displayName: profile.displayName,
+      wins: profile.wins,
+      losses: profile.losses,
+      draws: profile.draws,
+      totalGames: profile.totalGames
+    } : null 
+  });
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
@@ -200,9 +212,21 @@ export function PlayerProfileModal({ playerId, open, onClose, currentUserId }: P
         {profileLoading ? (
           <div className="flex items-center justify-center py-8 flex-1">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
-            <span className="ml-2">{t('loading') || 'Loading...'}</span>
+            <span className="ml-2">{t('loading') || 'Loading player profile...'}</span>
           </div>
-        ) : profile ? (
+        ) : !profile ? (
+          <div className="flex items-center justify-center py-8 flex-1">
+            <div className="text-center">
+              <p className="text-red-500 mb-2">Failed to load player profile</p>
+              <button 
+                onClick={() => window.location.reload()} 
+                className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+              >
+                Refresh Page
+              </button>
+            </div>
+          </div>
+        ) : (
           <div className="flex-1 overflow-y-auto space-y-6">
             {/* Profile Header */}
             <Card>
@@ -353,10 +377,6 @@ export function PlayerProfileModal({ playerId, open, onClose, currentUserId }: P
                 </CardContent>
               </Card>
             )}
-          </div>
-        ) : (
-          <div className="flex items-center justify-center py-8 flex-1">
-            <span className="text-gray-600 dark:text-gray-400">{t('playerNotFound') || 'Player not found'}</span>
           </div>
         )}
 
