@@ -98,7 +98,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Offline reconnection handler with expiration check
   async function handleUserReconnection(userId: string, connectionId: string, ws: WebSocket) {
     try {
-      console.log(`🔄 Checking for active game reconnection for user: ${userId}`);
+      // Checking for active game reconnection
       
       // Check if user has an active game (not expired)
       const activeGame = await storage.getActiveGameForUser(userId);
@@ -278,7 +278,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           }
         }
       } else {
-        console.log(`🔄 No active game found for user ${userId} - normal connection`);
+        // No active game found - normal connection
       }
     } catch (error) {
       console.error(`🔄 Error handling reconnection for user ${userId}:`, error);
@@ -462,9 +462,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get('/api/users/online-stats', requireAuth, async (req: any, res) => {
     try {
       const userId = req.session.user.userId;
-      console.log('Fetching online stats for current user:', userId);
+      // Fetching online stats for current user
       const stats = await storage.getOnlineGameStats(userId);
-      console.log('Retrieved stats:', stats);
+      // Stats retrieved successfully
       res.json(stats);
     } catch (error) {
       console.error("Error fetching online game stats:", error);
@@ -522,9 +522,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get('/api/users/:id/online-stats', requireAuth, async (req: any, res) => {
     try {
       const userId = req.params.id;
-      console.log('Fetching online stats for user:', userId);
+      // Fetching online stats for user
       const stats = await storage.getOnlineGameStats(userId);
-      console.log('Retrieved stats:', stats);
+      // Stats retrieved successfully
       res.json(stats);
     } catch (error) {
       console.error("Error fetching online game stats:", error);
@@ -1742,7 +1742,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // Add to queue
       matchmakingQueue.push(userId);
-      console.log(`🎯 User ${userId} joined matchmaking queue. Queue size: ${matchmakingQueue.length}`);
+      // User joined matchmaking queue
       
       // Set 25-second timer for AI bot matchmaking
       const botTimer = setTimeout(async () => {
@@ -1755,7 +1755,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
             return;
           }
           
-          console.log(`🤖 25 seconds passed - matching ${userId} with AI bot`);
+          // Matching user with AI bot after timeout
           
           // Remove user from queue and clear timer
           matchmakingQueue.splice(currentQueueIndex, 1);
@@ -1763,7 +1763,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           
           // Get a random bot
           const bot = getRandomAvailableBot();
-          console.log(`🤖 Selected bot: ${bot.displayName} (${bot.difficulty} difficulty)`);
+          // Bot selected for matchmaking
           
           // Create room for user vs bot
           const room = await storage.createRoom({
@@ -1841,7 +1841,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
                 playerInfo: bot
               }));
               
-              console.log(`🤖 User ${userId} matched with bot in room ${room.id}`);
+              // User matched with bot
               
               // Clear matchmaking timer since user is now matched
               if (matchmakingTimers.has(userId)) {
@@ -1885,11 +1885,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
                   // Broadcast game start to all room participants (should only be the user)
                   const roomConnections_botGame = roomConnections.get(room.id);
                   if (roomConnections_botGame) {
-                    console.log(`🎮 Broadcasting bot game start to ${roomConnections_botGame.size} connections in room ${room.id}`);
+                    // Broadcasting bot game start
                     roomConnections_botGame.forEach(connectionId => {
                       const conn = connections.get(connectionId);
                       if (conn && conn.ws.readyState === WebSocket.OPEN) {
-                        console.log(`🎮 Sending game_started message to connection ${connectionId} (user: ${conn.userId})`);
+                        // Sending game_started message
                         conn.ws.send(JSON.stringify({
                           type: 'game_started',
                           game: gameWithPlayers,
@@ -1897,7 +1897,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
                         }));
                       }
                     });
-                    console.log(`🎮 Bot game started and broadcasted in room ${room.id}`);
+                    // Bot game started and broadcasted
                   } else {
                     console.log(`🎮 Warning: No room connections found for room ${room.id}`);
                   }
@@ -2239,7 +2239,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const userId = req.session.user.userId;
       const { roomId } = req.params;
       
-      console.log('🎮 Room start-game request:', { roomId, userId });
+      // Room start-game request
       
       // Get the room to verify it exists
       const room = await storage.getRoomById(roomId);
@@ -2354,11 +2354,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       };
       
       const game = await storage.createGame(gameData);
-      console.log('🎮 New game created:', game.id);
+      // New game created
       
       // Update room status to "playing"
       await storage.updateRoomStatus(roomId, 'playing');
-      console.log('🎮 Room status updated to "playing"');
+      // Room status updated to playing
       
       // Get player information with achievements
       const [playerXInfo, playerOInfo] = await Promise.all([
@@ -3366,7 +3366,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   wss.on('connection', (ws, req) => {
     const connectionId = Math.random().toString(36).substring(7);
-    console.log(`🔗 New WebSocket connection: ${connectionId}`);
+    // New WebSocket connection
     
     ws.on('message', async (message) => {
       try {
@@ -3374,7 +3374,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         
         switch (data.type) {
           case 'auth':
-            console.log(`🔐 WebSocket auth: ${data.userId} -> ${connectionId}`);
+            // WebSocket authenticated
             
             // Get user info for online tracking
             const userInfo = await storage.getUser(data.userId);
@@ -3416,7 +3416,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           case 'join_room':
             const connection = connections.get(connectionId);
             if (connection) {
-              console.log(`🏠 User ${connection.userId} joining room ${data.roomId} via connection ${connectionId}`);
+              // User joining room
               connection.roomId = data.roomId;
               
               // Update user's room state
@@ -3439,7 +3439,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
                 roomConnections.set(data.roomId, new Set());
               }
               roomConnections.get(data.roomId)!.add(connectionId);
-              console.log(`🏠 Room ${data.roomId} now has ${roomConnections.get(data.roomId)?.size} connections`);
+              // Room connection updated
               
               // If there's an active game in this room, send the game state to the joining user
               // BUT only if this is NOT a reconnection (to prevent duplicate notifications)
