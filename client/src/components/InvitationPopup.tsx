@@ -128,7 +128,7 @@ export function InvitationPopup({ onRoomJoin }: InvitationPopupProps) {
           <CardContent className="space-y-4">
             <div className="text-center space-y-2">
               <div className="text-white font-medium">
-{t('invitedYouToJoinRoom', { inviterName: visibleInvitation.inviterName })}
+{t('invitedYouToJoinRoom', { inviterName: visibleInvitation.inviterName || visibleInvitation.inviter?.displayName || visibleInvitation.inviter?.username || 'Unknown' })}
               </div>
               <div className="text-blue-200 text-sm">
 {t('room')}: {visibleInvitation.roomCode}
