@@ -101,15 +101,10 @@ export function useWebSocket() {
           localStorage.removeItem('currentGameState');
           sessionStorage.removeItem('currentGameState');
           
-          // Navigate to home page without reload after showing the notification
-          console.log('🏠 WebSocket: Navigating to home due to game abandonment');
+          // Force page reload after showing the notification
+          console.log('🏠 WebSocket: Reloading page due to game abandonment');
           setTimeout(() => {
-            // Use history API to navigate to home without page reload
-            if (window.location.pathname !== '/') {
-              window.history.pushState({}, '', '/');
-              // Trigger a custom event to notify components about the navigation
-              window.dispatchEvent(new CustomEvent('navigate-home-abandonment'));
-            }
+            window.location.href = '/'; // Redirect to root instead of reload to prevent reconnection
           }, 2000); // Give user time to see the notification
           
           return; // Don't set lastMessage to prevent useEffect processing

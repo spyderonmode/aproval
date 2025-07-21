@@ -424,12 +424,12 @@ export default function Home() {
             toast({
               title: "Room Ended",
               description: `${lastMessage.playerName || 'A player'} left the room. Refreshing page...`,
-              duration: 2000,
+              duration: 1000,
             });
             // Auto-refresh the page after a short delay
             setTimeout(() => {
               window.location.reload();
-            }, 2000);
+            }, 1000);
           }
           break;
         case 'match_found':
@@ -616,14 +616,14 @@ export default function Home() {
                 }
               } catch (innerError) {
                 console.error('🏠 Error in initializeLocalGame:', innerError);
-                // Don't reload, just reset to a clean state
-                setIsResettingState(false);
+                // Force page reload if local game initialization fails
+                window.location.reload();
               }
             }, 50); // Minimal delay just for state synchronization
           } catch (error) {
             console.error('🏠 Error handling game abandonment in useEffect:', error);
-            // Don't reload, just reset to a clean state
-            setIsResettingState(false);
+            // Force page reload as fallback
+            window.location.reload();
           }
           break;
         case 'player_reaction':
@@ -645,44 +645,6 @@ export default function Home() {
       }
     }
   }, [lastMessage, currentGame, currentRoom, user]);
-
-  // Handle game abandonment navigation without page reload
-  useEffect(() => {
-    const handleAbandonmentNavigation = () => {
-      console.log('🏠 Home: Handling game abandonment navigation - clearing states');
-      // Clear all game states immediately
-      setIsResettingState(true);
-      setCurrentRoom(null);
-      setCurrentGame(null);
-      setShowGameOver(false);
-      setGameResult(null);
-      setIsCreatingGame(false);
-      
-      // Reset to AI mode for immediate playability
-      setSelectedMode('ai');
-      
-      // Initialize local game after state reset
-      setTimeout(() => {
-        setIsResettingState(false);
-        initializeLocalGame();
-      }, 100);
-      
-      // Remove the notification after navigation
-      setTimeout(() => {
-        const notifications = document.querySelectorAll('div[style*="position: fixed"][style*="background: #ef4444"]');
-        notifications.forEach(notification => {
-          if (notification.parentNode) {
-            notification.parentNode.removeChild(notification);
-          }
-        });
-      }, 3000);
-    };
-
-    window.addEventListener('navigate-home-abandonment', handleAbandonmentNavigation);
-    return () => {
-      window.removeEventListener('navigate-home-abandonment', handleAbandonmentNavigation);
-    };
-  }, []);
 
   const handleRoomJoin = (room: any) => {
     console.log('🏠 handleRoomJoin called with room:', room.id);
