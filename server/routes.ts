@@ -52,7 +52,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const expiredGames = await storage.getExpiredGames();
       
       for (const expiredGame of expiredGames) {
-        console.log(`⏰ Game ${expiredGame.id} expired after 10 minutes of inactivity`);
+        // Game expired after inactivity
         
         // Update game status to expired
         await storage.expireGame(expiredGame.id);
@@ -109,7 +109,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         const tenMinutes = 10 * 60 * 1000;
         
         if (gameAge > tenMinutes) {
-          console.log(`⏰ Game ${activeGame.id} is expired (${Math.round(gameAge / 60000)} minutes old), expiring now`);
+          // Game expired - expiring now
           
           // Expire the game immediately
           await storage.expireGame(activeGame.id);
@@ -918,7 +918,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get('/api/themes', requireAuth, async (req: any, res) => {
     try {
       const userId = req.session.user.userId;
-      console.log('📊 Fetching themes for user:', userId);
+      // Fetching themes for user
       
       // Add default themes that are always available
       const defaultThemes = [
@@ -957,7 +957,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         themes = [];
       }
       
-      console.log('📊 Themes fetched successfully for user:', userId);
+      // Themes fetched successfully
       res.json({
         defaultThemes,
         specialThemes,
@@ -1223,12 +1223,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post('/api/achievements/sync', requireAuth, async (req: any, res) => {
     try {
       const userId = req.session.user.userId;
-      console.log(`🔄 Achievement sync request for user: ${userId}`);
+      // Achievement sync request
       
       await storage.ensureAllAchievementsUpToDate(userId);
       const achievements = await storage.getUserAchievements(userId);
       
-      console.log(`✅ Achievement sync successful for user: ${userId}`);
+      // Achievement sync successful
       
       res.json({
         success: true,
@@ -3525,12 +3525,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
               const activeGame = await storage.getActiveGameByRoomId(roomId);
               const room = await storage.getRoomById(roomId);
               
-              console.log(`🏠 Checking active game for room ${roomId}:`, {
-                activeGame: activeGame ? { id: activeGame.id, status: activeGame.status, playerX: activeGame.playerXId, playerO: activeGame.playerOId } : null,
-                roomStatus: room?.status,
-                userId: userId,
-                isPlayerInGame: activeGame ? (activeGame.playerXId === userId || activeGame.playerOId === userId) : false
-              });
+              // Checking active game for room
               
               // Check both game status AND room status to catch "Play Again" scenarios
               const isInActiveGame = activeGame && activeGame.status === 'active' && 
@@ -3539,7 +3534,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
               
               if (isInActiveGame || (isRoomInPlayingState && activeGame && 
                   (activeGame.playerXId === userId || activeGame.playerOId === userId))) {
-                console.log(`🏠 Player ${playerName} leaving active game - terminating game and redirecting all users`);
+                // Player leaving active game - terminating
                 
                 // Mark game as finished due to player leaving - this persists in database
                 await storage.finishGame(activeGame.id, {
@@ -3549,9 +3544,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
                   updatedAt: new Date()
                 });
                 
-                console.log(`🏠 Game ${activeGame.id} permanently ended in database due to player exit`);
+                // Game permanently ended in database
                 
-                console.log(`🏠 Game ${activeGame.id} marked as abandoned due to player exit`);
+                // Game marked as abandoned
                 
                 // Get all users in the room (players and spectators)
                 const roomUsers = roomConnections.get(roomId);
@@ -3613,7 +3608,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
                   
                   // Clear the entire room
                   roomConnections.delete(roomId);
-                  console.log(`🏠 Room ${roomId} completely cleared due to game abandonment`);
+                  // Room completely cleared
                 }
                 
                 return;
@@ -3643,7 +3638,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
                     message: `${playerName} left the room`
                   });
                   
-                  console.log(`🏠 Broadcasting room end to ${roomUsers.size} remaining users`);
+                  // Broadcasting room end to remaining users
                   roomUsers.forEach(remainingConnectionId => {
                     const remainingConnection = connections.get(remainingConnectionId);
                     if (remainingConnection && remainingConnection.ws.readyState === WebSocket.OPEN) {
@@ -3655,7 +3650,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
                 // Clear the room if no users left
                 if (roomUsers.size === 0) {
                   roomConnections.delete(roomId);
-                  console.log(`🏠 Room ${roomId} cleared - no users remaining`);
+                  // Room cleared - no users remaining
                 }
               }
               
@@ -3667,7 +3662,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
             // Handle player reaction and broadcast to all users in the room
             const { roomId, gameId, userId, playerSymbol, reactionType, emoji, playerInfo } = data;
             
-            console.log(`🎭 Player reaction from ${userId} in room ${roomId}: ${emoji} (${playerSymbol})`);
+            // Player reaction received
             
             // Broadcast reaction to all users in the room
             const roomUsers = roomConnections.get(roomId);
@@ -3842,7 +3837,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
               // Clear the room if no users left
               if (roomUsers.size === 0) {
                 roomConnections.delete(roomId);
-                console.log(`🏠 Room ${roomId} cleared - no users remaining`);
+                // Room cleared - no users remaining
               }
             }
           }

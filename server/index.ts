@@ -28,7 +28,13 @@ app.use((req, res, next) => {
         '/api/users/online-stats',
         '/api/leaderboard',
         '/api/rooms/',
-        '/api/games/'
+        '/api/games/',
+        '/api/users/online',
+        '/api/users/blocked',
+        '/api/friends',
+        '/api/achievements',
+        '/api/themes',
+        '/api/matchmaking/'
       ];
       
       const shouldLog = !excludedPaths.some(excludedPath => path.includes(excludedPath)) || 

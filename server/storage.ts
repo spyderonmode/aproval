@@ -1292,9 +1292,9 @@ export class DatabaseStorage implements IStorage {
         // After validation, check for theme unlocks
         await this.checkThemeUnlocks(userId);
         
-        console.log(`✅ Achievement validation completed for user: ${userId}`);
+        // Achievement validation completed
       } else {
-        console.log(`✅ All achievements up to date for user: ${userId}`);
+        // All achievements up to date
       }
     } catch (error) {
       console.error('Error ensuring achievements are up to date:', error);
