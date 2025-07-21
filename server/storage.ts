@@ -456,15 +456,34 @@ export class DatabaseStorage implements IStorage {
     if (!user) return;
 
     const updates: any = {};
-    if (result === 'win') updates.wins = (user.wins || 0) + 1;
-    if (result === 'loss') updates.losses = (user.losses || 0) + 1;
-    if (result === 'draw') updates.draws = (user.draws || 0) + 1;
+    if (result === 'win') {
+      updates.wins = (user.wins || 0) + 1;
+      // Update win streak
+      const newCurrentStreak = (user.currentWinStreak || 0) + 1;
+      updates.currentWinStreak = newCurrentStreak;
+      // Update best streak if current streak is higher
+      const currentBestStreak = user.bestWinStreak || 0;
+      if (newCurrentStreak > currentBestStreak) {
+        updates.bestWinStreak = newCurrentStreak;
+      }
+      console.log(`🏆 Win streak updated for user ${userId}: current=${newCurrentStreak}, best=${Math.max(newCurrentStreak, currentBestStreak)}`);
+    } else {
+      // Reset current win streak on loss or draw
+      updates.currentWinStreak = 0;
+      if (result === 'loss') {
+        updates.losses = (user.losses || 0) + 1;
+        console.log(`💔 Win streak reset for user ${userId} due to loss`);
+      } else if (result === 'draw') {
+        updates.draws = (user.draws || 0) + 1;
+        console.log(`⚖️ Win streak reset for user ${userId} due to draw`);
+      }
+    }
 
     await db.update(users).set(updates).where(eq(users.id, userId));
   }
 
   async recalculateUserStats(userId: string): Promise<void> {
-    // Get all finished games for this user
+    // Get all finished games for this user ordered by finish time
     const userGames = await db
       .select()
       .from(games)
@@ -474,28 +493,43 @@ export class DatabaseStorage implements IStorage {
           eq(games.playerXId, userId),
           eq(games.playerOId, userId)
         )
-      ));
+      ))
+      .orderBy(games.finishedAt);
 
     let wins = 0;
     let losses = 0;
     let draws = 0;
+    let currentWinStreak = 0;
+    let bestWinStreak = 0;
+    let tempStreak = 0;
 
     userGames.forEach(game => {
       if (game.winnerId === userId) {
         wins++;
+        tempStreak++;
+        bestWinStreak = Math.max(bestWinStreak, tempStreak);
       } else if (game.winnerId === null) {
         draws++;
+        tempStreak = 0; // Reset streak on draw
       } else {
         losses++;
+        tempStreak = 0; // Reset streak on loss
       }
     });
 
-    // Update user stats in database
+    // Current streak is the streak at the end of the game history
+    currentWinStreak = tempStreak;
+
+    // Update user stats in database including win streaks
     await db.update(users).set({
       wins: wins,
       losses: losses,
-      draws: draws
+      draws: draws,
+      currentWinStreak: currentWinStreak,
+      bestWinStreak: bestWinStreak
     }).where(eq(users.id, userId));
+
+    console.log(`📊 Recalculated stats for user ${userId}: W${wins}-L${losses}-D${draws}, Current streak: ${currentWinStreak}, Best streak: ${bestWinStreak}`);
 
     // Ensure achievements are up to date after stats recalculation
     await this.ensureAllAchievementsUpToDate(userId);
@@ -897,9 +931,13 @@ export class DatabaseStorage implements IStorage {
     try {
       console.log(`🔄 Recalculating achievements for user: ${userId}`);
       
-      // Get current user stats
+      // Get current user stats and user object for win streak data
       const userStats = await this.getUserStats(userId);
+      const user = await this.getUser(userId);
+      if (!user) return { removed: 0, added: [] };
+      
       console.log(`📊 User stats:`, userStats);
+      console.log(`🔥 Win streaks - current: ${user.currentWinStreak || 0}, best: ${user.bestWinStreak || 0}`);
       
       // Get existing achievements count first
       const existingAchievements = await db
@@ -931,6 +969,20 @@ export class DatabaseStorage implements IStorage {
           description: 'winYourVeryFirstGame',
           icon: '🏆',
           condition: userStats.wins >= 1,
+        },
+        {
+          type: 'win_streak_5',
+          name: 'winStreakMaster',
+          description: 'winFiveConsecutiveGames',
+          icon: '🔥',
+          condition: (user.bestWinStreak || 0) >= 5,
+        },
+        {
+          type: 'win_streak_10',
+          name: 'unstoppable',
+          description: 'winTenConsecutiveGames',
+          icon: '⚡',
+          condition: (user.bestWinStreak || 0) >= 10,
         },
         {
           type: 'speed_demon',
@@ -1016,8 +1068,10 @@ export class DatabaseStorage implements IStorage {
   async checkAndGrantAchievements(userId: string, gameResult: 'win' | 'loss' | 'draw', gameData?: any): Promise<Achievement[]> {
     const newAchievements: Achievement[] = [];
     
-    // Get user stats
+    // Get user stats and user object for win streak data
     const userStats = await this.getUserStats(userId);
+    const user = await this.getUser(userId);
+    if (!user) return newAchievements;
     
     // Define achievement conditions
     const achievementConditions = [
@@ -1033,14 +1087,14 @@ export class DatabaseStorage implements IStorage {
         name: 'winStreakMaster',
         description: 'winFiveConsecutiveGames',
         icon: '🔥',
-        condition: gameResult === 'win' && await this.checkWinStreak(userId, 5),
+        condition: gameResult === 'win' && (user.currentWinStreak || 0) >= 5,
       },
       {
         type: 'win_streak_10',
         name: 'unstoppable',
         description: 'winTenConsecutiveGames',
         icon: '⚡',
-        condition: gameResult === 'win' && await this.checkWinStreak(userId, 10),
+        condition: gameResult === 'win' && (user.currentWinStreak || 0) >= 10,
       },
       {
         type: 'master_of_diagonals',
@@ -1144,9 +1198,15 @@ export class DatabaseStorage implements IStorage {
       const userStats = await this.getUserStats(userId);
       const totalGames = userStats.wins + userStats.losses + userStats.draws;
       
+      // Get user object for win streak data
+      const user = await this.getUser(userId);
+      if (!user) return;
+      
       // Define all possible achievements that should exist based on current stats
       const allPossibleAchievements = [
         { type: 'first_win', condition: userStats.wins >= 1 },
+        { type: 'win_streak_5', condition: (user.bestWinStreak || 0) >= 5 },
+        { type: 'win_streak_10', condition: (user.bestWinStreak || 0) >= 10 },
         { type: 'speed_demon', condition: userStats.wins >= 20 },
         { type: 'legend', condition: userStats.wins >= 50 },
         { type: 'champion', condition: userStats.wins >= 100 },

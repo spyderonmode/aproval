@@ -37,6 +37,8 @@ export const users = pgTable("users", {
   wins: integer("wins").default(0),
   losses: integer("losses").default(0),
   draws: integer("draws").default(0),
+  currentWinStreak: integer("current_win_streak").default(0),
+  bestWinStreak: integer("best_win_streak").default(0),
   selectedAchievementBorder: varchar("selected_achievement_border"), // Store the selected achievement type for border display
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
