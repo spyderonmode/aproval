@@ -456,15 +456,32 @@ export class DatabaseStorage implements IStorage {
     if (!user) return;
 
     const updates: any = {};
-    if (result === 'win') updates.wins = (user.wins || 0) + 1;
-    if (result === 'loss') updates.losses = (user.losses || 0) + 1;
-    if (result === 'draw') updates.draws = (user.draws || 0) + 1;
+    
+    // Update basic stats
+    if (result === 'win') {
+      updates.wins = (user.wins || 0) + 1;
+      // Update win streak
+      const currentStreak = (user.currentWinStreak || 0) + 1;
+      updates.currentWinStreak = currentStreak;
+      // Update best win streak if current streak is better
+      if (currentStreak > (user.bestWinStreak || 0)) {
+        updates.bestWinStreak = currentStreak;
+      }
+    } else if (result === 'loss') {
+      updates.losses = (user.losses || 0) + 1;
+      // Reset win streak on loss
+      updates.currentWinStreak = 0;
+    } else if (result === 'draw') {
+      updates.draws = (user.draws || 0) + 1;
+      // Reset win streak on draw
+      updates.currentWinStreak = 0;
+    }
 
     await db.update(users).set(updates).where(eq(users.id, userId));
   }
 
   async recalculateUserStats(userId: string): Promise<void> {
-    // Get all finished games for this user
+    // Get all finished games for this user ordered by finish time
     const userGames = await db
       .select()
       .from(games)
@@ -474,12 +491,17 @@ export class DatabaseStorage implements IStorage {
           eq(games.playerXId, userId),
           eq(games.playerOId, userId)
         )
-      ));
+      ))
+      .orderBy(desc(games.finishedAt));
 
     let wins = 0;
     let losses = 0;
     let draws = 0;
+    let currentWinStreak = 0;
+    let bestWinStreak = 0;
+    let tempStreak = 0;
 
+    // Calculate basic stats and win streaks
     userGames.forEach(game => {
       if (game.winnerId === userId) {
         wins++;
@@ -490,11 +512,35 @@ export class DatabaseStorage implements IStorage {
       }
     });
 
+    // Calculate current win streak from most recent games
+    for (const game of userGames) {
+      if (game.winnerId === userId) {
+        currentWinStreak++;
+      } else {
+        break; // Stop at first non-win
+      }
+    }
+
+    // Calculate best win streak by going through all games in chronological order
+    const chronologicalGames = [...userGames].reverse();
+    for (const game of chronologicalGames) {
+      if (game.winnerId === userId) {
+        tempStreak++;
+        if (tempStreak > bestWinStreak) {
+          bestWinStreak = tempStreak;
+        }
+      } else {
+        tempStreak = 0; // Reset streak on loss or draw
+      }
+    }
+
     // Update user stats in database
     await db.update(users).set({
       wins: wins,
       losses: losses,
-      draws: draws
+      draws: draws,
+      currentWinStreak: currentWinStreak,
+      bestWinStreak: bestWinStreak
     }).where(eq(users.id, userId));
 
     // Ensure achievements are up to date after stats recalculation
@@ -924,6 +970,10 @@ export class DatabaseStorage implements IStorage {
       const totalGames = userStats.wins + userStats.losses + userStats.draws;
       console.log(`📊 Detailed stats - wins: ${userStats.wins}, losses: ${userStats.losses}, draws: ${userStats.draws}, total: ${totalGames}`);
       
+      // Get user for win streak data
+      const user = await this.getUser(userId);
+      const bestWinStreak = user?.bestWinStreak || 0;
+      
       const achievementRules = [
         {
           type: 'first_win',
@@ -931,6 +981,20 @@ export class DatabaseStorage implements IStorage {
           description: 'winYourVeryFirstGame',
           icon: '🏆',
           condition: userStats.wins >= 1,
+        },
+        {
+          type: 'win_streak_5',
+          name: 'winStreakMaster',
+          description: 'winFiveConsecutiveGames',
+          icon: '🔥',
+          condition: bestWinStreak >= 5,
+        },
+        {
+          type: 'win_streak_10',
+          name: 'unstoppable',
+          description: 'winTenConsecutiveGames',
+          icon: '⚡',
+          condition: bestWinStreak >= 10,
         },
         {
           type: 'speed_demon',
@@ -1033,14 +1097,14 @@ export class DatabaseStorage implements IStorage {
         name: 'winStreakMaster',
         description: 'winFiveConsecutiveGames',
         icon: '🔥',
-        condition: gameResult === 'win' && await this.checkWinStreak(userId, 5),
+        condition: gameResult === 'win' && await this.checkWinStreakAchievement(userId, 5),
       },
       {
         type: 'win_streak_10',
         name: 'unstoppable',
         description: 'winTenConsecutiveGames',
         icon: '⚡',
-        condition: gameResult === 'win' && await this.checkWinStreak(userId, 10),
+        condition: gameResult === 'win' && await this.checkWinStreakAchievement(userId, 10),
       },
       {
         type: 'master_of_diagonals',
@@ -1178,6 +1242,18 @@ export class DatabaseStorage implements IStorage {
   }
 
   private async checkWinStreak(userId: string, requiredStreak: number): Promise<boolean> {
+    // First try to get current streak from user record for efficiency
+    const user = await db
+      .select({ currentWinStreak: users.currentWinStreak })
+      .from(users)
+      .where(eq(users.id, userId))
+      .limit(1);
+
+    if (user[0]?.currentWinStreak >= requiredStreak) {
+      return true;
+    }
+
+    // Fallback to calculating from games if needed (for backward compatibility)
     const recentGames = await db
       .select()
       .from(games)
@@ -1200,6 +1276,24 @@ export class DatabaseStorage implements IStorage {
     }
 
     return streak >= requiredStreak;
+  }
+
+  private async checkWinStreakAchievement(userId: string, requiredStreak: number): Promise<boolean> {
+    // Check both current win streak and best win streak for achievement eligibility
+    const user = await db
+      .select({ 
+        currentWinStreak: users.currentWinStreak,
+        bestWinStreak: users.bestWinStreak 
+      })
+      .from(users)
+      .where(eq(users.id, userId))
+      .limit(1);
+
+    const userStats = user[0];
+    if (!userStats) return false;
+
+    // User qualifies if they currently have the streak OR have ever achieved it
+    return (userStats.currentWinStreak >= requiredStreak) || (userStats.bestWinStreak >= requiredStreak);
   }
 
   private async checkDiagonalWins(userId: string, requiredWins: number): Promise<boolean> {
