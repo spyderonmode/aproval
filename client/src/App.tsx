@@ -210,15 +210,20 @@ function App() {
   const [showLoading, setShowLoading] = useState(true);
 
   useEffect(() => {
-    // Show loading screen for 3 seconds (as requested by user)
+    console.log('🚀 App started - showing splash screen for 3 seconds');
+    // Always show splash screen for 3 seconds on app startup
     const timer = setTimeout(() => {
+      console.log('🚀 Hiding splash screen, showing main app');
       setShowLoading(false);
     }, 3000);
 
     return () => clearTimeout(timer);
   }, []);
 
+  console.log('🚀 App render - showLoading:', showLoading);
+
   if (showLoading) {
+    console.log('🚀 Rendering splash screen (LoadingScreen component)');
     return (
       <ErrorBoundary>
         <QueryClientProvider client={queryClient}>
