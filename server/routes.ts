@@ -873,6 +873,31 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Ensure achievements are up to date for current user
+  app.post('/api/achievements/sync', requireAuth, async (req: any, res) => {
+    try {
+      const userId = req.session.user.userId;
+      console.log(`🔄 Achievement sync request for user: ${userId}`);
+      
+      await storage.ensureAllAchievementsUpToDate(userId);
+      const achievements = await storage.getUserAchievements(userId);
+      
+      console.log(`✅ Achievement sync successful for user: ${userId}`);
+      
+      res.json({
+        success: true,
+        message: 'Achievements synced successfully',
+        achievements: achievements
+      });
+    } catch (error) {
+      console.error("❌ Error syncing achievements:", error);
+      res.status(500).json({ 
+        error: "Failed to sync achievements",
+        details: error.message 
+      });
+    }
+  });
+
   // Get head-to-head stats
   app.get('/api/friends/:friendId/stats', requireAuth, async (req: any, res) => {
     try {

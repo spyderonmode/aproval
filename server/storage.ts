@@ -496,6 +496,9 @@ export class DatabaseStorage implements IStorage {
       losses: losses,
       draws: draws
     }).where(eq(users.id, userId));
+
+    // Ensure achievements are up to date after stats recalculation
+    await this.ensureAllAchievementsUpToDate(userId);
   }
 
   async recalculateAllUserStats(): Promise<void> {
@@ -522,6 +525,14 @@ export class DatabaseStorage implements IStorage {
     }
 
     console.log('🎉 User stats recalculation completed!');
+    
+    // Now ensure all achievements are recalculated for all users
+    console.log('🔄 Recalculating achievements for all users...');
+    for (const user of allUsers) {
+      await this.recalculateUserAchievements(user.id);
+      console.log(`✅ Updated achievements for user: ${user.id}`);
+    }
+    console.log('🎉 User achievement recalculation completed!');
   }
 
   async resetAllBotStats(): Promise<void> {
@@ -815,7 +826,7 @@ export class DatabaseStorage implements IStorage {
         .where(eq(achievements.userId, userId));
       
       // Define what achievements should exist
-      const shouldHaveAchievements = [];
+      const shouldHaveAchievements: string[] = [];
       
       if (userStats.wins >= 1) shouldHaveAchievements.push('first_win');
       if (userStats.wins >= 20) shouldHaveAchievements.push('speed_demon');
@@ -850,7 +861,7 @@ export class DatabaseStorage implements IStorage {
       if (missingAchievements.length > 0) {
         console.log(`🔄 Auto-adding ${missingAchievements.length} missing achievements for user: ${userId}`);
         
-        const achievementData = {
+        const achievementData: Record<string, { name: string; description: string; icon: string }> = {
           'first_win': { name: 'firstVictoryTitle', description: 'winYourVeryFirstGame', icon: '🏆' },
           'speed_demon': { name: 'speedDemon', description: 'winTwentyTotalGames', icon: '⚡' },
           'legend': { name: 'legend', description: 'achieveFiftyTotalWins', icon: '🌟' },
@@ -1008,7 +1019,7 @@ export class DatabaseStorage implements IStorage {
     // Get user stats
     const userStats = await this.getUserStats(userId);
     
-    // Define achievement conditions - only check milestones when they are exactly reached
+    // Define achievement conditions
     const achievementConditions = [
       {
         type: 'first_win',
@@ -1043,14 +1054,14 @@ export class DatabaseStorage implements IStorage {
         name: 'speedDemon',
         description: 'winTwentyTotalGames',
         icon: '⚡',
-        condition: gameResult === 'win' && userStats.wins === 20, // Only when exactly reaching 20 wins
+        condition: gameResult === 'win' && userStats.wins === 20,
       },
       {
         type: 'veteran_player',
         name: 'veteranPlayer',
         description: 'playOneHundredTotalGames',
         icon: '🎖️',
-        condition: (userStats.wins + userStats.losses + userStats.draws) === 100, // Only when exactly reaching 100 games
+        condition: (userStats.wins + userStats.losses + userStats.draws) === 100,
       },
       {
         type: 'comeback_king',
@@ -1064,28 +1075,28 @@ export class DatabaseStorage implements IStorage {
         name: 'legend',
         description: 'achieveFiftyTotalWins',
         icon: '🌟',
-        condition: gameResult === 'win' && userStats.wins === 50, // Only when exactly reaching 50 wins
+        condition: gameResult === 'win' && userStats.wins === 50,
       },
       {
         type: 'champion',
         name: 'champion',
         description: 'achieveOneHundredTotalWins',
         icon: '👑',
-        condition: gameResult === 'win' && userStats.wins === 100, // Only when exactly reaching 100 wins
+        condition: gameResult === 'win' && userStats.wins === 100,
       },
       {
         type: 'grandmaster',
         name: 'grandmaster',
         description: 'achieveTwoHundredTotalWins',
         icon: '💎',
-        condition: gameResult === 'win' && userStats.wins === 200, // Only when exactly reaching 200 wins
+        condition: gameResult === 'win' && userStats.wins === 200,
       },
       {
         type: 'ultimate_veteran',
         name: 'ultimateVeteran',
         description: 'playFiveHundredTotalGames',
         icon: '🔥',
-        condition: (userStats.wins + userStats.losses + userStats.draws) === 500, // Only when exactly reaching 500 games
+        condition: (userStats.wins + userStats.losses + userStats.draws) === 500,
       },
     ];
 
@@ -1103,6 +1114,7 @@ export class DatabaseStorage implements IStorage {
           });
           if (newAchievement) {
             newAchievements.push(newAchievement);
+            console.log(`🎉 New achievement unlocked for user ${userId}: ${achievement.type}`);
             
             // Unlock special themes for certain achievements
             if (achievement.type === 'win_streak_10') {
@@ -1119,7 +1131,50 @@ export class DatabaseStorage implements IStorage {
       }
     }
 
+    // After checking immediate achievements, ensure all past milestones are covered
+    await this.ensureAllAchievementsUpToDate(userId);
+
     return newAchievements;
+  }
+
+  // New method to ensure all achievements are up to date based on current stats
+  async ensureAllAchievementsUpToDate(userId: string): Promise<void> {
+    try {
+      console.log(`🔄 Ensuring achievements are up to date for user: ${userId}`);
+      const userStats = await this.getUserStats(userId);
+      const totalGames = userStats.wins + userStats.losses + userStats.draws;
+      
+      // Define all possible achievements that should exist based on current stats
+      const allPossibleAchievements = [
+        { type: 'first_win', condition: userStats.wins >= 1 },
+        { type: 'speed_demon', condition: userStats.wins >= 20 },
+        { type: 'legend', condition: userStats.wins >= 50 },
+        { type: 'champion', condition: userStats.wins >= 100 },
+        { type: 'grandmaster', condition: userStats.wins >= 200 },
+        { type: 'veteran_player', condition: totalGames >= 100 },
+        { type: 'ultimate_veteran', condition: totalGames >= 500 },
+      ];
+
+      // Track missing achievements
+      let missingCount = 0;
+      
+      // Check each achievement and grant if missing
+      for (const achievement of allPossibleAchievements) {
+        if (achievement.condition && !await this.hasAchievement(userId, achievement.type)) {
+          missingCount++;
+        }
+      }
+
+      if (missingCount > 0) {
+        console.log(`🔄 Found ${missingCount} missing achievements for user ${userId}. Running validation...`);
+        await this.validateUserAchievements(userId);
+        console.log(`✅ Achievement validation completed for user: ${userId}`);
+      } else {
+        console.log(`✅ All achievements up to date for user: ${userId}`);
+      }
+    } catch (error) {
+      console.error('Error ensuring achievements are up to date:', error);
+    }
   }
 
   private async checkWinStreak(userId: string, requiredStreak: number): Promise<boolean> {

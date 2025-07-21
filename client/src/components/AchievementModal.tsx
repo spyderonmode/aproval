@@ -5,6 +5,7 @@ import { AchievementBorderSelector } from "./AchievementBorderSelector";
 import { useQuery } from "@tanstack/react-query";
 import { Loader2, Trophy, Target, Star } from "lucide-react";
 import { useTranslation } from "@/contexts/LanguageContext";
+import { useEffect } from "react";
 
 interface AchievementModalProps {
   open: boolean;
@@ -86,10 +87,36 @@ export function AchievementModal({ open, onClose, userId, user }: AchievementMod
         return originalDescription;
     }
   };
-  const { data: achievements, isLoading } = useQuery({
+  const { data: achievements, isLoading, refetch } = useQuery({
     queryKey: userId ? ['/api/users', userId, 'achievements'] : ['/api/achievements'],
     enabled: open,
   });
+
+  // Auto-sync achievements when modal opens for current user
+  useEffect(() => {
+    const syncAchievements = async () => {
+      if (open && !userId && user) { // Only for current user viewing their own achievements
+        try {
+          const response = await fetch('/api/achievements/sync', {
+            method: 'POST',
+            credentials: 'include',
+            headers: {
+              'Content-Type': 'application/json'
+            }
+          });
+          
+          if (response.ok) {
+            console.log('🎉 Achievements synced successfully');
+            refetch(); // Refresh the achievements data
+          }
+        } catch (error) {
+          console.error('Failed to sync achievements:', error);
+        }
+      }
+    };
+
+    syncAchievements();
+  }, [open, userId, user, refetch]);
 
 
 
