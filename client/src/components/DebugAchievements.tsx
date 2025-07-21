@@ -2,11 +2,17 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Loader2, Trophy, AlertCircle, CheckCircle } from 'lucide-react';
+import { Loader2, Trophy, AlertCircle, CheckCircle, RefreshCw } from 'lucide-react';
+import { queryClient } from '@/lib/queryClient';
 
 export function DebugAchievements() {
   const [isLoading, setIsLoading] = useState(false);
   const [result, setResult] = useState<any>(null);
+
+  const handleRefreshCache = () => {
+    queryClient.invalidateQueries({ queryKey: ['/api/achievements'] });
+    console.log('Achievement cache invalidated');
+  };
 
   const handleRecalculate = async () => {
     setIsLoading(true);
@@ -60,20 +66,31 @@ export function DebugAchievements() {
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
-        <Button 
-          onClick={handleRecalculate} 
-          disabled={isLoading}
-          className="w-full bg-primary hover:bg-primary/90"
-        >
-          {isLoading ? (
-            <>
-              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-              Recalculating...
-            </>
-          ) : (
-            'Recalculate Achievements'
-          )}
-        </Button>
+        <div className="space-y-2">
+          <Button 
+            onClick={handleRecalculate} 
+            disabled={isLoading}
+            className="w-full bg-primary hover:bg-primary/90"
+          >
+            {isLoading ? (
+              <>
+                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                Recalculating...
+              </>
+            ) : (
+              'Recalculate Achievements'
+            )}
+          </Button>
+          
+          <Button 
+            onClick={handleRefreshCache} 
+            variant="outline"
+            className="w-full"
+          >
+            <RefreshCw className="w-4 h-4 mr-2" />
+            Refresh Achievement Cache
+          </Button>
+        </div>
         
         {result && (
           <div className="space-y-3">
