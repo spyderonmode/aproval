@@ -6,7 +6,7 @@ import session from 'express-session';
 import connectPgSimple from 'connect-pg-simple';
 import MemoryStore from 'memorystore';
 import { storage } from './storage';
-import { db } from './db';
+import { db, pool } from './db';
 import { sql } from 'drizzle-orm';
 import { createEmailService } from './emailService';
 
@@ -223,11 +223,27 @@ async function syncAllUsersToDatabase() {
 }
 
 export function setupAuth(app: Express) {
-  // Use memory store for sessions for now (will improve session persistence later)
-  const MemoryStoreSession = MemoryStore(session);
-  const sessionStore = new MemoryStoreSession({
-    checkPeriod: 86400000 // prune expired entries every 24h
-  });
+  // PostgreSQL store for sessions (persistent across server restarts)
+  const PostgreSQLStore = connectPgSimple(session);
+  
+  let sessionStore;
+  try {
+    // Use the same connection pool as our main database
+    sessionStore = new PostgreSQLStore({
+      pool: pool, // Use the existing connection pool from db.ts
+      tableName: 'session',
+      createTableIfMissing: true,
+      pruneSessionInterval: false, // Disable automatic pruning to avoid issues
+      ttl: 24 * 60 * 60, // 24 hours session TTL
+    });
+    console.log('✅ PostgreSQL session store initialized with existing pool');
+  } catch (error) {
+    console.log('⚠️ PostgreSQL session store failed, falling back to memory store:', error.message);
+    const MemoryStoreSession = MemoryStore(session);
+    sessionStore = new MemoryStoreSession({
+      checkPeriod: 86400000 // prune expired entries every 24h
+    });
+  }
   
   // Sync all existing users to database on startup
   syncAllUsersToDatabase();
@@ -255,7 +271,7 @@ export function setupAuth(app: Express) {
     }
   }, 5000); // Wait 5 seconds to ensure database sync is complete
   
-  // Session middleware with memory storage
+  // Session middleware with PostgreSQL storage
   app.use(session({
     secret: process.env.SESSION_SECRET || 'your-secret-key-change-in-production',
     resave: false,
