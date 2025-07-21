@@ -90,6 +90,8 @@ export function AchievementModal({ open, onClose, userId, user }: AchievementMod
   const { data: achievements, isLoading, refetch } = useQuery({
     queryKey: userId ? ['/api/users', userId, 'achievements'] : ['/api/achievements'],
     enabled: open,
+    staleTime: 0, // Always fetch fresh data
+    cacheTime: 0, // Don't cache achievement data
   });
 
   // Auto-sync achievements when modal opens for current user
@@ -107,7 +109,10 @@ export function AchievementModal({ open, onClose, userId, user }: AchievementMod
           
           if (response.ok) {
             console.log('🎉 Achievements synced successfully');
-            refetch(); // Refresh the achievements data
+            // Force multiple refetches to ensure cache is cleared
+            setTimeout(() => refetch(), 100);
+            setTimeout(() => refetch(), 500);
+            setTimeout(() => refetch(), 1000);
           }
         } catch (error) {
           console.error('Failed to sync achievements:', error);
@@ -117,6 +122,13 @@ export function AchievementModal({ open, onClose, userId, user }: AchievementMod
 
     syncAchievements();
   }, [open, userId, user, refetch]);
+
+  // Force refetch when modal opens
+  useEffect(() => {
+    if (open) {
+      refetch();
+    }
+  }, [open, refetch]);
 
 
 

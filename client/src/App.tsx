@@ -80,14 +80,14 @@ function Router() {
     }
   }, [isLoading, hasInitiallyLoaded]);
 
-  // Force loading to complete after 1 second to prevent infinite loading
+  // Force loading to complete after 0.5 seconds to prevent infinite loading
   useEffect(() => {
     const timer = setTimeout(() => {
       if (!hasInitiallyLoaded) {
         setHasInitiallyLoaded(true);
         setIsInitialLoad(false);
       }
-    }, 1000);
+    }, 500);
 
     return () => clearTimeout(timer);
   }, [hasInitiallyLoaded]);

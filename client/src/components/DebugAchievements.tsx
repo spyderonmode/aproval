@@ -54,8 +54,12 @@ export function DebugAchievements() {
       
       // Auto-refresh cache after successful recalculation
       if (data.success) {
-        setTimeout(() => {
-          handleRefreshCache();
+        setTimeout(async () => {
+          await handleRefreshCache();
+          // Force reload the page to ensure all cached data is refreshed
+          setTimeout(() => {
+            window.location.reload();
+          }, 1000);
         }, 500);
       }
     } catch (error) {
