@@ -562,22 +562,38 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.log(`🔧 DEBUG: User stats:`, userStats);
       console.log(`🔧 DEBUG: User win streaks - current: ${user?.currentWinStreak}, best: ${user?.bestWinStreak}`);
       
+      // Get current achievements before recalculation
+      const achievementsBefore = await storage.getUserAchievements(userId);
+      console.log(`🔧 DEBUG: Achievements before:`, achievementsBefore.map(a => a.achievementType));
+      
       // Trigger achievement recalculation
       const result = await storage.recalculateUserAchievements(userId);
       
+      // Get achievements after recalculation
+      const achievementsAfter = await storage.getUserAchievements(userId);
+      console.log(`🔧 DEBUG: Achievements after:`, achievementsAfter.map(a => a.achievementType));
+      
       console.log(`🔧 DEBUG: Recalculation result:`, result);
       
-      res.json({ 
+      const debugData = { 
         success: true, 
         userStats,
         winStreaks: {
           current: user?.currentWinStreak,
           best: user?.bestWinStreak
         },
+        achievementsBefore: achievementsBefore.length,
+        achievementsAfter: achievementsAfter.length,
+        achievementTypes: achievementsAfter.map(a => a.achievementType),
+        hasWinStreak5: achievementsAfter.some(a => a.achievementType === 'win_streak_5'),
+        hasWinStreak10: achievementsAfter.some(a => a.achievementType === 'win_streak_10'),
         result 
-      });
+      };
+      
+      console.log(`🔧 DEBUG: Response data:`, debugData);
+      res.json(debugData);
     } catch (error) {
-      console.error("Error during debug recalculation:", error);
+      console.error("🔧 DEBUG ERROR:", error);
       res.status(500).json({ message: "Failed to recalculate achievements", error: error.message });
     }
   });
