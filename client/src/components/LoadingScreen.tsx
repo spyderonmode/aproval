@@ -1,9 +1,24 @@
 import { GamepadIcon } from "lucide-react";
 
 export default function LoadingScreen() {
+  console.log('🚀 LoadingScreen component rendering');
 
   return (
-    <div className="fixed inset-0 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center z-50">
+    <div 
+      className="fixed inset-0 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center z-50"
+      style={{
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        zIndex: 9999,
+        background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%)',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center'
+      }}
+    >
       {/* Background animated particles */}
       <div className="absolute inset-0 overflow-hidden">
         <div className="absolute -top-40 -right-40 w-80 h-80 bg-primary/10 rounded-full blur-3xl animate-pulse"></div>
@@ -60,11 +75,24 @@ export default function LoadingScreen() {
 
         {/* Made by text - enhanced styling to match user's expectations */}
         <div className="text-center mt-8 space-y-2 animate-fade-in animation-delay-1000">
-          <p className="text-slate-400 text-lg font-medium tracking-wide">
+          <p className="text-white text-xl font-medium tracking-wide">
             Made By
           </p>
-          <p className="text-2xl font-bold bg-gradient-to-r from-primary via-blue-400 to-purple-400 bg-clip-text text-transparent tracking-wider">
+          <p 
+            className="text-3xl font-bold bg-gradient-to-r from-primary via-blue-400 to-purple-400 bg-clip-text text-transparent tracking-wider"
+            style={{
+              fontSize: '2rem',
+              fontWeight: 'bold',
+              background: 'linear-gradient(90deg, #3b82f6, #60a5fa, #a855f7)',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+              letterSpacing: '0.1em'
+            }}
+          >
             DarkLayer Studios
+          </p>
+          <p className="text-slate-300 text-sm italic mt-2 tracking-wide">
+            Crafting Digital Experiences
           </p>
         </div>
       </div>
