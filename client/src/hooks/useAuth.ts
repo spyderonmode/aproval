@@ -11,10 +11,10 @@ export function useAuth() {
   const startTimeRef = useRef(Date.now());
 
   useEffect(() => {
-    // Always show loading for at least 1.5 seconds, then stop regardless of query state
+    // Always show loading for at least 2.5 seconds, then stop regardless of query state
     const timer = setTimeout(() => {
       setIsLoading(false);
-    }, 1500);
+    }, 2500);
 
     return () => clearTimeout(timer);
   }, []);

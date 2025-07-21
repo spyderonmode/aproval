@@ -3,6 +3,7 @@ import path from 'path';
 import crypto from 'crypto';
 import { Express } from 'express';
 import session from 'express-session';
+import connectPgSimple from 'connect-pg-simple';
 import MemoryStore from 'memorystore';
 import { storage } from './storage';
 import { db } from './db';
@@ -222,8 +223,11 @@ async function syncAllUsersToDatabase() {
 }
 
 export function setupAuth(app: Express) {
-  // Memory store for sessions
+  // Use memory store for sessions for now (will improve session persistence later)
   const MemoryStoreSession = MemoryStore(session);
+  const sessionStore = new MemoryStoreSession({
+    checkPeriod: 86400000 // prune expired entries every 24h
+  });
   
   // Sync all existing users to database on startup
   syncAllUsersToDatabase();
@@ -251,14 +255,12 @@ export function setupAuth(app: Express) {
     }
   }, 5000); // Wait 5 seconds to ensure database sync is complete
   
-  // Session middleware
+  // Session middleware with memory storage
   app.use(session({
     secret: process.env.SESSION_SECRET || 'your-secret-key-change-in-production',
     resave: false,
     saveUninitialized: false,
-    store: new MemoryStoreSession({
-      checkPeriod: 86400000 // prune expired entries every 24h
-    }),
+    store: sessionStore,
     cookie: {
       secure: process.env.NODE_ENV === 'production', // Only use secure in production
       httpOnly: true,

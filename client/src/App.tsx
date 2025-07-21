@@ -80,14 +80,14 @@ function Router() {
     }
   }, [isLoading, hasInitiallyLoaded]);
 
-  // Force loading to complete after 2 seconds to prevent infinite loading
+  // Force loading to complete after 3 seconds to prevent infinite loading
   useEffect(() => {
     const timer = setTimeout(() => {
       if (!hasInitiallyLoaded) {
         setHasInitiallyLoaded(true);
         setIsInitialLoad(false);
       }
-    }, 2000);
+    }, 3000);
 
     return () => clearTimeout(timer);
   }, [hasInitiallyLoaded]);
@@ -210,10 +210,10 @@ function App() {
   const [showLoading, setShowLoading] = useState(true);
 
   useEffect(() => {
-    // Show loading screen for 1.5 seconds (same as auth loading)
+    // Show loading screen for 2.5 seconds (same as auth loading)
     const timer = setTimeout(() => {
       setShowLoading(false);
-    }, 1500);
+    }, 2500);
 
     return () => clearTimeout(timer);
   }, []);
