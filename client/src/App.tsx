@@ -207,8 +207,32 @@ function Router() {
 }
 
 function App() {
-  // HTML splash screen handles the 3-second delay, so React app loads immediately
-  console.log('🚀 App render - using HTML splash screen, loading React app immediately');
+  const [showLoading, setShowLoading] = useState(true);
+
+  useEffect(() => {
+    // Show loading screen for 2.5 seconds
+    const timer = setTimeout(() => {
+      setShowLoading(false);
+    }, 2500);
+
+    return () => clearTimeout(timer);
+  }, []);
+
+  if (showLoading) {
+    return (
+      <ErrorBoundary>
+        <QueryClientProvider client={queryClient}>
+          <LanguageProvider>
+            <ThemeProvider>
+              <TooltipProvider>
+                <LoadingScreen />
+              </TooltipProvider>
+            </ThemeProvider>
+          </LanguageProvider>
+        </QueryClientProvider>
+      </ErrorBoundary>
+    );
+  }
 
   return (
     <ErrorBoundary>
