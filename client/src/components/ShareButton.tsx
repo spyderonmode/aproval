@@ -78,7 +78,7 @@ export function ShareButton({
   };
 
   // Check if native sharing is available
-  const hasNativeShare = navigator.share && navigator.canShare && navigator.canShare({ title, text, url: shareUrl });
+  const hasNativeShare = navigator.share && navigator.canShare?.({ title, text, url: shareUrl });
 
   if (hasNativeShare) {
     return (
