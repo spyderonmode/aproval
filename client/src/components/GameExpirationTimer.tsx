@@ -28,17 +28,24 @@ export function GameExpirationTimer({ lastMoveAt, createdAt, onExpired, serverTi
     };
   });
 
-  // Update reference time when we get new server data
+  // Only update reference time on the very first server data or when timer would reset to a higher value
   useEffect(() => {
     if (serverTimeRemaining !== undefined) {
-      console.log('⏱️ Timer: Updating reference with server time remaining:', serverTimeRemaining);
-      setReferenceTime({
-        lastActivity: new Date(lastMoveAt || createdAt),
-        clientTime: Date.now(),
-        serverRemaining: serverTimeRemaining
-      });
+      console.log('⏱️ Timer: Received server time remaining:', serverTimeRemaining);
+      
+      // Only update if this is the first time getting server data OR if server time is higher (game restart)
+      if (referenceTime.serverRemaining === undefined || serverTimeRemaining > referenceTime.serverRemaining) {
+        console.log('⏱️ Timer: Setting NEW reference point - server time:', serverTimeRemaining);
+        setReferenceTime({
+          lastActivity: new Date(lastMoveAt || createdAt),
+          clientTime: Date.now(),
+          serverRemaining: serverTimeRemaining
+        });
+      } else {
+        console.log('⏱️ Timer: Keeping existing reference point - ignoring server update to prevent reset');
+      }
     }
-  }, [serverTimeRemaining, lastMoveAt, createdAt]);
+  }, [serverTimeRemaining, lastMoveAt, createdAt, referenceTime.serverRemaining]);
 
   useEffect(() => {
     const updateTimer = () => {

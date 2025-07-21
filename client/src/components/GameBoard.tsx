@@ -770,7 +770,8 @@ export function GameBoard({ game, onGameOver, gameMode, user, lastMessage, sendM
         setWinningLine(winningPositions);
       }
       
-      // Add delay before showing game over for AI and pass-play
+      // Only add delay for AI mode to see the winning move, instant for online games
+      const delayTime = gameMode === 'ai' ? 1500 : 0; // Reduced delay for AI, instant for online
       setTimeout(() => {
         try {
           if (onGameOver) {
@@ -789,7 +790,7 @@ export function GameBoard({ game, onGameOver, gameMode, user, lastMessage, sendM
         } catch (error) {
           console.error('🚨 Error in game over handler:', error);
         }
-      }, gameMode === 'ai' || gameMode === 'pass-play' ? 2500 : 0);
+      }, delayTime);
       return;
     }
     
@@ -928,7 +929,7 @@ export function GameBoard({ game, onGameOver, gameMode, user, lastMessage, sendM
             console.error('🚨 Error in AI win handler:', error);
           }
         }
-      }, 2500);
+      }, 1500); // Reduced delay
       return;
     }
     
