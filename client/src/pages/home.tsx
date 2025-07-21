@@ -20,6 +20,7 @@ import { AchievementModal } from "@/components/AchievementModal";
 import { Friends } from "@/components/Friends";
 import { InvitationPopup } from "@/components/InvitationPopup";
 import { Leaderboard } from "@/components/Leaderboard";
+import { ShareButton } from "@/components/ShareButton";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -1129,6 +1130,20 @@ export default function Home() {
                         <Trophy className="h-3 w-3 mr-1" />
                         {t('view')}
                       </Button>
+                    </div>
+                    
+                    {/* Share Game */}
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center space-x-2">
+                        <span className="text-sm text-gray-300">{t('shareGame')}</span>
+                      </div>
+                      <ShareButton
+                        title="TicTac 3x5 - Strategic Tic-Tac-Toe"
+                        text="Join me for strategic tic-tac-toe on TicTac 3x5! It's more challenging than regular tic-tac-toe with diagonal-only wins."
+                        variant="outline"
+                        size="sm"
+                        className="bg-slate-700 border-slate-600 text-white hover:bg-slate-600 text-xs"
+                      />
                     </div>
                     
 

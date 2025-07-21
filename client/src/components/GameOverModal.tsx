@@ -1,6 +1,7 @@
 import React from "react";
 import { Home, RefreshCw } from "lucide-react";
 import { useTranslation } from '../contexts/LanguageContext';
+import { ShareButton } from './ShareButton';
 
 interface GameOverModalProps {
   open: boolean;
@@ -222,7 +223,7 @@ export function GameOverModal({ open, onClose, result, onPlayAgain, isCreatingGa
           )}
         </div>
         
-        <div style={{ display: 'flex', justifyContent: 'center', gap: '12px' }}>
+        <div style={{ display: 'flex', justifyContent: 'center', gap: '12px', flexWrap: 'wrap' }}>
           <button
             onClick={() => {
               console.log('🏠 Main Menu button clicked from GameOverModal');
@@ -273,6 +274,18 @@ export function GameOverModal({ open, onClose, result, onPlayAgain, isCreatingGa
               <RefreshCw style={{ width: '16px', height: '16px' }} />
               {t('playAgain')}
             </button>
+          )}
+          
+          {/* Share button for victories */}
+          {!isDraw && winner && (
+            <div style={{ marginTop: '8px' }}>
+              <ShareButton
+                title="TicTac 3x5 Victory!"
+                text={`🎉 I just won a game in TicTac 3x5! ${winnerName} wins! Check out this strategic tic-tac-toe game.`}
+                variant="outline"
+                size="sm"
+              />
+            </div>
           )}
         </div>
       </div>

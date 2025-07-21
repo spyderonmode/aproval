@@ -1603,6 +1603,24 @@ export const translations = {
     es: 'Línea diagonal',
     id: 'Garis diagonal',
   },
+  
+  // Social Media Sharing
+  shareGame: {
+    en: 'Share Game',
+    ar: 'مشاركة اللعبة',
+    bn: 'গেম শেয়ার করুন',
+    hi: 'खेल साझा करें',
+    es: 'Compartir Juego',
+    id: 'Bagikan Permainan',
+  },
+  shareGameText: {
+    en: 'Check out this awesome strategic tic-tac-toe game!',
+    ar: 'اطلع على لعبة إكس أو الاستراتيجية الرائعة هذه!',
+    bn: 'এই দুর্দান্ত কৌশলগত টিক ট্যাক টো গেমটি দেখুন!',
+    hi: 'इस अद्भुत रणनीतिक टिक टैक टो गेम को देखें!',
+    es: '¡Echa un vistazo a este increíble juego de tic-tac-toe estratégico!',
+    id: 'Lihat permainan tic-tac-toe strategis yang luar biasa ini!',
+  },
   mainMenu: {
     en: 'Main Menu',
     ar: 'القائمة الرئيسية',

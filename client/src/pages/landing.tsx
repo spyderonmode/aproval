@@ -4,6 +4,7 @@ import { GamepadIcon } from "lucide-react";
 import { useLocation } from "wouter";
 import { useTranslation } from "@/contexts/LanguageContext";
 import { LanguageSelector } from "@/components/LanguageSelector";
+import { ShareButton } from "@/components/ShareButton";
 
 export default function Landing() {
   const [, setLocation] = useLocation();
@@ -26,6 +27,11 @@ export default function Landing() {
           </div>
           <div className="flex items-center gap-4">
             <LanguageSelector />
+            <ShareButton 
+              text={t('shareGameText')}
+              variant="ghost"
+              size="sm"
+            />
             <Button 
               onClick={handleLogin}
               className="bg-primary hover:bg-primary/90"
