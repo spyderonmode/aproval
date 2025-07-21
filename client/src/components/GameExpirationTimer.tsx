@@ -38,7 +38,7 @@ export function GameExpirationTimer({ lastMoveAt, createdAt, onExpired, serverTi
         serverRemaining: serverTimeRemaining
       });
     }
-  }, [serverTimeRemaining, lastMoveAt, createdAt]);
+  }, [serverTimeRemaining]); // Removed lastMoveAt and createdAt from dependencies to prevent timer reset on moves
 
   useEffect(() => {
     const updateTimer = () => {
