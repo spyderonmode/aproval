@@ -3,9 +3,11 @@ import { createServer, type Server } from "http";
 import { WebSocketServer, WebSocket } from "ws";
 import { storage } from "./storage";
 import { setupAuth, requireAuth } from "./auth";
-import { insertRoomSchema, insertGameSchema, insertMoveSchema } from "@shared/schema";
+import { insertRoomSchema, insertGameSchema, insertMoveSchema, users, games, achievements } from "@shared/schema";
 import { AIPlayer } from "./aiPlayer";
 import { makeMove, checkWin, checkDraw, getOpponentSymbol, validateMove } from "./gameLogic";
+import { db } from "./db";
+import { eq, and, or, desc, exists } from "drizzle-orm";
 
 interface WSConnection {
   ws: WebSocket;
@@ -764,6 +766,147 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error updating selected achievement border:", error);
       res.status(500).json({ message: "Failed to update selected achievement border" });
+    }
+  });
+
+  // Debug endpoint specifically for win streak achievements
+  app.post('/api/debug/fix-win-streak-achievements', requireAuth, async (req: any, res) => {
+    try {
+      console.log('🔧 DEBUG: Starting win streak achievement fix for all users');
+      
+      // Get all users who have games
+      const allUsers = await db
+        .select({ id: users.id })
+        .from(users)
+        .where(
+          exists(
+            db.select().from(games).where(
+              or(
+                eq(games.playerXId, users.id),
+                eq(games.playerOId, users.id)
+              )
+            )
+          )
+        );
+
+      console.log(`🔧 DEBUG: Found ${allUsers.length} users with games`);
+
+      const results = [];
+      let fixedUsersCount = 0;
+
+      for (const user of allUsers) {
+        const userId = user.id;
+        console.log(`🔧 DEBUG: Processing user ${userId}`);
+
+        try {
+          // Get user's current win streak data
+          const userRecord = await storage.getUser(userId);
+          const currentBestWinStreak = userRecord?.bestWinStreak || 0;
+
+          // Recalculate user stats from games to ensure accurate win streaks
+          await storage.recalculateUserStats(userId);
+          
+          // Get updated user data after recalculation
+          const updatedUser = await storage.getUser(userId);
+          const newBestWinStreak = updatedUser?.bestWinStreak || 0;
+
+          console.log(`🔧 DEBUG: User ${userId} - Win streak updated from ${currentBestWinStreak} to ${newBestWinStreak}`);
+
+          // Get current achievements
+          const currentAchievements = await db
+            .select()
+            .from(achievements)
+            .where(eq(achievements.userId, userId));
+
+          const hasWinStreak5 = currentAchievements.some(a => a.achievementType === 'win_streak_5');
+          const hasWinStreak10 = currentAchievements.some(a => a.achievementType === 'win_streak_10');
+          
+          const shouldHaveWinStreak5 = newBestWinStreak >= 5;
+          const shouldHaveWinStreak10 = newBestWinStreak >= 10;
+
+          let achievementsAdded = [];
+
+          // Add missing win streak achievements
+          if (shouldHaveWinStreak5 && !hasWinStreak5) {
+            try {
+              await db
+                .insert(achievements)
+                .values({
+                  userId,
+                  achievementType: 'win_streak_5',
+                  achievementName: 'winStreakMaster',
+                  description: 'winFiveConsecutiveGames',
+                  icon: '🔥',
+                  metadata: {},
+                })
+                .onConflictDoNothing();
+              achievementsAdded.push('win_streak_5');
+              console.log(`✅ Added win_streak_5 achievement for user ${userId}`);
+            } catch (error) {
+              console.error(`❌ Error adding win_streak_5 for user ${userId}:`, error);
+            }
+          }
+
+          if (shouldHaveWinStreak10 && !hasWinStreak10) {
+            try {
+              await db
+                .insert(achievements)
+                .values({
+                  userId,
+                  achievementType: 'win_streak_10',
+                  achievementName: 'unstoppable',
+                  description: 'winTenConsecutiveGames',
+                  icon: '⚡',
+                  metadata: {},
+                })
+                .onConflictDoNothing();
+              achievementsAdded.push('win_streak_10');
+              console.log(`✅ Added win_streak_10 achievement for user ${userId}`);
+            } catch (error) {
+              console.error(`❌ Error adding win_streak_10 for user ${userId}:`, error);
+            }
+          }
+
+          if (achievementsAdded.length > 0) {
+            fixedUsersCount++;
+          }
+
+          results.push({
+            userId,
+            oldBestWinStreak: currentBestWinStreak,
+            newBestWinStreak: newBestWinStreak,
+            hadWinStreak5: hasWinStreak5,
+            hadWinStreak10: hasWinStreak10,
+            shouldHaveWinStreak5,
+            shouldHaveWinStreak10,
+            achievementsAdded
+          });
+
+        } catch (userError) {
+          console.error(`❌ Error processing user ${userId}:`, userError);
+          results.push({
+            userId,
+            error: userError.message
+          });
+        }
+      }
+
+      console.log(`🎉 Win streak achievement fix completed! Fixed ${fixedUsersCount} users`);
+
+      res.json({
+        success: true,
+        message: `Win streak achievements fixed for ${fixedUsersCount} users`,
+        totalUsers: allUsers.length,
+        fixedUsers: fixedUsersCount,
+        results: results.slice(0, 10) // Return first 10 for debugging
+      });
+
+    } catch (error) {
+      console.error('❌ Error in win streak achievement fix:', error);
+      res.status(500).json({
+        success: false,
+        error: error.message
+      });
     }
   });
 

@@ -70,6 +70,40 @@ export function DebugAchievements() {
     }
   };
 
+  const handleFixWinStreaks = async () => {
+    setIsLoading(true);
+    setResult(null);
+    try {
+      console.log('Making request to fix win streak achievements...');
+      const response = await fetch('/api/debug/fix-win-streak-achievements', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include'
+      });
+      
+      const data = await response.json();
+      console.log('Win streak fix response:', data);
+      setResult(data);
+      
+      // Auto-refresh cache after successful fix
+      if (data.success) {
+        setTimeout(async () => {
+          await handleRefreshCache();
+          setTimeout(() => {
+            window.location.reload();
+          }, 1000);
+        }, 500);
+      }
+    } catch (error) {
+      console.error('Error fixing win streak achievements:', error);
+      setResult({ error: `${error.message}` });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
     <Card className="w-96 bg-slate-800 border-slate-700 text-white">
       <CardHeader className="pb-3">
@@ -95,6 +129,21 @@ export function DebugAchievements() {
               </>
             ) : (
               'Recalculate Achievements'
+            )}
+          </Button>
+          
+          <Button 
+            onClick={handleFixWinStreaks} 
+            disabled={isLoading}
+            className="w-full bg-orange-600 hover:bg-orange-700"
+          >
+            {isLoading ? (
+              <>
+                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                Fixing...
+              </>
+            ) : (
+              '🔥 Fix Win Streak Achievements'
             )}
           </Button>
           

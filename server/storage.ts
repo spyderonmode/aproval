@@ -878,6 +878,10 @@ export class DatabaseStorage implements IStorage {
       const userStats = await this.getUserStats(userId);
       const totalGames = userStats.wins + userStats.losses + userStats.draws;
       
+      // Get user for win streak data
+      const user = await this.getUser(userId);
+      const bestWinStreak = user?.bestWinStreak || 0;
+      
       // Get existing achievements
       const existingAchievements = await db
         .select()
@@ -888,6 +892,10 @@ export class DatabaseStorage implements IStorage {
       const shouldHaveAchievements: string[] = [];
       
       if (userStats.wins >= 1) shouldHaveAchievements.push('first_win');
+      if (bestWinStreak >= 5) shouldHaveAchievements.push('win_streak_5');
+      if (bestWinStreak >= 10) shouldHaveAchievements.push('win_streak_10');
+      if (await this.checkDiagonalWins(userId, 3)) shouldHaveAchievements.push('master_of_diagonals');
+      if (await this.checkComebackCondition(userId)) shouldHaveAchievements.push('comeback_king');
       if (userStats.wins >= 20) shouldHaveAchievements.push('speed_demon');
       if (userStats.wins >= 50) shouldHaveAchievements.push('legend');
       if (userStats.wins >= 100) shouldHaveAchievements.push('champion');
@@ -922,6 +930,10 @@ export class DatabaseStorage implements IStorage {
         
         const achievementData: Record<string, { name: string; description: string; icon: string }> = {
           'first_win': { name: 'firstVictoryTitle', description: 'winYourVeryFirstGame', icon: '🏆' },
+          'win_streak_5': { name: 'winStreakMaster', description: 'winFiveConsecutiveGames', icon: '🔥' },
+          'win_streak_10': { name: 'unstoppable', description: 'winTenConsecutiveGames', icon: '⚡' },
+          'master_of_diagonals': { name: 'masterOfDiagonals', description: 'winThreeGamesDiagonally', icon: '🎯' },
+          'comeback_king': { name: 'comebackKing', description: 'winAfterLosingFive', icon: '👑' },
           'speed_demon': { name: 'speedDemon', description: 'winTwentyTotalGames', icon: '⚡' },
           'legend': { name: 'legend', description: 'achieveFiftyTotalWins', icon: '🌟' },
           'champion': { name: 'champion', description: 'achieveOneHundredTotalWins', icon: '👑' },
@@ -987,6 +999,10 @@ export class DatabaseStorage implements IStorage {
       const user = await this.getUser(userId);
       const bestWinStreak = user?.bestWinStreak || 0;
       
+      // Check special conditions
+      const hasDiagonalWins = await this.checkDiagonalWins(userId, 3);
+      const hasComeback = await this.checkComebackCondition(userId);
+      
       const achievementRules = [
         {
           type: 'first_win',
@@ -1008,6 +1024,20 @@ export class DatabaseStorage implements IStorage {
           description: 'winTenConsecutiveGames',
           icon: '⚡',
           condition: bestWinStreak >= 10,
+        },
+        {
+          type: 'master_of_diagonals',
+          name: 'masterOfDiagonals',
+          description: 'winThreeGamesDiagonally',
+          icon: '🎯',
+          condition: hasDiagonalWins,
+        },
+        {
+          type: 'comeback_king',
+          name: 'comebackKing',
+          description: 'winAfterLosingFive',
+          icon: '👑',
+          condition: hasComeback,
         },
         {
           type: 'speed_demon',
@@ -1221,9 +1251,23 @@ export class DatabaseStorage implements IStorage {
       const userStats = await this.getUserStats(userId);
       const totalGames = userStats.wins + userStats.losses + userStats.draws;
       
+      // Get user for win streak data
+      const user = await this.getUser(userId);
+      const bestWinStreak = user?.bestWinStreak || 0;
+      
+      // Check diagonal wins count
+      const diagonalWinsCount = await this.checkDiagonalWins(userId, 1) ? await this.getDiagonalWinsCount(userId) : 0;
+      
+      // Check comeback condition
+      const hasComeback = await this.checkComebackCondition(userId);
+      
       // Define all possible achievements that should exist based on current stats
       const allPossibleAchievements = [
         { type: 'first_win', condition: userStats.wins >= 1 },
+        { type: 'win_streak_5', condition: bestWinStreak >= 5 },
+        { type: 'win_streak_10', condition: bestWinStreak >= 10 },
+        { type: 'master_of_diagonals', condition: diagonalWinsCount >= 3 },
+        { type: 'comeback_king', condition: hasComeback },
         { type: 'speed_demon', condition: userStats.wins >= 20 },
         { type: 'legend', condition: userStats.wins >= 50 },
         { type: 'champion', condition: userStats.wins >= 100 },
@@ -1245,6 +1289,10 @@ export class DatabaseStorage implements IStorage {
       if (missingCount > 0) {
         console.log(`🔄 Found ${missingCount} missing achievements for user ${userId}. Running validation...`);
         await this.validateUserAchievements(userId);
+        
+        // After validation, check for theme unlocks
+        await this.checkThemeUnlocks(userId);
+        
         console.log(`✅ Achievement validation completed for user: ${userId}`);
       } else {
         console.log(`✅ All achievements up to date for user: ${userId}`);
@@ -1319,6 +1367,43 @@ export class DatabaseStorage implements IStorage {
       ));
 
     return diagonalWins.length >= requiredWins;
+  }
+
+  private async getDiagonalWinsCount(userId: string): Promise<number> {
+    const diagonalWins = await db
+      .select()
+      .from(games)
+      .where(and(
+        eq(games.winnerId, userId),
+        eq(games.winCondition, 'diagonal')
+      ));
+
+    return diagonalWins.length;
+  }
+
+  private async checkThemeUnlocks(userId: string): Promise<void> {
+    try {
+      // Check if user has achievements that should unlock themes
+      const userAchievements = await db
+        .select()
+        .from(achievements)
+        .where(eq(achievements.userId, userId));
+
+      const achievementTypes = userAchievements.map(a => a.achievementType);
+
+      // Check theme unlock conditions
+      if (achievementTypes.includes('win_streak_10')) {
+        await this.unlockTheme(userId, 'halloween');
+      }
+      if (achievementTypes.includes('speed_demon')) {
+        await this.unlockTheme(userId, 'christmas');
+      }
+      if (achievementTypes.includes('veteran_player')) {
+        await this.unlockTheme(userId, 'summer');
+      }
+    } catch (error) {
+      console.error('Error checking theme unlocks:', error);
+    }
   }
 
   private async checkComebackCondition(userId: string): Promise<boolean> {
