@@ -1,13 +1,15 @@
 import { useState } from 'react';
-import { Share2, Facebook, Twitter, MessageCircle, Copy, Check } from 'lucide-react';
+import { Share2, Facebook, Twitter, MessageCircle, Copy, Check, Smartphone } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
+  DropdownMenuSeparator,
 } from '@/components/ui/dropdown-menu';
 import { useToast } from '@/hooks/use-toast';
+import { getShareUrl, getShareText, shareConfig } from '@/lib/shareConfig';
 
 interface ShareButtonProps {
   title?: string;
@@ -16,23 +18,29 @@ interface ShareButtonProps {
   variant?: 'default' | 'outline' | 'ghost';
   size?: 'default' | 'sm' | 'lg';
   className?: string;
+  preferPlayStore?: boolean; // Whether to prefer Play Store link when available
 }
 
 export function ShareButton({ 
-  title = "TicTac 3x5 - Strategic Tic-Tac-Toe", 
-  text = "Check out this awesome 3x5 strategic tic-tac-toe game!",
+  title,
+  text,
   url,
   variant = "outline",
   size = "default",
-  className = ""
+  className = "",
+  preferPlayStore = false
 }: ShareButtonProps) {
   const [copied, setCopied] = useState(false);
   const { toast } = useToast();
   
-  const shareUrl = url || window.location.href;
-  const encodedUrl = encodeURIComponent(shareUrl);
-  const encodedTitle = encodeURIComponent(title);
-  const encodedText = encodeURIComponent(text);
+  // Get dynamic URL and text based on environment
+  const dynamicUrl = url || getShareUrl(preferPlayStore);
+  const dynamicText = text || getShareText(dynamicUrl);
+  const dynamicTitle = title || shareConfig.appName;
+  
+  const encodedUrl = encodeURIComponent(dynamicUrl);
+  const encodedTitle = encodeURIComponent(dynamicTitle);
+  const encodedText = encodeURIComponent(dynamicText);
 
   const shareLinks = {
     facebook: `https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}&quote=${encodedText}`,
@@ -40,13 +48,16 @@ export function ShareButton({
     whatsapp: `https://wa.me/?text=${encodedText}%20${encodedUrl}`,
   };
 
-  const handleCopyLink = async () => {
+  const handleCopyLink = async (urlToCopy: string = dynamicUrl) => {
     try {
-      await navigator.clipboard.writeText(shareUrl);
+      await navigator.clipboard.writeText(urlToCopy);
       setCopied(true);
+      const isPlayStore = urlToCopy === shareConfig.playStoreUrl;
       toast({
         title: "Link copied!",
-        description: "Share link has been copied to clipboard",
+        description: isPlayStore 
+          ? "Play Store link copied to clipboard" 
+          : "Share link copied to clipboard",
       });
       setTimeout(() => setCopied(false), 2000);
     } catch (err) {
@@ -66,9 +77,9 @@ export function ShareButton({
     if (navigator.share) {
       try {
         await navigator.share({
-          title,
-          text,
-          url: shareUrl,
+          title: dynamicTitle,
+          text: dynamicText,
+          url: dynamicUrl,
         });
       } catch (err) {
         // User cancelled or share failed, fallback to dropdown
@@ -78,7 +89,11 @@ export function ShareButton({
   };
 
   // Check if native sharing is available
-  const hasNativeShare = navigator.share && navigator.canShare?.({ title, text, url: shareUrl });
+  const hasNativeShare = navigator.share && navigator.canShare && navigator.canShare({ 
+    title: dynamicTitle, 
+    text: dynamicText, 
+    url: dynamicUrl 
+  });
 
   if (hasNativeShare) {
     return (
@@ -102,7 +117,7 @@ export function ShareButton({
           Share
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-48">
+      <DropdownMenuContent align="end" className="w-52">
         <DropdownMenuItem onClick={() => handleShare('facebook')}>
           <Facebook className="h-4 w-4 mr-2 text-blue-600" />
           Share on Facebook
@@ -115,14 +130,26 @@ export function ShareButton({
           <MessageCircle className="h-4 w-4 mr-2 text-green-600" />
           Share on WhatsApp
         </DropdownMenuItem>
-        <DropdownMenuItem onClick={handleCopyLink}>
+        
+        <DropdownMenuSeparator />
+        
+        {/* Current app link (Replit or production web) */}
+        <DropdownMenuItem onClick={() => handleCopyLink(getShareUrl(false))}>
           {copied ? (
             <Check className="h-4 w-4 mr-2 text-green-600" />
           ) : (
             <Copy className="h-4 w-4 mr-2" />
           )}
-          {copied ? 'Link Copied!' : 'Copy Link'}
+          Copy Web App Link
         </DropdownMenuItem>
+        
+        {/* Play Store link (only show if configured) */}
+        {shareConfig.playStoreUrl && (
+          <DropdownMenuItem onClick={() => handleCopyLink(shareConfig.playStoreUrl!)}>
+            <Smartphone className="h-4 w-4 mr-2 text-green-700" />
+            Copy Play Store Link
+          </DropdownMenuItem>
+        )}
       </DropdownMenuContent>
     </DropdownMenu>
   );

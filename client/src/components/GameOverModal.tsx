@@ -282,8 +282,9 @@ export function GameOverModal({ open, onClose, result, onPlayAgain, isCreatingGa
               <ShareButton
                 title="TicTac 3x5 Victory!"
                 text={`🎉 I just won a game in TicTac 3x5! ${winnerName} wins! Check out this strategic tic-tac-toe game.`}
-                variant="outline"
+                variant="default"
                 size="sm"
+                className="bg-green-600 hover:bg-green-700 text-white border-green-600"
               />
             </div>
           )}
