@@ -28,6 +28,7 @@ import { GamepadIcon, LogOut, User, Zap, Loader2, Users, Settings, Menu, X, Pale
 import { logout } from "@/lib/firebase";
 import { useTranslation } from "@/contexts/LanguageContext";
 import { CustomLanguageSelector } from "@/components/CustomLanguageSelector";
+import { DebugAchievements } from "@/components/DebugAchievements";
 
 export default function Home() {
   const { user } = useAuth();
@@ -1444,6 +1445,11 @@ export default function Home() {
 
       {/* Global Room Invitation Popup */}
       <InvitationPopup onRoomJoin={handleRoomJoin} />
+
+      {/* Temporary Debug Component */}
+      <div className="fixed bottom-4 right-4 z-50">
+        <DebugAchievements />
+      </div>
 
     </div>
   );

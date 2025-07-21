@@ -549,6 +549,39 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Debug endpoint to manually trigger achievement recalculation
+  app.post('/api/debug/recalculate-achievements', requireAuth, async (req: any, res) => {
+    try {
+      const userId = req.session.user.userId;
+      console.log(`🔧 DEBUG: Manually recalculating achievements for user: ${userId}`);
+      
+      // Get current user stats for debugging
+      const userStats = await storage.getUserStats(userId);
+      const user = await storage.getUser(userId);
+      
+      console.log(`🔧 DEBUG: User stats:`, userStats);
+      console.log(`🔧 DEBUG: User win streaks - current: ${user?.currentWinStreak}, best: ${user?.bestWinStreak}`);
+      
+      // Trigger achievement recalculation
+      const result = await storage.recalculateUserAchievements(userId);
+      
+      console.log(`🔧 DEBUG: Recalculation result:`, result);
+      
+      res.json({ 
+        success: true, 
+        userStats,
+        winStreaks: {
+          current: user?.currentWinStreak,
+          best: user?.bestWinStreak
+        },
+        result 
+      });
+    } catch (error) {
+      console.error("Error during debug recalculation:", error);
+      res.status(500).json({ message: "Failed to recalculate achievements", error: error.message });
+    }
+  });
+
   // Update selected achievement border
   app.post('/api/achievement-border/select', requireAuth, async (req: any, res) => {
     try {
