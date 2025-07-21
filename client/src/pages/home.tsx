@@ -287,6 +287,9 @@ export default function Home() {
                 board: lastMessage.board,
                 currentPlayer: lastMessage.currentPlayer,
                 lastMove: lastMessage.position,
+                lastMoveAt: lastMessage.lastMoveAt || prevGame.lastMoveAt,
+                serverTime: lastMessage.serverTime || prevGame.serverTime,
+                timeRemaining: lastMessage.timeRemaining || prevGame.timeRemaining,
                 playerXInfo: lastMessage.playerXInfo || prevGame.playerXInfo,
                 playerOInfo: lastMessage.playerOInfo || prevGame.playerOInfo,
                 timestamp: Date.now() // Force re-render
@@ -315,6 +318,9 @@ export default function Home() {
                 board: lastMessage.board,
                 currentPlayer: lastMessage.currentPlayer,
                 lastMove: lastMessage.position,
+                lastMoveAt: lastMessage.lastMoveAt,
+                serverTime: lastMessage.serverTime,
+                timeRemaining: lastMessage.timeRemaining,
                 playerXInfo: lastMessage.playerXInfo,
                 playerOInfo: lastMessage.playerOInfo,
                 timestamp: Date.now()
@@ -326,6 +332,9 @@ export default function Home() {
                 board: lastMessage.board,
                 currentPlayer: lastMessage.currentPlayer,
                 lastMove: lastMessage.position,
+                lastMoveAt: lastMessage.lastMoveAt || prevGame.lastMoveAt,
+                serverTime: lastMessage.serverTime || prevGame.serverTime,
+                timeRemaining: lastMessage.timeRemaining || prevGame.timeRemaining,
                 playerXInfo: lastMessage.playerXInfo || prevGame.playerXInfo,
                 playerOInfo: lastMessage.playerOInfo || prevGame.playerOInfo,
                 timestamp: Date.now()

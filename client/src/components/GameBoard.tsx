@@ -1142,6 +1142,8 @@ export function GameBoard({ game, onGameOver, gameMode, user, lastMessage, sendM
               <GameExpirationTimer 
                 lastMoveAt={game.lastMoveAt}
                 createdAt={game.createdAt || new Date()}
+                serverTime={game.serverTime}
+                timeRemaining={game.timeRemaining}
                 onExpired={() => {
                   console.log('⏰ Game expired in GameBoard component');
                   // The actual expiration handling is done by server, this is just for UI feedback

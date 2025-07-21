@@ -6,14 +6,25 @@ interface GameExpirationTimerProps {
   lastMoveAt: string | Date;
   createdAt: string | Date;
   onExpired?: () => void;
+  serverTime?: string; // Server timestamp for sync
+  timeRemaining?: number; // Pre-calculated time remaining from server
 }
 
-export function GameExpirationTimer({ lastMoveAt, createdAt, onExpired }: GameExpirationTimerProps) {
+export function GameExpirationTimer({ lastMoveAt, createdAt, onExpired, serverTime, timeRemaining: serverTimeRemaining }: GameExpirationTimerProps) {
   const [timeRemaining, setTimeRemaining] = useState<number>(0);
   const [isExpired, setIsExpired] = useState(false);
+  const [startTime] = useState<number>(Date.now()); // Client start time for drift compensation
 
   useEffect(() => {
     const calculateTimeRemaining = () => {
+      // If server provided pre-calculated time remaining, use it with drift compensation
+      if (serverTimeRemaining !== undefined && serverTime) {
+        const clientElapsed = Date.now() - startTime;
+        const adjustedRemaining = Math.max(0, serverTimeRemaining - clientElapsed);
+        return adjustedRemaining;
+      }
+      
+      // Fallback to client-side calculation
       const lastActivity = new Date(lastMoveAt || createdAt);
       const now = new Date();
       const tenMinutes = 10 * 60 * 1000; // 10 minutes in milliseconds
@@ -40,7 +51,7 @@ export function GameExpirationTimer({ lastMoveAt, createdAt, onExpired }: GameEx
     const interval = setInterval(updateTimer, 1000);
 
     return () => clearInterval(interval);
-  }, [lastMoveAt, createdAt, onExpired, isExpired]);
+  }, [lastMoveAt, createdAt, onExpired, isExpired, serverTime, serverTimeRemaining, startTime]);
 
   const formatTime = (milliseconds: number) => {
     const minutes = Math.floor(milliseconds / 60000);
