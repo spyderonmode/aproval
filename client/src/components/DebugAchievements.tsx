@@ -98,6 +98,7 @@ export function DebugAchievements() {
             onClick={handleRefreshCache} 
             variant="outline"
             className="w-full"
+            disabled={isLoading}
           >
             <RefreshCw className="w-4 h-4 mr-2" />
             Refresh Achievement Cache

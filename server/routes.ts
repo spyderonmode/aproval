@@ -577,7 +577,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
       
       // Calculate win streaks from game history for comparison
+      console.log('🔧 DEBUG: About to call getUserGames');
       const games = await storage.getUserGames(userId);
+      console.log('🔧 DEBUG: Retrieved games:', games.length);
       const gameResults = games
         .filter(g => g.status === 'finished')
         .sort((a, b) => new Date(a.finishedAt || '').getTime() - new Date(b.finishedAt || '').getTime())
@@ -631,6 +633,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Get current achievements before recalculation
       const achievementsBefore = await storage.getUserAchievements(userId);
       console.log(`🔧 DEBUG: Achievements before (${achievementsBefore.length}):`, achievementsBefore.map(a => a.achievementType));
+      
+      // Force update win streaks if they're incorrect
+      if (calculatedBestWinStreak > (user?.bestWinStreak || 0)) {
+        console.log(`🔧 DEBUG: Updating incorrect win streaks from ${user?.bestWinStreak} to ${calculatedBestWinStreak}`);
+        await storage.updateUserStats(userId, {
+          currentWinStreak: calculatedCurrentWinStreak,
+          bestWinStreak: calculatedBestWinStreak
+        });
+      }
       
       // Trigger achievement recalculation
       console.log(`🔧 DEBUG: Starting recalculation...`);

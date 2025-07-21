@@ -450,8 +450,8 @@ export class DatabaseStorage implements IStorage {
       .where(and(eq(roomParticipants.roomId, roomId), eq(roomParticipants.userId, userId)));
   }
 
-  // Statistics
-  async updateUserStats(userId: string, result: 'win' | 'loss' | 'draw'): Promise<void> {
+  // Statistics - for game results
+  async updateUserStatsFromGame(userId: string, result: 'win' | 'loss' | 'draw'): Promise<void> {
     const user = await this.getUser(userId);
     if (!user) return;
 
@@ -478,6 +478,19 @@ export class DatabaseStorage implements IStorage {
     }
 
     await db.update(users).set(updates).where(eq(users.id, userId));
+  }
+
+  // Overloaded method to update specific user stats
+  async updateUserStats(userId: string, statsUpdate: { currentWinStreak?: number; bestWinStreak?: number; wins?: number; losses?: number; draws?: number }): Promise<void> {
+    await db.update(users).set(statsUpdate).where(eq(users.id, userId));
+  }
+
+  // Alias method for getUserGames
+  async getUserGames(userId: string): Promise<Game[]> {
+    return await db
+      .select()
+      .from(games)
+      .where(or(eq(games.playerXId, userId), eq(games.playerOId, userId)));
   }
 
   async recalculateUserStats(userId: string): Promise<void> {

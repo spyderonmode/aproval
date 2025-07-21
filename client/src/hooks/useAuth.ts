@@ -13,8 +13,8 @@ export function useAuth() {
   useEffect(() => {
     if (!queryLoading) {
       const elapsed = Date.now() - startTimeRef.current;
-      // Reduce minimum loading time to 1 second to prevent app from getting stuck
-      const remainingTime = Math.max(0, 1000 - elapsed);
+      // Reduce minimum loading time to 500ms to prevent app from getting stuck
+      const remainingTime = Math.max(0, 500 - elapsed);
       
       const timer = setTimeout(() => {
         setIsLoading(false);
