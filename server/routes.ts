@@ -3699,7 +3699,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
             // Handle player chat message and broadcast to all users in the room
             const { roomId: chatRoomId, gameId: chatGameId, userId: chatUserId, playerSymbol: chatPlayerSymbol, messageText, playerInfo: chatPlayerInfo } = data;
             
-            console.log(`💬 Player chat from ${chatUserId} in room ${chatRoomId}: ${messageText} (${chatPlayerSymbol})`);
+            // console.log(`💬 Player chat from ${chatUserId} in room ${chatRoomId}: ${messageText} (${chatPlayerSymbol})`);
             
             // Broadcast chat message to all users in the room
             const chatRoomUsers = roomConnections.get(chatRoomId);
@@ -3715,17 +3715,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
                 timestamp: Date.now()
               });
               
-              console.log(`💬 Broadcasting chat to ${chatRoomUsers.size} users in room ${chatRoomId}`);
+              // console.log(`💬 Broadcasting chat to ${chatRoomUsers.size} users in room ${chatRoomId}`);
               let broadcastCount = 0;
               chatRoomUsers.forEach(connId => {
                 const conn = connections.get(connId);
                 if (conn && conn.ws.readyState === WebSocket.OPEN) {
                   conn.ws.send(chatMessage);
                   broadcastCount++;
-                  console.log(`💬 Sent chat to user: ${conn.userId}`);
+                  // console.log(`💬 Sent chat to user: ${conn.userId}`);
                 }
               });
-              console.log(`💬 Successfully broadcast chat to ${broadcastCount} users`);
+              // console.log(`💬 Successfully broadcast chat to ${broadcastCount} users`);
             } else {
               console.log(`💬 No room users found for room ${chatRoomId} or room is empty`);
             }

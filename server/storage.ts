@@ -909,7 +909,7 @@ export class DatabaseStorage implements IStorage {
       
       // Remove incorrect achievements
       if (incorrectAchievements.length > 0) {
-        console.log(`🔄 Auto-removing ${incorrectAchievements.length} incorrect achievements for user: ${userId}`);
+        // console.log(`🔄 Auto-removing ${incorrectAchievements.length} incorrect achievements for user: ${userId}`);
         await db
           .delete(achievements)
           .where(and(
@@ -925,7 +925,7 @@ export class DatabaseStorage implements IStorage {
       );
       
       if (missingAchievements.length > 0) {
-        console.log(`🔄 Auto-adding ${missingAchievements.length} missing achievements for user: ${userId}`);
+        // console.log(`🔄 Auto-adding ${missingAchievements.length} missing achievements for user: ${userId}`);
         
         const achievementData: Record<string, { name: string; description: string; icon: string }> = {
           'first_win': { name: 'firstVictoryTitle', description: 'winYourVeryFirstGame', icon: '🏆' },
@@ -1246,7 +1246,7 @@ export class DatabaseStorage implements IStorage {
   // New method to ensure all achievements are up to date based on current stats
   async ensureAllAchievementsUpToDate(userId: string): Promise<void> {
     try {
-      console.log(`🔄 Ensuring achievements are up to date for user: ${userId}`);
+      // console.log(`🔄 Ensuring achievements are up to date for user: ${userId}`);
       const userStats = await this.getUserStats(userId);
       const totalGames = userStats.wins + userStats.losses + userStats.draws;
       

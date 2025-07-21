@@ -245,7 +245,7 @@ export function setupAuth(app: Express) {
       }
       
       await storage.recalculateAllUserStats();
-      console.log('✅ User stats recalculation completed!');
+      // console.log('✅ User stats recalculation completed!');
     } catch (error: any) {
       console.error('Failed to recalculate user stats:', error.message);
     }
