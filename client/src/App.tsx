@@ -207,37 +207,8 @@ function Router() {
 }
 
 function App() {
-  const [showLoading, setShowLoading] = useState(true);
-
-  useEffect(() => {
-    console.log('🚀 App started - showing splash screen for 3 seconds');
-    // Always show splash screen for 3 seconds on app startup
-    const timer = setTimeout(() => {
-      console.log('🚀 Hiding splash screen, showing main app');
-      setShowLoading(false);
-    }, 3000);
-
-    return () => clearTimeout(timer);
-  }, []);
-
-  console.log('🚀 App render - showLoading:', showLoading);
-
-  if (showLoading) {
-    console.log('🚀 Rendering splash screen (LoadingScreen component)');
-    return (
-      <ErrorBoundary>
-        <QueryClientProvider client={queryClient}>
-          <LanguageProvider>
-            <ThemeProvider>
-              <TooltipProvider>
-                <LoadingScreen />
-              </TooltipProvider>
-            </ThemeProvider>
-          </LanguageProvider>
-        </QueryClientProvider>
-      </ErrorBoundary>
-    );
-  }
+  // HTML splash screen handles the 3-second delay, so React app loads immediately
+  console.log('🚀 App render - using HTML splash screen, loading React app immediately');
 
   return (
     <ErrorBoundary>
