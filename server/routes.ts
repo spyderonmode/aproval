@@ -100,10 +100,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       // Checking for active game reconnection
       
-      // Check if user has an active game (not expired)
+      // Check if user has an active game (not expired or abandoned)
+      // Also check if user has any room state - if not, they were properly cleaned up from abandonment
+      const userRoomState = userRoomStates.get(userId);
       const activeGame = await storage.getActiveGameForUser(userId);
       
-      if (activeGame && activeGame.roomId && activeGame.status === 'active') {
+      if (activeGame && activeGame.roomId && activeGame.status === 'active' && userRoomState) {
         // Check if game is still within 10 minute limit
         const gameAge = Date.now() - new Date(activeGame.lastMoveAt || activeGame.createdAt).getTime();
         const tenMinutes = 10 * 60 * 1000;

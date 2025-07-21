@@ -97,10 +97,14 @@ export function useWebSocket() {
           `;
           document.body.appendChild(notificationDiv);
           
+          // Clear any stored game state to prevent reconnection
+          localStorage.removeItem('currentGameState');
+          sessionStorage.removeItem('currentGameState');
+          
           // Force page reload after showing the notification
           console.log('🏠 WebSocket: Reloading page due to game abandonment');
           setTimeout(() => {
-            window.location.reload();
+            window.location.href = '/'; // Redirect to root instead of reload to prevent reconnection
           }, 2000); // Give user time to see the notification
           
           return; // Don't set lastMessage to prevent useEffect processing
