@@ -42,8 +42,10 @@ export default function Auth() {
             title: t('loginSuccessful'),
             description: t('welcomeBack'),
           });
-          // Force immediate redirect to dashboard
-          window.location.href = "/";
+          // Use proper routing instead of full page reload
+          setTimeout(() => {
+            setLocation('/');
+          }, 500);
         } else {
           const errorData = await response.json();
           

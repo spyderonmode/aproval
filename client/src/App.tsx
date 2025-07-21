@@ -76,18 +76,18 @@ function Router() {
       // Set a flag to indicate we've moved past the initial load
       setTimeout(() => {
         setIsInitialLoad(false);
-      }, 100);
+      }, 300);
     }
   }, [isLoading, hasInitiallyLoaded]);
 
-  // Force loading to complete after 0.1 seconds to prevent infinite loading
+  // Force loading to complete after 2 seconds to prevent infinite loading
   useEffect(() => {
     const timer = setTimeout(() => {
       if (!hasInitiallyLoaded) {
         setHasInitiallyLoaded(true);
         setIsInitialLoad(false);
       }
-    }, 100);
+    }, 2000);
 
     return () => clearTimeout(timer);
   }, [hasInitiallyLoaded]);
@@ -100,8 +100,8 @@ function Router() {
     }
   }, [location, hasInitiallyLoaded]);
 
-  // Disable loading screen entirely to prevent authentication issues
-  if (false && isLoading && !hasInitiallyLoaded && isInitialLoad) {
+  // Show loading screen during authentication check (but only for a limited time)
+  if (isLoading && !hasInitiallyLoaded && isInitialLoad) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center relative overflow-hidden">
         {/* Background animated particles */}
@@ -210,10 +210,10 @@ function App() {
   const [showLoading, setShowLoading] = useState(true);
 
   useEffect(() => {
-    // Show loading screen for 2.5 seconds
+    // Show loading screen for 1.5 seconds (same as auth loading)
     const timer = setTimeout(() => {
       setShowLoading(false);
-    }, 2500);
+    }, 1500);
 
     return () => clearTimeout(timer);
   }, []);
