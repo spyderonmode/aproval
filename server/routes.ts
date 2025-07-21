@@ -2716,10 +2716,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Position must be an integer between 1 and 15" });
       }
 
-      console.log(`\n=== MOVE REQUEST ===`);
-      console.log(`Game ID: ${gameId}`);
-      console.log(`User ID: ${userId}`);
-      console.log(`Position: ${position}`);
+      // Move request processing
 
       // Always fetch fresh game state to avoid stale data
       const game = await storage.getGameById(gameId);
@@ -2727,11 +2724,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "Game not found" });
       }
 
-      console.log(`Current game state (fresh from DB):`);
-      console.log(`- Player X: ${game.playerXId}`);
-      console.log(`- Player O: ${game.playerOId}`);
-      console.log(`- Current player: ${game.currentPlayer}`);
-      console.log(`- Board: ${JSON.stringify(game.board)}`);
+      // Validating game state
 
       if (game.status !== 'active') {
         console.log(`❌ MOVE REJECTED: Game status is ${game.status}, not active`);
@@ -2742,8 +2735,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const isPlayerX = game.playerXId === userId;
       const isPlayerO = game.playerOId === userId;
       
-      console.log(`- Is Player X: ${isPlayerX}`);
-      console.log(`- Is Player O: ${isPlayerO}`);
+      // Validating player roles
       
       if (!isPlayerX && !isPlayerO) {
         console.log(`❌ MOVE REJECTED: User ${userId} is not a player in this game`);
@@ -2751,8 +2743,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       const playerSymbol = isPlayerX ? 'X' : 'O';
-      console.log(`- Player symbol: ${playerSymbol}`);
-      console.log(`- Turn validation: ${game.currentPlayer} === ${playerSymbol} ? ${game.currentPlayer === playerSymbol}`);
+      // Validating turn
       
       if (game.currentPlayer !== playerSymbol) {
         console.log(`❌ MOVE REJECTED: Not your turn. Current: ${game.currentPlayer}, User: ${playerSymbol}`);
@@ -2804,13 +2795,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
         
         // Check and grant achievements for the winner (only for online games)
         if (game.roomId && game.gameMode === 'online') {
-          console.log(`🏆 Checking achievements for winner: ${userId} in online game`);
+          // Checking achievements for winner
           try {
             const newAchievements = await storage.checkAndGrantAchievements(userId, 'win', {
               winCondition: winResult.condition,
               isOnlineGame: true
             });
-            console.log(`🏆 Granted ${newAchievements.length} new achievements:`, newAchievements.map(a => a.achievementName));
+            // Achievement processing completed
           } catch (error) {
             console.error('🏆 Error checking achievements for winner:', error);
           }
@@ -2966,10 +2957,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         
         // Verify the update was successful by fetching fresh game state
         const updatedGame = await storage.getGameById(gameId);
-        console.log(`✅ MOVE SUCCESSFUL: ${playerSymbol} at position ${position}`);
-        console.log(`- Next player: ${nextPlayer}`);
-        console.log(`- Database current player: ${updatedGame?.currentPlayer}`);
-        console.log(`- Broadcasting to room: ${game.roomId}`);
+        // Move successful, broadcasting to room
         
         // Broadcast move to room AFTER updating current player (INCLUDING SPECTATORS)
         if (game.roomId && roomConnections.has(game.roomId)) {
@@ -3037,19 +3025,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
             } : null)
           });
           
-          // Enhanced broadcast with debugging
-          console.log(`📡 Broadcasting move to ${roomUsers.size} users:`, {
-            position,
-            player: playerSymbol,
-            currentPlayer: actualCurrentPlayer,
-            nextPlayerExpected: nextPlayer,
-            gameId: gameId.substring(0, 8)
-          });
-          
+          // Broadcast move to all room users
           roomUsers.forEach(connectionId => {
             const connection = connections.get(connectionId);
             if (connection && connection.ws.readyState === WebSocket.OPEN) {
-              console.log(`📡 Sending move to user ${connection.userId}: currentPlayer=${actualCurrentPlayer}`);
               connection.ws.send(moveMessage);
             }
           });
@@ -3058,7 +3037,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         // Handle Bot move if it's an online game against a bot
         const isGameAgainstBot = game.playerOId && AI_BOTS.some(bot => bot.id === game.playerOId);
         if (game.gameMode === 'online' && isGameAgainstBot && nextPlayer === 'O') {
-          console.log(`🤖 Bot's turn - ${game.playerOId} making move`);
+          // Bot's turn to make a move
           setTimeout(async () => {
             try {
               // Find the bot information
@@ -3072,7 +3051,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
               const aiBot = new AIPlayer('O', botInfo.difficulty);
               const botMove = aiBot.makeMove(newBoard);
               
-              console.log(`🤖 ${botInfo.displayName} (${botInfo.difficulty}) chose position ${botMove}`);
+              // Bot selected move
               
               const botBoard = makeMove(newBoard, botMove, 'O');
               
@@ -3240,7 +3219,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
                     }
                   });
                   
-                  console.log(`🤖 Broadcasting bot move to ${roomUsers.size} users`);
+                  // Broadcasting bot move to room users
                   roomUsers.forEach(connectionId => {
                     const connection = connections.get(connectionId);
                     if (connection && connection.ws.readyState === WebSocket.OPEN) {
@@ -3539,7 +3518,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
               const userId = conn.userId;
               const playerName = conn.displayName || conn.username || 'Unknown Player';
               
-              console.log(`🏠 Processing leave_room message for ${playerName} (${userId}) in room ${roomId}`);
+              // Processing room leave request
               
               // Check if user is in an active game
               const userState = userRoomStates.get(userId);

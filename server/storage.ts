@@ -582,22 +582,15 @@ export class DatabaseStorage implements IStorage {
         )
       );
 
-    console.log(`🔄 Recalculating stats for ${allUsers.length} users...`);
-
+    // Recalculating user statistics in background
     for (const user of allUsers) {
       await this.recalculateUserStats(user.id);
-      console.log(`✅ Updated stats for user: ${user.id}`);
     }
-
-    console.log('🎉 User stats recalculation completed!');
     
-    // Now ensure all achievements are recalculated for all users
-    console.log('🔄 Recalculating achievements for all users...');
+    // Recalculating achievements in background
     for (const user of allUsers) {
       await this.recalculateUserAchievements(user.id);
-      console.log(`✅ Updated achievements for user: ${user.id}`);
     }
-    console.log('🎉 User achievement recalculation completed!');
   }
 
   async resetAllBotStats(): Promise<void> {
@@ -972,11 +965,11 @@ export class DatabaseStorage implements IStorage {
 
   async recalculateUserAchievements(userId: string): Promise<{ removed: number; added: Achievement[] }> {
     try {
-      console.log(`🔄 Recalculating achievements for user: ${userId}`);
+      // Recalculating achievements for user
       
       // Get current user stats
       const userStats = await this.getUserStats(userId);
-      console.log(`📊 User stats:`, userStats);
+      // Processing user statistics
       
       // Get existing achievements count first
       const existingAchievements = await db
@@ -984,7 +977,7 @@ export class DatabaseStorage implements IStorage {
         .from(achievements)
         .where(eq(achievements.userId, userId));
       
-      console.log(`🏆 Existing achievements count: ${existingAchievements.length}`);
+      // Processing existing achievements
       
       // Remove all existing achievements for this user
       await db
@@ -992,14 +985,14 @@ export class DatabaseStorage implements IStorage {
         .where(eq(achievements.userId, userId));
       
       const removedCount = existingAchievements.length;
-      console.log(`🗑️ Removed ${removedCount} existing achievements`);
+      // Removed existing achievements
       
       // Define correct achievement conditions based on current stats only
       const newAchievements: Achievement[] = [];
       
       // Only grant achievements that the user actually qualifies for
       const totalGames = userStats.wins + userStats.losses + userStats.draws;
-      console.log(`📊 Detailed stats - wins: ${userStats.wins}, losses: ${userStats.losses}, draws: ${userStats.draws}, total: ${totalGames}`);
+      // Processing detailed statistics
       
       // Get user for win streak data
       const user = await this.getUser(userId);
@@ -1093,7 +1086,7 @@ export class DatabaseStorage implements IStorage {
       for (const rule of achievementRules) {
         if (rule.condition) {
           try {
-            console.log(`✅ Creating achievement: ${rule.type} for user with ${userStats.wins} wins`);
+            // Creating achievement
             
             // Create achievement with direct database insert instead of using createAchievement
             const [newAchievement] = await db
@@ -1110,7 +1103,7 @@ export class DatabaseStorage implements IStorage {
             
             if (newAchievement) {
               newAchievements.push(newAchievement);
-              console.log(`✅ Achievement created: ${rule.type}`);
+              // Achievement created
             }
           } catch (error) {
             console.error(`❌ Error creating achievement ${rule.type}:`, error);
@@ -1118,7 +1111,7 @@ export class DatabaseStorage implements IStorage {
         }
       }
 
-      console.log(`🎉 Added ${newAchievements.length} new achievements`);
+      // Achievement processing completed
       return { removed: removedCount, added: newAchievements };
     } catch (error) {
       console.error('❌ Error during achievement recalculation:', error);

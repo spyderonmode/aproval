@@ -1,0 +1,357 @@
+✅ Creating achievement: master_of_diagonals for user with 78 wins
+✅ Achievement created: master_of_diagonals
+✅ Creating achievement: speed_demon for user with 78 wins
+✅ Achievement created: speed_demon
+✅ Creating achievement: legend for user with 78 wins
+✅ Achievement created: legend
+✅ Creating achievement: veteran_player for user with 78 wins
+✅ Achievement created: veteran_player
+🎉 Added 7 new achievements
+✅ Updated achievements for user: c9122c48-3c24-4891-a6b5-f02aa8362af2
+🔄 Recalculating achievements for user: player_35
+📊 User stats: { wins: 0, losses: 0, draws: 0 }
+🏆 Existing achievements count: 0
+🗑️ Removed 0 existing achievements
+📊 Detailed stats - wins: 0, losses: 0, draws: 0, total: 0
+🎉 Added 0 new achievements
+✅ Updated achievements for user: player_35
+🔄 Recalculating achievements for user: player_19
+📊 User stats: { wins: 1, losses: 2, draws: 0 }
+🏆 Existing achievements count: 1
+🗑️ Removed 1 existing achievements
+📊 Detailed stats - wins: 1, losses: 2, draws: 0, total: 3
+✅ Creating achievement: first_win for user with 1 wins
+✅ Achievement created: first_win
+🎉 Added 1 new achievements
+✅ Updated achievements for user: player_19
+🔄 Recalculating achievements for user: player_87
+📊 User stats: { wins: 0, losses: 3, draws: 0 }
+🏆 Existing achievements count: 0
+🗑️ Removed 0 existing achievements
+📊 Detailed stats - wins: 0, losses: 3, draws: 0, total: 3
+🎉 Added 0 new achievements
+✅ Updated achievements for user: player_87
+🔄 Recalculating achievements for user: player_89
+📊 User stats: { wins: 1, losses: 0, draws: 0 }
+🏆 Existing achievements count: 1
+🗑️ Removed 1 existing achievements
+📊 Detailed stats - wins: 1, losses: 0, draws: 0, total: 1
+✅ Creating achievement: first_win for user with 1 wins
+✅ Achievement created: first_win
+🎉 Added 1 new achievements
+✅ Updated achievements for user: player_89
+🔄 Recalculating achievements for user: player_91
+📊 User stats: { wins: 0, losses: 1, draws: 0 }
+🏆 Existing achievements count: 0
+🗑️ Removed 0 existing achievements
+📊 Detailed stats - wins: 0, losses: 1, draws: 0, total: 1
+🎉 Added 0 new achievements
+✅ Updated achievements for user: player_91
+🔄 Recalculating achievements for user: player_81
+📊 User stats: { wins: 2, losses: 3, draws: 0 }
+🏆 Existing achievements count: 1
+🗑️ Removed 1 existing achievements
+📊 Detailed stats - wins: 2, losses: 3, draws: 0, total: 5
+✅ Creating achievement: first_win for user with 2 wins
+✅ Achievement created: first_win
+🎉 Added 1 new achievements
+✅ Updated achievements for user: player_81
+🔄 Recalculating achievements for user: player_74
+📊 User stats: { wins: 1, losses: 0, draws: 0 }
+🏆 Existing achievements count: 1
+🗑️ Removed 1 existing achievements
+📊 Detailed stats - wins: 1, losses: 0, draws: 0, total: 1
+✅ Creating achievement: first_win for user with 1 wins
+✅ Achievement created: first_win
+🎉 Added 1 new achievements
+✅ Updated achievements for user: player_74
+🔄 Recalculating achievements for user: player_82
+📊 User stats: { wins: 0, losses: 1, draws: 0 }
+🏆 Existing achievements count: 0
+🗑️ Removed 0 existing achievements
+📊 Detailed stats - wins: 0, losses: 1, draws: 0, total: 1
+🎉 Added 0 new achievements
+✅ Updated achievements for user: player_82
+🔄 Recalculating achievements for user: player_22
+📊 User stats: { wins: 0, losses: 0, draws: 0 }
+🏆 Existing achievements count: 0
+🗑️ Removed 0 existing achievements
+📊 Detailed stats - wins: 0, losses: 0, draws: 0, total: 0
+🎉 Added 0 new achievements
+✅ Updated achievements for user: player_22
+🔄 Recalculating achievements for user: player_75
+📊 User stats: { wins: 1, losses: 0, draws: 0 }
+🏆 Existing achievements count: 1
+🗑️ Removed 1 existing achievements
+📊 Detailed stats - wins: 1, losses: 0, draws: 0, total: 1
+8:36:45 AM [express] GET /api/room-invitations 401 in 1ms :: {"error":"Not authenticated"}
+✅ Creating achievement: first_win for user with 1 wins
+✅ Achievement created: first_win
+🎉 Added 1 new achievements
+✅ Updated achievements for user: player_75
+🔄 Recalculating achievements for user: player_14
+📊 User stats: { wins: 0, losses: 1, draws: 0 }
+🏆 Existing achievements count: 0
+🗑️ Removed 0 existing achievements
+📊 Detailed stats - wins: 0, losses: 1, draws: 0, total: 1
+🎉 Added 0 new achievements
+✅ Updated achievements for user: player_14
+🔄 Recalculating achievements for user: player_11
+📊 User stats: { wins: 0, losses: 0, draws: 0 }
+🏆 Existing achievements count: 0
+🗑️ Removed 0 existing achievements
+📊 Detailed stats - wins: 0, losses: 0, draws: 0, total: 0
+🎉 Added 0 new achievements
+✅ Updated achievements for user: player_11
+🔄 Recalculating achievements for user: player_77
+📊 User stats: { wins: 0, losses: 0, draws: 0 }
+🏆 Existing achievements count: 0
+🗑️ Removed 0 existing achievements
+📊 Detailed stats - wins: 0, losses: 0, draws: 0, total: 0
+8:36:49 AM [express] GET /api/auth/user 401 in 1ms :: {"error":"Not authenticated"}
+🎉 Added 0 new achievements
+✅ Updated achievements for user: player_77
+🔄 Recalculating achievements for user: player_92
+📊 User stats: { wins: 2, losses: 1, draws: 0 }
+🏆 Existing achievements count: 1
+🗑️ Removed 1 existing achievements
+📊 Detailed stats - wins: 2, losses: 1, draws: 0, total: 3
+✅ Creating achievement: first_win for user with 2 wins
+✅ Achievement created: first_win
+🎉 Added 1 new achievements
+✅ Updated achievements for user: player_92
+🔄 Recalculating achievements for user: player_15
+📊 User stats: { wins: 0, losses: 2, draws: 0 }
+🏆 Existing achievements count: 0
+🗑️ Removed 0 existing achievements
+📊 Detailed stats - wins: 0, losses: 2, draws: 0, total: 2
+🎉 Added 0 new achievements
+✅ Updated achievements for user: player_15
+🔄 Recalculating achievements for user: player_94
+📊 User stats: { wins: 1, losses: 0, draws: 0 }
+🏆 Existing achievements count: 1
+🗑️ Removed 1 existing achievements
+📊 Detailed stats - wins: 1, losses: 0, draws: 0, total: 1
+✅ Creating achievement: first_win for user with 1 wins
+✅ Achievement created: first_win
+🎉 Added 1 new achievements
+✅ Updated achievements for user: player_94
+🔄 Recalculating achievements for user: player_3
+📊 User stats: { wins: 0, losses: 1, draws: 0 }
+🏆 Existing achievements count: 0
+🗑️ Removed 0 existing achievements
+📊 Detailed stats - wins: 0, losses: 1, draws: 0, total: 1
+🎉 Added 0 new achievements
+✅ Updated achievements for user: player_3
+🔄 Recalculating achievements for user: player_5
+📊 User stats: { wins: 0, losses: 1, draws: 0 }
+🏆 Existing achievements count: 0
+🗑️ Removed 0 existing achievements
+📊 Detailed stats - wins: 0, losses: 1, draws: 0, total: 1
+🎉 Added 0 new achievements
+✅ Updated achievements for user: player_5
+🔄 Recalculating achievements for user: player_12
+📊 User stats: { wins: 0, losses: 2, draws: 0 }
+🏆 Existing achievements count: 0
+🗑️ Removed 0 existing achievements
+📊 Detailed stats - wins: 0, losses: 2, draws: 0, total: 2
+🎉 Added 0 new achievements
+✅ Updated achievements for user: player_12
+🔄 Recalculating achievements for user: e08f9202-f1d0-4adf-abc7-f5fbca314dc3
+📊 User stats: { wins: 40, losses: 60, draws: 10 }
+🏆 Existing achievements count: 5
+🗑️ Removed 5 existing achievements
+📊 Detailed stats - wins: 40, losses: 60, draws: 10, total: 110
+✅ Creating achievement: first_win for user with 40 wins
+✅ Achievement created: first_win
+✅ Creating achievement: win_streak_5 for user with 40 wins
+✅ Achievement created: win_streak_5
+✅ Creating achievement: master_of_diagonals for user with 40 wins
+✅ Achievement created: master_of_diagonals
+✅ Creating achievement: speed_demon for user with 40 wins
+✅ Achievement created: speed_demon
+✅ Creating achievement: veteran_player for user with 40 wins
+✅ Achievement created: veteran_player
+🎉 Added 5 new achievements
+✅ Updated achievements for user: e08f9202-f1d0-4adf-abc7-f5fbca314dc3
+🔄 Recalculating achievements for user: player_2
+📊 User stats: { wins: 0, losses: 1, draws: 0 }
+🏆 Existing achievements count: 0
+🗑️ Removed 0 existing achievements
+📊 Detailed stats - wins: 0, losses: 1, draws: 0, total: 1
+🎉 Added 0 new achievements
+✅ Updated achievements for user: player_2
+🔄 Recalculating achievements for user: e94fbb01-8a59-4773-869d-345b26b9046b
+📊 User stats: { wins: 2, losses: 6, draws: 0 }
+🏆 Existing achievements count: 1
+🗑️ Removed 1 existing achievements
+📊 Detailed stats - wins: 2, losses: 6, draws: 0, total: 8
+✅ Creating achievement: first_win for user with 2 wins
+✅ Achievement created: first_win
+🎉 Added 1 new achievements
+✅ Updated achievements for user: e94fbb01-8a59-4773-869d-345b26b9046b
+🔄 Recalculating achievements for user: player_7
+📊 User stats: { wins: 0, losses: 3, draws: 0 }
+🏆 Existing achievements count: 0
+🗑️ Removed 0 existing achievements
+📊 Detailed stats - wins: 0, losses: 3, draws: 0, total: 3
+🎉 Added 0 new achievements
+✅ Updated achievements for user: player_7
+🔄 Recalculating achievements for user: player_20
+📊 User stats: { wins: 0, losses: 7, draws: 0 }
+🏆 Existing achievements count: 0
+🗑️ Removed 0 existing achievements
+📊 Detailed stats - wins: 0, losses: 7, draws: 0, total: 7
+🎉 Added 0 new achievements
+✅ Updated achievements for user: player_20
+🔄 Recalculating achievements for user: player_34
+📊 User stats: { wins: 1, losses: 0, draws: 0 }
+🏆 Existing achievements count: 1
+🗑️ Removed 1 existing achievements
+📊 Detailed stats - wins: 1, losses: 0, draws: 0, total: 1
+✅ Creating achievement: first_win for user with 1 wins
+✅ Achievement created: first_win
+🎉 Added 1 new achievements
+✅ Updated achievements for user: player_34
+🔄 Recalculating achievements for user: player_52
+📊 User stats: { wins: 0, losses: 1, draws: 1 }
+🏆 Existing achievements count: 0
+🗑️ Removed 0 existing achievements
+📊 Detailed stats - wins: 0, losses: 1, draws: 1, total: 2
+🎉 Added 0 new achievements
+✅ Updated achievements for user: player_52
+🔄 Recalculating achievements for user: player_31
+📊 User stats: { wins: 0, losses: 0, draws: 0 }
+🏆 Existing achievements count: 0
+🗑️ Removed 0 existing achievements
+📊 Detailed stats - wins: 0, losses: 0, draws: 0, total: 0
+🎉 Added 0 new achievements
+✅ Updated achievements for user: player_31
+🔄 Recalculating achievements for user: player_36
+📊 User stats: { wins: 0, losses: 0, draws: 0 }
+🏆 Existing achievements count: 0
+🗑️ Removed 0 existing achievements
+📊 Detailed stats - wins: 0, losses: 0, draws: 0, total: 0
+🎉 Added 0 new achievements
+✅ Updated achievements for user: player_36
+🔄 Recalculating achievements for user: player_28
+📊 User stats: { wins: 0, losses: 1, draws: 0 }
+🏆 Existing achievements count: 0
+🗑️ Removed 0 existing achievements
+📊 Detailed stats - wins: 0, losses: 1, draws: 0, total: 1
+🎉 Added 0 new achievements
+✅ Updated achievements for user: player_28
+🔄 Recalculating achievements for user: player_25
+📊 User stats: { wins: 0, losses: 8, draws: 0 }
+🏆 Existing achievements count: 0
+🗑️ Removed 0 existing achievements
+📊 Detailed stats - wins: 0, losses: 8, draws: 0, total: 8
+🎉 Added 0 new achievements
+✅ Updated achievements for user: player_25
+🔄 Recalculating achievements for user: player_33
+📊 User stats: { wins: 0, losses: 0, draws: 0 }
+🏆 Existing achievements count: 0
+🗑️ Removed 0 existing achievements
+📊 Detailed stats - wins: 0, losses: 0, draws: 0, total: 0
+🎉 Added 0 new achievements
+✅ Updated achievements for user: player_33
+🔄 Recalculating achievements for user: player_37
+📊 User stats: { wins: 1, losses: 0, draws: 0 }
+🏆 Existing achievements count: 1
+🗑️ Removed 1 existing achievements
+📊 Detailed stats - wins: 1, losses: 0, draws: 0, total: 1
+✅ Creating achievement: first_win for user with 1 wins
+✅ Achievement created: first_win
+🎉 Added 1 new achievements
+✅ Updated achievements for user: player_37
+🔄 Recalculating achievements for user: player_60
+📊 User stats: { wins: 0, losses: 0, draws: 0 }
+🏆 Existing achievements count: 0
+🗑️ Removed 0 existing achievements
+📊 Detailed stats - wins: 0, losses: 0, draws: 0, total: 0
+🎉 Added 0 new achievements
+✅ Updated achievements for user: player_60
+🔄 Recalculating achievements for user: player_58
+📊 User stats: { wins: 0, losses: 0, draws: 0 }
+🏆 Existing achievements count: 0
+🗑️ Removed 0 existing achievements
+📊 Detailed stats - wins: 0, losses: 0, draws: 0, total: 0
+🎉 Added 0 new achievements
+✅ Updated achievements for user: player_58
+🔄 Recalculating achievements for user: player_85
+📊 User stats: { wins: 0, losses: 0, draws: 0 }
+🏆 Existing achievements count: 0
+🗑️ Removed 0 existing achievements
+📊 Detailed stats - wins: 0, losses: 0, draws: 0, total: 0
+🎉 Added 0 new achievements
+✅ Updated achievements for user: player_85
+🔄 Recalculating achievements for user: player_68
+📊 User stats: { wins: 0, losses: 0, draws: 0 }
+🏆 Existing achievements count: 0
+🗑️ Removed 0 existing achievements
+📊 Detailed stats - wins: 0, losses: 0, draws: 0, total: 0
+🎉 Added 0 new achievements
+✅ Updated achievements for user: player_68
+🔄 Recalculating achievements for user: player_61
+📊 User stats: { wins: 3, losses: 0, draws: 0 }
+🏆 Existing achievements count: 2
+🗑️ Removed 2 existing achievements
+📊 Detailed stats - wins: 3, losses: 0, draws: 0, total: 3
+✅ Creating achievement: first_win for user with 3 wins
+✅ Achievement created: first_win
+✅ Creating achievement: master_of_diagonals for user with 3 wins
+✅ Achievement created: master_of_diagonals
+🎉 Added 2 new achievements
+✅ Updated achievements for user: player_61
+🔄 Recalculating achievements for user: player_70
+📊 User stats: { wins: 0, losses: 0, draws: 0 }
+🏆 Existing achievements count: 0
+🗑️ Removed 0 existing achievements
+📊 Detailed stats - wins: 0, losses: 0, draws: 0, total: 0
+🎉 Added 0 new achievements
+✅ Updated achievements for user: player_70
+🔄 Recalculating achievements for user: player_66
+📊 User stats: { wins: 0, losses: 0, draws: 0 }
+🏆 Existing achievements count: 0
+🗑️ Removed 0 existing achievements
+📊 Detailed stats - wins: 0, losses: 0, draws: 0, total: 0
+🎉 Added 0 new achievements
+✅ Updated achievements for user: player_66
+🔄 Recalculating achievements for user: player_50
+📊 User stats: { wins: 1, losses: 0, draws: 0 }
+🏆 Existing achievements count: 1
+🗑️ Removed 1 existing achievements
+📊 Detailed stats - wins: 1, losses: 0, draws: 0, total: 1
+✅ Creating achievement: first_win for user with 1 wins
+✅ Achievement created: first_win
+🎉 Added 1 new achievements
+✅ Updated achievements for user: player_50
+🔄 Recalculating achievements for user: player_73
+📊 User stats: { wins: 0, losses: 0, draws: 0 }
+🏆 Existing achievements count: 0
+🗑️ Removed 0 existing achievements
+📊 Detailed stats - wins: 0, losses: 0, draws: 0, total: 0
+🎉 Added 0 new achievements
+✅ Updated achievements for user: player_73
+🔄 Recalculating achievements for user: player_59
+📊 User stats: { wins: 0, losses: 1, draws: 0 }
+🏆 Existing achievements count: 0
+🗑️ Removed 0 existing achievements
+📊 Detailed stats - wins: 0, losses: 1, draws: 0, total: 1
+🎉 Added 0 new achievements
+✅ Updated achievements for user: player_59
+🔄 Recalculating achievements for user: player_57
+📊 User stats: { wins: 0, losses: 0, draws: 0 }
+🏆 Existing achievements count: 0
+🗑️ Removed 0 existing achievements
+📊 Detailed stats - wins: 0, losses: 0, draws: 0, total: 0
+🎉 Added 0 new achievements
+✅ Updated achievements for user: player_57
+🔄 Recalculating achievements for user: player_56
+📊 User stats: { wins: 1, losses: 0, draws: 0 }
+🏆 Existing achievements count: 1
+🗑️ Removed 1 existing achievements
+📊 Detailed stats - wins: 1, losses: 0, draws: 0, total: 1
+✅ Creating achievement: first_win for user with 1 wins
+✅ Achievement created: first_win
+🎉 Added 1 new achievements
