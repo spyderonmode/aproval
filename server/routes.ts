@@ -216,7 +216,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           } : null,
           gameMode: activeGame.gameMode,
           serverTime: new Date().toISOString(), // Add server time for consistent timer calculation
-          timeRemaining: Math.max(0, 10 * 60 * 1000 - (Date.now() - new Date(activeGame.lastMoveAt || activeGame.createdAt).getTime())) // Calculate remaining time on server
+          timeRemaining: Math.max(0, 10 * 60 * 1000 - (Date.now() - new Date(activeGame.createdAt).getTime())) // Calculate remaining time from game start
         };
         
         // Get room info
@@ -2503,7 +2503,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           const refreshedGameWithPlayers = {
             ...refreshedGame,
             serverTime: new Date().toISOString(),
-            timeRemaining: Math.max(0, 10 * 60 * 1000 - (Date.now() - new Date(refreshedGame.lastMoveAt || refreshedGame.createdAt).getTime())),
+            timeRemaining: Math.max(0, 10 * 60 * 1000 - (Date.now() - new Date(refreshedGame.createdAt).getTime())),
             playerXInfo: playerXInfo ? {
               ...playerXInfo,
               achievements: playerXAchievements.slice(0, 3)
@@ -2994,10 +2994,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
           // Use the verified current player from database
           const actualCurrentPlayer = updatedGame?.currentPlayer || nextPlayer;
           
-          // Calculate remaining time for timer synchronization
+          // Calculate remaining time for timer synchronization - use original game creation time, not last move
           const currentTime = new Date();
-          const lastActivity = new Date(updatedGame?.lastMoveAt || game.lastMoveAt || game.createdAt);
-          const timeElapsed = currentTime.getTime() - lastActivity.getTime();
+          const gameStartTime = new Date(game.createdAt);
+          const timeElapsed = currentTime.getTime() - gameStartTime.getTime();
           const timeRemaining = Math.max(0, 10 * 60 * 1000 - timeElapsed);
 
           // Prepare the message once to avoid JSON.stringify overhead
