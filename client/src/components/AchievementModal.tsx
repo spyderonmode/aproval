@@ -152,11 +152,7 @@ export function AchievementModal({ open, onClose, userId, user }: AchievementMod
 
   const getAchievementsByCategory = (types: string[]) => {
     if (!achievements) return [];
-    console.log('🏆 DEBUG: All achievements data:', achievements);
-    console.log('🏆 DEBUG: Looking for types:', types);
-    const filtered = achievements.filter((achievement: any) => types.includes(achievement.achievementType));
-    console.log('🏆 DEBUG: Filtered achievements:', filtered);
-    return filtered;
+    return achievements.filter((achievement: any) => types.includes(achievement.achievementType));
   };
 
   const allPossibleAchievements = [
@@ -207,7 +203,6 @@ export function AchievementModal({ open, onClose, userId, user }: AchievementMod
                     <div className="space-y-3">
                       {possibleAchievements.map((possible) => {
                         const earned = categoryAchievements.find((a: any) => a.achievementType === possible.type);
-                        console.log(`🏆 DEBUG: Checking ${possible.type}, found:`, earned);
                         
                         if (earned) {
                           return (

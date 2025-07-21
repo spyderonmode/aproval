@@ -80,14 +80,14 @@ function Router() {
     }
   }, [isLoading, hasInitiallyLoaded]);
 
-  // Force loading to complete after 0.5 seconds to prevent infinite loading
+  // Force loading to complete after 0.1 seconds to prevent infinite loading
   useEffect(() => {
     const timer = setTimeout(() => {
       if (!hasInitiallyLoaded) {
         setHasInitiallyLoaded(true);
         setIsInitialLoad(false);
       }
-    }, 500);
+    }, 100);
 
     return () => clearTimeout(timer);
   }, [hasInitiallyLoaded]);
@@ -100,8 +100,8 @@ function Router() {
     }
   }, [location, hasInitiallyLoaded]);
 
-  // Show loading screen ONLY on very first app load, never on subsequent navigations
-  if (isLoading && !hasInitiallyLoaded && isInitialLoad) {
+  // Disable loading screen entirely to prevent authentication issues
+  if (false && isLoading && !hasInitiallyLoaded && isInitialLoad) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center relative overflow-hidden">
         {/* Background animated particles */}
