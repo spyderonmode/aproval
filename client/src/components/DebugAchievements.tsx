@@ -12,6 +12,7 @@ export function DebugAchievements() {
     setIsLoading(true);
     setResult(null);
     try {
+      console.log('Making request to debug endpoint...');
       const response = await fetch('/api/debug/recalculate-achievements', {
         method: 'POST',
         headers: {
@@ -20,12 +21,24 @@ export function DebugAchievements() {
         credentials: 'include'
       });
       
+      console.log('Response status:', response.status);
+      console.log('Response headers:', response.headers);
+      
+      const responseText = await response.text();
+      console.log('Raw response:', responseText);
+      
       if (!response.ok) {
-        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        throw new Error(`HTTP ${response.status}: ${response.statusText} - ${responseText}`);
       }
       
-      const data = await response.json();
-      console.log('Debug response:', data);
+      let data;
+      try {
+        data = JSON.parse(responseText);
+      } catch (parseError) {
+        throw new Error(`Invalid JSON response: ${responseText.substring(0, 100)}...`);
+      }
+      
+      console.log('Parsed response:', data);
       setResult(data);
     } catch (error) {
       console.error('Error recalculating achievements:', error);

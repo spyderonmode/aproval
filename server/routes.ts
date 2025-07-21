@@ -552,49 +552,69 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Debug endpoint to manually trigger achievement recalculation
   app.post('/api/debug/recalculate-achievements', requireAuth, async (req: any, res) => {
     try {
-      const userId = req.session.user.userId;
-      console.log(`🔧 DEBUG: Manually recalculating achievements for user: ${userId}`);
+      console.log('🔧 DEBUG: Starting debug endpoint');
+      const userId = req.session?.user?.userId;
+      
+      if (!userId) {
+        console.log('🔧 DEBUG: No user ID found in session');
+        return res.status(401).json({ error: "No user session found" });
+      }
+      
+      console.log(`🔧 DEBUG: Processing for user: ${userId}`);
       
       // Get current user stats for debugging
       const userStats = await storage.getUserStats(userId);
-      const user = await storage.getUser(userId);
-      
       console.log(`🔧 DEBUG: User stats:`, userStats);
-      console.log(`🔧 DEBUG: User win streaks - current: ${user?.currentWinStreak}, best: ${user?.bestWinStreak}`);
+      
+      const user = await storage.getUser(userId);
+      console.log(`🔧 DEBUG: User data:`, {
+        id: user?.id,
+        currentWinStreak: user?.currentWinStreak,
+        bestWinStreak: user?.bestWinStreak
+      });
       
       // Get current achievements before recalculation
       const achievementsBefore = await storage.getUserAchievements(userId);
-      console.log(`🔧 DEBUG: Achievements before:`, achievementsBefore.map(a => a.achievementType));
+      console.log(`🔧 DEBUG: Achievements before (${achievementsBefore.length}):`, achievementsBefore.map(a => a.achievementType));
       
       // Trigger achievement recalculation
+      console.log(`🔧 DEBUG: Starting recalculation...`);
       const result = await storage.recalculateUserAchievements(userId);
+      console.log(`🔧 DEBUG: Recalculation result:`, result);
       
       // Get achievements after recalculation
       const achievementsAfter = await storage.getUserAchievements(userId);
-      console.log(`🔧 DEBUG: Achievements after:`, achievementsAfter.map(a => a.achievementType));
-      
-      console.log(`🔧 DEBUG: Recalculation result:`, result);
+      console.log(`🔧 DEBUG: Achievements after (${achievementsAfter.length}):`, achievementsAfter.map(a => a.achievementType));
       
       const debugData = { 
         success: true, 
-        userStats,
+        userId,
+        userStats: userStats || {},
         winStreaks: {
-          current: user?.currentWinStreak,
-          best: user?.bestWinStreak
+          current: user?.currentWinStreak || 0,
+          best: user?.bestWinStreak || 0
         },
         achievementsBefore: achievementsBefore.length,
         achievementsAfter: achievementsAfter.length,
         achievementTypes: achievementsAfter.map(a => a.achievementType),
         hasWinStreak5: achievementsAfter.some(a => a.achievementType === 'win_streak_5'),
         hasWinStreak10: achievementsAfter.some(a => a.achievementType === 'win_streak_10'),
-        result 
+        result: result || {}
       };
       
-      console.log(`🔧 DEBUG: Response data:`, debugData);
-      res.json(debugData);
+      console.log(`🔧 DEBUG: Sending response:`, JSON.stringify(debugData, null, 2));
+      res.setHeader('Content-Type', 'application/json');
+      res.status(200).json(debugData);
     } catch (error) {
       console.error("🔧 DEBUG ERROR:", error);
-      res.status(500).json({ message: "Failed to recalculate achievements", error: error.message });
+      const errorResponse = { 
+        success: false,
+        error: error.message || "Unknown error occurred",
+        stack: error.stack
+      };
+      console.log(`🔧 DEBUG: Sending error response:`, errorResponse);
+      res.setHeader('Content-Type', 'application/json');
+      res.status(500).json(errorResponse);
     }
   });
 
