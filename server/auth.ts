@@ -236,6 +236,16 @@ export function setupAuth(app: Express) {
       pruneSessionInterval: false, // Disable automatic pruning to avoid issues
       ttl: 24 * 60 * 60, // 24 hours session TTL
     });
+    
+    // Test the session store connection
+    sessionStore.on('connect', () => {
+      console.log('✅ PostgreSQL session store connected successfully');
+    });
+    
+    sessionStore.on('disconnect', () => {
+      console.log('⚠️ PostgreSQL session store disconnected');
+    });
+    
     console.log('✅ PostgreSQL session store initialized with existing pool');
   } catch (error) {
     console.log('⚠️ PostgreSQL session store failed, falling back to memory store:', error.message);
