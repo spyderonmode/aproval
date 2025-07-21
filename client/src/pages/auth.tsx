@@ -10,6 +10,7 @@ import { EmailVerificationModal } from "@/components/EmailVerificationModal";
 import { ForgotPasswordModal } from "@/components/ForgotPasswordModal";
 import { GamepadIcon, Mail } from "lucide-react";
 import { useTranslation } from "@/contexts/LanguageContext";
+import { queryClient } from "@/lib/queryClient";
 
 
 export default function Auth() {
@@ -38,14 +39,16 @@ export default function Auth() {
         });
 
         if (response.ok) {
+          // Invalidate auth query to refresh user state immediately
+          await queryClient.invalidateQueries({ queryKey: ["/api/auth/user"] });
+          
           toast({
             title: t('loginSuccessful'),
             description: t('welcomeBack'),
           });
-          // Use proper routing instead of full page reload
-          setTimeout(() => {
-            setLocation('/');
-          }, 500);
+          
+          // Redirect immediately after invalidating query
+          setLocation('/');
         } else {
           const errorData = await response.json();
           
