@@ -561,8 +561,9 @@ export class DatabaseStorage implements IStorage {
       bestWinStreak: bestWinStreak
     }).where(eq(users.id, userId));
 
-    // Ensure achievements are up to date after stats recalculation
-    await this.ensureAllAchievementsUpToDate(userId);
+    // Skip expensive achievement validation during normal stats updates for performance
+    // Only run during administrative operations
+    // await this.ensureAllAchievementsUpToDate(userId);
   }
 
   async recalculateAllUserStats(): Promise<void> {
@@ -1243,8 +1244,8 @@ export class DatabaseStorage implements IStorage {
       }
     }
 
-    // After checking immediate achievements, ensure all past milestones are covered
-    await this.ensureAllAchievementsUpToDate(userId);
+    // Only run expensive validation during administrative operations, not during normal gameplay
+    // await this.ensureAllAchievementsUpToDate(userId); // Commented out to improve move performance
 
     return newAchievements;
   }
