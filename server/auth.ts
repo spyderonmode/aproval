@@ -6,7 +6,7 @@ import session from 'express-session';
 import connectPgSimple from 'connect-pg-simple';
 import MemoryStore from 'memorystore';
 import { storage } from './storage';
-import { db, pool } from './db';
+import { db } from './db';
 import { sql } from 'drizzle-orm';
 import { createEmailService } from './emailService';
 
@@ -228,9 +228,11 @@ export function setupAuth(app: Express) {
   
   let sessionStore;
   try {
-    // Use the same connection pool as our main database
+    // Use connection string directly for session store
+    const DATABASE_URL = process.env.DATABASE_URL || "postgresql://neondb_owner:npg_tNTYy7S9AMuP@ep-wandering-wave-aef2douv-pooler.c-2.us-east-2.aws.neon.tech/neondb?sslmode=require&channel_binding=require";
+    
     sessionStore = new PostgreSQLStore({
-      pool: pool, // Use the existing connection pool from db.ts
+      conString: DATABASE_URL,
       tableName: 'session',
       createTableIfMissing: true,
       pruneSessionInterval: false, // Disable automatic pruning to avoid issues
@@ -246,7 +248,7 @@ export function setupAuth(app: Express) {
       console.log('⚠️ PostgreSQL session store disconnected');
     });
     
-    console.log('✅ PostgreSQL session store initialized with existing pool');
+    console.log('✅ PostgreSQL session store initialized with connection string');
   } catch (error) {
     console.log('⚠️ PostgreSQL session store failed, falling back to memory store:', error.message);
     const MemoryStoreSession = MemoryStore(session);
