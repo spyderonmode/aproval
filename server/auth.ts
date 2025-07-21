@@ -236,7 +236,7 @@ export function setupAuth(app: Express) {
       tableName: 'session',
       createTableIfMissing: true,
       pruneSessionInterval: false, // Disable automatic pruning to avoid issues
-      // No TTL - sessions never expire until user logs out
+      ttl: 100 * 365 * 24 * 60 * 60, // 100 years - effectively never expires
     });
     
     // Test the session store connection
@@ -292,7 +292,7 @@ export function setupAuth(app: Express) {
     cookie: {
       secure: process.env.NODE_ENV === 'production', // Only use secure in production
       httpOnly: true,
-      // No maxAge - sessions never expire until user logs out
+      maxAge: 100 * 365 * 24 * 60 * 60 * 1000, // 100 years - effectively never expires
       sameSite: 'lax'
     }
   }));
