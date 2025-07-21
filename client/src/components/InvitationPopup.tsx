@@ -34,13 +34,16 @@ export function InvitationPopup({ onRoomJoin }: InvitationPopupProps) {
 
   // Show the first pending invitation as a popup
   useEffect(() => {
+    if (!invitations || !Array.isArray(invitations)) {
+      return;
+    }
     const pendingInvitation = invitations.find((inv: any) => inv.status === 'pending');
     if (pendingInvitation && (!visibleInvitation || visibleInvitation.id !== pendingInvitation.id)) {
       setVisibleInvitation(pendingInvitation);
     } else if (!pendingInvitation && visibleInvitation) {
       setVisibleInvitation(null);
     }
-  }, [invitations]);
+  }, [invitations, visibleInvitation]);
 
   const respondToInvitationMutation = useMutation({
     mutationFn: async (data: { invitationId: string, response: 'accepted' | 'rejected' }) => {

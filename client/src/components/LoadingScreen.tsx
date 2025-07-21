@@ -58,10 +58,15 @@ export default function LoadingScreen() {
           Loading your gaming experience...
         </p>
 
-        {/* Made by text */}
-        <p className="text-slate-300 text-sm font-semibold animate-fade-in animation-delay-1000 mt-4 bg-gradient-to-r from-primary to-blue-400 bg-clip-text text-transparent">
-          Made By DarkLayer Studios
-        </p>
+        {/* Made by text - enhanced styling to match user's expectations */}
+        <div className="text-center mt-8 space-y-2 animate-fade-in animation-delay-1000">
+          <p className="text-slate-400 text-lg font-medium tracking-wide">
+            Made By
+          </p>
+          <p className="text-2xl font-bold bg-gradient-to-r from-primary via-blue-400 to-purple-400 bg-clip-text text-transparent tracking-wider">
+            DarkLayer Studios
+          </p>
+        </div>
       </div>
     </div>
   );
