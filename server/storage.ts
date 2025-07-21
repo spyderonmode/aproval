@@ -480,8 +480,13 @@ export class DatabaseStorage implements IStorage {
     await db.update(users).set(updates).where(eq(users.id, userId));
   }
 
-  // Overloaded method to update specific user stats
-  async updateUserStats(userId: string, statsUpdate: { currentWinStreak?: number; bestWinStreak?: number; wins?: number; losses?: number; draws?: number }): Promise<void> {
+  // Method to update user stats based on game result (matches IStorage interface)
+  async updateUserStats(userId: string, result: 'win' | 'loss' | 'draw'): Promise<void> {
+    return this.updateUserStatsFromGame(userId, result);
+  }
+
+  // Helper method to update specific user stats
+  async updateSpecificUserStats(userId: string, statsUpdate: { currentWinStreak?: number; bestWinStreak?: number; wins?: number; losses?: number; draws?: number }): Promise<void> {
     await db.update(users).set(statsUpdate).where(eq(users.id, userId));
   }
 

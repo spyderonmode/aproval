@@ -596,7 +596,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
 
         // Update user stats to ensure consistency
-        await storage.updateUserStats(userId, {
+        await storage.updateSpecificUserStats(userId, {
           wins: 38,
           losses: 59,
           draws: 10,
@@ -691,7 +691,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Force update win streaks if they're incorrect
       if (calculatedBestWinStreak > (user?.bestWinStreak || 0)) {
         console.log(`🔧 DEBUG: Updating incorrect win streaks from ${user?.bestWinStreak} to ${calculatedBestWinStreak}`);
-        await storage.updateUserStats(userId, {
+        await storage.updateSpecificUserStats(userId, {
           currentWinStreak: calculatedCurrentWinStreak,
           bestWinStreak: calculatedBestWinStreak
         });
@@ -3761,9 +3761,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         
         // Only remove from online users if no other connections exist
         if (!userHasOtherConnections) {
-          // Check if user is in active game - if so, don't remove them completely
+          // Check if user is in active game by checking both memory state and database
           const userState = userRoomStates.get(connection.userId);
-          if (userState && userState.isInGame) {
+          const activeGame = await storage.getActiveGameForUser(connection.userId);
+          const isReallyInActiveGame = activeGame && activeGame.status === 'active';
+          
+          if (userState && userState.isInGame && isReallyInActiveGame) {
             console.log(`🏠 User ${connection.userId} disconnected but is in active game - keeping in room`);
             // Update last seen time but don't remove
             const onlineUser = onlineUsers.get(connection.userId);
@@ -3771,6 +3774,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
               onlineUser.lastSeen = new Date();
             }
           } else {
+            // Clean up stale userRoomState if game is no longer active
+            if (userState && userState.isInGame && !isReallyInActiveGame) {
+              console.log(`🏠 Cleaning up stale room state for user ${connection.userId} - game no longer active`);
+              userRoomStates.delete(connection.userId);
+            }
             // Remove from online users if not in active game
             onlineUsers.delete(connection.userId);
             userRoomStates.delete(connection.userId);
