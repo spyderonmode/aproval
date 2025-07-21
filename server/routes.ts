@@ -130,13 +130,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
           return;
         }
         
-        console.log(`🎮 Found active game ${activeGame.id} in room ${activeGame.roomId} for reconnecting user ${userId}`);
+
         
         // Check if user already has an active reconnection in progress (within last 2 seconds)
         const now = Date.now();
         const lastReconnection = recentReconnections.get(userId);
         if (lastReconnection && (now - lastReconnection) < 2000) {
-          console.log(`🔄 Skipping duplicate reconnection for user ${userId} (sent ${now - lastReconnection}ms ago)`);
+
           // Still add to room connections but don't send messages
           if (!roomConnections.has(activeGame.roomId)) {
             roomConnections.set(activeGame.roomId, new Set());
@@ -241,7 +241,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
                 message: 'Game state recovered successfully'
               }));
               
-              console.log(`🔄 Sent reconnection data to user ${userId} for game ${activeGame.id}`);
+
               
               // Clean up old reconnection tracking entries (older than 5 seconds)
               setTimeout(() => {
@@ -3737,7 +3737,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     });
 
     ws.on('close', async () => {
-      console.log(`🔌 WebSocket connection closed: ${connectionId}`);
+
       
       // Get user info before cleaning up
       const connection = connections.get(connectionId);

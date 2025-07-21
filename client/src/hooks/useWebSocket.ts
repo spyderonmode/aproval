@@ -18,18 +18,18 @@ export function useWebSocket() {
     
     // Prevent duplicate connections by checking if one already exists
     if (ws.current && ws.current.readyState !== WebSocket.CLOSED) {
-      console.log('🔌 WebSocket already exists, skipping duplicate connection');
+
       return;
     }
 
     const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
     const wsUrl = `${protocol}//${window.location.host}/ws`;
     
-    console.log('🔌 Creating WebSocket connection for user:', (user as any)?.userId || (user as any)?.id);
+
     ws.current = new WebSocket(wsUrl);
 
     ws.current.onopen = () => {
-      console.log('🔌 WebSocket connected');
+
       setIsConnected(true);
       // Clear joined rooms on reconnect to prevent duplicates
       joinedRooms.current.clear();
@@ -38,22 +38,15 @@ export function useWebSocket() {
         type: 'auth',
         userId: (user as any)?.userId || (user as any)?.id,
       };
-      console.log('🔐 Sending auth message:', authMessage);
+
       ws.current?.send(JSON.stringify(authMessage));
     };
 
     ws.current.onmessage = (event) => {
       try {
         const message = JSON.parse(event.data);
-        console.log(`📥 Received WebSocket message:`, message);
-        console.log(`📥 Message type: ${message.type}`);
-        if (message.type === 'move') {
-          console.log(`📥 Move message - GameId: ${message.gameId}, Position: ${message.position}, Board:`, message.board);
-        }
-        if (message.type === 'game_started') {
-          console.log(`📥 Game started message - RoomId: ${message.roomId}, GameId: ${message.game?.id}`);
-          console.log(`📥 Game players - X: ${message.game?.playerXInfo?.displayName}, O: ${message.game?.playerOInfo?.displayName}`);
-        }
+
+        // Remove verbose logging for game messages
         
         // Dispatch custom events for different message types
         if (message.type === 'chat_message_received') {
@@ -137,8 +130,7 @@ export function useWebSocket() {
     };
 
     ws.current.onclose = (event) => {
-      console.log('🔌 WebSocket connection closed:', event.code, event.reason);
-      console.log('🔌 Close event details:', event);
+
       setIsConnected(false);
       // Don't clear game state on connection close to prevent white screen
     };
@@ -148,7 +140,7 @@ export function useWebSocket() {
     };
 
     return () => {
-      console.log('🔌 Cleaning up WebSocket connection');
+
       if (ws.current && ws.current.readyState !== WebSocket.CLOSED) {
         ws.current.close();
       }
