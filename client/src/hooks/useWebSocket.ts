@@ -120,6 +120,14 @@ export function useWebSocket() {
             detail: message
           }));
         }
+
+        // Handle online status updates for friends list
+        if (message.type === 'online_users_update' || message.type === 'user_offline') {
+          console.log('👥 Dispatching online status update:', message.type);
+          window.dispatchEvent(new CustomEvent('online_status_update', {
+            detail: message
+          }));
+        }
         
         console.log('🔔 Setting lastMessage in useWebSocket:', message.type);
         setLastMessage(message);

@@ -70,6 +70,13 @@ export function Friends() {
     retry: 1,
   });
 
+  // Fetch online users for online status indicators
+  const { data: onlineUsersData } = useQuery<{ total: number; users: any[] }>({
+    queryKey: ['/api/users/online'],
+    enabled: isOpen,
+    refetchInterval: 30000, // Refresh every 30 seconds
+  });
+
   // Send friend request mutation
   const sendFriendRequest = useMutation({
     mutationFn: async (requestedId: string) => {
@@ -198,15 +205,26 @@ export function Friends() {
       }
     };
 
+    const handleOnlineStatusUpdate = (event: CustomEvent) => {
+      const data = event.detail;
+      
+      // Refresh online users data when users come online/offline
+      if (data.type === 'online_users_update' || data.type === 'user_offline') {
+        queryClient.invalidateQueries({ queryKey: ['/api/users/online'] });
+      }
+    };
+
     // Only listen for events when modal is open
     if (isOpen) {
       window.addEventListener('chat_message_received', handleChatMessage as EventListener);
+      window.addEventListener('online_status_update', handleOnlineStatusUpdate as EventListener);
       
       return () => {
         window.removeEventListener('chat_message_received', handleChatMessage as EventListener);
+        window.removeEventListener('online_status_update', handleOnlineStatusUpdate as EventListener);
       };
     }
-  }, [isOpen, selectedChatFriend]);
+  }, [isOpen, selectedChatFriend, queryClient]);
 
   const handleSendMessage = () => {
     if (!chatMessage.trim() || !selectedChatFriend) return;
@@ -229,6 +247,11 @@ export function Friends() {
 
   // Get current chat messages for selected friend
   const currentChatMessages = selectedChatFriend ? chatHistory.get(selectedChatFriend.id) || [] : [];
+
+  // Helper function to check if a friend is online
+  const isUserOnline = (friendId: string) => {
+    return onlineUsersData?.users?.some(onlineUser => onlineUser.userId === friendId) || false;
+  };
 
   // Find users by name for friend requests
   const findUsersByName = async () => {
@@ -306,27 +329,47 @@ export function Friends() {
               </div>
             ) : (
               <div className="space-y-2">
-                {friends.map((friend) => (
+                {friends
+                  .sort((a, b) => {
+                    // Sort online friends first
+                    const aOnline = isUserOnline(a.id);
+                    const bOnline = isUserOnline(b.id);
+                    if (aOnline && !bOnline) return -1;
+                    if (!aOnline && bOnline) return 1;
+                    return 0;
+                  })
+                  .map((friend) => (
                   <div
                     key={friend.id}
                     className="flex items-center justify-between p-3 border rounded-lg hover:bg-accent cursor-pointer"
                     onClick={() => setSelectedFriend(friend)}
                   >
                     <div className="flex items-center gap-3">
-                      {friend.profileImageUrl ? (
-                        <img
-                          src={friend.profileImageUrl}
-                          alt={friend.displayName || `${friend.firstName} ${friend.lastName || ''}`.trim()}
-                          className="w-10 h-10 rounded-full"
-                        />
-                      ) : (
-                        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-medium">
-                          {friend.firstName?.[0] || '?'}{friend.lastName?.[0] || ''}
-                        </div>
-                      )}
+                      <div className="relative">
+                        {friend.profileImageUrl ? (
+                          <img
+                            src={friend.profileImageUrl}
+                            alt={friend.displayName || `${friend.firstName} ${friend.lastName || ''}`.trim()}
+                            className="w-10 h-10 rounded-full"
+                          />
+                        ) : (
+                          <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-medium">
+                            {friend.firstName?.[0] || '?'}{friend.lastName?.[0] || ''}
+                          </div>
+                        )}
+                        {/* Online status indicator */}
+                        {isUserOnline(friend.id) && (
+                          <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-green-500 border-2 border-white dark:border-gray-800 rounded-full"></div>
+                        )}
+                      </div>
                       <div>
-                        <div className="font-medium">
+                        <div className="font-medium flex items-center gap-2">
                           {friend.displayName || `${friend.firstName} ${friend.lastName || ''}`.trim()}
+                          {isUserOnline(friend.id) && (
+                            <Badge variant="secondary" className="text-xs px-1.5 py-0.5 bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300">
+                              Online
+                            </Badge>
+                          )}
                         </div>
                         <div className="text-sm text-muted-foreground">
                           {friend.wins}W-{friend.losses}L-{friend.draws}D
