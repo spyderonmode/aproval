@@ -9,9 +9,14 @@ export function DebugAchievements() {
   const [isLoading, setIsLoading] = useState(false);
   const [result, setResult] = useState<any>(null);
 
-  const handleRefreshCache = () => {
-    queryClient.invalidateQueries({ queryKey: ['/api/achievements'] });
-    console.log('Achievement cache invalidated');
+  const handleRefreshCache = async () => {
+    try {
+      await queryClient.invalidateQueries({ queryKey: ['/api/achievements'] });
+      await queryClient.refetchQueries({ queryKey: ['/api/achievements'] });
+      console.log('Achievement cache invalidated and refetched');
+    } catch (error) {
+      console.error('Error refreshing cache:', error);
+    }
   };
 
   const handleRecalculate = async () => {
@@ -46,6 +51,13 @@ export function DebugAchievements() {
       
       console.log('Parsed response:', data);
       setResult(data);
+      
+      // Auto-refresh cache after successful recalculation
+      if (data.success) {
+        setTimeout(() => {
+          handleRefreshCache();
+        }, 500);
+      }
     } catch (error) {
       console.error('Error recalculating achievements:', error);
       setResult({ error: `${error.message}` });

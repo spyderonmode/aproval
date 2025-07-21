@@ -570,7 +570,62 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.log(`🔧 DEBUG: User data:`, {
         id: user?.id,
         currentWinStreak: user?.currentWinStreak,
-        bestWinStreak: user?.bestWinStreak
+        bestWinStreak: user?.bestWinStreak,
+        wins: user?.wins,
+        losses: user?.losses,
+        draws: user?.draws
+      });
+      
+      // Calculate win streaks from game history for comparison
+      const games = await storage.getUserGames(userId);
+      const gameResults = games
+        .filter(g => g.status === 'finished')
+        .sort((a, b) => new Date(a.finishedAt || '').getTime() - new Date(b.finishedAt || '').getTime())
+        .map(g => {
+          if (g.winnerId === userId) return 'win';
+          if (g.winnerId === null) return 'draw';
+          return 'loss';
+        });
+      
+      // Calculate actual win streaks from game history
+      let calculatedCurrentWinStreak = 0;
+      let calculatedBestWinStreak = 0;
+      let currentStreak = 0;
+      
+      for (let i = gameResults.length - 1; i >= 0; i--) {
+        if (gameResults[i] === 'win') {
+          currentStreak++;
+          if (i === gameResults.length - 1 || calculatedCurrentWinStreak === 0) {
+            calculatedCurrentWinStreak = currentStreak;
+          }
+        } else {
+          if (calculatedCurrentWinStreak === 0) {
+            calculatedCurrentWinStreak = 0;
+          }
+          currentStreak = 0;
+        }
+        calculatedBestWinStreak = Math.max(calculatedBestWinStreak, currentStreak);
+      }
+      
+      // Reset currentStreak calculation for proper current win streak
+      calculatedCurrentWinStreak = 0;
+      for (let i = gameResults.length - 1; i >= 0; i--) {
+        if (gameResults[i] === 'win') {
+          calculatedCurrentWinStreak++;
+        } else {
+          break;
+        }
+      }
+      
+      console.log(`🔧 DEBUG: Calculated win streaks from ${gameResults.length} games:`, {
+        currentWinStreak: calculatedCurrentWinStreak,
+        bestWinStreak: calculatedBestWinStreak,
+        recentResults: gameResults.slice(-10)
+      });
+      
+      console.log(`🔧 DEBUG: Database vs Calculated:`, {
+        database: { current: user?.currentWinStreak, best: user?.bestWinStreak },
+        calculated: { current: calculatedCurrentWinStreak, best: calculatedBestWinStreak }
       });
       
       // Get current achievements before recalculation
@@ -582,23 +637,35 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const result = await storage.recalculateUserAchievements(userId);
       console.log(`🔧 DEBUG: Recalculation result:`, result);
       
+      // Wait a moment for database consistency then check achievements again
+      await new Promise(resolve => setTimeout(resolve, 100));
+      
       // Get achievements after recalculation
       const achievementsAfter = await storage.getUserAchievements(userId);
       console.log(`🔧 DEBUG: Achievements after (${achievementsAfter.length}):`, achievementsAfter.map(a => a.achievementType));
+      
+      // Re-check win streaks to ensure we have the latest data
+      const updatedUser = await storage.getUser(userId);
+      const currentWinStreak = updatedUser?.currentWinStreak || 0;
+      const bestWinStreak = updatedUser?.bestWinStreak || 0;
+      
+      console.log(`🔧 DEBUG: Updated win streaks - current: ${currentWinStreak}, best: ${bestWinStreak}`);
       
       const debugData = { 
         success: true, 
         userId,
         userStats: userStats || {},
         winStreaks: {
-          current: user?.currentWinStreak || 0,
-          best: user?.bestWinStreak || 0
+          current: currentWinStreak,
+          best: bestWinStreak
         },
         achievementsBefore: achievementsBefore.length,
         achievementsAfter: achievementsAfter.length,
         achievementTypes: achievementsAfter.map(a => a.achievementType),
         hasWinStreak5: achievementsAfter.some(a => a.achievementType === 'win_streak_5'),
         hasWinStreak10: achievementsAfter.some(a => a.achievementType === 'win_streak_10'),
+        recalculationAdded: result?.added?.length || 0,
+        recalculationRemoved: result?.removed || 0,
         result: result || {}
       };
       
