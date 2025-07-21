@@ -15,13 +15,14 @@
       width: 100vw;
       height: 100vh;
       z-index: 999999;
-      background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%);
+      background: #0f172a;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
       color: white;
       font-family: system-ui, -apple-system, sans-serif;
+      border: 5px solid #ff0000;
     ">
       <!-- Simple game logo -->
       <div style="
@@ -122,14 +123,11 @@
         <p style="
           font-size: 32px;
           font-weight: bold;
-          background: linear-gradient(90deg, #3b82f6, #60a5fa, #a855f7);
-          -webkit-background-clip: text;
-          -webkit-text-fill-color: transparent;
-          background-clip: text;
-          color: transparent;
+          color: #60a5fa;
           letter-spacing: 2px;
           margin-bottom: 8px;
           margin: 0 0 8px 0;
+          text-shadow: 0 0 10px rgba(96, 165, 250, 0.5);
         ">
           DarkLayer Studios
         </p>
@@ -147,6 +145,15 @@
     <div id="root"></div>
     
     <script>
+      // Make sure splash screen is visible
+      document.addEventListener('DOMContentLoaded', function() {
+        const splash = document.getElementById('splash-screen');
+        if (splash) {
+          splash.style.display = 'flex';
+          console.log('🚀 Splash screen should now be visible');
+        }
+      });
+      
       // Hide splash screen after 3 seconds
       setTimeout(function() {
         const splash = document.getElementById('splash-screen');
