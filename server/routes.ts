@@ -258,11 +258,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
           // Notify other players in the room about reconnection
           const roomUsers = roomConnections.get(activeGame.roomId);
           if (roomUsers) {
+            // Get the reconnecting user's info specifically
+            const reconnectingUser = await storage.getUser(userId);
             const reconnectionNotification = JSON.stringify({
               type: 'player_reconnected',
               userId: userId,
-              playerName: playerXInfo?.displayName || playerOInfo?.displayName || 'Player',
-              message: 'Player reconnected to the game'
+              playerName: reconnectingUser?.displayName || reconnectingUser?.firstName || 'Player',
+              message: `${reconnectingUser?.displayName || reconnectingUser?.firstName || 'Player'} reconnected to the game`
             });
             
             roomUsers.forEach(otherConnectionId => {

@@ -13,29 +13,54 @@ interface GameExpirationTimerProps {
 export function GameExpirationTimer({ lastMoveAt, createdAt, onExpired, serverTime, timeRemaining: serverTimeRemaining }: GameExpirationTimerProps) {
   const [timeRemaining, setTimeRemaining] = useState<number>(0);
   const [isExpired, setIsExpired] = useState(false);
-  const [startTime] = useState<number>(Date.now()); // Client start time for drift compensation
+  
+  // Store the reference point for timer calculations
+  const [referenceTime, setReferenceTime] = useState<{ 
+    lastActivity: Date; 
+    clientTime: number; 
+    serverRemaining?: number; 
+  }>(() => {
+    const lastActivity = new Date(lastMoveAt || createdAt);
+    return {
+      lastActivity,
+      clientTime: Date.now(),
+      serverRemaining: serverTimeRemaining
+    };
+  });
+
+  // Update reference time when we get new server data
+  useEffect(() => {
+    if (serverTimeRemaining !== undefined) {
+      console.log('⏱️ Timer: Updating reference with server time remaining:', serverTimeRemaining);
+      setReferenceTime({
+        lastActivity: new Date(lastMoveAt || createdAt),
+        clientTime: Date.now(),
+        serverRemaining: serverTimeRemaining
+      });
+    }
+  }, [serverTimeRemaining, lastMoveAt, createdAt]);
 
   useEffect(() => {
-    const calculateTimeRemaining = () => {
-      // If server provided pre-calculated time remaining, use it with drift compensation
-      if (serverTimeRemaining !== undefined && serverTime) {
-        const clientElapsed = Date.now() - startTime;
-        const adjustedRemaining = Math.max(0, serverTimeRemaining - clientElapsed);
-        return adjustedRemaining;
+    const updateTimer = () => {
+      const now = Date.now();
+      let remaining: number;
+      
+      if (referenceTime.serverRemaining !== undefined) {
+        // Use server-provided time as baseline
+        const elapsedSinceReference = now - referenceTime.clientTime;
+        remaining = Math.max(0, referenceTime.serverRemaining - elapsedSinceReference);
+        console.log('⏱️ Timer calculation:', {
+          serverRemaining: referenceTime.serverRemaining,
+          elapsedSinceReference,
+          finalRemaining: remaining
+        });
+      } else {
+        // Fallback to client calculation
+        const tenMinutes = 10 * 60 * 1000;
+        const elapsed = now - referenceTime.lastActivity.getTime();
+        remaining = Math.max(0, tenMinutes - elapsed);
       }
       
-      // Fallback to client-side calculation
-      const lastActivity = new Date(lastMoveAt || createdAt);
-      const now = new Date();
-      const tenMinutes = 10 * 60 * 1000; // 10 minutes in milliseconds
-      const elapsed = now.getTime() - lastActivity.getTime();
-      const remaining = Math.max(0, tenMinutes - elapsed);
-      
-      return remaining;
-    };
-
-    const updateTimer = () => {
-      const remaining = calculateTimeRemaining();
       setTimeRemaining(remaining);
       
       if (remaining === 0 && !isExpired) {
@@ -51,7 +76,7 @@ export function GameExpirationTimer({ lastMoveAt, createdAt, onExpired, serverTi
     const interval = setInterval(updateTimer, 1000);
 
     return () => clearInterval(interval);
-  }, [lastMoveAt, createdAt, onExpired, isExpired, serverTime, serverTimeRemaining, startTime]);
+  }, [referenceTime, onExpired, isExpired]);
 
   const formatTime = (milliseconds: number) => {
     const minutes = Math.floor(milliseconds / 60000);
