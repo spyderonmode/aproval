@@ -3529,12 +3529,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
               
               // Checking active game for room
               
-              // Check both game status AND room status to catch "Play Again" scenarios
-              const isInActiveGame = activeGame && activeGame.status === 'active' && 
+              // Check if the leaving user is actually a player in the active game
+              const isPlayerInActiveGame = activeGame && activeGame.status === 'active' && 
                   (activeGame.playerXId === userId || activeGame.playerOId === userId);
               const isRoomInPlayingState = room && room.status === 'playing';
               
-              if (isInActiveGame || (isRoomInPlayingState && activeGame && 
+              // Only abandon the game if a PLAYER leaves, not a spectator
+              if (isPlayerInActiveGame || (isRoomInPlayingState && activeGame && 
                   (activeGame.playerXId === userId || activeGame.playerOId === userId))) {
                 // Player leaving active game - terminating
                 
@@ -3616,6 +3617,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
                 return;
               }
               
+              // Handle spectator leave (non-player leaving the room)
               // Remove from room connections
               const roomUsers = roomConnections.get(roomId);
               if (roomUsers) {
@@ -3630,23 +3632,61 @@ export async function registerRoutes(app: Express): Promise<Server> {
                 // Remove from user room states
                 userRoomStates.delete(userId);
                 
-                // Send room end notification to all remaining users
-                if (roomUsers.size > 0) {
-                  const roomEndMessage = JSON.stringify({
-                    type: 'room_ended',
-                    roomId,
-                    userId,
-                    playerName,
-                    message: `${playerName} left the room`
-                  });
+                // Check if this was a spectator leaving
+                const participants = await storage.getRoomParticipants(roomId);
+                const leavingUser = participants.find(p => p.userId === userId);
+                const isSpectatorLeaving = leavingUser && leavingUser.role === 'spectator';
+                
+                if (isSpectatorLeaving) {
+                  // Remove spectator from database
+                  await storage.removeRoomParticipant(roomId, userId);
                   
-                  // Broadcasting room end to remaining users
-                  roomUsers.forEach(remainingConnectionId => {
-                    const remainingConnection = connections.get(remainingConnectionId);
-                    if (remainingConnection && remainingConnection.ws.readyState === WebSocket.OPEN) {
-                      remainingConnection.ws.send(roomEndMessage);
-                    }
-                  });
+                  // For spectators, send them back to home with a reload message
+                  conn.ws.send(JSON.stringify({
+                    type: 'spectator_left',
+                    roomId,
+                    message: 'You have left the room',
+                    redirectToHome: true,
+                    reloadPage: true
+                  }));
+                  
+                  // Just send a regular notification to other users that spectator left
+                  if (roomUsers.size > 0) {
+                    const spectatorLeftMessage = JSON.stringify({
+                      type: 'user_left',
+                      roomId,
+                      userId,
+                      playerName,
+                      role: 'spectator',
+                      message: `${playerName} (spectator) left the room`
+                    });
+                    
+                    roomUsers.forEach(remainingConnectionId => {
+                      const remainingConnection = connections.get(remainingConnectionId);
+                      if (remainingConnection && remainingConnection.ws.readyState === WebSocket.OPEN) {
+                        remainingConnection.ws.send(spectatorLeftMessage);
+                      }
+                    });
+                  }
+                } else {
+                  // For non-spectators (regular players), send room end notification to all remaining users
+                  if (roomUsers.size > 0) {
+                    const roomEndMessage = JSON.stringify({
+                      type: 'room_ended',
+                      roomId,
+                      userId,
+                      playerName,
+                      message: `${playerName} left the room`
+                    });
+                    
+                    // Broadcasting room end to remaining users
+                    roomUsers.forEach(remainingConnectionId => {
+                      const remainingConnection = connections.get(remainingConnectionId);
+                      if (remainingConnection && remainingConnection.ws.readyState === WebSocket.OPEN) {
+                        remainingConnection.ws.send(roomEndMessage);
+                      }
+                    });
+                  }
                 }
                 
                 // Clear the room if no users left

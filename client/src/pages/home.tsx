@@ -1210,6 +1210,7 @@ export default function Home() {
                   user={user}
                   lastMessage={lastMessage}
                   sendMessage={sendMessage}
+                  isSpectator={isSpectator}
                 />
               </div>
             ) : (

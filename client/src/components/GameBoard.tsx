@@ -394,9 +394,10 @@ interface GameBoardProps {
   user: any;
   lastMessage?: any;
   sendMessage?: (message: any) => void;
+  isSpectator?: boolean;
 }
 
-export function GameBoard({ game, onGameOver, gameMode, user, lastMessage, sendMessage }: GameBoardProps) {
+export function GameBoard({ game, onGameOver, gameMode, user, lastMessage, sendMessage, isSpectator = false }: GameBoardProps) {
   const [board, setBoard] = useState<Record<string, string>>({});
   const [currentPlayer, setCurrentPlayer] = useState<'X' | 'O'>('X');
   const [winningLine, setWinningLine] = useState<number[] | null>(null);
@@ -519,6 +520,14 @@ export function GameBoard({ game, onGameOver, gameMode, user, lastMessage, sendM
     if (gameMode === 'online' && user) {
       const userId = user.userId || user.id;
       const isPlayerX = game.playerXId === userId;
+      const isPlayerO = game.playerOId === userId;
+      
+      // Check if user is actually a player (not a spectator)
+      if (!isPlayerX && !isPlayerO) {
+        console.log('❌ Spectator cannot use quick chat');
+        return;
+      }
+      
       const playerSymbol = isPlayerX ? 'X' : 'O';
       
       // Show message locally first
@@ -1363,14 +1372,17 @@ export function GameBoard({ game, onGameOver, gameMode, user, lastMessage, sendM
 
         {/* Game Controls */}
         <div className="mt-8 flex justify-center space-x-4">
-          <Button 
-            variant="outline"
-            onClick={() => setShowChatPanel(!showChatPanel)}
-            className="flex items-center space-x-2"
-          >
-            <MessageCircle className="w-4 h-4" />
-            <span>{t('chat')}</span>
-          </Button>
+          {/* Only show chat button for players, not spectators */}
+          {!isSpectator && (
+            <Button 
+              variant="outline"
+              onClick={() => setShowChatPanel(!showChatPanel)}
+              className="flex items-center space-x-2"
+            >
+              <MessageCircle className="w-4 h-4" />
+              <span>{t('chat')}</span>
+            </Button>
+          )}
           
 
           

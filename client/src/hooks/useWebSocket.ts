@@ -110,6 +110,21 @@ export function useWebSocket() {
           return; // Don't set lastMessage to prevent useEffect processing
         }
         
+        // Handle spectator leaving and needing to redirect to home
+        if (message.type === 'spectator_left') {
+          console.log('👀 WebSocket: Spectator left message received:', message);
+          
+          // Clear any stored game state to prevent reconnection
+          localStorage.removeItem('currentGameState');
+          sessionStorage.removeItem('currentGameState');
+          
+          // Force page reload to go back to home
+          console.log('👀 WebSocket: Reloading page for spectator leave');
+          window.location.href = '/';
+          
+          return; // Don't set lastMessage to prevent useEffect processing
+        }
+        
         // For critical reconnection messages, dispatch custom events immediately
         if (message.type === 'game_reconnection') {
           console.log('🔔 Dispatching immediate game_reconnection event');
