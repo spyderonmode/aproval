@@ -1635,16 +1635,20 @@ export class DatabaseStorage implements IStorage {
         displayName: users.displayName,
         firstName: users.firstName,
         lastName: users.lastName,
-        profilePicture: users.profilePicture,
         profileImageUrl: users.profileImageUrl,
+        isGuest: users.isGuest,
+        guestSessionExpiry: users.guestSessionExpiry,
         wins: users.wins,
         losses: users.losses,
         draws: users.draws,
+        currentWinStreak: users.currentWinStreak,
+        bestWinStreak: users.bestWinStreak,
+        selectedAchievementBorder: users.selectedAchievementBorder,
         createdAt: users.createdAt,
         updatedAt: users.updatedAt,
       })
       .from(friendships)
-      .leftJoin(users, or(
+      .innerJoin(users, or(
         and(eq(friendships.user1Id, userId), eq(friendships.user2Id, users.id)),
         and(eq(friendships.user2Id, userId), eq(friendships.user1Id, users.id))
       ))
@@ -1654,18 +1658,22 @@ export class DatabaseStorage implements IStorage {
       ))
       .orderBy(desc(friendships.becameFriendsAt));
 
-    return friends.map(friend => ({
+    return friends.filter(friend => friend.id !== null).map(friend => ({
       id: friend.id!,
       username: friend.username!,
       email: friend.email!,
       displayName: friend.displayName!,
       firstName: friend.firstName!,
       lastName: friend.lastName!,
-      profilePicture: friend.profilePicture!,
       profileImageUrl: friend.profileImageUrl!,
+      isGuest: friend.isGuest!,
+      guestSessionExpiry: friend.guestSessionExpiry!,
       wins: friend.wins!,
       losses: friend.losses!,
       draws: friend.draws!,
+      currentWinStreak: friend.currentWinStreak!,
+      bestWinStreak: friend.bestWinStreak!,
+      selectedAchievementBorder: friend.selectedAchievementBorder!,
       createdAt: friend.createdAt!,
       updatedAt: friend.updatedAt!,
     }));
