@@ -22,6 +22,8 @@ interface User {
   emailVerificationExpiry?: Date;
   passwordResetToken?: string;
   passwordResetExpiry?: Date;
+  isGuest?: boolean;
+  guestExpiresAt?: string; // For JSON storage compatibility
   createdAt: string;
 }
 
@@ -119,7 +121,6 @@ async function createUser(username: string, password: string, email?: string): P
 async function createGuestUser(): Promise<User> {
   const guestId = crypto.randomUUID();
   const guestName = `Guest_${Math.floor(Math.random() * 10000)}`;
-  const sessionExpiry = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 hours
   
   const guestUser: User = {
     id: guestId,
@@ -131,10 +132,11 @@ async function createGuestUser(): Promise<User> {
     isEmailVerified: true, // Guests don't need email verification
     emailVerificationToken: undefined,
     emailVerificationExpiry: undefined,
+    isGuest: true, // Flag to identify as guest user
     createdAt: new Date().toISOString()
   };
   
-  // Store guest user in JSON (optional, for consistency)
+  // Store guest user in JSON (for consistency)
   const users = getUsers();
   users.push(guestUser);
   saveUsers(users);
@@ -149,7 +151,7 @@ async function createGuestUser(): Promise<User> {
       lastName: null,
       profileImageUrl: null,
       isGuest: true,
-      guestSessionExpiry: sessionExpiry,
+      guestSessionExpiry: null, // No expiry - guest stays until logout
     });
     console.log('Guest user created in database:', guestUser.id);
   } catch (error) {
@@ -240,6 +242,26 @@ async function sendPasswordResetEmail(email: string, token: string): Promise<boo
   }
 }
 
+// Clean up guest user when they log out
+export async function cleanupGuestOnLogout(userId: string) {
+  try {
+    const users = getUsers();
+    const user = users.find(u => u.id === userId);
+    
+    if (user && user.isGuest) {
+      // Remove guest from JSON storage
+      const updatedUsers = users.filter(u => u.id !== userId);
+      saveUsers(updatedUsers);
+      
+      // Remove guest from database
+      await storage.deleteUser(userId);
+      console.log(`🧹 Cleaned up guest user on logout: ${user.username} (${userId})`);
+    }
+  } catch (error: any) {
+    console.error('❌ Error cleaning up guest user:', error.message || error);
+  }
+}
+
 // Sync all existing JSON users to the database
 async function syncAllUsersToDatabase() {
   try {
@@ -256,6 +278,8 @@ async function syncAllUsersToDatabase() {
           displayName: user.displayName || user.username || 'Anonymous',
           username: user.username || null,
           profileImageUrl: user.profilePicture || null,
+          isGuest: user.isGuest || false,
+          guestSessionExpiry: null, // No expiry - guest stays until logout
         });
         console.log(`✅ Synced user: ${user.username} (${user.id})`);
       } catch (error: any) {
@@ -498,11 +522,24 @@ export function setupAuth(app: Express) {
   });
 
   // Logout endpoint
-  app.post('/api/auth/logout', (req, res) => {
-    req.session.destroy((err) => {
+  app.post('/api/auth/logout', async (req, res) => {
+    const userId = req.session?.user?.userId;
+    
+    req.session.destroy(async (err) => {
       if (err) {
         return res.status(500).json({ error: 'Failed to logout' });
       }
+      
+      // Clean up guest user if logging out
+      if (userId) {
+        try {
+          await cleanupGuestOnLogout(userId);
+        } catch (error) {
+          console.error('Error cleaning up guest user on logout:', error);
+          // Don't fail logout if cleanup fails
+        }
+      }
+      
       res.json({ message: 'Logged out successfully' });
     });
   });

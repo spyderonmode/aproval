@@ -42,6 +42,7 @@ export interface IStorage {
   getUserByEmail(email: string): Promise<User | undefined>;
   getUsersByName(name: string): Promise<User[]>;
   upsertUser(user: UpsertUser): Promise<User>;
+  deleteUser(id: string): Promise<void>;
   
   // Room operations
   createRoom(room: InsertRoom & { ownerId: string }): Promise<Room>;
