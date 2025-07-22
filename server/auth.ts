@@ -445,9 +445,17 @@ export function setupAuth(app: Express) {
   // Guest login endpoint
   app.post('/api/auth/guest', async (req, res) => {
     try {
+      // Check if user already has a session (prevent duplicate guest creation)
+      if (req.session?.user) {
+        console.log('User already has session:', req.session.user.userId);
+        return res.status(400).json({ error: 'User already has an active session' });
+      }
+
       const guestUser = await createGuestUser();
       const sessionData = { userId: guestUser.id, username: guestUser.username };
       req.session.user = sessionData;
+      
+      console.log('✅ Guest user created and session started:', guestUser.username);
       
       res.json({ 
         id: guestUser.id, 
@@ -456,7 +464,7 @@ export function setupAuth(app: Express) {
         isEmailVerified: true,
         isGuest: true 
       });
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error creating guest user:', error);
       res.status(500).json({ error: 'Failed to create guest user' });
     }
@@ -525,7 +533,7 @@ export function setupAuth(app: Express) {
   app.post('/api/auth/logout', async (req, res) => {
     const userId = req.session?.user?.userId;
     
-    req.session.destroy(async (err) => {
+    req.session.destroy(async (err: any) => {
       if (err) {
         return res.status(500).json({ error: 'Failed to logout' });
       }
@@ -546,7 +554,7 @@ export function setupAuth(app: Express) {
 
   // Get current user endpoint
   app.get('/api/auth/user', async (req, res) => {
-    if (!req.session.user) {
+    if (!req.session?.user) {
       return res.status(401).json({ error: 'Not authenticated' });
     }
     

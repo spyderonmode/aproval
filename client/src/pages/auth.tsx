@@ -117,6 +117,9 @@ export default function Auth() {
   };
 
   const handleGuestLogin = async () => {
+    // Prevent multiple guest creations
+    if (isGuestLoading) return;
+    
     setIsGuestLoading(true);
 
     try {
