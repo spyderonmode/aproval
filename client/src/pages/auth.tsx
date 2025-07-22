@@ -262,7 +262,7 @@ export default function Auth() {
             </Button>
             
             <p className="text-xs text-slate-400 text-center mt-2">
-              Start playing instantly without registration. Progress saved for 24 hours.
+              Start playing instantly without registration. Progress saved until logout.
             </p>
             
             <div className="text-center space-y-2">
