@@ -1630,9 +1630,12 @@ export class DatabaseStorage implements IStorage {
     const friends = await db
       .select({
         id: users.id,
+        username: users.username,
         email: users.email,
+        displayName: users.displayName,
         firstName: users.firstName,
         lastName: users.lastName,
+        profilePicture: users.profilePicture,
         profileImageUrl: users.profileImageUrl,
         wins: users.wins,
         losses: users.losses,
@@ -1653,9 +1656,12 @@ export class DatabaseStorage implements IStorage {
 
     return friends.map(friend => ({
       id: friend.id!,
+      username: friend.username!,
       email: friend.email!,
+      displayName: friend.displayName!,
       firstName: friend.firstName!,
       lastName: friend.lastName!,
+      profilePicture: friend.profilePicture!,
       profileImageUrl: friend.profileImageUrl!,
       wins: friend.wins!,
       losses: friend.losses!,

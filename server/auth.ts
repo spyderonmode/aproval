@@ -153,7 +153,7 @@ async function createGuestUser(): Promise<User> {
       isGuest: true,
       guestSessionExpiry: null, // No expiry - guest stays until logout
     });
-    console.log('Guest user created in database:', guestUser.id);
+    // Guest user created in database
   } catch (error) {
     console.error('Error creating guest user in database:', error);
     throw new Error('Failed to create guest user');
@@ -731,7 +731,7 @@ export function setupAuth(app: Express) {
           username: updatedUser.username || null,
           profileImageUrl: updatedUser.profilePicture || null,
         });
-        console.log('User profile synced to database:', updatedUser.id);
+        // User profile synced to database
       } catch (error) {
         console.error('Error syncing updated user to database:', error);
         // Continue even if database sync fails to avoid breaking the session

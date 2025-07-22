@@ -417,10 +417,8 @@ export function GameBoard({ game, onGameOver, gameMode, user, lastMessage, sendM
 
   // Handle profile picture click
   const handleProfileClick = (playerId: string) => {
-    console.log('🎮 Profile click handler called with playerId:', playerId);
-    console.log('🎮 Current showProfileModal state:', showProfileModal);
-    console.log('🎮 Current selectedPlayerId state:', selectedPlayerId);
-    console.log('🎮 Setting selectedPlayerId and showProfileModal to true');
+    // Profile click handler called
+    // Current selectedPlayerId state and setting modal
     
     // Force close first if already open, then open with new player
     if (showProfileModal) {
@@ -430,12 +428,12 @@ export function GameBoard({ game, onGameOver, gameMode, user, lastMessage, sendM
       setTimeout(() => {
         setSelectedPlayerId(playerId);
         setShowProfileModal(true);
-        console.log('🎮 Modal reopened with playerId:', playerId);
+        // Modal reopened with playerId
       }, 100);
     } else {
       setSelectedPlayerId(playerId);
       setShowProfileModal(true);
-      console.log('🎮 Modal opened with playerId:', playerId);
+      // Modal opened with playerId
     }
   };
 
@@ -455,7 +453,7 @@ export function GameBoard({ game, onGameOver, gameMode, user, lastMessage, sendM
   useEffect(() => {
     if (game?.status === 'finished' || game?.status === 'abandoned') {
       if (showProfileModal) {
-        console.log('🎮 Auto-closing profile modal due to game end');
+        // Auto-closing profile modal due to game end
         setShowProfileModal(false);
         setSelectedPlayerId(null);
       }
@@ -464,7 +462,7 @@ export function GameBoard({ game, onGameOver, gameMode, user, lastMessage, sendM
 
   // Debug effect to track modal state changes
   useEffect(() => {
-    console.log('🎮 Modal state changed - showProfileModal:', showProfileModal, 'selectedPlayerId:', selectedPlayerId);
+    // Modal state changed
   }, [showProfileModal, selectedPlayerId]);
   const { toast } = useToast();
   const { currentTheme, themes } = useTheme();
@@ -570,9 +568,8 @@ export function GameBoard({ game, onGameOver, gameMode, user, lastMessage, sendM
 
   useEffect(() => {
     if (game) {
-      console.log('🎮 Game prop changed:', game);
-      console.log('🎮 Game ID:', game.id);
-      console.log('📋 Game board from prop:', game.board || {});
+      // Game prop changed
+      // Game board from prop
       
       const gameBoard = game.board || {};
       const isNewGame = Object.keys(gameBoard).length === 0;
@@ -700,10 +697,8 @@ export function GameBoard({ game, onGameOver, gameMode, user, lastMessage, sendM
   const handleLocalMove = (position: number) => {
     if (!game) return;
     
-    console.log('🎮 HandleLocalMove called:');
-    console.log('  - Position:', position);
-    console.log('  - Current player:', currentPlayer);
-    console.log('  - Current board:', board);
+    // HandleLocalMove called
+    // Position, current player, and board state
     
     // Sound effects removed as requested
     const newBoard = { ...board };
@@ -765,7 +760,7 @@ export function GameBoard({ game, onGameOver, gameMode, user, lastMessage, sendM
     };
     
     // Update board state and force render
-    console.log('🎮 LocalMove: Updating board from', board, 'to', newBoard);
+    // LocalMove: Updating board
     setBoard(newBoard);
     
     if (checkWin(newBoard, currentPlayer)) {
@@ -784,11 +779,7 @@ export function GameBoard({ game, onGameOver, gameMode, user, lastMessage, sendM
         try {
           if (onGameOver) {
             const winnerName = currentPlayer === 'X' ? 'Player X' : (gameMode === 'ai' ? 'AI' : 'Player O');
-            console.log('🎮 GameBoard sending win result:', {
-              winner: currentPlayer,
-              winnerName,
-              condition: 'diagonal'
-            });
+            // GameBoard sending win result
             onGameOver({
               winner: currentPlayer,
               winnerName,
@@ -805,11 +796,7 @@ export function GameBoard({ game, onGameOver, gameMode, user, lastMessage, sendM
     if (checkDraw(newBoard)) {
       if (onGameOver) {
         try {
-          console.log('🎮 GameBoard sending draw result:', {
-            winner: null,
-            winnerName: null,
-            condition: 'draw'
-          });
+          // GameBoard sending draw result
           onGameOver({
             winner: null,
             winnerName: null,
@@ -860,7 +847,7 @@ export function GameBoard({ game, onGameOver, gameMode, user, lastMessage, sendM
     const newBoard = { ...currentBoard };
     newBoard[selectedMove.toString()] = 'O';
     
-    console.log('🎮 AI Move: Updating board from', currentBoard, 'to', newBoard);
+    // AI Move: Updating board
     setBoard(newBoard);
     setLastMove(selectedMove);
     

@@ -52,7 +52,7 @@ export function PlayerProfileModal({ playerId, open, onClose, currentUserId }: P
   
   // Debug logging for profile modal
   useEffect(() => {
-    console.log('🎮 PlayerProfileModal props changed:', { playerId, open, currentUserId });
+    // PlayerProfileModal props changed
   }, [playerId, open, currentUserId]);
   
   const { data: profile, isLoading: profileLoading } = useQuery<PlayerProfile>({
@@ -186,11 +186,11 @@ export function PlayerProfileModal({ playerId, open, onClose, currentUserId }: P
   };
 
   if (!open || !playerId) {
-    console.log('🎮 PlayerProfileModal not showing:', { open, playerId });
+    // PlayerProfileModal not showing
     return null;
   }
 
-  console.log('🎮 PlayerProfileModal rendering:', { open, playerId, profileLoading, profile: !!profile });
+  // PlayerProfileModal rendering
 
   return (
     <Dialog open={open} onOpenChange={onClose}>

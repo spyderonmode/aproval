@@ -1683,7 +1683,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       // Send to only the most recent active connection for the target user to avoid duplicates
       let messageSent = false;
-      console.log(`📨 Found ${targetConnections.length} connections for target user ${targetUserId}`);
+      // Found connections for target user
       
       // Find the most recent active connection
       const activeConnections = targetConnections.filter(conn => 
@@ -1695,7 +1695,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         activeConnections.sort((a, b) => b.lastSeen.getTime() - a.lastSeen.getTime());
         const targetConnection = activeConnections[0];
         
-        console.log(`📨 Sending to most recent connection - readyState: ${targetConnection.ws?.readyState}, userId: ${targetConnection.userId}`);
+        // Sending to most recent connection
         const chatMessage = {
           type: 'chat_message_received',
           message: {
@@ -1705,19 +1705,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
             timestamp: new Date().toISOString()
           }
         };
-        console.log(`📨 Sending WebSocket message to ${targetUserId}:`, JSON.stringify(chatMessage));
+        // Sending WebSocket message
         targetConnection.ws.send(JSON.stringify(chatMessage));
-        console.log(`📨 Message sent successfully to most recent connection`);
+        // Message sent successfully
         messageSent = true;
       } else {
-        console.log(`📨 No active connections found for ${targetUserId}`);
+        // No active connections found
       }
 
       if (!messageSent) {
         return res.status(400).json({ error: 'Target user connection is not active' });
       }
 
-      console.log(`📨 Chat message sent from ${senderId} to ${targetUserId}: ${message}`);
+      // Chat message sent successfully
 
       res.json({ success: true, message: 'Message sent successfully' });
     } catch (error) {
@@ -2390,13 +2390,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
       let broadcastSuccess = false;
       if (roomConnections.has(roomId)) {
         const roomUsers = roomConnections.get(roomId)!;
-        console.log(`🎮 Broadcasting game_started to ${roomUsers.size} users in room ${roomId}`);
+        // Broadcasting game_started to users in room
         
         const broadcastPromises: Promise<void>[] = [];
         roomUsers.forEach(connectionId => {
           const connection = connections.get(connectionId);
           if (connection && connection.ws.readyState === WebSocket.OPEN) {
-            console.log(`🎮 Sending game_started to user: ${connection.userId}`);
+            // Sending game_started to user
             // Create a promise for each WebSocket send to ensure delivery
             const sendPromise = new Promise<void>((resolve) => {
               try {
@@ -2420,7 +2420,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         // Wait for all broadcasts to complete
         await Promise.all(broadcastPromises);
         broadcastSuccess = true;
-        console.log(`🎮 All game_started broadcasts completed for room ${roomId}`);
+        // All game_started broadcasts completed
       }
       
       // Ensure API response comes after WebSocket broadcasts
@@ -2521,15 +2521,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
             }
           };
           
-          console.log('🎮 Broadcasting game_started for refreshed game to room:', gameData.roomId);
+          // Broadcasting game_started for refreshed game
           if (roomConnections.has(gameData.roomId)) {
             const roomUsers = roomConnections.get(gameData.roomId)!;
-            console.log(`🎮 Broadcasting to ${roomUsers.size} users in room`);
+            // Broadcasting to users in room
             const broadcastPromises: Promise<void>[] = [];
             roomUsers.forEach(connectionId => {
               const connection = connections.get(connectionId);
               if (connection && connection.ws.readyState === WebSocket.OPEN) {
-                console.log(`🎮 Sending game_started to user: ${connection.userId}`);
+                // Sending game_started to user
                 const sendPromise = new Promise<void>((resolve) => {
                   try {
                     connection.ws.send(JSON.stringify({
@@ -2624,15 +2624,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
         await storage.updateRoomStatus(gameData.roomId, 'playing');
         
         // Broadcast game start to all room participants with proper synchronization
-        console.log('🎮 Broadcasting game_started for new game to room:', gameData.roomId);
+        // Broadcasting game_started for new game
         if (roomConnections.has(gameData.roomId)) {
           const roomUsers = roomConnections.get(gameData.roomId)!;
-          console.log(`🎮 Broadcasting to ${roomUsers.size} users in room`);
+          // Broadcasting to users in room
           const broadcastPromises: Promise<void>[] = [];
           roomUsers.forEach(connectionId => {
             const connection = connections.get(connectionId);
             if (connection && connection.ws.readyState === WebSocket.OPEN) {
-              console.log(`🎮 Sending game_started to user: ${connection.userId}`);
+              // Sending game_started to user
               const sendPromise = new Promise<void>((resolve) => {
                 try {
                   connection.ws.send(JSON.stringify({
@@ -3452,7 +3452,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
                 const isRecentReconnection = lastReconnection && (now - lastReconnection) < 3000; // 3 second window
                 
                 if (!isRecentReconnection) {
-                  console.log(`🎮 Sending active game state to joining user ${connection.userId} (not a reconnection)`);
+                  // Sending active game state to joining user
                   
                   // Get player information with achievements
                   const [playerXInfo, playerOInfo] = await Promise.all([
@@ -3728,12 +3728,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
                 if (conn && conn.ws.readyState === WebSocket.OPEN) {
                   conn.ws.send(reactionMessage);
                   broadcastCount++;
-                  console.log(`🎭 Sent reaction to user: ${conn.userId}`);
+                  // Sent reaction to user
                 }
               });
-              console.log(`🎭 Successfully broadcast reaction to ${broadcastCount} users`);
+              // Successfully broadcast reaction
             } else {
-              console.log(`🎭 No room users found for room ${roomId} or room is empty`);
+              // No room users found or room is empty
             }
             break;
             
@@ -3769,7 +3769,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
               });
               // console.log(`💬 Successfully broadcast chat to ${broadcastCount} users`);
             } else {
-              console.log(`💬 No room users found for room ${chatRoomId} or room is empty`);
+              // No room users found or room is empty
             }
             break;
         }
@@ -3807,7 +3807,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           } else {
             // Clean up stale userRoomState if game is no longer active
             if (userState && userState.isInGame && !isReallyInActiveGame) {
-              console.log(`🏠 Cleaning up stale room state for user ${connection.userId} - game no longer active`);
+              // Cleaning up stale room state
               userRoomStates.delete(connection.userId);
             }
             // Remove from online users if not in active game
@@ -3887,6 +3887,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
     });
   });
+
+
 
   return httpServer;
 }

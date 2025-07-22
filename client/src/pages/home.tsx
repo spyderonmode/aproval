@@ -192,8 +192,8 @@ export default function Home() {
 
   useEffect(() => {
     if (lastMessage) {
-      console.log('🎮 Home received WebSocket message:', lastMessage);
-      console.log('🎮 Message type being processed:', lastMessage.type);
+      // Home received WebSocket message
+      // Message type being processed
       switch (lastMessage.type) {
         case 'online_users_update':
           setOnlineUserCount(lastMessage.count);
@@ -208,15 +208,10 @@ export default function Home() {
           }));
           break;
         case 'game_started':
-          console.log('🎮 Processing game_started message:', lastMessage);
-          console.log('🎮 Current room ID:', currentRoom?.id);
-          console.log('🎮 Message room ID:', lastMessage.roomId);
-          console.log('🎮 Game data:', lastMessage.game);
-          console.log('🎮 Current user ID:', user?.userId || user?.id);
+          // Processing game_started message
           // Handle game start from WebSocket - ensure both players transition
           if (lastMessage.roomId === currentRoom?.id || !currentRoom) {
-            console.log('🎮 Setting current game from WebSocket:', lastMessage.game);
-            console.log('🎮 New game ID:', lastMessage.game.id);
+            // Setting current game from WebSocket
             console.log('🎮 Previous game ID:', currentGame?.id);
             console.log('🎮 Game status:', lastMessage.game.status);
             console.log('🎮 Game board:', lastMessage.game.board);

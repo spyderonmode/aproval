@@ -38,7 +38,7 @@ export function InviteFriendsModal({ open, onClose, roomId, roomName }: InviteFr
       return response.json();
     },
     onSuccess: (_, friendId) => {
-      setInvitedFriends(prev => new Set([...prev, friendId]));
+      setInvitedFriends(prev => new Set([...Array.from(prev), friendId]));
       toast({
         title: t('invitationSent'),
         description: t('friendInvitedToRoom'),
@@ -78,7 +78,7 @@ export function InviteFriendsModal({ open, onClose, roomId, roomName }: InviteFr
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto"></div>
               <p className="text-sm text-gray-600 dark:text-gray-300 mt-2">{t('loadingFriends')}</p>
             </div>
-          ) : friends.length === 0 ? (
+          ) : (friends as any[]).length === 0 ? (
             <div className="text-center py-8 text-muted-foreground">
               <Users className="h-12 w-12 mx-auto text-gray-400 mb-3" />
               <h3 className="font-medium text-lg mb-2">{t('noFriendsFound')}</h3>
@@ -92,7 +92,7 @@ export function InviteFriendsModal({ open, onClose, roomId, roomName }: InviteFr
                 {t('selectFriendsToInvite')}
               </div>
               
-              {friends.map((friend: any) => {
+              {(friends as any[]).map((friend: any) => {
                 const isInvited = invitedFriends.has(friend.id);
                 const isInviting = sendInvitationMutation.isPending;
                 

@@ -61,7 +61,7 @@ function Router() {
   const [hasInitiallyLoaded, setHasInitiallyLoaded] = useState(false);
   const [isInitialLoad, setIsInitialLoad] = useState(true);
 
-  console.log('🔐 Router render - isLoading:', isLoading, 'isAuthenticated:', isAuthenticated, 'user:', user, 'location:', location);
+  // Router render state tracking
 
   // Define public routes that don't require authentication
   const publicRoutes = ['/reset-password', '/verify-email', '/auth', '/'];
@@ -143,7 +143,7 @@ function Router() {
     );
   }
 
-  console.log('🔐 About to render content - isAuthenticated:', isAuthenticated, 'user?.isEmailVerified:', (user as any)?.isEmailVerified, 'isPublicRoute:', isPublicRoute);
+  // About to render content
 
   // Handle public routes without authentication check
   if (isPublicRoute) {
@@ -172,18 +172,18 @@ function Router() {
 
   // For protected routes, check authentication
   if (!isAuthenticated) {
-    console.log('🔐 Rendering Auth component - user not authenticated');
+    // Rendering Auth component - user not authenticated
     return <Auth />;
   }
 
   // If user is authenticated but email is not verified, redirect to auth for verification
   if (isAuthenticated && user && !(user as any).isEmailVerified) {
-    console.log('🔐 Rendering Auth component - email not verified');
+    // Rendering Auth component - email not verified
     return <Auth />;
   }
 
   // User is authenticated and verified, show main app
-  console.log('🔐 Rendering main app content');
+  // Rendering main app content
   const content = (
     <Switch>
       <Route path="/auth">

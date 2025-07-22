@@ -50,18 +50,14 @@ export function useWebSocket() {
         
         // Dispatch custom events for different message types
         if (message.type === 'chat_message_received') {
-          console.log('📨 useWebSocket: CHAT MESSAGE RECEIVED! Data:', message);
-          console.log('📨 useWebSocket: Message details - sender:', message.message?.senderName, 'content:', message.message?.message);
           const chatEvent = new CustomEvent('chat_message_received', {
             detail: message
           });
           window.dispatchEvent(chatEvent);
-          console.log('📨 useWebSocket: Chat event dispatched successfully');
         }
 
         // Handle room invitation messages
         if (message.type === 'room_invitation') {
-          console.log('📧 Received room invitation:', message.invitation);
           const invitationEvent = new CustomEvent('room_invitation_received', {
             detail: message.invitation
           });
@@ -70,7 +66,6 @@ export function useWebSocket() {
 
         // Handle game abandonment due to player leaving
         if (message.type === 'game_abandoned') {
-          console.log('🏠 WebSocket: Game abandoned message received:', message);
           
           // Show toast notification directly
           const toastMessage = message.message || "Game ended because a player left the room.";
@@ -102,7 +97,6 @@ export function useWebSocket() {
           sessionStorage.removeItem('currentGameState');
           
           // Force page reload after showing the notification
-          console.log('🏠 WebSocket: Reloading page due to game abandonment');
           setTimeout(() => {
             window.location.href = '/'; // Redirect to root instead of reload to prevent reconnection
           }, 2000); // Give user time to see the notification
@@ -127,7 +121,7 @@ export function useWebSocket() {
         
         // For critical reconnection messages, dispatch custom events immediately
         if (message.type === 'game_reconnection') {
-          console.log('🔔 Dispatching immediate game_reconnection event');
+          // Dispatching immediate game_reconnection event
           window.dispatchEvent(new CustomEvent('game_reconnection', {
             detail: message
           }));
@@ -135,13 +129,13 @@ export function useWebSocket() {
 
         // Handle online status updates for friends list
         if (message.type === 'online_users_update' || message.type === 'user_offline') {
-          console.log('👥 Dispatching online status update:', message.type);
+          // Dispatching online status update
           window.dispatchEvent(new CustomEvent('online_status_update', {
             detail: message
           }));
         }
         
-        console.log('🔔 Setting lastMessage in useWebSocket:', message.type);
+        // Setting lastMessage in useWebSocket
         setLastMessage(message);
       } catch (error) {
         console.error('Failed to parse WebSocket message:', error);

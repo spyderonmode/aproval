@@ -87,7 +87,7 @@ export function RoomManager({
       return response.json();
     },
     onSuccess: (game) => {
-      console.log('🎮 Game started successfully:', game);
+      // Game started successfully
       onGameStart(game);
       toast({
         title: t('gameStarted'),
@@ -206,7 +206,7 @@ export function RoomManager({
                 {participants.some(p => p.userId === (user?.userId || user?.id) && p.role === 'player') ? (
                   <Button
                     onClick={() => {
-                      console.log('🎮 Start game button clicked');
+                      // Start game button clicked
                       startGameMutation.mutate();
                     }}
                     disabled={startGameMutation.isPending || currentRoom.status === 'playing'}
