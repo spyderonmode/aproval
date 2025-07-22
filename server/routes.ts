@@ -105,7 +105,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const userRoomState = userRoomStates.get(userId);
       const activeGame = await storage.getActiveGameForUser(userId);
       
-      if (activeGame && activeGame.roomId && activeGame.status === 'active' && userRoomState) {
+      // Check for active game - don't require userRoomState since it might be cleared on disconnect
+      if (activeGame && activeGame.roomId && activeGame.status === 'active') {
+        console.log(`🔄 Found active game for user ${userId}:`, activeGame.id);
         // Check if game is still within 10 minute limit
         const gameAge = Date.now() - new Date(activeGame.lastMoveAt || activeGame.createdAt).getTime();
         const tenMinutes = 10 * 60 * 1000;
@@ -159,7 +161,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           connection.roomId = activeGame.roomId;
         }
         
-        // Update user room state
+        // Restore/update user room state for reconnection
         userRoomStates.set(userId, {
           roomId: activeGame.roomId,
           gameId: activeGame.id,
@@ -3793,14 +3795,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
               onlineUser.lastSeen = new Date();
             }
           } else {
-            // Clean up stale userRoomState if game is no longer active
-            if (userState && userState.isInGame && !isReallyInActiveGame) {
-              // Cleaning up stale room state
+            // Only clean up room state if user truly doesn't have an active game
+            const activeGame = await storage.getActiveGameForUser(connection.userId);
+            
+            if (!activeGame || activeGame.status !== 'active') {
+              // No active game - safe to clean up completely
+              onlineUsers.delete(connection.userId);
               userRoomStates.delete(connection.userId);
+              console.log(`🧹 Cleaned up state for user ${connection.userId} (no active game)`);
+            } else {
+              // User has active game - preserve room state for reconnection
+              console.log(`🔄 Preserving room state for user ${connection.userId} with active game ${activeGame.id}`);
+              // Only remove from online users but keep room state
+              onlineUsers.delete(connection.userId);
             }
-            // Remove from online users if not in active game
-            onlineUsers.delete(connection.userId);
-            userRoomStates.delete(connection.userId);
             
             // Broadcast user offline event for chat history cleanup
             const userOfflineMessage = JSON.stringify({
