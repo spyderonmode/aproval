@@ -159,14 +159,10 @@ export default function Home() {
     // Handle immediate game reconnection events
     const handleGameReconnection = (event: any) => {
       const message = event.detail;
-      console.log('🔄 IMMEDIATE GAME RECONNECTION EVENT:', message);
-      console.log('🔄 Full game data:', JSON.stringify(message.game, null, 2));
+      console.log('🔄 Immediate reconnection event received:', message.game?.id);
       
       if (message.game && message.roomId) {
-        console.log('🔄 Processing immediate reconnection:', message.game);
-        console.log('🔄 Room ID from message:', message.roomId, 'Current room ID:', currentRoom?.id);
-        
-        // Process reconnection immediately
+        // Restore game state immediately and consistently
         setSelectedMode('online');
         setCurrentGame({
           ...message.game,
@@ -175,11 +171,14 @@ export default function Home() {
           timestamp: Date.now(),
           syncTimestamp: Date.now()
         });
+        
+        // Clear any interfering states
         setIsCreatingGame(false);
         setShowGameOver(false);
         setGameResult(null);
+        setShowMatchmaking(false);
         
-        console.log('🔄 Immediate reconnection completed');
+        console.log('✅ Immediate reconnection processed');
       }
     };
 
@@ -492,51 +491,32 @@ export default function Home() {
           }
           break;
         case 'game_reconnection':
-          console.log('🔄 PROCESSING GAME RECONNECTION MESSAGE');
-          console.log('🔄 Game reconnection:', lastMessage);
-          console.log('🔄 Full game data:', JSON.stringify(lastMessage.game, null, 2));
-          console.log('🔄 Current game before restore:', currentGame);
+          console.log('🔄 Processing game reconnection:', lastMessage);
           if (lastMessage.game && lastMessage.roomId) {
-            console.log('🔄 Restoring game state from reconnection:', lastMessage.game);
-            console.log('🔄 Room ID from message:', lastMessage.roomId, 'Current room ID:', currentRoom?.id);
+            console.log('✅ Restoring game state:', lastMessage.game.id);
             
-            // First ensure we're in the right room
-            if (!currentRoom || currentRoom.id !== lastMessage.roomId) {
-              console.log('🔄 Room mismatch - waiting for room join to complete');
-              // Wait a bit for room join to complete, then try again
-              setTimeout(() => {
-                if (lastMessage.game && lastMessage.roomId) {
-                  console.log('🔄 Retrying game restoration after room join');
-                  setSelectedMode('online');
-                  setCurrentGame({
-                    ...lastMessage.game,
-                    status: 'active',
-                    gameMode: 'online',
-                    timestamp: Date.now(),
-                    syncTimestamp: Date.now() // Force GameBoard re-sync
-                  });
-                  setIsCreatingGame(false);
-                  setShowGameOver(false);
-                  setGameResult(null);
-                }
-              }, 100);
-            } else {
-              // Room already set, restore game immediately
-              console.log('🔄 Room matches - restoring game immediately');
-              setSelectedMode('online');
-              setCurrentGame({
-                ...lastMessage.game,
-                status: 'active',
-                gameMode: 'online',
-                timestamp: Date.now(),
-                syncTimestamp: Date.now() // Force GameBoard re-sync
-              });
-              setIsCreatingGame(false);
-              setShowGameOver(false);
-              setGameResult(null);
-            }
+            // Restore game state immediately - room state will be handled by reconnection_room_join
+            setSelectedMode('online');
+            setCurrentGame({
+              ...lastMessage.game,
+              status: 'active',
+              gameMode: 'online',
+              timestamp: Date.now(),
+              syncTimestamp: Date.now()
+            });
             
-            console.log('🔄 Game state restoration completed');
+            // Reset any modal states that might interfere
+            setIsCreatingGame(false);
+            setShowGameOver(false);
+            setGameResult(null);
+            setShowMatchmaking(false);
+            
+            toast({
+              title: "Game Reconnected",
+              description: "Your game has been restored successfully.",
+            });
+            
+            console.log('✅ Game reconnection completed');
           }
           break;
         case 'player_reconnected':

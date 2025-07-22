@@ -134,25 +134,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
         
 
         
-        // Check if user already has an active reconnection in progress (within last 2 seconds)
+        // Simplified reconnection - always allow reconnection but track it to prevent spam
         const now = Date.now();
         const lastReconnection = recentReconnections.get(userId);
-        if (lastReconnection && (now - lastReconnection) < 2000) {
-
-          // Still add to room connections but don't send messages
-          if (!roomConnections.has(activeGame.roomId)) {
-            roomConnections.set(activeGame.roomId, new Set());
-          }
-          roomConnections.get(activeGame.roomId)!.add(connectionId);
-          const connection = connections.get(connectionId);
-          if (connection) {
-            connection.roomId = activeGame.roomId;
-          }
-          userRoomStates.set(userId, {
-            roomId: activeGame.roomId,
-            gameId: activeGame.id,
-            isInGame: true
-          });
+        
+        // Only skip reconnection if it was very recent (within 1 second)
+        if (lastReconnection && (now - lastReconnection) < 1000) {
+          console.log(`🔄 Skipping duplicate reconnection for user ${userId}`);
           return;
         }
         
@@ -224,38 +212,38 @@ export async function registerRoutes(app: Express): Promise<Server> {
         // Get room info
         const room = await storage.getRoomById(activeGame.roomId);
         
-        // Send reconnection messages
+        // Send reconnection messages immediately
         if (ws.readyState === WebSocket.OPEN) {
-          // First, send room join notification
-          ws.send(JSON.stringify({
-            type: 'reconnection_room_join',
-            room: room,
-            message: 'Reconnected to your game room'
-          }));
+          try {
+            // Send room join notification first
+            ws.send(JSON.stringify({
+              type: 'reconnection_room_join',
+              room: room,
+              message: 'Reconnected to your game room'
+            }));
+            
+            // Send game state immediately (no delay to reduce race conditions)
+            ws.send(JSON.stringify({
+              type: 'game_reconnection',
+              game: gameWithPlayers,
+              roomId: activeGame.roomId,
+              message: 'Game state recovered successfully'
+            }));
+            
+            console.log(`✅ Sent reconnection messages to user ${userId}`);
+          } catch (error) {
+            console.error(`❌ Failed to send reconnection messages to user ${userId}:`, error);
+          }
           
-          // Then send current game state (only once)
+          // Clean up old reconnection tracking entries (older than 10 seconds)
           setTimeout(() => {
-            if (ws.readyState === WebSocket.OPEN) {
-              ws.send(JSON.stringify({
-                type: 'game_reconnection',
-                game: gameWithPlayers,
-                roomId: activeGame.roomId,
-                message: 'Game state recovered successfully'
-              }));
-              
-
-              
-              // Clean up old reconnection tracking entries (older than 5 seconds)
-              setTimeout(() => {
-                const cutoff = Date.now() - 5000;
-                for (const [trackingUserId, timestamp] of recentReconnections.entries()) {
-                  if (timestamp < cutoff) {
-                    recentReconnections.delete(trackingUserId);
-                  }
-                }
-              }, 5000);
+            const cutoff = Date.now() - 10000;
+            for (const [trackingUserId, timestamp] of recentReconnections.entries()) {
+              if (timestamp < cutoff) {
+                recentReconnections.delete(trackingUserId);
+              }
             }
-          }, 500);
+          }, 10000);
           
           // Notify other players in the room about reconnection
           const roomUsers = roomConnections.get(activeGame.roomId);
