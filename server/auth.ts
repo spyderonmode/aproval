@@ -455,7 +455,7 @@ export function setupAuth(app: Express) {
       const sessionData = { userId: guestUser.id, username: guestUser.username };
       req.session.user = sessionData;
       
-      console.log('✅ Guest user created and session started:', guestUser.username);
+      console.log('✅ Guest user created via explicit /api/auth/guest request:', guestUser.username);
       
       res.json({ 
         id: guestUser.id, 
@@ -525,6 +525,8 @@ export function setupAuth(app: Express) {
 
     const sessionData = { userId: user.id, username: user.username };
     req.session.user = sessionData;
+    
+    console.log('✅ Regular user logged in:', user.username, '(ID:', user.id, ')');
     
     res.json({ id: user.id, username: user.username, email: user.email, isEmailVerified: user.isEmailVerified });
   });
