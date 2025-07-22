@@ -3475,7 +3475,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
                     roomId: data.roomId,
                   }));
                 } else {
-                  console.log(`🔄 Skipping game state send for ${connection.userId} - recent reconnection detected`);
+
                 }
               }
               
@@ -3800,10 +3800,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
               // No active game - safe to clean up completely
               onlineUsers.delete(connection.userId);
               userRoomStates.delete(connection.userId);
-              console.log(`🧹 Cleaned up state for user ${connection.userId} (no active game)`);
             } else {
               // User has active game - preserve room state for reconnection
-              console.log(`🔄 Preserving room state for user ${connection.userId} with active game ${activeGame.id}`);
               // Only remove from online users but keep room state
               onlineUsers.delete(connection.userId);
             }
