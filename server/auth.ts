@@ -35,6 +35,9 @@ declare global {
     interface Request {
       user?: Session;
     }
+    interface SessionData {
+      user?: Session;
+    }
   }
 }
 
@@ -84,7 +87,7 @@ async function createUser(username: string, password: string, email?: string): P
     password: hashPassword(password),
     email: email ? email.toLowerCase() : email,
     displayName: username,
-    profilePicture: null,
+    profilePicture: undefined,
     isEmailVerified: false,
     emailVerificationToken: verificationToken,
     emailVerificationExpiry: verificationExpiry,
@@ -101,7 +104,8 @@ async function createUser(username: string, password: string, email?: string): P
       firstName: newUser.displayName || newUser.username,
       displayName: newUser.displayName || newUser.username,
       lastName: null,
-      profileImageUrl: newUser.profilePicture || null,
+      profileImageUrl: newUser.profilePicture,
+      isGuest: false,
     });
     console.log('User created in database:', newUser.id);
   } catch (error) {
@@ -110,6 +114,50 @@ async function createUser(username: string, password: string, email?: string): P
   }
   
   return newUser;
+}
+
+async function createGuestUser(): Promise<User> {
+  const guestId = crypto.randomUUID();
+  const guestName = `Guest_${Math.floor(Math.random() * 10000)}`;
+  const sessionExpiry = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 hours
+  
+  const guestUser: User = {
+    id: guestId,
+    username: guestName,
+    password: '', // No password for guests
+    email: undefined,
+    displayName: guestName,
+    profilePicture: undefined,
+    isEmailVerified: true, // Guests don't need email verification
+    emailVerificationToken: undefined,
+    emailVerificationExpiry: undefined,
+    createdAt: new Date().toISOString()
+  };
+  
+  // Store guest user in JSON (optional, for consistency)
+  const users = getUsers();
+  users.push(guestUser);
+  saveUsers(users);
+  
+  // Create guest user in database
+  try {
+    await storage.upsertUser({
+      id: guestUser.id,
+      email: null,
+      firstName: guestName,
+      displayName: guestName,
+      lastName: null,
+      profileImageUrl: null,
+      isGuest: true,
+      guestSessionExpiry: sessionExpiry,
+    });
+    console.log('Guest user created in database:', guestUser.id);
+  } catch (error) {
+    console.error('Error creating guest user in database:', error);
+    throw new Error('Failed to create guest user');
+  }
+  
+  return guestUser;
 }
 
 function updateUser(userId: string, updates: Partial<User>): User | null {
@@ -128,7 +176,7 @@ function updateUser(userId: string, updates: Partial<User>): User | null {
     storage.upsertUser({
       id: userId,
       email: users[userIndex].email || null,
-      firstName: users[userIndex].firstName || null,
+      firstName: users[userIndex].displayName || users[userIndex].username,
       displayName: users[userIndex].displayName || null,
       username: users[userIndex].username || null,
       profileImageUrl: users[userIndex].profilePicture || null,
@@ -340,7 +388,7 @@ export function setupAuth(app: Express) {
         await storage.upsertUser({
           id: user.id,
           email: user.email || null,
-          firstName: user.firstName || null,
+          firstName: user.displayName || user.username,
           displayName: user.displayName || null,
           username: user.username || null,
           profileImageUrl: user.profilePicture || null,
@@ -367,6 +415,26 @@ export function setupAuth(app: Express) {
       });
     } catch (error) {
       res.status(500).json({ error: 'Failed to create user' });
+    }
+  });
+
+  // Guest login endpoint
+  app.post('/api/auth/guest', async (req, res) => {
+    try {
+      const guestUser = await createGuestUser();
+      const sessionData = { userId: guestUser.id, username: guestUser.username };
+      req.session.user = sessionData;
+      
+      res.json({ 
+        id: guestUser.id, 
+        username: guestUser.username, 
+        email: null, 
+        isEmailVerified: true,
+        isGuest: true 
+      });
+    } catch (error) {
+      console.error('Error creating guest user:', error);
+      res.status(500).json({ error: 'Failed to create guest user' });
     }
   });
 

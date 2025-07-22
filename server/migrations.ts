@@ -17,6 +17,17 @@ export async function runMigrations(): Promise<void> {
       ADD COLUMN IF NOT EXISTS best_win_streak INTEGER DEFAULT 0;
     `);
     
+    // Add guest user columns if they don't exist
+    await db.execute(sql`
+      ALTER TABLE users 
+      ADD COLUMN IF NOT EXISTS is_guest BOOLEAN DEFAULT FALSE;
+    `);
+    
+    await db.execute(sql`
+      ALTER TABLE users 
+      ADD COLUMN IF NOT EXISTS guest_session_expiry TIMESTAMP;
+    `);
+    
     console.log('✅ Database migrations completed successfully');
   } catch (error) {
     console.error('❌ Error running database migrations:', error);

@@ -22,6 +22,7 @@ export default function Auth() {
   const [showEmailVerification, setShowEmailVerification] = useState(false);
   const [showForgotPassword, setShowForgotPassword] = useState(false);
   const [registrationEmail, setRegistrationEmail] = useState("");
+  const [isGuestLoading, setIsGuestLoading] = useState(false);
   const { toast } = useToast();
   const [, setLocation] = useLocation();
   const { t } = useTranslation();
@@ -115,6 +116,43 @@ export default function Auth() {
     }
   };
 
+  const handleGuestLogin = async () => {
+    setIsGuestLoading(true);
+
+    try {
+      const response = await fetch('/api/auth/guest', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' }
+      });
+
+      if (response.ok) {
+        await queryClient.invalidateQueries({ queryKey: ["/api/auth/user"] });
+        
+        toast({
+          title: t('loginSuccessful'),
+          description: 'Welcome! You\'re playing as a guest.',
+        });
+        
+        setLocation('/');
+      } else {
+        const errorData = await response.json();
+        toast({
+          title: 'Guest Login Failed',
+          description: errorData.error || 'Failed to create guest session',
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
+      toast({
+        title: 'Guest Login Failed',
+        description: 'Network error. Please try again.',
+        variant: "destructive",
+      });
+    } finally {
+      setIsGuestLoading(false);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center p-4">
       <div className="w-full max-w-md">
@@ -193,6 +231,39 @@ export default function Auth() {
                 {isLoading ? t('loading') : (isLogin ? t('login') : t('register'))}
               </Button>
             </form>
+            
+            {/* Guest Login Option */}
+            <div className="relative my-6">
+              <div className="absolute inset-0 flex items-center">
+                <span className="w-full border-t border-slate-600" />
+              </div>
+              <div className="relative flex justify-center text-xs uppercase">
+                <span className="bg-slate-800 px-2 text-slate-400">Or</span>
+              </div>
+            </div>
+            
+            <Button 
+              onClick={handleGuestLogin}
+              className="w-full bg-slate-600 hover:bg-slate-500 text-white"
+              disabled={isGuestLoading}
+              variant="outline"
+            >
+              {isGuestLoading ? (
+                <>
+                  <div className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent"></div>
+                  Creating Guest Session...
+                </>
+              ) : (
+                <>
+                  <GamepadIcon className="mr-2 h-4 w-4" />
+                  Play as Guest
+                </>
+              )}
+            </Button>
+            
+            <p className="text-xs text-slate-400 text-center mt-2">
+              Start playing instantly without registration. Progress saved for 24 hours.
+            </p>
             
             <div className="text-center space-y-2">
               {isLogin && (

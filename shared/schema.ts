@@ -34,6 +34,8 @@ export const users = pgTable("users", {
   displayName: varchar("display_name"),
   username: varchar("username").unique(),
   profileImageUrl: varchar("profile_image_url"),
+  isGuest: boolean("is_guest").default(false), // Flag to identify guest users
+  guestSessionExpiry: timestamp("guest_session_expiry"), // Expiry time for guest sessions
   wins: integer("wins").default(0),
   losses: integer("losses").default(0),
   draws: integer("draws").default(0),
@@ -313,7 +315,6 @@ export type User = typeof users.$inferSelect;
 export type Room = typeof rooms.$inferSelect;
 export type Game = typeof games.$inferSelect;
 export type RoomInvitation = typeof roomInvitations.$inferSelect;
-export type InsertRoomInvitation = z.infer<typeof insertRoomInvitationSchema>;
 export type Move = typeof moves.$inferSelect;
 export type RoomParticipant = typeof roomParticipants.$inferSelect;
 export type BlockedUser = typeof blockedUsers.$inferSelect;

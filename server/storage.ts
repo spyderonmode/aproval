@@ -212,7 +212,9 @@ export class DatabaseStorage implements IStorage {
         existingUser.lastName !== userData.lastName ||
         existingUser.displayName !== userData.displayName ||
         existingUser.username !== userData.username ||
-        existingUser.profileImageUrl !== userData.profileImageUrl;
+        existingUser.profileImageUrl !== userData.profileImageUrl ||
+        existingUser.isGuest !== userData.isGuest ||
+        existingUser.guestSessionExpiry !== userData.guestSessionExpiry;
       
       if (shouldUpdate) {
         try {
@@ -225,6 +227,8 @@ export class DatabaseStorage implements IStorage {
               displayName: userData.displayName,
               username: userData.username,
               profileImageUrl: userData.profileImageUrl,
+              isGuest: userData.isGuest,
+              guestSessionExpiry: userData.guestSessionExpiry,
               updatedAt: new Date(),
             })
             .where(eq(users.id, userData.id))
