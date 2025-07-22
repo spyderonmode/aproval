@@ -107,7 +107,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // Check for active game - don't require userRoomState since it might be cleared on disconnect
       if (activeGame && activeGame.roomId && activeGame.status === 'active') {
-        console.log(`🔄 Found active game for user ${userId}:`, activeGame.id);
         // Check if game is still within 10 minute limit
         const gameAge = Date.now() - new Date(activeGame.lastMoveAt || activeGame.createdAt).getTime();
         const tenMinutes = 10 * 60 * 1000;
@@ -142,7 +141,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
         
         // Only skip reconnection if it was very recent (within 1 second)
         if (lastReconnection && (now - lastReconnection) < 1000) {
-          console.log(`🔄 Skipping duplicate reconnection for user ${userId}`);
           return;
         }
         
@@ -232,7 +230,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
               message: 'Game state recovered successfully'
             }));
             
-            console.log(`✅ Sent reconnection messages to user ${userId}`);
+
           } catch (error) {
             console.error(`❌ Failed to send reconnection messages to user ${userId}:`, error);
           }
